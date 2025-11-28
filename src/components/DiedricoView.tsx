@@ -204,11 +204,6 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
         }
     }, [activeTool]);
 
-    useEffect(() => {
-        if (mode === '2d') setShowLT(true);
-        else setShowLT(false);
-    }, [mode]);
-
     // --- Hit Test Logic ---
     const hitTest = (x: number, y: number): string | null => {
         const threshold = 10 / zoom;
@@ -911,7 +906,17 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
 
                     {showLT && (
                         <g className="lt-axis">
+                            {/* Main LT line */}
                             <line x1="-5000" y1="0" x2="5000" y2="0" stroke={axisColor} strokeWidth="2" />
+
+                            {/* Left perpendicular marks (double line) */}
+                            <line x1="-400" y1="-8" x2="-400" y2="8" stroke={axisColor} strokeWidth="2" />
+                            <line x1="-410" y1="-8" x2="-410" y2="8" stroke={axisColor} strokeWidth="2" />
+
+                            {/* Right perpendicular marks (double line) */}
+                            <line x1="400" y1="-8" x2="400" y2="8" stroke={axisColor} strokeWidth="2" />
+                            <line x1="410" y1="-8" x2="410" y2="8" stroke={axisColor} strokeWidth="2" />
+
                             <text x="-380" y="-10" className={`text-sm font-bold select-none ${isDark ? 'fill-white' : 'fill-black'}`} fontSize="16">L.T.</text>
 
                             {/* Ruler Ticks */}
