@@ -13,6 +13,7 @@ interface SketchToolbarProps {
     selectedColor: string;
     setSelectedColor: (color: string) => void;
     isDark: boolean;
+    isHidden?: boolean;
 }
 
 const COLORS = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#eab308', '#a855f7', '#ec4899', '#ffffff'];
@@ -84,7 +85,7 @@ const TOOL_GROUPS: ToolGroup[] = [
     }
 ];
 
-export default function SketchToolbar({ activeTool, setActiveTool, selectedColor, setSelectedColor, isDark }: SketchToolbarProps) {
+export default function SketchToolbar({ activeTool, setActiveTool, selectedColor, setSelectedColor, isDark, isHidden }: SketchToolbarProps) {
     const [expandedGroup, setExpandedGroup] = useState<string | null>('basic');
 
     const bgClass = isDark ? 'bg-gray-800/90 backdrop-blur-md border-gray-700 text-gray-200' : 'bg-white/90 backdrop-blur-md border-gray-200 text-gray-700';
@@ -156,32 +157,34 @@ export default function SketchToolbar({ activeTool, setActiveTool, selectedColor
             </div>
 
             {/* Mobile Toolbar (Bottom) */}
-            <div className={`md:hidden absolute bottom-0 left-0 right-0 border-t z-40 pb-4 ${bgClass}`}>
-                <div className="flex overflow-x-auto p-2 gap-2 no-scrollbar">
-                    {TOOL_GROUPS.flatMap(g => g.tools).map(tool => (
-                        <button
-                            key={tool.id}
-                            onClick={() => setActiveTool(tool.id)}
-                            className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[60px] gap-1 border border-transparent ${activeTool === tool.id ? activeClass : hoverClass}`}
-                        >
-                            {tool.icon}
-                            <span className="text-[10px] whitespace-nowrap">{tool.label}</span>
-                        </button>
-                    ))}
+            {!isHidden && (
+                <div className={`md:hidden absolute bottom-0 left-0 right-0 border-t z-40 pb-4 ${bgClass}`}>
+                    <div className="flex overflow-x-auto p-2 gap-2 no-scrollbar">
+                        {TOOL_GROUPS.flatMap(g => g.tools).map(tool => (
+                            <button
+                                key={tool.id}
+                                onClick={() => setActiveTool(tool.id)}
+                                className={`flex flex-col items-center justify-center p-2 rounded-lg min-w-[60px] gap-1 border border-transparent ${activeTool === tool.id ? activeClass : hoverClass}`}
+                            >
+                                {tool.icon}
+                                <span className="text-[10px] whitespace-nowrap">{tool.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                    {/* Mobile Color Picker Bar */}
+                    <div className={`flex items-center gap-2 p-2 border-t overflow-x-auto ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <Palette size={16} className="min-w-[16px]" />
+                        {COLORS.map(c => (
+                            <button
+                                key={c}
+                                onClick={() => setSelectedColor(c)}
+                                className={`w-6 h-6 rounded-full border flex-shrink-0 ${selectedColor === c ? 'border-white ring-1 ring-black' : 'border-transparent'}`}
+                                style={{ backgroundColor: c }}
+                            />
+                        ))}
+                    </div>
                 </div>
-                {/* Mobile Color Picker Bar */}
-                <div className={`flex items-center gap-2 p-2 border-t overflow-x-auto ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                    <Palette size={16} className="min-w-[16px]" />
-                    {COLORS.map(c => (
-                        <button
-                            key={c}
-                            onClick={() => setSelectedColor(c)}
-                            className={`w-6 h-6 rounded-full border flex-shrink-0 ${selectedColor === c ? 'border-white ring-1 ring-black' : 'border-transparent'}`}
-                            style={{ backgroundColor: c }}
-                        />
-                    ))}
-                </div>
-            </div>
+            )}
         </>
     );
 }

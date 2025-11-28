@@ -85,7 +85,7 @@ function App() {
                             </div>
                         </>
                     ) : (
-                        <DiedricoView mode={viewMode} />
+                        <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />
                     )}
                 </div>
             </div>

@@ -24,6 +24,7 @@ const compassCursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.or
 
 interface DiedricoViewProps {
     mode?: '2d' | 'sketch';
+    isSidebarOpen?: boolean;
 }
 
 // --- Math Helpers ---
@@ -134,7 +135,7 @@ function getTangentsCircleCircle(c1: { x: number, y: number }, r1: number, c2: {
     return lines;
 }
 
-export default function DiedricoView({ mode = '2d' }: DiedricoViewProps) {
+export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
     const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile } = useGeometryStore();
 
     // Viewport State
@@ -856,7 +857,6 @@ export default function DiedricoView({ mode = '2d' }: DiedricoViewProps) {
                 style={{ backgroundImage: `linear-gradient(${gridColor} 1px, transparent 1px), linear-gradient(90deg, ${gridColor} 1px, transparent 1px)`, backgroundSize: '20px 20px' }}
             />
 
-            {/* Toolbar - Only visible in Sketch Mode */}
             {mode === 'sketch' && (
                 <SketchToolbar
                     activeTool={activeTool}
@@ -864,6 +864,7 @@ export default function DiedricoView({ mode = '2d' }: DiedricoViewProps) {
                     selectedColor={selectedColor}
                     setSelectedColor={setSelectedColor}
                     isDark={isDark}
+                    isHidden={isSidebarOpen}
                 />
             )}
 
