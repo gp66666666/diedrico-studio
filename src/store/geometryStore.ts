@@ -16,6 +16,7 @@ interface GeometryState {
     // Actions
     addElement: (element: Omit<GeometryElement, 'id' | 'visible'>) => void;
     removeElement: (id: string) => void;
+    updateElement: (id: string, updates: Partial<GeometryElement>) => void;
     toggleVisibility: (id: string) => void;
     clearAll: () => void;
 
@@ -121,6 +122,16 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     removeElement: (id) => set((state) => ({
         elements: state.elements.filter((el) => el.id !== id),
         selectedElementId: state.selectedElementId === id ? null : state.selectedElementId,
+        history: {
+            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            future: []
+        }
+    })),
+
+    updateElement: (id, updates) => set((state) => ({
+        elements: state.elements.map((el) =>
+            el.id === id ? { ...el, ...updates } as GeometryElement : el
+        ),
         history: {
             past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
             future: []

@@ -142,7 +142,20 @@ export default function DiedricoView({ mode = '2d' }: DiedricoViewProps) {
     const [zoom, setZoom] = useState(1);
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+    const [lastTouchDist, setLastTouchDist] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Touch Helpers
+    const getTouchDist = (t1: React.Touch, t2: React.Touch) => {
+        return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    };
+
+    const getTouchCenter = (t1: React.Touch, t2: React.Touch) => {
+        return {
+            x: (t1.clientX + t2.clientX) / 2,
+            y: (t1.clientY + t2.clientY) / 2
+        };
+    };
 
     // Sketch State
     const [activeTool, setActiveTool] = useState<SketchTool>('select');
@@ -811,14 +824,32 @@ export default function DiedricoView({ mode = '2d' }: DiedricoViewProps) {
             onWheel={handleWheel}
             onContextMenu={(e) => e.preventDefault()}
             onTouchStart={(e) => {
-                const touch = e.touches[0];
-                handleMouseDown({ ...e, clientX: touch.clientX, clientY: touch.clientY, button: 0, target: e.target } as any);
+                if (e.touches.length === 2) {
+                    const dist = getTouchDist(e.touches[0], e.touches[1]);
+                    setLastTouchDist(dist);
+                } else if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    handleMouseDown({ ...e, clientX: touch.clientX, clientY: touch.clientY, button: 0, target: e.target } as any);
+                }
             }}
             onTouchMove={(e) => {
-                const touch = e.touches[0];
-                handleMouseMove({ ...e, clientX: touch.clientX, clientY: touch.clientY } as any);
+                if (e.touches.length === 2 && lastTouchDist) {
+                    const dist = getTouchDist(e.touches[0], e.touches[1]);
+                    const scale = dist / lastTouchDist;
+                    setZoom(z => Math.max(0.2, Math.min(5, z * scale)));
+                    setLastTouchDist(dist);
+
+                    // Optional: Pan with two fingers center? 
+                    // For now just zoom to keep it simple and avoid conflict
+                } else if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    handleMouseMove({ ...e, clientX: touch.clientX, clientY: touch.clientY } as any);
+                }
             }}
-            onTouchEnd={() => handleMouseUp()}
+            onTouchEnd={() => {
+                setLastTouchDist(null);
+                handleMouseUp();
+            }}
         >
             {/* Grid */}
             <div className="absolute inset-0 opacity-10 pointer-events-none"
@@ -943,6 +974,19 @@ export default function DiedricoView({ mode = '2d' }: DiedricoViewProps) {
 
                                     return (
                                         <g key={`prof-${el.id}`}>
+                                            {/* Projection Lines for Start Point */}
+                                            <line x1={pt1.x * SCALE} y1={p1_3Y} x2={p1_3X} y2={p1_3Y} stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+                                            <line x1={pt1.x * SCALE} y1={pt1.y * SCALE} x2={ppX} y2={pt1.y * SCALE} stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+                                            <path d={`M ${ppX} ${pt1.y * SCALE} A ${Math.abs(pt1.y * SCALE)} ${Math.abs(pt1.y * SCALE)} 0 0 ${pt1.y > 0 ? 0 : 1} ${p1_3X} 0`} fill="none" stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+                                            <line x1={p1_3X} y1={0} x2={p1_3X} y2={p1_3Y} stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+
+                                            {/* Projection Lines for End Point */}
+                                            <line x1={pt2.x * SCALE} y1={p2_3Y} x2={p2_3X} y2={p2_3Y} stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+                                            <line x1={pt2.x * SCALE} y1={pt2.y * SCALE} x2={ppX} y2={pt2.y * SCALE} stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+                                            <path d={`M ${ppX} ${pt2.y * SCALE} A ${Math.abs(pt2.y * SCALE)} ${Math.abs(pt2.y * SCALE)} 0 0 ${pt2.y > 0 ? 0 : 1} ${p2_3X} 0`} fill="none" stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+                                            <line x1={p2_3X} y1={0} x2={p2_3X} y2={p2_3Y} stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+
+                                            {/* The Profile Line */}
                                             <line x1={p1_3X} y1={p1_3Y} x2={p2_3X} y2={p2_3Y} stroke={profColor} strokeWidth="2" />
                                             <text x={p2_3X} y={p2_3Y - 5} fontSize="10" fill={profColor}>{el.name}'''</text>
                                         </g>
@@ -964,6 +1008,13 @@ export default function DiedricoView({ mode = '2d' }: DiedricoViewProps) {
                                     if (pA && pB) {
                                         return (
                                             <g key={`prof-${el.id}`}>
+                                                {/* Projection for pA (from Horizontal Trace) */}
+                                                <line x1={ppX} y1={0} x2={pA.x} y2={0} stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+                                                <path d={`M ${ppX} 0 A ${Math.abs(pA.x - ppX)} ${Math.abs(pA.x - ppX)} 0 0 ${pA.x > ppX ? 0 : 1} ${pA.x} 0`} fill="none" stroke={profColor} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.3" />
+
+                                                {/* Projection for pB (from Vertical Trace) - usually direct on Z axis */}
+
+                                                {/* The Profile Trace */}
                                                 <line x1={pA.x} y1={pA.y} x2={pB.x} y2={pB.y} stroke={profColor} strokeWidth="2" />
                                                 <text x={pB.x + 5} y={pB.y - 5} fontSize="10" fill={profColor}>{el.name}'''</text>
                                             </g>

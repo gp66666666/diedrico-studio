@@ -156,7 +156,7 @@ export default function SketchToolbar({ activeTool, setActiveTool, selectedColor
             </div>
 
             {/* Mobile Toolbar (Bottom) */}
-            <div className={`md:hidden absolute bottom-0 left-0 right-0 border-t z-40 pb-safe ${bgClass}`}>
+            <div className={`md:hidden absolute bottom-0 left-0 right-0 border-t z-40 pb-4 ${bgClass}`}>
                 <div className="flex overflow-x-auto p-2 gap-2 no-scrollbar">
                     {TOOL_GROUPS.flatMap(g => g.tools).map(tool => (
                         <button

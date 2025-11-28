@@ -7,8 +7,9 @@ export default function Line2D({ element }: { element: LineElement }) {
     // Calculate two points on the line to draw it
     // Use a large range to simulate infinite lines (e.g., -200 to 200)
     // This ensures the line covers the viewport even for small direction vectors
-    const t1 = -200;
-    const t2 = 200;
+    // Use a reasonable range to keep labels visible
+    const t1 = -15;
+    const t2 = 15;
 
     const p1 = {
         x: element.point.x + element.direction.x * t1,

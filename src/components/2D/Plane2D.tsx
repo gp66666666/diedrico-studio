@@ -1,7 +1,7 @@
 import type { PlaneElement } from '../../types';
 
 const SCALE = 40;
-const DRAW_RANGE = 2000; // Draw lines very long
+const DRAW_RANGE = 15; // Draw lines long enough but keep labels visible
 
 export default function Plane2D({ element }: { element: PlaneElement }) {
     const { normal, constant, color, name } = element;

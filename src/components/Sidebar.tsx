@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings
 } from 'lucide-react';
 import { useGeometryStore } from '../store/geometryStore';
 import type { GeometryElement, PointElement, LineElement, PlaneElement } from '../types';
 import AdvancedToolsPanel from './AdvancedToolsPanel';
+import { calculatePlaneFromTwoLines } from '../utils/mathUtils';
 
 export default function Sidebar() {
     const {
         elements,
         addElement,
         removeElement,
+        updateElement,
         toggleVisibility,
         selectedElementId,
         selectElement,
@@ -26,13 +28,16 @@ export default function Sidebar() {
         redo,
         theme,
         toggleTheme,
-        toggleHelp
+        toggleHelp,
+        activeTool,
+        selectForDistance
     } = useGeometryStore();
 
     const isDark = theme === 'dark';
 
     const [activeTab, setActiveTab] = useState<'add' | 'list' | 'tools'>('add');
     const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane'>('point');
+    const [editingElementId, setEditingElementId] = useState<string | null>(null);
 
     // Point state
     const [pointName, setPointName] = useState('');
@@ -68,13 +73,21 @@ export default function Sidebar() {
     const [planeIntercepts, setPlaneIntercepts] = useState({ x: 0, y: 0, z: 0 });
 
     const handleAddPoint = () => {
-        const id = Math.random().toString(36).substr(2, 9);
         const name = pointName.trim() || `Punto ${elements.filter(e => e.type === 'point').length + 1}`;
-        addElement({
-            id, type: 'point', name, color: '#ef4444', visible: true,
+        const data = {
+            type: 'point', name, color: '#ef4444', visible: true,
             coords: { ...pointCoords }
-        } as PointElement);
+        };
+
+        if (editingElementId) {
+            updateElement(editingElementId, data as PointElement);
+            setEditingElementId(null);
+        } else {
+            const id = Math.random().toString(36).substr(2, 9);
+            addElement({ id, ...data } as PointElement);
+        }
         setPointName('');
+        setPointCoords({ x: 0, y: 0, z: 0 });
     };
 
     const handleAddLine = () => {
@@ -123,10 +136,18 @@ export default function Sidebar() {
             else if (lineType === 'profile') direction = { x: 0, y: lineDir.y, z: lineDir.z };
         }
 
-        addElement({
-            id, type: 'line', name, color: '#3b82f6', visible: true,
+        const data = {
+            type: 'line', name, color: '#3b82f6', visible: true,
             point: finalP1, direction, p2
-        } as LineElement);
+        };
+
+        if (editingElementId) {
+            updateElement(editingElementId, data as LineElement);
+            setEditingElementId(null);
+        } else {
+            const id = Math.random().toString(36).substr(2, 9);
+            addElement({ id, ...data } as LineElement);
+        }
         setLineName('');
     };
 
@@ -170,13 +191,75 @@ export default function Sidebar() {
                     normal = { x: 1 / planeIntercepts.x, y: 1 / planeIntercepts.y, z: 1 / planeIntercepts.z };
                     constant = -1;
                 }
+            } else if (planeMode === '2lines') {
+                const l1 = elements.find(e => e.id === selectedLine1Id) as LineElement;
+                const l2 = elements.find(e => e.id === selectedLine2Id) as LineElement;
+
+                if (l1 && l2) {
+                    const result = calculatePlaneFromTwoLines(
+                        { point: l1.point, direction: l1.direction },
+                        { point: l2.point, direction: l2.direction }
+                    );
+
+                    if (result) {
+                        normal = result.normal;
+                        constant = result.constant;
+                    } else {
+                        alert("Las rectas no definen un plano válido (son colineales o se cruzan sin cortarse).");
+                        return;
+                    }
+                } else {
+                    alert("Selecciona dos rectas válidas.");
+                    return;
+                }
             }
         }
 
-        addElement({
-            id, type: 'plane', name, color: '#22c55e', visible: true,
+        const data = {
+            type: 'plane', name, color: '#22c55e', visible: true,
             normal, constant
-        } as PlaneElement);
+        };
+
+        if (editingElementId) {
+            updateElement(editingElementId, data as PlaneElement);
+            setEditingElementId(null);
+        } else {
+            const id = Math.random().toString(36).substr(2, 9);
+            addElement({ id, ...data } as PlaneElement);
+        }
+        setPlaneName('');
+    };
+
+    const startEditing = (el: GeometryElement) => {
+        setEditingElementId(el.id);
+        setActiveTab('add');
+        setGeometryType(el.type);
+
+        if (el.type === 'point') {
+            const p = el as PointElement;
+            setPointName(p.name);
+            setPointCoords({ ...p.coords });
+        } else if (el.type === 'line') {
+            const l = el as LineElement;
+            setLineName(l.name);
+            setLineType('generic');
+            setLineMode('pointDir');
+            setLineP1({ ...l.point });
+            setLineDir({ ...l.direction });
+            setLineP1Str({ x: l.point.x.toString(), y: l.point.y.toString(), z: l.point.z.toString() });
+        } else if (el.type === 'plane') {
+            const p = el as PlaneElement;
+            setPlaneName(p.name);
+            setPlaneType('generic');
+            setPlaneMode('equation');
+            setPlaneEq({ a: p.normal.x, b: p.normal.y, c: p.normal.z, d: p.constant });
+        }
+    };
+
+    const cancelEditing = () => {
+        setEditingElementId(null);
+        setPointName('');
+        setLineName('');
         setPlaneName('');
     };
 
@@ -299,6 +382,12 @@ export default function Sidebar() {
                 {activeTab === 'add' ? (
                     <div className="space-y-4">
                         {/* Type selector */}
+                        {editingElementId && (
+                            <div className="bg-yellow-50 border border-yellow-200 p-2 rounded-lg mb-2 flex items-center justify-between">
+                                <span className="text-xs font-bold text-yellow-700">Editando: {elements.find(e => e.id === editingElementId)?.name}</span>
+                                <button onClick={cancelEditing} className="text-xs text-red-600 hover:underline">Cancelar</button>
+                            </div>
+                        )}
                         <div className={`flex gap-2 p-1 rounded-lg ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
                             {(['point', 'line', 'plane'] as const).map((type) => (
                                 <button
@@ -332,8 +421,8 @@ export default function Sidebar() {
                                         <input type="number" placeholder="Z" value={pointCoords.z} onChange={(e) => setPointCoords({ ...pointCoords, z: parseFloat(e.target.value) || 0 })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
                                     </div>
                                 </div>
-                                <button onClick={handleAddPoint} className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                                    <Plus size={18} /> Añadir Punto
+                                <button onClick={handleAddPoint} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
+                                    {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Punto' : 'Añadir Punto'}
                                 </button>
                             </div>
                         )}
@@ -420,8 +509,8 @@ export default function Sidebar() {
                                     </div>
                                 )}
 
-                                <button onClick={handleAddLine} className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                                    <Plus size={18} /> Añadir Recta
+                                <button onClick={handleAddLine} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
+                                    {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Recta' : 'Añadir Recta'}
                                 </button>
                             </div>
                         )}
@@ -617,8 +706,8 @@ export default function Sidebar() {
                                     </div>
                                 )}
 
-                                <button onClick={handleAddPlane} className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                                    <Plus size={18} /> Añadir Plano
+                                <button onClick={handleAddPlane} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
+                                    {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Plano' : 'Añadir Plano'}
                                 </button>
                             </div>
                         )}
@@ -635,31 +724,63 @@ export default function Sidebar() {
                             elements.map((el: GeometryElement) => (
                                 <div
                                     key={el.id}
-                                    onClick={() => selectElement(el.id)}
-                                    className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer ${selectedElementId === el.id
+                                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id
                                         ? 'bg-blue-50 border-blue-400 shadow-sm'
                                         : `${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 hover:bg-gray-50'}`
                                         }`}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: el.color }} />
+                                    <div
+                                        className="flex items-center gap-3 flex-1 cursor-pointer"
+                                        onClick={() => {
+                                            if (activeTool !== 'none') {
+                                                selectForDistance(el.id);
+                                            } else {
+                                                selectElement(el.id);
+                                            }
+                                        }}
+                                    >
+                                        <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: el.color }} />
                                         <div>
-                                            <p className={`text-sm font-medium ${selectedElementId === el.id ? 'text-blue-700' : isDark ? 'text-gray-200' : 'text-gray-800'}`}>{el.name}</p>
-                                            <p className="text-xs text-gray-500 capitalize">{el.type}</p>
+                                            <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
+                                                {el.name}
+                                            </p>
+                                            <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                {el.type === 'point' && `(${el.coords.x}, ${el.coords.y}, ${el.coords.z})`}
+                                                {el.type === 'line' && 'Recta'}
+                                                {el.type === 'plane' && 'Plano'}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1">
+                                    <div className="flex items-center gap-1">
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); toggleVisibility(el.id); }}
-                                            className={`p-1.5 rounded ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200'}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleVisibility(el.id);
+                                            }}
+                                            className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
+                                            title={el.visible ? "Ocultar" : "Mostrar"}
                                         >
-                                            {el.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                                            {el.visible ? <Eye size={14} /> : <EyeOff size={14} />}
                                         </button>
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); removeElement(el.id); }}
-                                            className={`p-1.5 rounded ${isDark ? 'text-gray-400 hover:text-red-400 hover:bg-white/10' : 'text-gray-500 hover:text-red-600 hover:bg-gray-200'}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                startEditing(el);
+                                            }}
+                                            className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
+                                            title="Editar"
                                         >
-                                            <Trash2 size={16} />
+                                            <Settings size={14} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeElement(el.id);
+                                            }}
+                                            className={`p-1.5 rounded-md transition-colors hover:bg-red-100 hover:text-red-600 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                                            title="Eliminar"
+                                        >
+                                            <Trash2 size={14} />
                                         </button>
                                     </div>
                                 </div>
