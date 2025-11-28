@@ -1,0 +1,243 @@
+import { create } from 'zustand';
+import type { GeometryElement, SketchElement } from '../types';
+
+interface GeometryState {
+    elements: GeometryElement[];
+    sketchElements: SketchElement[];
+
+    // History
+    history: {
+        past: { elements: GeometryElement[], sketchElements: SketchElement[] }[];
+        future: { elements: GeometryElement[], sketchElements: SketchElement[] }[];
+    };
+    undo: () => void;
+    redo: () => void;
+
+    // Actions
+    addElement: (element: Omit<GeometryElement, 'id' | 'visible'>) => void;
+    removeElement: (id: string) => void;
+    toggleVisibility: (id: string) => void;
+    clearAll: () => void;
+
+    // Sketch Actions
+    addSketchElement: (element: SketchElement) => void;
+    removeSketchElement: (id: string) => void;
+    updateSketchElement: (id: string, updates: Partial<SketchElement>) => void;
+
+    // Theme
+    theme: 'dark' | 'light';
+    toggleTheme: () => void;
+
+    // Intersections
+    showIntersections: boolean;
+    toggleIntersections: () => void;
+
+    // System Planes (Quadrants/Bisectors)
+    showSystemPlanes: boolean;
+    toggleSystemPlanes: () => void;
+
+    // Flattening Animation (Abatimiento)
+    isFlattened: boolean;
+    toggleFlattening: () => void;
+
+    // Selection
+    selectedElementId: string | null;
+    selectElement: (id: string | null) => void;
+    // Help
+    showHelp: boolean;
+    toggleHelp: () => void;
+
+    // Profile View
+    showProfile: boolean;
+    toggleProfile: () => void;
+
+    // Distance Tools
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane';
+    setActiveTool: (tool: GeometryState['activeTool']) => void;
+    selectedForDistance: string[];  // IDs of selected elements
+    distanceResult: {
+        value: number;
+        auxiliaryPoints?: { x: number; y: number; z: number }[];
+        showTriangle?: boolean;
+    } | null;
+    selectForDistance: (id: string) => void;
+    clearDistanceTool: () => void;
+}
+
+export const useGeometryStore = create<GeometryState>((set, get) => ({
+    elements: [],
+    sketchElements: [],
+
+    history: {
+        past: [],
+        future: []
+    },
+
+    undo: () => {
+        const { history, elements, sketchElements } = get();
+        if (history.past.length === 0) return;
+
+        const previous = history.past[history.past.length - 1];
+        const newPast = history.past.slice(0, -1);
+
+        set({
+            elements: previous.elements,
+            sketchElements: previous.sketchElements,
+            history: {
+                past: newPast,
+                future: [{ elements, sketchElements }, ...history.future]
+            }
+        });
+    },
+
+    redo: () => {
+        const { history, elements, sketchElements } = get();
+        if (history.future.length === 0) return;
+
+        const next = history.future[0];
+        const newFuture = history.future.slice(1);
+
+        set({
+            elements: next.elements,
+            sketchElements: next.sketchElements,
+            history: {
+                past: [...history.past, { elements, sketchElements }],
+                future: newFuture
+            }
+        });
+    },
+
+    addElement: (element) => set((state) => {
+        const newElement = { ...element, id: Math.random().toString(36).substr(2, 9), visible: true } as GeometryElement;
+        return {
+            elements: [...state.elements, newElement],
+            history: {
+                past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+                future: []
+            }
+        };
+    }),
+
+    removeElement: (id) => set((state) => ({
+        elements: state.elements.filter((el) => el.id !== id),
+        selectedElementId: state.selectedElementId === id ? null : state.selectedElementId,
+        history: {
+            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            future: []
+        }
+    })),
+
+    toggleVisibility: (id) => set((state) => ({
+        elements: state.elements.map((el) =>
+            el.id === id ? { ...el, visible: !el.visible } : el
+        ),
+        history: {
+            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            future: []
+        }
+    })),
+
+    clearAll: () => set((state) => ({
+        elements: [],
+        sketchElements: [],
+        history: {
+            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            future: []
+        }
+    })),
+
+    // Sketch Actions
+    addSketchElement: (element) => set((state) => ({
+        sketchElements: [...state.sketchElements, element],
+        history: {
+            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            future: []
+        }
+    })),
+
+    removeSketchElement: (id) => set((state) => ({
+        sketchElements: state.sketchElements.filter((el) => el.id !== id),
+        history: {
+            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            future: []
+        }
+    })),
+
+    updateSketchElement: (id, updates) => set((state) => ({
+        sketchElements: state.sketchElements.map(el => el.id === id ? { ...el, ...updates } : el),
+        // Optional: Don't add to history for minor updates like selection, or do if important
+    })),
+
+
+    theme: 'dark',
+    toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
+
+    showIntersections: true,
+    toggleIntersections: () => set((state) => ({ showIntersections: !state.showIntersections })),
+
+    showSystemPlanes: false,
+    toggleSystemPlanes: () => set((state) => ({ showSystemPlanes: !state.showSystemPlanes })),
+
+    isFlattened: false,
+    toggleFlattening: () => set((state) => ({ isFlattened: !state.isFlattened })),
+
+    selectedElementId: null,
+    selectElement: (id) => set({ selectedElementId: id }),
+
+    showHelp: false,
+    toggleHelp: () => set((state) => ({ showHelp: !state.showHelp })),
+
+    showProfile: false,
+    toggleProfile: () => set((state) => ({ showProfile: !state.showProfile })),
+
+    // Distance Tools
+    activeTool: 'none',
+    setActiveTool: (tool) => {
+        set({ activeTool: tool, selectedForDistance: [], distanceResult: null });
+    },
+    selectedForDistance: [],
+    distanceResult: null,
+    selectForDistance: (id) => {
+        const { selectedForDistance, activeTool, elements } = get();
+
+        // Determine how many elements we need
+        let maxSelection = 0;
+        if (activeTool === 'distance-point-point') maxSelection = 2;
+        else if (activeTool === 'distance-point-line') maxSelection = 2;
+        else if (activeTool === 'distance-point-plane') maxSelection = 2;
+
+        // Add element if not already selected
+        if (!selectedForDistance.includes(id)) {
+            const newSelection = [...selectedForDistance, id].slice(-maxSelection);
+            set({ selectedForDistance: newSelection });
+
+            // Calculate distance if we have enough elements
+            if (newSelection.length === maxSelection) {
+                const el1 = elements.find(e => e.id === newSelection[0]);
+                const el2 = elements.find(e => e.id === newSelection[1]);
+
+                if (el1 && el2 && activeTool === 'distance-point-point') {
+                    if (el1.type === 'point' && el2.type === 'point') {
+                        const p1 = (el1 as any).coords;
+                        const p2 = (el2 as any).coords;
+                        const dx = p2.x - p1.x;
+                        const dy = p2.y - p1.y;
+                        const dz = p2.z - p1.z;
+                        const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                        set({
+                            distanceResult: {
+                                value: distance,
+                                auxiliaryPoints: [p1, p2],
+                                showTriangle: true
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    },
+    clearDistanceTool: () => {
+        set({ activeTool: 'none', selectedForDistance: [], distanceResult: null });
+    },
+}));
