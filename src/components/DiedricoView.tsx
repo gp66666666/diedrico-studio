@@ -142,13 +142,13 @@ const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisCo
             {/* Main LT line - Reduced range for safety */}
             <line x1="-3000" y1="0" x2="3000" y2="0" stroke={axisColor} strokeWidth="2" />
 
-            {/* Left perpendicular marks */}
-            <line x1="-400" y1="-8" x2="-400" y2="8" stroke={axisColor} strokeWidth="2" />
-            <line x1="-410" y1="-8" x2="-410" y2="8" stroke={axisColor} strokeWidth="2" />
+            {/* Left parallel marks (below LT) */}
+            <line x1="-410" y1="6" x2="-370" y2="6" stroke={axisColor} strokeWidth="1.5" />
+            <line x1="-410" y1="12" x2="-370" y2="12" stroke={axisColor} strokeWidth="1.5" />
 
-            {/* Right perpendicular marks */}
-            <line x1="400" y1="-8" x2="400" y2="8" stroke={axisColor} strokeWidth="2" />
-            <line x1="410" y1="-8" x2="410" y2="8" stroke={axisColor} strokeWidth="2" />
+            {/* Right parallel marks (below LT) */}
+            <line x1="370" y1="6" x2="410" y2="6" stroke={axisColor} strokeWidth="1.5" />
+            <line x1="370" y1="12" x2="410" y2="12" stroke={axisColor} strokeWidth="1.5" />
 
             <text x="-380" y="-10" className={`text-sm font-bold select-none ${isDark ? 'fill-white' : 'fill-black'}`} fontSize="16">L.T.</text>
 
@@ -207,8 +207,14 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     const [startAngle, setStartAngle] = useState(0);
     const [startScaleDist, setStartScaleDist] = useState(0);
 
-    // LT Visibility
-    const [showLT, setShowLT] = useState(mode === '2d');
+    // LT Visibility - Always show on mobile, toggleable on desktop
+    const [showLT, setShowLT] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const isMobile = window.innerWidth < 768;
+            return isMobile || mode === '2d';
+        }
+        return mode === '2d';
+    });
 
     // Magnetism & Help
     const [magnetismEnabled, setMagnetismEnabled] = useState(true);
@@ -907,13 +913,13 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
             {/* LT Toggle & Magnetism (Sketch Mode Only) */}
             {mode === 'sketch' && (
                 <div className={`absolute bottom-32 md:bottom-4 left-4 flex gap-2 p-2 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg}`}>
-                    {/* Only show LT button after adding elements */}
+                    {/* Only show LT button on desktop */}
                     {(elements.length > 0 || sketchElements.length > 0) && (
                         <>
-                            <button onClick={() => setShowLT(!showLT)} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${showLT ? 'bg-blue-500 text-white' : `${iconColor} hover:bg-gray-100`}`}>
+                            <button onClick={() => setShowLT(!showLT)} className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${showLT ? 'bg-blue-500 text-white' : `${iconColor} hover:bg-gray-100`}`}>
                                 {showLT ? <Eye size={14} /> : <EyeOff size={14} />} Línea de Tierra
                             </button>
-                            <div className={`w-px my-1 ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
+                            <div className={`hidden md:block w-px my-1 ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
                         </>
                     )}
                     <button onClick={() => setMagnetismEnabled(!magnetismEnabled)} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${magnetismEnabled ? 'bg-amber-500 text-white' : `${iconColor} hover:bg-gray-100`}`} title="Activar/Desactivar Magnetismo">
