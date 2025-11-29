@@ -21,7 +21,7 @@ function App() {
     const textSub = isDark ? 'text-white/80' : 'text-gray-600';
 
     return (
-        <div className={`flex h-screen w-screen overflow-hidden transition-colors duration-300 select-none ${bgClass}`}>
+        <div className={`flex h-[100dvh] w-screen overflow-hidden transition-colors duration-300 select-none ${bgClass}`}>
             {/* Mobile Menu Button */}
             <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
