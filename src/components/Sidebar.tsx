@@ -72,10 +72,13 @@ export default function Sidebar() {
     const [selectedLine2Id, setSelectedLine2Id] = useState('');
     const [planeIntercepts, setPlaneIntercepts] = useState({ x: 0, y: 0, z: 0 });
 
+    // Common state
+    const [elementColor, setElementColor] = useState('#000000');
+
     const handleAddPoint = () => {
         const name = pointName.trim() || `Punto ${elements.filter(e => e.type === 'point').length + 1}`;
         const data = {
-            type: 'point', name, color: '#ef4444', visible: true,
+            type: 'point', name, color: editingElementId ? elementColor : '#ef4444', visible: true,
             coords: { ...pointCoords }
         };
 
@@ -137,7 +140,7 @@ export default function Sidebar() {
         }
 
         const data = {
-            type: 'line', name, color: '#3b82f6', visible: true,
+            type: 'line', name, color: editingElementId ? elementColor : '#3b82f6', visible: true,
             point: finalP1, direction, p2
         };
 
@@ -216,7 +219,7 @@ export default function Sidebar() {
         }
 
         const data = {
-            type: 'plane', name, color: '#22c55e', visible: true,
+            type: 'plane', name, color: editingElementId ? elementColor : '#22c55e', visible: true,
             normal, constant
         };
 
@@ -254,6 +257,7 @@ export default function Sidebar() {
             setPlaneMode('equation');
             setPlaneEq({ a: p.normal.x, b: p.normal.y, c: p.normal.z, d: p.constant });
         }
+        setElementColor(el.color);
     };
 
     const cancelEditing = () => {
@@ -261,6 +265,7 @@ export default function Sidebar() {
         setPointName('');
         setLineName('');
         setPlaneName('');
+        setElementColor('#000000');
     };
 
     const lines = elements.filter(e => e.type === 'line');
@@ -406,13 +411,24 @@ export default function Sidebar() {
                         {/* Point Form */}
                         {geometryType === 'point' && (
                             <div className="space-y-3">
-                                <input
-                                    type="text"
-                                    placeholder="Nombre (opcional)"
-                                    value={pointName}
-                                    onChange={(e) => setPointName(e.target.value)}
-                                    className={`w-full px-3 py-2 border rounded-lg text-sm ${inputClass}`}
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Nombre (opcional)"
+                                        value={pointName}
+                                        onChange={(e) => setPointName(e.target.value)}
+                                        className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
+                                    />
+                                    {editingElementId && (
+                                        <input
+                                            type="color"
+                                            value={elementColor}
+                                            onChange={(e) => setElementColor(e.target.value)}
+                                            className="w-10 h-10 p-1 rounded border cursor-pointer"
+                                            title="Color del elemento"
+                                        />
+                                    )}
+                                </div>
                                 <div>
                                     <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Coordenadas</label>
                                     <div className="grid grid-cols-3 gap-2">
@@ -430,13 +446,24 @@ export default function Sidebar() {
                         {/* Line Form */}
                         {geometryType === 'line' && (
                             <div className="space-y-3">
-                                <input
-                                    type="text"
-                                    placeholder="Nombre (opcional)"
-                                    value={lineName}
-                                    onChange={(e) => setLineName(e.target.value)}
-                                    className={`w-full px-3 py-2 border rounded-lg text-sm ${inputClass}`}
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Nombre (opcional)"
+                                        value={lineName}
+                                        onChange={(e) => setLineName(e.target.value)}
+                                        className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
+                                    />
+                                    {editingElementId && (
+                                        <input
+                                            type="color"
+                                            value={elementColor}
+                                            onChange={(e) => setElementColor(e.target.value)}
+                                            className="w-10 h-10 p-1 rounded border cursor-pointer"
+                                            title="Color del elemento"
+                                        />
+                                    )}
+                                </div>
 
                                 <div className="space-y-2">
                                     <label className={`block text-xs font-medium ${labelClass}`}>Tipo de Recta</label>
@@ -518,13 +545,24 @@ export default function Sidebar() {
                         {/* Plane Form  */}
                         {geometryType === 'plane' && (
                             <div className="space-y-3">
-                                <input
-                                    type="text"
-                                    placeholder="Nombre (opcional)"
-                                    value={planeName}
-                                    onChange={(e) => setPlaneName(e.target.value)}
-                                    className={`w-full px-3 py-2 border rounded-lg text-sm ${inputClass}`}
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Nombre (opcional)"
+                                        value={planeName}
+                                        onChange={(e) => setPlaneName(e.target.value)}
+                                        className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
+                                    />
+                                    {editingElementId && (
+                                        <input
+                                            type="color"
+                                            value={elementColor}
+                                            onChange={(e) => setElementColor(e.target.value)}
+                                            className="w-10 h-10 p-1 rounded border cursor-pointer"
+                                            title="Color del elemento"
+                                        />
+                                    )}
+                                </div>
 
                                 <div className="space-y-2">
                                     <label className={`block text-xs font-medium ${labelClass}`}>Tipo de Plano</label>
