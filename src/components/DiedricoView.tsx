@@ -142,13 +142,11 @@ const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisCo
             {/* Main LT line - Reduced range for safety */}
             <line x1="-3000" y1="0" x2="3000" y2="0" stroke={axisColor} strokeWidth="2" />
 
-            {/* Left parallel marks (below LT) */}
-            <line x1="-410" y1="6" x2="-370" y2="6" stroke={axisColor} strokeWidth="1.5" />
-            <line x1="-410" y1="12" x2="-370" y2="12" stroke={axisColor} strokeWidth="1.5" />
+            {/* Left parallel mark (below LT) */}
+            <line x1="-410" y1="8" x2="-370" y2="8" stroke={axisColor} strokeWidth="1.5" />
 
-            {/* Right parallel marks (below LT) */}
-            <line x1="370" y1="6" x2="410" y2="6" stroke={axisColor} strokeWidth="1.5" />
-            <line x1="370" y1="12" x2="410" y2="12" stroke={axisColor} strokeWidth="1.5" />
+            {/* Right parallel mark (below LT) */}
+            <line x1="370" y1="8" x2="410" y2="8" stroke={axisColor} strokeWidth="1.5" />
 
             <text x="-380" y="-10" className={`text-sm font-bold select-none ${isDark ? 'fill-white' : 'fill-black'}`} fontSize="16">L.T.</text>
 
@@ -170,7 +168,7 @@ const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisCo
 });
 
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
-    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile } = useGeometryStore();
+    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool } = useGeometryStore();
 
     // Viewport State
     const [offset, setOffset] = useState({ x: 400, y: 300 });
@@ -851,7 +849,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     return (
         <div
             ref={containerRef}
-            className={`w-full h-full overflow-hidden relative transition-colors duration-300 ${bgColor}`}
+            className={`diedrico-canvas w-full h-full overflow-hidden relative transition-colors duration-300 ${bgColor}`}
             style={{ cursor: activeTool === 'circle' ? compassCursor : (activeTool === 'select' ? 'default' : 'crosshair') }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -934,6 +932,32 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     <button onClick={toggleProfile} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${showProfile ? 'bg-purple-500 text-white' : `${iconColor} hover:bg-gray-100`}`}>
                         <PanelRight size={14} /> {showProfile ? 'Ocultar Perfil' : 'Vista de Perfil'}
                     </button>
+                </div>
+            )}
+
+            {/* Distance Result Display */}
+            {distanceResult && (
+                <div className={`absolute top-4 right-4 p-4 rounded-lg shadow-lg border z-20 transition-colors ${toolbarBg}`}>
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            📏 Distancia Calculada
+                        </h3>
+                        <button
+                            onClick={clearDistanceTool}
+                            className={`text-xs px-2 py-1 rounded ${iconHover} ${iconColor}`}
+                            title="Cerrar"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    <div className={`text-2xl font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                        {distanceResult.value.toFixed(3)} unidades
+                    </div>
+                    {selectedForDistance.length === 2 && (
+                        <div className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Entre: {elements.find(e => e.id === selectedForDistance[0])?.name || 'P1'} y {elements.find(e => e.id === selectedForDistance[1])?.name || 'P2'}
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -1075,6 +1099,38 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
 
                     {/* Intersections (Always Visible) */}
                     <Intersections2D elements={elements} showIntersections={showIntersections} />
+
+                    {/* Distance Visualization */}
+                    {distanceResult && distanceResult.auxiliaryPoints && distanceResult.auxiliaryPoints.length === 2 && (
+                        <g className="distance-visualization">
+                            {(() => {
+                                const p1 = distanceResult.auxiliaryPoints[0];
+                                const p2 = distanceResult.auxiliaryPoints[1];
+                                const SCALE = 40;
+
+                                // Horizontal projection
+                                const x1_h = p1.x * SCALE;
+                                const y1_h = -p1.y * SCALE;
+                                const x2_h = p2.x * SCALE;
+                                const y2_h = -p2.y * SCALE;
+
+                                // Vertical projection
+                                const x1_v = p1.x * SCALE;
+                                const y1_v = p1.z * SCALE;
+                                const x2_v = p2.x * SCALE;
+                                const y2_v = p2.z * SCALE;
+
+                                return (
+                                    <>
+                                        {/* Horizontal projection line */}
+                                        <line x1={x1_h} y1={y1_h} x2={x2_h} y2={y2_h} stroke="#10b981" strokeWidth="2" strokeDasharray="5 5" opacity="0.7" />
+                                        {/* Vertical projection line */}
+                                        <line x1={x1_v} y1={y1_v} x2={x2_v} y2={y2_v} stroke="#10b981" strokeWidth="2" strokeDasharray="5 5" opacity="0.7" />
+                                    </>
+                                );
+                            })()}
+                        </g>
+                    )}
 
                     {/* Sketch Elements (Only in Sketch Mode) */}
                     {mode === 'sketch' && sketchElements.map(el => (
