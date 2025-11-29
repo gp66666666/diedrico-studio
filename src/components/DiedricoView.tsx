@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { useGeometryStore } from '../store/geometryStore';
 import { intersectLinePlane, intersectPlanePlane, intersectLineLine } from '../utils/mathUtils';
 import {
@@ -134,6 +134,40 @@ function getTangentsCircleCircle(c1: { x: number, y: number }, r1: number, c2: {
 
     return lines;
 }
+
+const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisColor: string, isDark: boolean, scale: number }) => {
+    if (!show) return null;
+    return (
+        <g className="lt-axis">
+            {/* Main LT line - Reduced range for safety */}
+            <line x1="-3000" y1="0" x2="3000" y2="0" stroke={axisColor} strokeWidth="2" />
+
+            {/* Left perpendicular marks */}
+            <line x1="-400" y1="-8" x2="-400" y2="8" stroke={axisColor} strokeWidth="2" />
+            <line x1="-410" y1="-8" x2="-410" y2="8" stroke={axisColor} strokeWidth="2" />
+
+            {/* Right perpendicular marks */}
+            <line x1="400" y1="-8" x2="400" y2="8" stroke={axisColor} strokeWidth="2" />
+            <line x1="410" y1="-8" x2="410" y2="8" stroke={axisColor} strokeWidth="2" />
+
+            <text x="-380" y="-10" className={`text-sm font-bold select-none ${isDark ? 'fill-white' : 'fill-black'}`} fontSize="16">L.T.</text>
+
+            {/* Ruler Ticks */}
+            {Array.from({ length: 21 }).map((_, i) => {
+                const val = i - 10;
+                const x = val * scale;
+                return (
+                    <g key={val}>
+                        <line x1={x} y1={-5} x2={x} y2={5} stroke={axisColor} strokeWidth="1" />
+                        {val !== 0 && <text x={x} y={20} textAnchor="middle" fontSize="10" fill={axisColor} className="select-none">{val}</text>}
+                    </g>
+                );
+            })}
+            {/* Origin */}
+            <circle cx={0} cy={0} r="3" fill={axisColor} />
+        </g>
+    );
+});
 
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
     const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile } = useGeometryStore();
@@ -904,36 +938,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         <line x1="-2000" y1="0" x2="2000" y2="0" stroke={axisColor} strokeWidth="1" />
                     </g>
 
-                    {showLT && (
-                        <g className="lt-axis">
-                            {/* Main LT line */}
-                            <line x1="-5000" y1="0" x2="5000" y2="0" stroke={axisColor} strokeWidth="2" />
-
-                            {/* Left perpendicular marks (double line) */}
-                            <line x1="-400" y1="-8" x2="-400" y2="8" stroke={axisColor} strokeWidth="2" />
-                            <line x1="-410" y1="-8" x2="-410" y2="8" stroke={axisColor} strokeWidth="2" />
-
-                            {/* Right perpendicular marks (double line) */}
-                            <line x1="400" y1="-8" x2="400" y2="8" stroke={axisColor} strokeWidth="2" />
-                            <line x1="410" y1="-8" x2="410" y2="8" stroke={axisColor} strokeWidth="2" />
-
-                            <text x="-380" y="-10" className={`text-sm font-bold select-none ${isDark ? 'fill-white' : 'fill-black'}`} fontSize="16">L.T.</text>
-
-                            {/* Ruler Ticks */}
-                            {Array.from({ length: 21 }).map((_, i) => {
-                                const val = i - 10;
-                                const x = val * SCALE;
-                                return (
-                                    <g key={val}>
-                                        <line x1={x} y1={-5} x2={x} y2={5} stroke={axisColor} strokeWidth="1" />
-                                        {val !== 0 && <text x={x} y={20} textAnchor="middle" fontSize="10" fill={axisColor} className="select-none">{val}</text>}
-                                    </g>
-                                );
-                            })}
-                            {/* Origin */}
-                            <circle cx={0} cy={0} r="3" fill={axisColor} />
-                        </g>
-                    )}
+                    <LTAxis show={showLT} axisColor={axisColor || '#000000'} isDark={isDark} scale={SCALE} />
 
                     {/* Profile View (3rd Projection) */}
                     {showProfile && (
