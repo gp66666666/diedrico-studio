@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download
 } from 'lucide-react';
 import { useGeometryStore } from '../store/geometryStore';
 import type { GeometryElement, PointElement, LineElement, PlaneElement } from '../types';

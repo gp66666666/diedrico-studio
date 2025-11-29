@@ -40,7 +40,7 @@ export type SketchTool =
     | 'select' | 'point' | 'segment' | 'ray' | 'line'
     | 'circle' | 'arc' | 'polygon' | 'ellipse' | 'parabola' | 'hyperbola'
     | 'text' | 'eraser' | 'rotate' | 'scale'
-    | 'mediatriz' | 'bisectriz' | 'tangent';
+    | 'mediatriz' | 'bisectriz' | 'tangent' | 'measure';
 
 export interface SketchElement {
     id: string;

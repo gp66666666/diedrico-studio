@@ -907,10 +907,15 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
             {/* LT Toggle & Magnetism (Sketch Mode Only) */}
             {mode === 'sketch' && (
                 <div className={`absolute bottom-32 md:bottom-4 left-4 flex gap-2 p-2 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg}`}>
-                    <button onClick={() => setShowLT(!showLT)} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${showLT ? 'bg-blue-500 text-white' : `${iconColor} hover:bg-gray-100`}`}>
-                        {showLT ? <Eye size={14} /> : <EyeOff size={14} />} Línea de Tierra
-                    </button>
-                    <div className={`w-px my-1 ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
+                    {/* Only show LT button after adding elements */}
+                    {(elements.length > 0 || sketchElements.length > 0) && (
+                        <>
+                            <button onClick={() => setShowLT(!showLT)} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${showLT ? 'bg-blue-500 text-white' : `${iconColor} hover:bg-gray-100`}`}>
+                                {showLT ? <Eye size={14} /> : <EyeOff size={14} />} Línea de Tierra
+                            </button>
+                            <div className={`w-px my-1 ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
+                        </>
+                    )}
                     <button onClick={() => setMagnetismEnabled(!magnetismEnabled)} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${magnetismEnabled ? 'bg-amber-500 text-white' : `${iconColor} hover:bg-gray-100`}`} title="Activar/Desactivar Magnetismo">
                         <Magnet size={14} /> {magnetismEnabled ? 'Magnetismo ON' : 'Magnetismo OFF'}
                     </button>

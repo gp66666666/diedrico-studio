@@ -3,7 +3,7 @@ import {
     MousePointer2, Dot, Minus, ArrowUpRight, ArrowLeftRight,
     Circle as CircleIcon, Spline, Hexagon, Orbit, TrendingUp, Infinity as InfinityIcon,
     GitCommitVertical, FoldVertical, Slash, Type, RotateCw, Scaling, Eraser,
-    ChevronDown, ChevronRight, Palette, Pencil, Construction, Move3d
+    ChevronDown, ChevronRight, Palette, Pencil, Construction, Move3d, Ruler
 } from 'lucide-react';
 import { SketchTool } from '../types';
 
@@ -81,6 +81,14 @@ const TOOL_GROUPS: ToolGroup[] = [
         tools: [
             { id: 'rotate', icon: <RotateCw size={18} />, label: 'Rotar' },
             { id: 'scale', icon: <Scaling size={18} />, label: 'Escalar' },
+        ]
+    },
+    {
+        id: 'measure',
+        name: 'Medición',
+        icon: <Ruler size={18} />,
+        tools: [
+            { id: 'measure', icon: <Ruler size={18} />, label: 'Regla' },
         ]
     }
 ];
