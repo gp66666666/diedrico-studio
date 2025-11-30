@@ -4,11 +4,33 @@
 
 body {
   margin: 0;
-  font-family: -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  'Roboto',
-  'Oxygen',
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide only Point2D text labels - they are re-rendered in merged-text-layer */
+svg .point-geometry~.text-labels {
+  display: none !important;
+}
+
+/* Show merged text layer on top */
+svg .merged-text-layer {
+  isolation: isolate;
+}
+
+svg .merged-label {
+  display: block !important;
+  pointer-events: none;
+  paint-order: stroke fill markers;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 
   .no-scrollbar {
     -ms-overflow-style: none;
