@@ -1134,46 +1134,65 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     {/* Merged Text Labels Layer (rendered on top) */}
                     <g className="merged-text-layer">
                         {(() => {
-                            // Collect all text labels from Point2D elements
-                            const allLabels: Array<{ x: number, y: number, text: string, color: string, elementId: string }> = [];
+                            // Collect all text labels from ALL elements
+                            const allLabels: Array<{ x: number, y: number, text: any, color: string, elementId: string, fontSize?: number }> = [];
                             const SCALE = 40;
 
                             elements.forEach(el => {
-                                if (!el.visible || el.type !== 'point') return;
-                                const px = (el as any).coords.x * SCALE;
-                                const py_h = (el as any).coords.y * SCALE;
-                                const py_v = -(el as any).coords.z * SCALE;
+                                if (!el.visible) return;
 
-                                allLabels.push({
-                                    x: px + 5,
-                                    y: py_v - 5,
-                                    text: `${el.name}''`,
-                                    color: el.color,
-                                    elementId: el.id
-                                });
-                                allLabels.push({
-                                    x: px + 5,
-                                    y: py_h + 15,
-                                    text: `${el.name}'`,
-                                    color: el.color,
-                                    elementId: el.id
-                                });
+                                if (el.type === 'point') {
+                                    const px = (el as any).coords.x * SCALE;
+                                    const py_h = (el as any).coords.y * SCALE;
+                                    const py_v = -(el as any).coords.z * SCALE;
+                                    allLabels.push({ x: px + 5, y: py_v - 5, text: `${el.name}''`, color: el.color, fontSize: 12, elementId: el.id });
+                                    allLabels.push({ x: px + 5, y: py_h + 15, text: `${el.name}'`, color: el.color, fontSize: 12, elementId: el.id });
+                                } else if (el.type === 'line') {
+                                    const line = el as any;
+                                    const p2 = { x: line.point.x + line.direction.x * 15, y: line.point.y + line.direction.y * 15, z: line.point.z + line.direction.z * 15 };
+                                    allLabels.push({ x: p2.x * SCALE, y: -p2.z * SCALE - 5, text: `${el.name}''`, color: el.color, fontSize: 12, elementId: `${el.id}-v` });
+                                    allLabels.push({ x: p2.x * SCALE, y: p2.y * SCALE + 15, text: `${el.name}'`, color: el.color, fontSize: 12, elementId: `${el.id}-h` });
+
+                                    const traces = calculateLineTraces(line.point, line.direction);
+                                    if (traces.hTrace) {
+                                        allLabels.push({ x: traces.hTrace.x * SCALE + 5, y: traces.hTrace.y * SCALE + 5, text: (<>h'<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-ht` });
+                                        allLabels.push({ x: traces.hTrace.x * SCALE + 5, y: -5, text: (<>h''<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-ht2` });
+                                    }
+                                    if (traces.vTrace) {
+                                        allLabels.push({ x: traces.vTrace.x * SCALE + 5, y: -traces.vTrace.z * SCALE - 5, text: (<>v''<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-vt` });
+                                        allLabels.push({ x: traces.vTrace.x * SCALE + 5, y: 15, text: (<>v'<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-vt2` });
+                                    }
+                                } else if (el.type === 'plane') {
+                                    const p = el as any;
+                                    const xR = 15 * SCALE;
+                                    if (Math.abs(p.normal.z) > 1e-6) {
+                                        const y = -(-p.constant - p.normal.x * 15) / p.normal.z * SCALE - 5;
+                                        allLabels.push({ x: xR, y, text: (<>{el.name}''<tspan fontSize="9" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 12, elementId: `${el.id}-pv` });
+                                    }
+                                    if (Math.abs(p.normal.y) > 1e-6) {
+                                        const y = (-p.constant - p.normal.x * 15) / p.normal.y * SCALE + 15;
+                                        allLabels.push({ x: xR, y, text: (<>{el.name}'<tspan fontSize="9" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 12, elementId: `${el.id}-ph` });
+                                    }
+                                }
                             });
 
-                            // Merge coincident labels
+                            // Merge coincident labels (only string labels)
                             const PROXIMITY_THRESHOLD = 15;
-                            const merged: typeof allLabels = [];
+                            const stringLabels = allLabels.filter(l => typeof l.text === 'string');
+                            const jsxLabels = allLabels.filter(l => typeof l.text !== 'string');
+
+                            const merged: typeof stringLabels = [];
                             const processed = new Set<number>();
 
-                            for (let i = 0; i < allLabels.length; i++) {
+                            for (let i = 0; i < stringLabels.length; i++) {
                                 if (processed.has(i)) continue;
 
-                                const current = allLabels[i];
+                                const current = stringLabels[i];
                                 const coincident = [current];
 
-                                for (let j = i + 1; j < allLabels.length; j++) {
+                                for (let j = i + 1; j < stringLabels.length; j++) {
                                     if (processed.has(j)) continue;
-                                    const other = allLabels[j];
+                                    const other = stringLabels[j];
                                     const distance = Math.sqrt(
                                         Math.pow(current.x - other.x, 2) + Math.pow(current.y - other.y, 2)
                                     );
@@ -1188,8 +1207,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
 
                                 if (coincident.length > 1) {
                                     coincident.sort((a, b) => {
-                                        const aPrimes = (a.text.match(/'/g) || []).length;
-                                        const bPrimes = (b.text.match(/'/g) || []).length;
+                                        const aPrimes = ((a.text as string).match(/'/g) || []).length;
+                                        const bPrimes = ((b.text as string).match(/'/g) || []).length;
                                         return aPrimes - bPrimes;
                                     });
 
@@ -1203,12 +1222,12 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                                 }
                             }
 
-                            return merged.map((label, idx) => (
+                            return [...merged, ...jsxLabels].map((label, idx) => (
                                 <text
                                     key={`merged-${label.elementId}-${idx}`}
                                     x={label.x}
                                     y={label.y}
-                                    fontSize="12"
+                                    fontSize={label.fontSize || 12}
                                     fill={label.color}
                                     className="merged-label"
                                 >
