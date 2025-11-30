@@ -32,7 +32,8 @@ export default function Sidebar() {
         activeTool,
         selectForDistance,
         selectedForDistance,
-        viewMode
+        viewMode,
+        setViewMode
     } = useGeometryStore();
 
     const isDark = theme === 'dark';
@@ -421,7 +422,7 @@ export default function Sidebar() {
                         zip.file(filename, base64Data, { base64: true });
                     }
                 } else {
-                    const svg = document.getElementById('main-drawing-svg') as SVGSVGElement;
+                    const svg = document.getElementById('main-drawing-svg') as unknown as SVGSVGElement;
                     if (svg) {
                         const serializer = new XMLSerializer();
                         const source = serializer.serializeToString(svg);
