@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { useGeometryStore } from '../store/geometryStore';
-import { intersectLinePlane, intersectPlanePlane, intersectLineLine } from '../utils/mathUtils';
+import { intersectLinePlane, intersectPlanePlane, intersectLineLine, calculateLineTraces } from '../utils/mathUtils';
 import {
     ZoomIn, ZoomOut, Move, Eye, EyeOff,
     Magnet, PanelRight
