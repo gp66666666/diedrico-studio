@@ -161,7 +161,11 @@ export default function Line2D({ element }: { element: LineElement }) {
             {traces.hTrace && (
                 <g>
                     {/* h' (Horizontal Projection of Trace) */}
-                    <circle cx={traces.hTrace.x * SCALE} cy={traces.hTrace.y * SCALE} r="3" fill="none" stroke={element.color} strokeWidth="1" />
+                    {/* h' (Horizontal Projection of Trace) - X marker */}
+                    <g>
+                        <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE - 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE + 4} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE + 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE - 4} stroke={element.color} strokeWidth="2" />
+                    </g>
                     <text x={traces.hTrace.x * SCALE + 5} y={traces.hTrace.y * SCALE + 5} fontSize="10" fill={element.color}>
                         h'<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
                     </text>
@@ -172,7 +176,11 @@ export default function Line2D({ element }: { element: LineElement }) {
                         x2={traces.hTrace.x * SCALE} y2={0}
                         stroke={element.color} strokeWidth="1" strokeDasharray="2 2"
                     />
-                    <circle cx={traces.hTrace.x * SCALE} cy={0} r="2" fill={element.color} />
+                    {/* h'' marker on LT - X */}
+                    <g>
+                        <line x1={traces.hTrace.x * SCALE - 3} y1={-3} x2={traces.hTrace.x * SCALE + 3} y2={3} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.hTrace.x * SCALE - 3} y1={3} x2={traces.hTrace.x * SCALE + 3} y2={-3} stroke={element.color} strokeWidth="2" />
+                    </g>
                     <text x={traces.hTrace.x * SCALE + 5} y={-5} fontSize="10" fill={element.color}>
                         h''<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
                     </text>
@@ -181,7 +189,11 @@ export default function Line2D({ element }: { element: LineElement }) {
             {traces.vTrace && (
                 <g>
                     {/* v'' (Vertical Projection of Trace) */}
-                    <circle cx={traces.vTrace.x * SCALE} cy={-traces.vTrace.z * SCALE} r="3" fill={element.color} />
+                    {/* v'' (Vertical Projection of Trace) - X marker */}
+                    <g>
+                        <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE - 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE + 4} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE + 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE - 4} stroke={element.color} strokeWidth="2" />
+                    </g>
                     <text x={traces.vTrace.x * SCALE + 5} y={-traces.vTrace.z * SCALE - 5} fontSize="10" fill={element.color}>
                         v''<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
                     </text>
@@ -192,7 +204,11 @@ export default function Line2D({ element }: { element: LineElement }) {
                         x2={traces.vTrace.x * SCALE} y2={0}
                         stroke={element.color} strokeWidth="1" strokeDasharray="2 2"
                     />
-                    <circle cx={traces.vTrace.x * SCALE} cy={0} r="2" fill="none" stroke={element.color} strokeWidth="1" />
+                    {/* v' marker on LT - X */}
+                    <g>
+                        <line x1={traces.vTrace.x * SCALE - 3} y1={-3} x2={traces.vTrace.x * SCALE + 3} y2={3} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.vTrace.x * SCALE - 3} y1={3} x2={traces.vTrace.x * SCALE + 3} y2={-3} stroke={element.color} strokeWidth="2" />
+                    </g>
                     <text x={traces.vTrace.x * SCALE + 5} y={15} fontSize="10" fill={element.color}>
                         v'<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
                     </text>
