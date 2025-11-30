@@ -19,8 +19,8 @@ export default function Sidebar() {
         selectElement,
         showIntersections,
         toggleIntersections,
-        showSystemPlanes,
-        toggleSystemPlanes,
+        showBisectors,
+        toggleBisectors,
         isFlattened,
         toggleFlattening,
         history,
@@ -30,7 +30,9 @@ export default function Sidebar() {
         toggleTheme,
         toggleHelp,
         activeTool,
-        selectForDistance
+        selectForDistance,
+        selectedForDistance,
+        viewMode
     } = useGeometryStore();
 
     const isDark = theme === 'dark';
@@ -336,51 +338,154 @@ export default function Sidebar() {
     };
 
     const handleExportCurrentView = () => {
-        const svg = document.querySelector('.diedrico-canvas svg');
-        if (!svg) {
-            alert('No se encontró ninguna vista para exportar');
-            return;
-        }
-
-        const serializer = new XMLSerializer();
-        const source = serializer.serializeToString(svg);
-        const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = svg.clientWidth || 800;
-            canvas.height = svg.clientHeight || 600;
-            const ctx = canvas.getContext('2d');
-
-            if (ctx) {
-                // Fill background
-                ctx.fillStyle = isDark ? '#111827' : '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        const link = document.createElement('a');
-                        link.download = `diedrico-vista-${Date.now()}.jpg`;
-                        link.href = URL.createObjectURL(blob);
-                        link.click();
-                        URL.revokeObjectURL(link.href);
-                    }
-                }, 'image/jpeg', 0.95);
+        if (viewMode === '3d') {
+            // 3D Export (Canvas)
+            const canvas = document.querySelector('canvas');
+            if (!canvas) {
+                alert('No se encontró la vista 3D para exportar');
+                return;
             }
-            URL.revokeObjectURL(url);
-        };
-        img.src = url;
+
+            // Create a temporary link to download the image
+            const link = document.createElement('a');
+            link.download = `diedrico-3d-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        } else {
+            // 2D/Sketch Export (SVG)
+            const svg = document.getElementById('main-drawing-svg') as unknown as SVGSVGElement;
+            if (!svg) {
+                alert('No se encontró ninguna vista para exportar');
+                return;
+            }
+
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svg);
+            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = svg.clientWidth || 800;
+                canvas.height = svg.clientHeight || 600;
+                const ctx = canvas.getContext('2d');
+
+                if (ctx) {
+                    // Fill background
+                    ctx.fillStyle = isDark ? '#111827' : '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            const link = document.createElement('a');
+                            link.download = `diedrico-vista-${Date.now()}.jpg`;
+                            link.href = URL.createObjectURL(blob);
+                            link.click();
+                            URL.revokeObjectURL(link.href);
+                        }
+                    }, 'image/jpeg', 0.95);
+                }
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
+        }
     };
 
-    const handleExportAllViews = () => {
-        // For now, export current view (future: implement multi-view export)
-        handleExportCurrentView();
-        setTimeout(() => {
-            alert('Exportación de vista actual completada. La exportación de múltiples vistas se implementará próximamente.');
-        }, 500);
+    const handleExportAllViews = async () => {
+        try {
+            const JSZip = (await import('jszip')).default;
+            const zip = new JSZip();
+            const originalViewMode = viewMode;
+
+            // Helper function to wait for render completion
+            const waitForRender = () => new Promise(resolve => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        setTimeout(resolve, 100);
+                    });
+                });
+            });
+
+            // Helper function to capture current view
+            const captureView = async (mode: '3d' | '2d' | 'sketch', filename: string) => {
+                setViewMode(mode);
+                await waitForRender();
+
+                if (mode === '3d') {
+                    const canvas = document.querySelector('canvas');
+                    if (canvas) {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const base64Data = dataUrl.split(',')[1];
+                        zip.file(filename, base64Data, { base64: true });
+                    }
+                } else {
+                    const svg = document.getElementById('main-drawing-svg') as SVGSVGElement;
+                    if (svg) {
+                        const serializer = new XMLSerializer();
+                        const source = serializer.serializeToString(svg);
+                        const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+
+                        await new Promise<void>((resolve) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = svg.clientWidth || 800;
+                                canvas.height = svg.clientHeight || 600;
+                                const ctx = canvas.getContext('2d');
+
+                                if (ctx) {
+                                    ctx.fillStyle = isDark ? '#111827' : '#ffffff';
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(img, 0, 0);
+
+                                    canvas.toBlob((blob) => {
+                                        if (blob) {
+                                            blob.arrayBuffer().then(buffer => {
+                                                zip.file(filename, buffer);
+                                                resolve();
+                                            });
+                                        } else {
+                                            resolve();
+                                        }
+                                    }, 'image/jpeg', 0.95);
+                                } else {
+                                    resolve();
+                                }
+                                URL.revokeObjectURL(url);
+                            };
+                            img.onerror = () => {
+                                URL.revokeObjectURL(url);
+                                resolve();
+                            };
+                            img.src = url;
+                        });
+                    }
+                }
+            };
+
+            // Capture all views
+            await captureView('3d', 'vista-3d.png');
+            await captureView('2d', 'vista-diedrico-2d.jpg');
+            await captureView('sketch', 'vista-boceto.jpg');
+
+            // Restore original view
+            setViewMode(originalViewMode);
+
+            // Generate and download ZIP
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
+            const link = document.createElement('a');
+            link.download = `diedrico-todas-vistas-${Date.now()}.zip`;
+            link.href = URL.createObjectURL(zipBlob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+        } catch (error) {
+            console.error('Error exporting all views:', error);
+            alert('Error al exportar las vistas. Por favor, inténtalo de nuevo.');
+        }
     };
 
     const headerBorder = isDark ? 'border-gray-700' : 'border-gray-200';
@@ -447,16 +552,16 @@ export default function Sidebar() {
                 </button>
 
                 <button
-                    onClick={toggleSystemPlanes}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${showSystemPlanes
+                    onClick={toggleBisectors}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${showBisectors
                         ? 'bg-purple-500/20 text-purple-600 border border-purple-500/50'
                         : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
                         }`}
                 >
                     <span className="flex items-center gap-2">
-                        <Box size={16} /> Cuadrantes / Bisectores
+                        <Box size={16} /> Bisectores
                     </span>
-                    {showSystemPlanes ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                    {showBisectors ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                 </button>
 
                 <button
@@ -884,8 +989,8 @@ export default function Sidebar() {
                             elements.map((el: GeometryElement) => (
                                 <div
                                     key={el.id}
-                                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id
-                                        ? 'bg-blue-50 border-blue-400 shadow-sm'
+                                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id))
+                                        ? 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400'
                                         : `${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 hover:bg-gray-50'}`
                                         }`}
                                 >

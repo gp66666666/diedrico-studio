@@ -953,19 +953,18 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     <div className={`text-2xl font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
                         {distanceResult.value.toFixed(3)} unidades
                     </div>
-                    {selectedForDistance.length === 2 && (
-                        <div className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {selectedForDistance && selectedForDistance.length === 2 && (
+                        <div className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                             Entre: {elements.find(e => e.id === selectedForDistance[0])?.name || 'P1'} y {elements.find(e => e.id === selectedForDistance[1])?.name || 'P2'}
                         </div>
                     )}
                 </div>
             )}
-
             {/* Help Guide Modal */}
             {showHelp && <HelpGuide isOpen={showHelp} onClose={toggleHelp} isDark={isDark} />}
 
             {/* SVG Canvas */}
-            <svg className="w-full h-full" style={{ touchAction: 'none' }}>
+            <svg id="main-drawing-svg" className="w-full h-full" style={{ touchAction: 'none' }}>
                 <g transform={`translate(${offset.x}, ${offset.y}) scale(${zoom})`}>
                     {/* Axes and Grid Lines */}
                     <g className="grid-lines opacity-10 pointer-events-none">

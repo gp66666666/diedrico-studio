@@ -29,13 +29,17 @@ interface GeometryState {
     theme: 'dark' | 'light';
     toggleTheme: () => void;
 
+    // View Mode
+    viewMode: '3d' | '2d' | 'sketch';
+    setViewMode: (mode: '3d' | '2d' | 'sketch') => void;
+
     // Intersections
     showIntersections: boolean;
     toggleIntersections: () => void;
 
-    // System Planes (Quadrants/Bisectors)
-    showSystemPlanes: boolean;
-    toggleSystemPlanes: () => void;
+    // System Planes (Bisectors)
+    showBisectors: boolean;
+    toggleBisectors: () => void;
 
     // Flattening Animation (Abatimiento)
     isFlattened: boolean;
@@ -176,18 +180,20 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
     updateSketchElement: (id, updates) => set((state) => ({
         sketchElements: state.sketchElements.map(el => el.id === id ? { ...el, ...updates } : el),
-        // Optional: Don't add to history for minor updates like selection, or do if important
     })),
 
 
     theme: 'dark',
     toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
 
+    viewMode: '3d',
+    setViewMode: (mode) => set({ viewMode: mode }),
+
     showIntersections: true,
     toggleIntersections: () => set((state) => ({ showIntersections: !state.showIntersections })),
 
-    showSystemPlanes: false,
-    toggleSystemPlanes: () => set((state) => ({ showSystemPlanes: !state.showSystemPlanes })),
+    showBisectors: false,
+    toggleBisectors: () => set((state) => ({ showBisectors: !state.showBisectors })),
 
     isFlattened: false,
     toggleFlattening: () => set((state) => ({ isFlattened: !state.isFlattened })),

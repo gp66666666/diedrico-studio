@@ -8,7 +8,7 @@ import IntersectionsRenderer from './3D/IntersectionsRenderer';
 import SystemPlanes from './3D/SystemPlanes';
 
 export default function Scene() {
-    const { elements, selectElement, showSystemPlanes, theme } = useGeometryStore();
+    const { elements, selectElement, showBisectors, theme } = useGeometryStore();
 
     const isDark = theme === 'dark';
     const bgColor = isDark ? '#0a0e1a' : '#f3f4f6';
@@ -21,6 +21,7 @@ export default function Scene() {
                 camera={{ position: [12, 10, 12], fov: 50 }}
                 shadows
                 onPointerMissed={() => selectElement(null)}
+                gl={{ preserveDrawingBuffer: true }}
             >
                 {/* Background */}
                 <color attach="background" args={[bgColor]} />
@@ -41,11 +42,8 @@ export default function Scene() {
                     cellThickness={0.6}
                 />
 
-                {/* Axes */}
-                <axesHelper args={[8]} />
-
-                {/* System Planes (Quadrants/Bisectors) */}
-                {showSystemPlanes && <SystemPlanes />}
+                {/* System Planes (Quadrants always visible, Bisectors toggleable) */}
+                <SystemPlanes showBisectors={showBisectors} />
 
                 {/* Render all geometry elements */}
                 {elements.map((element) => {

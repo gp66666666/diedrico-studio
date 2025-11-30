@@ -6,9 +6,8 @@ import DiedricoView from './components/DiedricoView';
 import { useGeometryStore } from './store/geometryStore';
 
 function App() {
-    const [viewMode, setViewMode] = useState<'3d' | '2d' | 'sketch'>('3d');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { theme } = useGeometryStore();
+    const { theme, viewMode, setViewMode } = useGeometryStore();
     const isDark = theme === 'dark';
 
     // Theme Classes
