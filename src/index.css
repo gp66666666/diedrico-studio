@@ -11,24 +11,38 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* SVG text labels should render on top */
-svg .text-labels {
-  pointer-events: none;
+/* Hide original text elements - they are re-rendered in merged-text-layer */
+svg text:not(.merged-label):not(.snap-label) {
+  display: none;
 }
 
-svg text {
+svg .text-labels {
+  display: none !important;
+}
+
+/* Only show merged text layer - it renders on top */
+svg .merged-text-layer {
+  isolation: isolate;
+}
+
+svg .merged-label {
+  display: block;
   pointer-events: none;
-  paint-order: stroke fill;
+  paint-order: stroke fill markers;
 }
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
