@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function PlaneObject({ element }: Props) {
-    const { selectedElementId, selectElement, isFlattened } = useGeometryStore();
+    const { selectedElementId, selectElement, isFlattened, activeTool, selectForDistance } = useGeometryStore();
     const isSelected = selectedElementId === element.id;
 
     const groupHRef = useRef<THREE.Group>(null);
@@ -74,7 +74,11 @@ export default function PlaneObject({ element }: Props) {
         <group
             onClick={(e) => {
                 e.stopPropagation();
-                selectElement(element.id);
+                if (activeTool !== 'none') {
+                    selectForDistance(element.id);
+                } else {
+                    selectElement(element.id);
+                }
             }}
         >
             {/* --- 3D Plane (Wireframe) --- */}

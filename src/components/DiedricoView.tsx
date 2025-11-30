@@ -168,7 +168,7 @@ const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisCo
 });
 
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
-    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool } = useGeometryStore();
+    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement } = useGeometryStore();
 
     // Viewport State
     const [offset, setOffset] = useState({ x: 400, y: 300 });
@@ -1088,10 +1088,20 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     {/* 3D Elements Projections (Always Visible) */}
                     {elements.map((el) => {
                         if (!el.visible) return null;
+
+                        const handleClick = (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            if (activeDistanceTool !== 'none') {
+                                selectForDistance(el.id);
+                            } else {
+                                selectElement(el.id);
+                            }
+                        };
+
                         switch (el.type) {
-                            case 'point': return <Point2D key={el.id} element={el as any} />;
-                            case 'line': return <Line2D key={el.id} element={el as any} />;
-                            case 'plane': return <Plane2D key={el.id} element={el as any} />;
+                            case 'point': return <Point2D key={el.id} element={el as any} onClick={handleClick} />;
+                            case 'line': return <Line2D key={el.id} element={el as any} onClick={handleClick} />;
+                            case 'plane': return <Plane2D key={el.id} element={el as any} onClick={handleClick} />;
                             default: return null;
                         }
                     })}
@@ -1134,8 +1144,34 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     {/* Merged Text Labels Layer (rendered on top) */}
                     <g className="merged-text-layer">
                         {(() => {
-                            // Collect all text labels from ALL elements
-                            const allLabels: Array<{ x: number, y: number, text: any, color: string, elementId: string, fontSize?: number }> = [];
+                            // Helper to lighten color (mix with white)
+                            const lightenColor = (hex: string, percent: number) => {
+                                if (!hex.startsWith('#') || hex.length !== 7) return hex;
+                                const num = parseInt(hex.replace('#', ''), 16);
+                                let r = (num >> 16);
+                                let g = (num >> 8) & 0x00FF;
+                                let b = (num & 0x0000FF);
+
+                                // Mix with white (255, 255, 255)
+                                r = Math.round(r + (255 - r) * (percent / 100));
+                                g = Math.round(g + (255 - g) * (percent / 100));
+                                b = Math.round(b + (255 - b) * (percent / 100));
+
+                                return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+                            };
+
+                            // Label Structure
+                            interface LabelData {
+                                x: number;
+                                y: number;
+                                main: string;
+                                sub?: string;
+                                color: string;
+                                elementId: string;
+                                priority: number; // 0 for points (highest), 1 for traces
+                            }
+
+                            const allLabels: LabelData[] = [];
                             const SCALE = 40;
 
                             elements.forEach(el => {
@@ -1145,104 +1181,105 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                                     const px = (el as any).coords.x * SCALE;
                                     const py_h = (el as any).coords.y * SCALE;
                                     const py_v = -(el as any).coords.z * SCALE;
-                                    allLabels.push({ x: px + 5, y: py_v - 5, text: `${el.name}''`, color: el.color, fontSize: 12, elementId: el.id });
-                                    allLabels.push({ x: px + 5, y: py_h + 15, text: `${el.name}'`, color: el.color, fontSize: 12, elementId: el.id });
+                                    // Points usually don't have subscripts in this notation, just the name with primes
+                                    allLabels.push({ x: px + 5, y: py_v - 5, main: `${el.name}''`, color: el.color, elementId: el.id, priority: 0 });
+                                    allLabels.push({ x: px + 5, y: py_h + 15, main: `${el.name}'`, color: el.color, elementId: el.id, priority: 0 });
                                 } else if (el.type === 'line') {
                                     const line = el as any;
                                     const p2 = { x: line.point.x + line.direction.x * 15, y: line.point.y + line.direction.y * 15, z: line.point.z + line.direction.z * 15 };
-                                    allLabels.push({ x: p2.x * SCALE, y: -p2.z * SCALE - 5, text: `${el.name}''`, color: el.color, fontSize: 12, elementId: `${el.id}-v` });
-                                    allLabels.push({ x: p2.x * SCALE, y: p2.y * SCALE + 15, text: `${el.name}'`, color: el.color, fontSize: 12, elementId: `${el.id}-h` });
+                                    // Line projections
+                                    allLabels.push({ x: p2.x * SCALE, y: -p2.z * SCALE - 5, main: `${el.name}''`, color: el.color, elementId: `${el.id}-v`, priority: 1 });
+                                    allLabels.push({ x: p2.x * SCALE, y: p2.y * SCALE + 15, main: `${el.name}'`, color: el.color, elementId: `${el.id}-h`, priority: 1 });
 
                                     const traces = calculateLineTraces(line.point, line.direction);
+                                    // Use a lighter version of the color for traces, but same hue
+                                    const traceColor = lightenColor(el.color, 30);
+
                                     if (traces.hTrace) {
-                                        allLabels.push({ x: traces.hTrace.x * SCALE + 5, y: traces.hTrace.y * SCALE + 5, text: (<>h'<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-ht` });
-                                        allLabels.push({ x: traces.hTrace.x * SCALE + 5, y: -5, text: (<>h''<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-ht2` });
+                                        allLabels.push({ x: traces.hTrace.x * SCALE + 5, y: traces.hTrace.y * SCALE + 5, main: "h'", sub: el.name, color: traceColor, elementId: `${el.id}-ht`, priority: 1 });
+                                        allLabels.push({ x: traces.hTrace.x * SCALE + 5, y: -5, main: "h''", sub: el.name, color: traceColor, elementId: `${el.id}-ht2`, priority: 1 });
                                     }
                                     if (traces.vTrace) {
-                                        allLabels.push({ x: traces.vTrace.x * SCALE + 5, y: -traces.vTrace.z * SCALE - 5, text: (<>v''<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-vt` });
-                                        allLabels.push({ x: traces.vTrace.x * SCALE + 5, y: 15, text: (<>v'<tspan fontSize="7" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 10, elementId: `${el.id}-vt2` });
+                                        allLabels.push({ x: traces.vTrace.x * SCALE + 5, y: -traces.vTrace.z * SCALE - 5, main: "v''", sub: el.name, color: traceColor, elementId: `${el.id}-vt`, priority: 1 });
+                                        allLabels.push({ x: traces.vTrace.x * SCALE + 5, y: 15, main: "v'", sub: el.name, color: traceColor, elementId: `${el.id}-vt2`, priority: 1 });
                                     }
                                 } else if (el.type === 'plane') {
                                     const p = el as any;
                                     const xR = 15 * SCALE;
+                                    const traceColor = lightenColor(el.color, 30);
+
                                     if (Math.abs(p.normal.z) > 1e-6) {
                                         const y = -(-p.constant - p.normal.x * 15) / p.normal.z * SCALE - 5;
-                                        allLabels.push({ x: xR, y, text: (<>{el.name}''<tspan fontSize="9" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 12, elementId: `${el.id}-pv` });
+                                        allLabels.push({ x: xR, y, main: `${el.name}''`, sub: el.name, color: traceColor, elementId: `${el.id}-pv`, priority: 1 });
                                     }
                                     if (Math.abs(p.normal.y) > 1e-6) {
                                         const y = (-p.constant - p.normal.x * 15) / p.normal.y * SCALE + 15;
-                                        allLabels.push({ x: xR, y, text: (<>{el.name}'<tspan fontSize="9" baselineShift="sub">{el.name}</tspan></>), color: el.color, fontSize: 12, elementId: `${el.id}-ph` });
+                                        allLabels.push({ x: xR, y, main: `${el.name}'`, sub: el.name, color: traceColor, elementId: `${el.id}-ph`, priority: 1 });
                                     }
                                 }
                             });
 
-                            // Merge coincident labels (only string labels)
+                            // Merge coincident labels
                             const PROXIMITY_THRESHOLD = 15;
-                            const stringLabels = allLabels.filter(l => typeof l.text === 'string');
-                            const jsxLabels = allLabels.filter(l => typeof l.text !== 'string');
-
-                            const merged: typeof stringLabels = [];
+                            const mergedLabels: Array<{ x: number, y: number, items: LabelData[] }> = [];
                             const processed = new Set<number>();
 
-                            for (let i = 0; i < stringLabels.length; i++) {
+                            for (let i = 0; i < allLabels.length; i++) {
                                 if (processed.has(i)) continue;
 
-                                const current = stringLabels[i];
-                                const coincident = [current];
+                                const current = allLabels[i];
+                                const group = [current];
 
-                                for (let j = i + 1; j < stringLabels.length; j++) {
+                                for (let j = i + 1; j < allLabels.length; j++) {
                                     if (processed.has(j)) continue;
-                                    const other = stringLabels[j];
+                                    const other = allLabels[j];
                                     const distance = Math.sqrt(
                                         Math.pow(current.x - other.x, 2) + Math.pow(current.y - other.y, 2)
                                     );
 
                                     if (distance < PROXIMITY_THRESHOLD) {
-                                        coincident.push(other);
+                                        group.push(other);
                                         processed.add(j);
                                     }
                                 }
-
                                 processed.add(i);
 
-                                if (coincident.length > 1) {
-                                    coincident.sort((a, b) => {
-                                        const aPrimes = ((a.text as string).match(/'/g) || []).length;
-                                        const bPrimes = ((b.text as string).match(/'/g) || []).length;
-                                        return aPrimes - bPrimes;
-                                    });
+                                // Sort group: Points first, then by name
+                                group.sort((a, b) => {
+                                    if (a.priority !== b.priority) return a.priority - b.priority;
+                                    return a.main.localeCompare(b.main);
+                                });
 
-                                    merged.push({
-                                        ...current,
-                                        text: coincident.map(l => l.text).join('-'),
-                                        elementId: coincident.map(l => l.elementId).join(',')
-                                    });
-                                } else {
-                                    merged.push(current);
-                                }
+                                mergedLabels.push({ x: current.x, y: current.y, items: group });
                             }
 
-                            return [...merged, ...jsxLabels].map((label, idx) => (
+                            return mergedLabels.map((group, idx) => (
                                 <text
-                                    key={`merged-${label.elementId}-${idx}`}
-                                    x={label.x}
-                                    y={label.y}
-                                    fontSize={label.fontSize || 12}
-                                    fill={label.color}
+                                    key={`merged-${idx}`}
+                                    x={group.x}
+                                    y={group.y}
+                                    fontSize="12"
+                                    fill={group.items[0].color} // Use color of first item (usually point or first trace)
                                     className="merged-label"
+                                    style={{ fontVariantNumeric: 'tabular-nums' }}
                                 >
-                                    {label.text}
+                                    {group.items.map((item, i) => (
+                                        <tspan key={i} fill={item.color}>
+                                            {i > 0 && <tspan fill={isDark ? '#888' : '#ccc'}> - </tspan>}
+                                            {item.main}
+                                            {item.sub && (
+                                                <tspan dy="4" fontSize="9" style={{ fontWeight: 'bold' }}>
+                                                    {item.sub}
+                                                </tspan>
+                                            )}
+                                            {item.sub && <tspan dy="-4"> </tspan>}
+                                        </tspan>
+                                    ))}
                                 </text>
                             ));
                         })()}
                     </g>
 
-                    {/* Sketch Elements (Only in Sketch Mode) */}
-                    {mode === 'sketch' && sketchElements.map(el => (
-                        <SketchElementRenderer key={el.id} element={el} isDark={isDark} onClick={(e) => handleSketchClick(e, el)} selected={selectedElementId === el.id} />
-                    ))}
-
-                    {/* Drawing Preview */}
                     {mode === 'sketch' && renderPreview()}
 
                     {/* Snap Guide Visual */}

@@ -3,7 +3,7 @@ import type { PlaneElement } from '../../types';
 const SCALE = 40;
 const DRAW_RANGE = 15; // Draw lines long enough but keep labels visible
 
-export default function Plane2D({ element }: { element: PlaneElement }) {
+export default function Plane2D({ element, onClick }: { element: PlaneElement, onClick?: (e: React.MouseEvent) => void }) {
     const { normal, constant, color, name } = element;
     const { x: A, y: B, z: C } = normal;
     const D = constant;
@@ -85,25 +85,9 @@ export default function Plane2D({ element }: { element: PlaneElement }) {
             );
         }
 
-        // Label position (at the visible end if possible)
-        // We prefer placing label at the "top" for vertical trace and "bottom" for horizontal
-        // Or just at one of the ends
-        const labelX = xRight;
-        const labelY = getVal(xRight);
-        const svgY = isVerticalTrace ? -labelY * SCALE : labelY * SCALE;
-
         return (
             <g>
                 {lines}
-                <text
-                    x={labelX * SCALE}
-                    y={svgY - (isVerticalTrace ? 5 : -15)}
-                    fontSize="12"
-                    fontWeight="bold"
-                    fill={color}
-                >
-                    {name}{isVerticalTrace ? "''" : "'"}<tspan fontSize="9" dy="2">{name}</tspan>
-                </text>
             </g>
         );
     };
@@ -122,16 +106,8 @@ export default function Plane2D({ element }: { element: PlaneElement }) {
         return (-D - A * x) / B;
     };
 
-    // Special case: Projecting planes (C=0 or B=0)
-    // If C=0 (Vertical Plane / Proyectante Horizontal), Vertical Trace is a vertical line?
-    // No, if C=0, Ax + By + D = 0. It has no Z dependency. It's a wall.
-    // The "Vertical Trace" is the intersection with y=0 plane?
-    // If y=0 => Ax + D = 0 => x = -D/A. Vertical line at x = -D/A.
-
-    // Let's handle standard functions first.
-
     return (
-        <g>
+        <g onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
             {/* Vertical Trace (alpha'') */}
             {Math.abs(C) > 1e-6 ? (
                 renderSplitLine(getZ, true)
@@ -153,7 +129,6 @@ export default function Plane2D({ element }: { element: PlaneElement }) {
                             x2={(-D / A) * SCALE} y2={DRAW_RANGE * SCALE}
                             stroke={color} strokeWidth="1" strokeDasharray="5 5"
                         />
-                        <text x={(-D / A) * SCALE + 5} y={-100} fontSize="12" fontWeight="bold" fill={color}>{name}''</text>
                     </g>
                 )
             )}
@@ -179,7 +154,6 @@ export default function Plane2D({ element }: { element: PlaneElement }) {
                             x2={(-D / A) * SCALE} y2={-DRAW_RANGE * SCALE}
                             stroke={color} strokeWidth="1" strokeDasharray="5 5"
                         />
-                        <text x={(-D / A) * SCALE + 5} y={100} fontSize="12" fontWeight="bold" fill={color}>{name}'</text>
                     </g>
                 )
             )}

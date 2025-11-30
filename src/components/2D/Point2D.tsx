@@ -2,7 +2,7 @@ import type { PointElement } from '../../types';
 
 const SCALE = 40;
 
-export default function Point2D({ element }: { element: PointElement }) {
+export default function Point2D({ element, onClick }: { element: PointElement, onClick?: (e: React.MouseEvent) => void }) {
     const px = element.coords.x * SCALE;
     const py_h = element.coords.y * SCALE; // Horizontal projection (y)
     const py_v = -element.coords.z * SCALE; // Vertical projection (z) - negative because SVG y increases downwards
@@ -10,7 +10,7 @@ export default function Point2D({ element }: { element: PointElement }) {
     return (
         <>
             {/* Geometry (rendered first) */}
-            <g className="point-geometry">
+            <g className="point-geometry" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
                 {/* Vertical Projection (z) */}
                 <circle cx={px} cy={py_v} r="4" fill={element.color} />
 

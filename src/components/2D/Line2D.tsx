@@ -3,11 +3,8 @@ import { calculateLineTraces } from '../../utils/mathUtils';
 
 const SCALE = 40;
 
-export default function Line2D({ element }: { element: LineElement }) {
+export default function Line2D({ element, onClick }: { element: LineElement, onClick?: (e: React.MouseEvent) => void }) {
     // Calculate two points on the line to draw it
-    // Use a large range to simulate infinite lines (e.g., -200 to 200)
-    // This ensures the line covers the viewport even for small direction vectors
-    // Use a reasonable range to keep labels visible
     const t1 = -15;
     const t2 = 15;
 
@@ -27,9 +24,6 @@ export default function Line2D({ element }: { element: LineElement }) {
     const traces = calculateLineTraces(element.point, element.direction);
 
     // Calculate split points (traces) to determine visibility
-    // Horizontal Projection (r'): visible when y > 0 (in front of Vertical Plane)
-    // Vertical Projection (r''): visible when z > 0 (above Horizontal Plane)
-
     const splitPointsH = [t1, t2]; // For horizontal projection
     const splitPointsV = [t1, t2]; // For vertical projection
 
@@ -114,7 +108,7 @@ export default function Line2D({ element }: { element: LineElement }) {
     };
 
     return (
-        <g>
+        <g onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
             {/* Vertical Projection (r'') */}
             {Math.hypot(p1.x - p2.x, p1.z - p2.z) < 1e-4 ? (
                 <g>
@@ -127,12 +121,10 @@ export default function Line2D({ element }: { element: LineElement }) {
                         strokeDasharray="4 4"
                     />
                     <circle cx={p1.x * SCALE} cy={-p1.z * SCALE} r="4" fill={element.color} />
-                    <text x={p1.x * SCALE + 8} y={-p1.z * SCALE - 5} fontSize="12" fill={element.color} fontWeight="bold">{element.name}''</text>
                 </g>
             ) : (
                 <g>
                     {segmentsV.map(seg => renderLineSegment(seg.ta, seg.tb, seg.isVisible, 'v'))}
-                    <text x={p2.x * SCALE} y={-p2.z * SCALE - 5} fontSize="12" fill={element.color}>{element.name}''</text>
                 </g>
             )}
 
@@ -148,27 +140,21 @@ export default function Line2D({ element }: { element: LineElement }) {
                         strokeDasharray="4 4"
                     />
                     <circle cx={p1.x * SCALE} cy={p1.y * SCALE} r="4" fill={element.color} />
-                    <text x={p1.x * SCALE + 8} y={p1.y * SCALE + 5} fontSize="12" fill={element.color} fontWeight="bold">{element.name}'</text>
                 </g>
             ) : (
                 <g>
                     {segmentsH.map(seg => renderLineSegment(seg.ta, seg.tb, seg.isVisible, 'h'))}
-                    <text x={p2.x * SCALE} y={p2.y * SCALE + 15} fontSize="12" fill={element.color}>{element.name}'</text>
                 </g>
             )}
 
             {/* Traces */}
             {traces.hTrace && (
                 <g>
-                    {/* h' (Horizontal Projection of Trace) */}
                     {/* h' (Horizontal Projection of Trace) - X marker */}
                     <g>
                         <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE - 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE + 4} stroke={element.color} strokeWidth="2" />
                         <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE + 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE - 4} stroke={element.color} strokeWidth="2" />
                     </g>
-                    <text x={traces.hTrace.x * SCALE + 5} y={traces.hTrace.y * SCALE + 5} fontSize="10" fill={element.color}>
-                        h'<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
-                    </text>
 
                     {/* h'' (Vertical Projection of Trace on LT) */}
                     <line
@@ -181,22 +167,15 @@ export default function Line2D({ element }: { element: LineElement }) {
                         <line x1={traces.hTrace.x * SCALE - 3} y1={-3} x2={traces.hTrace.x * SCALE + 3} y2={3} stroke={element.color} strokeWidth="2" />
                         <line x1={traces.hTrace.x * SCALE - 3} y1={3} x2={traces.hTrace.x * SCALE + 3} y2={-3} stroke={element.color} strokeWidth="2" />
                     </g>
-                    <text x={traces.hTrace.x * SCALE + 5} y={-5} fontSize="10" fill={element.color}>
-                        h''<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
-                    </text>
                 </g>
             )}
             {traces.vTrace && (
                 <g>
-                    {/* v'' (Vertical Projection of Trace) */}
                     {/* v'' (Vertical Projection of Trace) - X marker */}
                     <g>
                         <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE - 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE + 4} stroke={element.color} strokeWidth="2" />
                         <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE + 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE - 4} stroke={element.color} strokeWidth="2" />
                     </g>
-                    <text x={traces.vTrace.x * SCALE + 5} y={-traces.vTrace.z * SCALE - 5} fontSize="10" fill={element.color}>
-                        v''<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
-                    </text>
 
                     {/* v' (Horizontal Projection of Trace on LT) */}
                     <line
@@ -209,9 +188,6 @@ export default function Line2D({ element }: { element: LineElement }) {
                         <line x1={traces.vTrace.x * SCALE - 3} y1={-3} x2={traces.vTrace.x * SCALE + 3} y2={3} stroke={element.color} strokeWidth="2" />
                         <line x1={traces.vTrace.x * SCALE - 3} y1={3} x2={traces.vTrace.x * SCALE + 3} y2={-3} stroke={element.color} strokeWidth="2" />
                     </g>
-                    <text x={traces.vTrace.x * SCALE + 5} y={15} fontSize="10" fill={element.color}>
-                        v'<tspan fontSize="7" baseline-shift="sub">{element.name}</tspan>
-                    </text>
                 </g>
             )}
 
@@ -219,11 +195,31 @@ export default function Line2D({ element }: { element: LineElement }) {
             {element.p2 && (
                 <g>
                     {/* Point 1 */}
-                    {/* Vertical Proj */}
                     <circle cx={element.point.x * SCALE} cy={-element.point.z * SCALE} r="2.5" fill={element.color} />
-                    {/* Horizontal Proj */}
+                    <text
+                        x={element.point.x * SCALE}
+                        y={-element.point.z * SCALE}
+                        fontSize="4"
+                        fill="white"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{ fontWeight: 'bold', pointerEvents: 'none' }}
+                    >
+                        a''
+                    </text>
+
                     <circle cx={element.point.x * SCALE} cy={element.point.y * SCALE} r="2.5" fill={element.color} />
-                    {/* Connection Line */}
+                    <text
+                        x={element.point.x * SCALE}
+                        y={element.point.y * SCALE}
+                        fontSize="4"
+                        fill="white"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{ fontWeight: 'bold', pointerEvents: 'none' }}
+                    >
+                        a'
+                    </text>
                     <line
                         x1={element.point.x * SCALE} y1={-element.point.z * SCALE}
                         x2={element.point.x * SCALE} y2={element.point.y * SCALE}
@@ -231,11 +227,31 @@ export default function Line2D({ element }: { element: LineElement }) {
                     />
 
                     {/* Point 2 */}
-                    {/* Vertical Proj */}
                     <circle cx={element.p2.x * SCALE} cy={-element.p2.z * SCALE} r="2.5" fill={element.color} />
-                    {/* Horizontal Proj */}
+                    <text
+                        x={element.p2.x * SCALE}
+                        y={-element.p2.z * SCALE}
+                        fontSize="4"
+                        fill="white"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{ fontWeight: 'bold', pointerEvents: 'none' }}
+                    >
+                        b''
+                    </text>
+
                     <circle cx={element.p2.x * SCALE} cy={element.p2.y * SCALE} r="2.5" fill={element.color} />
-                    {/* Connection Line */}
+                    <text
+                        x={element.p2.x * SCALE}
+                        y={element.p2.y * SCALE}
+                        fontSize="4"
+                        fill="white"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{ fontWeight: 'bold', pointerEvents: 'none' }}
+                    >
+                        b'
+                    </text>
                     <line
                         x1={element.p2.x * SCALE} y1={-element.p2.z * SCALE}
                         x2={element.p2.x * SCALE} y2={element.p2.y * SCALE}
