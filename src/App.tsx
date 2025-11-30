@@ -4,6 +4,8 @@ import Scene from './components/Scene';
 import Sidebar from './components/Sidebar';
 import DiedricoView from './components/DiedricoView';
 import { useGeometryStore } from './store/geometryStore';
+import { FEATURES } from './config/features';
+import { AIChatPanel } from './features/ai-assistant';
 
 function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -88,6 +90,10 @@ function App() {
                     )}
                 </div>
             </div>
+
+            {/* AI Assistant Panel */}
+            {FEATURES.AI_ASSISTANT && <AIChatPanel />}
+
             {/* Watermark */}
             <div className={`fixed bottom-16 md:bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Hecho por Eloi García

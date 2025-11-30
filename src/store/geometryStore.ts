@@ -189,7 +189,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     viewMode: '3d',
     setViewMode: (mode) => set({ viewMode: mode }),
 
-    showIntersections: true,
+    showIntersections: false,
     toggleIntersections: () => set((state) => ({ showIntersections: !state.showIntersections })),
 
     showBisectors: false,

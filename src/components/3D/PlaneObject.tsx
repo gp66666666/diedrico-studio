@@ -138,7 +138,8 @@ export default function PlaneObject({ element }: Props) {
                                 [traceLength, 0, (-D - A * traceLength) / C]
                             ]}
                             color={color}
-                            lineWidth={3}
+                            lineWidth={1}
+                            opacity={0.25}
                         />
                     ) : (
                         // Vertical line (x = -D/A)
@@ -148,7 +149,8 @@ export default function PlaneObject({ element }: Props) {
                                 [-D / A, 0, traceLength]
                             ]}
                             color={color}
-                            lineWidth={3}
+                            lineWidth={1}
+                            opacity={0.25}
                         />
                     )}
 
@@ -178,7 +180,8 @@ export default function PlaneObject({ element }: Props) {
                                     [traceLength, (-D - A * traceLength) / B, 0]
                                 ]}
                                 color={color}
-                                lineWidth={3}
+                                lineWidth={1}
+                                opacity={0.25}
                             />
                         ) : (
                             // Line x = -D/A (Perpendicular to LT)
@@ -188,7 +191,8 @@ export default function PlaneObject({ element }: Props) {
                                     [-D / A, traceLength, 0]
                                 ]}
                                 color={color}
-                                lineWidth={3}
+                                lineWidth={1}
+                                opacity={0.25}
                             />
                         )}
 
