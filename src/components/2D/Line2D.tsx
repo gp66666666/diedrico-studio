@@ -162,7 +162,9 @@ export default function Line2D({ element }: { element: LineElement }) {
                 <g>
                     {/* h' (Horizontal Projection of Trace) */}
                     <circle cx={traces.hTrace.x * SCALE} cy={traces.hTrace.y * SCALE} r="3" fill="none" stroke={element.color} strokeWidth="1" />
-                    <text x={traces.hTrace.x * SCALE + 5} y={traces.hTrace.y * SCALE + 5} fontSize="10" fill={element.color}>H'</text>
+                    <text x={traces.hTrace.x * SCALE + 5} y={traces.hTrace.y * SCALE + 5} fontSize="10" fill={element.color}>
+                        h'<tspan fontSize="8" dy="2">{element.name}</tspan>
+                    </text>
 
                     {/* h'' (Vertical Projection of Trace on LT) */}
                     <line
@@ -171,14 +173,18 @@ export default function Line2D({ element }: { element: LineElement }) {
                         stroke={element.color} strokeWidth="1" strokeDasharray="2 2"
                     />
                     <circle cx={traces.hTrace.x * SCALE} cy={0} r="2" fill={element.color} />
-                    <text x={traces.hTrace.x * SCALE + 5} y={-5} fontSize="10" fill={element.color}>h''</text>
+                    <text x={traces.hTrace.x * SCALE + 5} y={-5} fontSize="10" fill={element.color}>
+                        h''<tspan fontSize="8" dy="2">{element.name}</tspan>
+                    </text>
                 </g>
             )}
             {traces.vTrace && (
                 <g>
                     {/* v'' (Vertical Projection of Trace) */}
                     <circle cx={traces.vTrace.x * SCALE} cy={-traces.vTrace.z * SCALE} r="3" fill={element.color} />
-                    <text x={traces.vTrace.x * SCALE + 5} y={-traces.vTrace.z * SCALE - 5} fontSize="10" fill={element.color}>V''</text>
+                    <text x={traces.vTrace.x * SCALE + 5} y={-traces.vTrace.z * SCALE - 5} fontSize="10" fill={element.color}>
+                        v''<tspan fontSize="8" dy="2">{element.name}</tspan>
+                    </text>
 
                     {/* v' (Horizontal Projection of Trace on LT) */}
                     <line
@@ -187,7 +193,9 @@ export default function Line2D({ element }: { element: LineElement }) {
                         stroke={element.color} strokeWidth="1" strokeDasharray="2 2"
                     />
                     <circle cx={traces.vTrace.x * SCALE} cy={0} r="2" fill="none" stroke={element.color} strokeWidth="1" />
-                    <text x={traces.vTrace.x * SCALE + 5} y={15} fontSize="10" fill={element.color}>v'</text>
+                    <text x={traces.vTrace.x * SCALE + 5} y={15} fontSize="10" fill={element.color}>
+                        v'<tspan fontSize="8" dy="2">{element.name}</tspan>
+                    </text>
                 </g>
             )}
 

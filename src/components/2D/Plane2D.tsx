@@ -102,7 +102,7 @@ export default function Plane2D({ element }: { element: PlaneElement }) {
                     fontWeight="bold"
                     fill={color}
                 >
-                    {name}{isVerticalTrace ? "''" : "'"}
+                    {name}{isVerticalTrace ? "''" : "'"}<tspan fontSize="9" dy="2">{name}</tspan>
                 </text>
             </g>
         );

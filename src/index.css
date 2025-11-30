@@ -11,6 +11,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* SVG text labels should render on top */
+svg .text-labels {
+  pointer-events: none;
+}
+
+svg text {
+  pointer-events: none;
+  paint-order: stroke fill;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
