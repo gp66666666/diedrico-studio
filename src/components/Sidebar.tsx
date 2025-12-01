@@ -8,6 +8,8 @@ import type { GeometryElement, PointElement, LineElement, PlaneElement } from '.
 import AdvancedToolsPanel from './AdvancedToolsPanel';
 import { calculatePlaneFromTwoLines } from '../utils/mathUtils';
 import UserMenu from './Auth/UserMenu';
+import PremiumModal from './Auth/PremiumModal';
+import { useUserStore } from '../store/userStore';
 
 export default function Sidebar() {
     const {
@@ -43,6 +45,9 @@ export default function Sidebar() {
     const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane'>('point');
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
+    const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+    const { profile } = useUserStore();
 
     // Point state
     const [pointName, setPointName] = useState('');
@@ -583,25 +588,30 @@ export default function Sidebar() {
             {/* Export Options */}
             <div className={`p-4 border-b ${headerBorder} space-y-2`}>
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Exportar
+                    Exportar {!profile?.is_premium && '🔒'}
                 </h3>
                 <button
-                    onClick={handleExportCurrentView}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                    onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
                 >
                     <span className="flex items-center gap-2">
                         <Download size={16} /> Vista Actual
                     </span>
+                    {!profile?.is_premium && <span className="text-xs">🔒</span>}
                 </button>
                 <button
-                    onClick={handleExportAllViews}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                    onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
                 >
                     <span className="flex items-center gap-2">
                         <Download size={16} /> Todas las Vistas
                     </span>
+                    {!profile?.is_premium && <span className="text-xs">🔒</span>}
                 </button>
             </div>
+
+            {/* Premium Modal */}
+            <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
 
             {/* Tabs */}
             <div className="flex p-2 gap-2">
