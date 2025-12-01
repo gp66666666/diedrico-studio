@@ -15,13 +15,24 @@ export default function UserMenu() {
 
     if (!user) {
         return (
-            <button
-                onClick={signInWithGoogle}
-                className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-                <LogIn size={18} />
-                <span>Iniciar Sesión</span>
-            </button>
+            <div className="flex flex-col gap-2 w-full">
+                <button
+                    onClick={signInWithGoogle}
+                    className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-200"
+                >
+                    <LogIn size={18} />
+                    <span>Iniciar Sesión</span>
+                </button>
+
+                <a
+                    href="https://ko-fi.com/diedricostudio"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full p-2 rounded-lg bg-pink-100 text-pink-600 hover:bg-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:hover:bg-pink-900/30 transition-colors text-xs font-medium"
+                >
+                    <span>☕ Invítame a un café</span>
+                </a>
+            </div>
         );
     }
 
