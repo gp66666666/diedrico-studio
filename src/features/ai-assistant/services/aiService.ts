@@ -9,7 +9,12 @@ class AIService {
 
     constructor() {
         if (AI_CONFIG.provider === 'groq') {
-            this.service = new GroqService(AI_CONFIG.groqApiKey);
+            // Ensure API key exists, otherwise warn and use empty string (service handles it)
+            const apiKey = AI_CONFIG.groqApiKey || '';
+            if (!apiKey) {
+                console.warn('Groq API Key is missing. AI features will not work.');
+            }
+            this.service = new GroqService(apiKey);
         } else {
             this.service = new GeminiService();
         }

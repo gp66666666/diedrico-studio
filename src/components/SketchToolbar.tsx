@@ -108,39 +108,45 @@ export default function SketchToolbar({ activeTool, setActiveTool, selectedColor
         <>
             {/* Desktop Toolbar (Left Side) */}
             <div className={`hidden md:flex flex-col gap-2 p-2 rounded-xl border shadow-lg w-16 hover:w-64 transition-all duration-300 group absolute left-4 top-20 z-30 max-h-[80vh] overflow-y-auto overflow-x-hidden ${bgClass}`}>
-                {TOOL_GROUPS.map(group => (
-                    <div key={group.id} className="flex flex-col">
-                        <button
-                            onClick={() => toggleGroup(group.id)}
-                            className={`flex items-center gap-3 p-2 rounded-lg transition-colors w-full ${hoverClass} ${expandedGroup === group.id ? 'bg-opacity-50' : ''}`}
-                            title={group.name}
-                        >
-                            <div className="min-w-[24px] flex justify-center">{group.icon}</div>
-                            <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-1 text-left">
-                                {group.name}
-                            </span>
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                {expandedGroup === group.id ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                            </div>
-                        </button>
+                {TOOL_GROUPS.map(group => {
+                    const activeToolInGroup = group.tools.find(t => t.id === activeTool);
+                    const groupIcon = activeToolInGroup ? activeToolInGroup.icon : group.icon;
+                    const isGroupActive = !!activeToolInGroup;
 
-                        {expandedGroup === group.id && (
-                            <div className="flex flex-col gap-1 ml-2 pl-2 border-l border-gray-200/20 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                {group.tools.map(tool => (
-                                    <button
-                                        key={tool.id}
-                                        onClick={() => setActiveTool(tool.id)}
-                                        className={`flex items-center gap-3 p-2 rounded-lg text-xs transition-all w-full border border-transparent ${activeTool === tool.id ? activeClass : hoverClass}`}
-                                        title={tool.label}
-                                    >
-                                        <div className="min-w-[20px] flex justify-center">{tool.icon}</div>
-                                        <span className="whitespace-nowrap">{tool.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    return (
+                        <div key={group.id} className="flex flex-col">
+                            <button
+                                onClick={() => toggleGroup(group.id)}
+                                className={`flex items-center gap-3 p-2 rounded-lg transition-colors w-full ${hoverClass} ${expandedGroup === group.id ? 'bg-opacity-50' : ''} ${isGroupActive && expandedGroup !== group.id ? activeClass : ''}`}
+                                title={group.name}
+                            >
+                                <div className="min-w-[24px] flex justify-center">{groupIcon}</div>
+                                <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-1 text-left">
+                                    {group.name}
+                                </span>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    {expandedGroup === group.id ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                </div>
+                            </button>
+
+                            {expandedGroup === group.id && (
+                                <div className="flex flex-col gap-1 mt-1 transition-all duration-200 group-hover:ml-2 group-hover:pl-2 group-hover:border-l border-gray-200/20">
+                                    {group.tools.map(tool => (
+                                        <button
+                                            key={tool.id}
+                                            onClick={() => setActiveTool(tool.id)}
+                                            className={`flex items-center gap-3 p-2 rounded-lg text-xs transition-all w-full border border-transparent ${activeTool === tool.id ? activeClass : hoverClass}`}
+                                            title={tool.label}
+                                        >
+                                            <div className="min-w-[20px] flex justify-center">{tool.icon}</div>
+                                            <span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">{tool.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
 
                 <div className={`h-px my-1 w-full ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
 

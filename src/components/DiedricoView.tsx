@@ -1280,6 +1280,17 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         })()}
                     </g>
 
+                    {/* Sketch Elements Layer */}
+                    {sketchElements.map(el => (
+                        <SketchElementRenderer
+                            key={el.id}
+                            element={el}
+                            isDark={isDark}
+                            onClick={(e) => handleSketchClick(e, el)}
+                            selected={selectedElementId === el.id}
+                        />
+                    ))}
+
                     {mode === 'sketch' && renderPreview()}
 
                     {/* Snap Guide Visual */}
