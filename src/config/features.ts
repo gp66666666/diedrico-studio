@@ -1,6 +1,7 @@
 // Feature Flags Configuration
 export const FEATURES = {
-    AI_ASSISTANT: import.meta.env.VITE_ENABLE_AI === 'true',
+    AI_ASSISTANT: true, // Force enabled for now
+    // AI_ASSISTANT: import.meta.env.VITE_ENABLE_AI === 'true',
 } as const;
 
 export const AI_CONFIG = {
