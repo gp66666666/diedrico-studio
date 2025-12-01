@@ -50,11 +50,20 @@ export default function UserMenu() {
             </div>
 
             {!profile?.is_premium && (
-                <button className="flex items-center justify-center gap-2 w-full p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:shadow-lg transition-all text-sm font-bold">
-                    <Crown size={16} />
+                <button className="flex items-center justify-center gap-1.5 w-full p-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:shadow-md transition-all text-xs font-bold">
+                    <Crown size={14} />
                     <span>Hacerse Premium</span>
                 </button>
             )}
+
+            <a
+                href="https://ko-fi.com/diedricostudio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full p-2 rounded-lg bg-pink-100 text-pink-600 hover:bg-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:hover:bg-pink-900/30 transition-colors text-xs font-medium"
+            >
+                <span>☕ Invítame a un café</span>
+            </a>
 
             <button
                 onClick={signOut}

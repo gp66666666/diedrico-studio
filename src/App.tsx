@@ -23,87 +23,87 @@ function App() {
     const textSub = isDark ? 'text-white/80' : 'text-gray-600';
 
     return (
-        <div className={`flex h-[100dvh] w-screen overflow-hidden transition-colors duration-300 select-none ${bgClass}`}>
-            {/* Mobile Menu Button */}
-            <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className={`md:hidden absolute top-4 left-4 z-50 p-2 rounded-lg backdrop-blur-md border transition-colors ${tabBg} ${textMain}`}
-            >
-                {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+        <div className={`grid h-[100dvh] w-screen overflow-hidden transition-colors duration-300 select-none ${bgClass}`} style={{ gridTemplateRows: '1fr auto' }}>
+            {/* Main App Area (grows to fill available space) */}
+            <div className="overflow-hidden flex min-h-0">
+                {/* Mobile Menu Button */}
+                <button
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className={`md:hidden absolute top-4 left-4 z-50 p-2 rounded-lg backdrop-blur-md border transition-colors ${tabBg} ${textMain}`}
+                >
+                    {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
 
-            {/* Sidebar Wrapper */}
-            <div className={`
-                fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 shadow-2xl md:shadow-none
-                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}>
-                <Sidebar />
-            </div>
-
-            {/* Mobile Overlay */}
-            {isSidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm"
-                    onClick={() => setIsSidebarOpen(false)}
-                />
-            )}
-
-            {/* Main Content Area */}
-            <div className="flex-1 relative h-full flex flex-col w-full pb-12">{/* view_file */}
-
-                {/* View Switcher Tabs */}
-                <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 backdrop-blur-md p-1 rounded-xl border flex gap-1 transition-colors max-w-[90vw] overflow-x-auto no-scrollbar ${tabBg}`}>
-                    <button
-                        onClick={() => setViewMode('3d')}
-                        className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === '3d' ? tabActive : tabInactive}`}
-                    >
-                        <Box size={16} /> <span className="hidden sm:inline">Vista</span> 3D
-                    </button>
-                    <button
-                        onClick={() => setViewMode('2d')}
-                        className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === '2d' ? tabActive : tabInactive}`}
-                    >
-                        <FileText size={16} /> <span className="hidden sm:inline">Diédrico</span> (2D)
-                    </button>
-                    <button
-                        onClick={() => setViewMode('sketch')}
-                        className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === 'sketch' ? 'bg-purple-600 text-white shadow-lg' : tabInactive}`}
-                    >
-                        <PenTool size={16} /> Boceto
-                    </button>
+                {/* Sidebar Wrapper */}
+                <div className={`
+                    fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 shadow-2xl md:shadow-none
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                `}>
+                    <Sidebar />
                 </div>
 
-                {/* View Content */}
-                <div className="flex-1 relative w-full h-full">
-                    {viewMode === '3d' ? (
-                        <>
-                            <Scene />
-                            {/* Instructions overlay (only for 3D) */}
-                            <div className={`absolute top-16 left-4 md:top-4 md:left-4 backdrop-blur-md p-3 rounded-xl border max-w-xs pointer-events-none transition-colors ${overlayBg}`}>
-                                <h3 className={`font-bold text-sm mb-1 ${textMain}`}>🎓 Diedrico 3D</h3>
-                                <p className={`text-xs ${textSub}`}>
-                                    Ejes: <span className="text-red-400">X</span>, <span className="text-green-400">Y</span>, <span className="text-blue-400">Z</span>
-                                </p>
-                            </div>
-                        </>
-                    ) : (
-                        <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />
-                    )}
+                {/* Mobile Overlay */}
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
+
+                {/* Main Content Area */}
+                <div className="flex-1 relative flex flex-col w-full min-h-0">
+                    {/* View Switcher Tabs */}
+                    <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 backdrop-blur-md p-1 rounded-xl border flex gap-1 transition-colors max-w-[90vw] overflow-x-auto no-scrollbar ${tabBg}`}>
+                        <button
+                            onClick={() => setViewMode('3d')}
+                            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === '3d' ? tabActive : tabInactive}`}
+                        >
+                            <Box size={16} /> <span className="hidden sm:inline">Vista</span> 3D
+                        </button>
+                        <button
+                            onClick={() => setViewMode('2d')}
+                            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === '2d' ? tabActive : tabInactive}`}
+                        >
+                            <FileText size={16} /> <span className="hidden sm:inline">Diédrico</span> (2D)
+                        </button>
+                        <button
+                            onClick={() => setViewMode('sketch')}
+                            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === 'sketch' ? 'bg-purple-600 text-white shadow-lg' : tabInactive}`}
+                        >
+                            <PenTool size={16} /> Boceto
+                        </button>
+                    </div>
+
+                    {/* View Content */}
+                    <div className="flex-1 relative w-full h-full">
+                        {viewMode === '3d' ? (
+                            <>
+                                <Scene />
+                                {/* Instructions overlay (only for 3D) */}
+                                <div className={`absolute top-16 left-4 md:top-4 md:left-4 backdrop-blur-md p-3 rounded-xl border max-w-xs pointer-events-none transition-colors ${overlayBg}`}>
+                                    <h3 className={`font-bold text-sm mb-1 ${textMain}`}>🎓 Diedrico 3D</h3>
+                                    <p className={`text-xs ${textSub}`}>
+                                        Ejes: <span className="text-red-400">X</span>, <span className="text-green-400">Y</span>, <span className="text-blue-400">Z</span>
+                                    </p>
+                                </div>
+                            </>
+                        ) : (
+                            <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />
+                        )}
+                    </div>
+                </div>
+
+                {/* AI Assistant Panel */}
+                {FEATURES.AI_ASSISTANT && <AIChatPanel />}
+
+                {/* Watermark */}
+                <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    Hecho por Eloi Garc\u00EDa
                 </div>
             </div>
 
-            {/* AI Assistant Panel */}
-            {FEATURES.AI_ASSISTANT && <AIChatPanel />}
-
-            {/* Ad Banner (only for non-premium users) */}
-            <div className="fixed bottom-0 left-0 right-0 z-40">
-                <AdBanner />
-            </div>
-
-            {/* Watermark */}
-            <div className={`fixed bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                Hecho por Eloi García
-            </div>
+            {/* Ad Banner (takes its natural height in grid, pushes content up) */}
+            <AdBanner />
         </div>
     );
 }

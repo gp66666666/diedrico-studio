@@ -73,6 +73,8 @@ interface GeometryState {
     saveProject: (title: string, description?: string) => Promise<string>;
     loadProject: (projectId: string) => Promise<void>;
     getUserProjects: () => Promise<any[]>;
+    deleteProject: (projectId: string) => Promise<void>;
+    renameProject: (projectId: string, title: string, description?: string) => Promise<void>;
 }
 
 export const useGeometryStore = create<GeometryState>((set, get) => ({
@@ -318,5 +320,23 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
         if (error) throw error;
         return data || [];
+    },
+
+    deleteProject: async (projectId: string) => {
+        const { error } = await supabase
+            .from('projects')
+            .delete()
+            .eq('id', projectId);
+
+        if (error) throw error;
+    },
+
+    renameProject: async (projectId: string, title: string, description?: string) => {
+        const { error } = await supabase
+            .from('projects')
+            .update({ title, description: description || '' })
+            .eq('id', projectId);
+
+        if (error) throw error;
     },
 }));

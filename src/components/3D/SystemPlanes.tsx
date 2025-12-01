@@ -1,9 +1,17 @@
 import { Plane, Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { useGeometryStore } from '../../store/geometryStore';
 
 export default function SystemPlanes({ showBisectors }: { showBisectors: boolean }) {
+    const { theme } = useGeometryStore();
+    const isDark = theme === 'dark';
+
     const size = 40;
-    const opacity = 0.1;
+    // Dark Mode: Opacity 0.1 (Original), Color #c55dc5ff (Original)
+    // Light Mode: Opacity 0.3 (Higher), Color #4c1d95 (Deep Violet)
+    const opacity = isDark ? 0.1 : 0.3;
+    const planeColor = isDark ? "#c55dc5ff" : "#4c1d95";
+    const gridColor = isDark ? "white" : "black";
     const bisectorOpacity = 0.15;
 
     return (
@@ -15,7 +23,7 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             {/* Horizontal Plane (XY) - Ground */}
             {/* Offset slightly to avoid Z-fighting with the grid */}
             <Plane args={[size, size]} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-                <meshBasicMaterial color="#c55dc5ff" transparent opacity={0.3} side={THREE.DoubleSide} depthWrite={false} />
+                <meshBasicMaterial color={planeColor} transparent opacity={isDark ? 0.3 : 0.1} side={THREE.DoubleSide} depthWrite={false} />
             </Plane>
 
             {/* Vertical Plane (XZ) - Wall */}
@@ -23,7 +31,7 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             {/* Vertical Plane (XZ) - Wall */}
             {/* Offset slightly to avoid Z-fighting */}
             <Plane args={[size, size]} position={[0, 0, -0.02]}>
-                <meshBasicMaterial color="#c55dc5ff" transparent opacity={0.3} side={THREE.DoubleSide} depthWrite={false} />
+                <meshBasicMaterial color={planeColor} transparent opacity={isDark ? 0.3 : 0.1} side={THREE.DoubleSide} depthWrite={false} />
             </Plane>
 
 
@@ -57,10 +65,10 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             )}
 
             {/* --- Quadrant Labels --- */}
-            <Text position={[5, 5, 5]} fontSize={1} color="white" fillOpacity={0.5}>I Cuadrante</Text>
-            <Text position={[5, 5, -5]} fontSize={1} color="white" fillOpacity={0.5}>II Cuadrante</Text>
-            <Text position={[5, -5, -5]} fontSize={1} color="white" fillOpacity={0.5}>III Cuadrante</Text>
-            <Text position={[5, -5, 5]} fontSize={1} color="white" fillOpacity={0.5}>IV Cuadrante</Text>
+            <Text position={[5, 5, 5]} fontSize={1} color={gridColor} fillOpacity={0.5}>I Cuadrante</Text>
+            <Text position={[5, 5, -5]} fontSize={1} color={gridColor} fillOpacity={0.5}>II Cuadrante</Text>
+            <Text position={[5, -5, -5]} fontSize={1} color={gridColor} fillOpacity={0.5}>III Cuadrante</Text>
+            <Text position={[5, -5, 5]} fontSize={1} color={gridColor} fillOpacity={0.5}>IV Cuadrante</Text>
 
         </group>
     );

@@ -40,6 +40,10 @@ export class AIExecutor {
                     this.executeDeleteElement(step, store);
                     break;
 
+                case 'add_line_by_coords':
+                    this.executeAddLineByCoords(step, store);
+                    break;
+
                 default:
                     throw new Error(`Unknown action: ${step.action}`);
             }
@@ -200,6 +204,19 @@ export class AIExecutor {
         } else {
             throw new Error(`Elemento "${name}" no encontrado para eliminar.`);
         }
+    }
+
+    private executeAddLineByCoords(step: AIStep, store: any): void {
+        const { name, p1_x, p1_y, p1_z, p2_x, p2_y, p2_z, color } = step.params;
+
+        store.addElement({
+            type: 'line',
+            name: name || `L${Date.now()}`,
+            color: color || step.color,
+            p1: { x: p1_x, y: p1_y, z: p1_z },
+            p2: { x: p2_x, y: p2_y, z: p2_z },
+            isInfinite: true
+        });
     }
 }
 

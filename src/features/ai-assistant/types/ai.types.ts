@@ -38,7 +38,8 @@ export type AIAction =
     | 'set_view_mode'
     | 'toggle_visibility'
     | 'clear_canvas'
-    | 'delete_element';
+    | 'delete_element'
+    | 'add_line_by_coords';
 
 export interface AddPointParams {
     name: string;

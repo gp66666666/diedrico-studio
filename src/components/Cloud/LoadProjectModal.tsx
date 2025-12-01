@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, FolderOpen, Loader, Trash2, Calendar } from 'lucide-react';
+import { X, FolderOpen, Loader, Trash2, Calendar, Edit2 } from 'lucide-react';
 import { useGeometryStore } from '../../store/geometryStore';
 
 interface LoadProjectModalProps {
@@ -12,7 +12,7 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const { loadProject, getUserProjects } = useGeometryStore();
+    const { loadProject, getUserProjects, deleteProject, renameProject } = useGeometryStore();
 
     useEffect(() => {
         if (isOpen) {
@@ -40,6 +40,24 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
             alert('✅ Proyecto cargado correctamente');
         } catch (err: any) {
             setError(err.message || 'Error al cargar el proyecto');
+        }
+    };
+
+    const handleDelete = async (projectId: string) => {
+        try {
+            await deleteProject(projectId);
+            setProjects(projects.filter(p => p.id !== projectId));
+        } catch (err: any) {
+            setError(err.message || 'Error al eliminar el proyecto');
+        }
+    };
+
+    const handleRename = async (projectId: string, newTitle: string, description?: string) => {
+        try {
+            await renameProject(projectId, newTitle, description);
+            setProjects(projects.map(p => p.id === projectId ? { ...p, title: newTitle } : p));
+        } catch (err: any) {
+            setError(err.message || 'Error al renombrar el proyecto');
         }
     };
 
@@ -102,15 +120,43 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
                                             {new Date(project.updated_at).toLocaleDateString('es-ES')}
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleLoad(project.id);
-                                        }}
-                                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                                    >
-                                        Cargar
-                                    </button>
+
+                                    <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const newName = window.prompt('Nuevo nombre del proyecto:', project.title);
+                                                if (newName && newName !== project.title) {
+                                                    handleRename(project.id, newName, project.description);
+                                                }
+                                            }}
+                                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                            title="Renombrar"
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (window.confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
+                                                    handleDelete(project.id);
+                                                }
+                                            }}
+                                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                            title="Eliminar"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleLoad(project.id);
+                                            }}
+                                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-all ml-2"
+                                        >
+                                            Cargar
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
