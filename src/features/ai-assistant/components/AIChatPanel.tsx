@@ -34,7 +34,7 @@ export default function AIChatPanel() {
 
     if (isMinimized) {
         return (
-            <div className="fixed bottom-24 right-4 z-50">
+            <div className="fixed bottom-24 right-4 z-[60]">
                 <button
                     onClick={() => setIsMinimized(false)}
                     className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"

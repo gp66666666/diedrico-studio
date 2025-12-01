@@ -1089,9 +1089,14 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     {elements.map((el) => {
                         if (!el.visible) return null;
 
-                        const handleClick = (e: React.MouseEvent) => {
+                        const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
                             e.stopPropagation();
-                            if (activeDistanceTool !== 'none') {
+                            // Prevent double firing on mobile
+                            if (e.type === 'touchstart') {
+                                // e.preventDefault(); // Removed to allow scrolling if needed, but be careful
+                            }
+
+                            if (activeDistanceTool && activeDistanceTool !== 'none') {
                                 selectForDistance(el.id);
                             } else {
                                 selectElement(el.id);
