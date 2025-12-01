@@ -7,6 +7,7 @@ import { useGeometryStore } from '../store/geometryStore';
 import type { GeometryElement, PointElement, LineElement, PlaneElement } from '../types';
 import AdvancedToolsPanel from './AdvancedToolsPanel';
 import { calculatePlaneFromTwoLines } from '../utils/mathUtils';
+import UserMenu from './Auth/UserMenu';
 
 export default function Sidebar() {
     const {
@@ -1054,6 +1055,10 @@ export default function Sidebar() {
                         )}
                     </div>
                 )}
+            </div>
+            {/* User Menu */}
+            <div className={`p-4 border-t ${headerBorder}`}>
+                <UserMenu />
             </div>
         </div>
     );
