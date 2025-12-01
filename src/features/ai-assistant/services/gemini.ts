@@ -7,25 +7,33 @@ import { colorManager } from './colorManager';
 import type { AIStep, GeminiResponse } from '../types/ai.types';
 
 export class GeminiService {
-    private genAI: GoogleGenerativeAI;
-    private model: any;
+    private genAI?: GoogleGenerativeAI;
+    private model?: any;
 
     constructor() {
         if (!AI_CONFIG.geminiApiKey) {
-            throw new Error('Gemini API key not configured');
+            console.warn('Gemini API key not configured. Gemini features will not work.');
+            // We don't throw here to prevent app crash on load
+        } else {
+            this.genAI = new GoogleGenerativeAI(AI_CONFIG.geminiApiKey);
+            this.model = this.genAI.getGenerativeModel({
+                model: AI_CONFIG.geminiModel,
+                generationConfig: {
+                    temperature: AI_CONFIG.temperature,
+                    maxOutputTokens: AI_CONFIG.maxTokens,
+                },
+            });
         }
-
-        this.genAI = new GoogleGenerativeAI(AI_CONFIG.geminiApiKey);
-        this.model = this.genAI.getGenerativeModel({
-            model: AI_CONFIG.geminiModel,
-            generationConfig: {
-                temperature: AI_CONFIG.temperature,
-                maxOutputTokens: AI_CONFIG.maxTokens,
-            },
-        });
     }
+    // ... (rest of class)
+
+    // Removed side-effect export
+    // export const geminiService = new GeminiService();
 
     async solveExercise(userPrompt: string): Promise<GeminiResponse> {
+        if (!this.model) {
+            throw new Error('Gemini API key not configured');
+        }
         await rateLimiter.checkLimit();
         colorManager.reset();
 
@@ -167,4 +175,4 @@ export class GeminiService {
     }
 }
 
-export const geminiService = new GeminiService();
+
