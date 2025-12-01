@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { GeometryElement, SketchElement } from '../types';
+import { supabase } from '../lib/supabase';
 
 interface GeometryState {
     elements: GeometryElement[];
@@ -67,6 +68,11 @@ interface GeometryState {
     } | null;
     selectForDistance: (id: string) => void;
     clearDistanceTool: () => void;
+
+    // Cloud Save/Load (Premium)
+    saveProject: (title: string, description?: string) => Promise<string>;
+    loadProject: (projectId: string) => Promise<void>;
+    getUserProjects: () => Promise<any[]>;
 }
 
 export const useGeometryStore = create<GeometryState>((set, get) => ({
@@ -256,5 +262,61 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     },
     clearDistanceTool: () => {
         set({ activeTool: 'none', selectedForDistance: [], distanceResult: null });
+    },
+
+    // Cloud Save/Load (Premium)
+    saveProject: async (title: string, description?: string) => {
+        const { elements, sketchElements } = get();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) throw new Error('Must be logged in to save projects');
+
+        const projectData = {
+            user_id: user.id,
+            title,
+            description: description || '',
+            data: { elements, sketchElements }
+        };
+
+        const { data, error } = await supabase
+            .from('projects')
+            .insert(projectData)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data.id;
+    },
+
+    loadProject: async (projectId: string) => {
+        const { data, error } = await supabase
+            .from('projects')
+            .select('*')
+            .eq('id', projectId)
+            .single();
+
+        if (error) throw error;
+
+        const { elements, sketchElements } = data.data;
+        set({
+            elements,
+            sketchElements,
+            history: { past: [], future: [] }
+        });
+    },
+
+    getUserProjects: async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) return [];
+
+        const { data, error } = await supabase
+            .from('projects')
+            .select('id, title, description, created_at, updated_at')
+            .eq('user_id', user.id)
+            .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
     },
 }));

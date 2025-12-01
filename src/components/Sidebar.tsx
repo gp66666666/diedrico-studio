@@ -10,6 +10,8 @@ import { calculatePlaneFromTwoLines } from '../utils/mathUtils';
 import UserMenu from './Auth/UserMenu';
 import PremiumModal from './Auth/PremiumModal';
 import { useUserStore } from '../store/userStore';
+import SaveProjectModal from './Cloud/SaveProjectModal';
+import LoadProjectModal from './Cloud/LoadProjectModal';
 
 export default function Sidebar() {
     const {
@@ -46,6 +48,8 @@ export default function Sidebar() {
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
     const [showPremiumModal, setShowPremiumModal] = useState(false);
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [showLoadModal, setShowLoadModal] = useState(false);
 
     const { profile } = useUserStore();
 
@@ -585,6 +589,29 @@ export default function Sidebar() {
                 </button>
             </div>
 
+            {/* Cloud Save/Load (Premium) */}
+            <div className={`p-4 border-b ${headerBorder} space-y-2`}>
+                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Proyectos {!profile?.is_premium && '🔒'}
+                </h3>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => profile?.is_premium ? setShowSaveModal(true) : setShowPremiumModal(true)}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                    >
+                        <Download size={16} /> Guardar
+                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                    </button>
+                    <button
+                        onClick={() => profile?.is_premium ? setShowLoadModal(true) : setShowPremiumModal(true)}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                    >
+                        <ArrowDownToLine size={16} /> Cargar
+                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                    </button>
+                </div>
+            </div>
+
             {/* Export Options */}
             <div className={`p-4 border-b ${headerBorder} space-y-2`}>
                 <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -1070,6 +1097,10 @@ export default function Sidebar() {
             <div className={`p-4 border-t ${headerBorder}`}>
                 <UserMenu />
             </div>
+
+            {/* Modals */}
+            <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
+            <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />
         </div>
     );
 }
