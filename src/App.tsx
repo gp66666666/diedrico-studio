@@ -49,7 +49,7 @@ function App() {
             )}
 
             {/* Main Content Area */}
-            <div className="flex-1 relative h-full flex flex-col w-full">
+            <div className="flex-1 relative h-full flex flex-col w-full pb-12">{/* view_file */}
 
                 {/* View Switcher Tabs */}
                 <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 backdrop-blur-md p-1 rounded-xl border flex gap-1 transition-colors max-w-[90vw] overflow-x-auto no-scrollbar ${tabBg}`}>
