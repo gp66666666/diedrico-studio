@@ -505,7 +505,7 @@ export default function Sidebar() {
     const buttonClass = isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100';
 
     return (
-        <div className={`h-full w-80 flex flex-col border-r ${headerBorder} ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+        <div className={`h-full w-80 flex flex-col border-r pb-14 ${headerBorder} ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
             {/* Header */}
             <div className={`p-4 border-b ${headerBorder}`}>
                 <div className="flex items-center justify-between">
