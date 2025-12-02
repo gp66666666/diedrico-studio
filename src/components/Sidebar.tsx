@@ -505,7 +505,7 @@ export default function Sidebar() {
     const buttonClass = isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100';
 
     return (
-        <div className={`h-full w-80 flex flex-col border-r pb-14 ${headerBorder} ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+        <div className={`h-full w-80 flex flex-col border-r pb-14 relative ${headerBorder} ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
             {/* Header */}
             <div className={`p-4 border-b ${headerBorder}`}>
                 <div className="flex items-center justify-between">
@@ -663,7 +663,7 @@ export default function Sidebar() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 pb-24">
                 {activeTab === 'add' ? (
                     <div className="space-y-4">
                         {/* Type selector */}
@@ -1093,8 +1093,8 @@ export default function Sidebar() {
                     </div>
                 )}
             </div>
-            {/* User Menu */}
-            <div className={`p-4 border-t ${headerBorder}`}>
+            {/* User Menu - Absolutely positioned at bottom */}
+            <div className={`absolute bottom-0 left-0 right-0 p-2 border-t ${headerBorder} ${isDark ? 'bg-gray-900' : 'bg-white'} z-10`}>
                 <UserMenu />
             </div>
 
