@@ -51,6 +51,8 @@ export default function Sidebar() {
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [showLoadModal, setShowLoadModal] = useState(false);
     const [showViewControls, setShowViewControls] = useState(false);
+    const [showCloudOptions, setShowCloudOptions] = useState(false);
+    const [showExportOptions, setShowExportOptions] = useState(false);
 
     const { profile } = useUserStore();
 
@@ -603,54 +605,70 @@ export default function Sidebar() {
                 )}
             </div>
 
-            {/* Cloud Save/Load (Premium) */}
-            <div className={`p-2 border-b ${headerBorder} space-y-2`}>
-                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Proyectos {!profile?.is_premium && '🔒'}
-                </h3>
-                <div className="flex gap-2 px-2">
-                    <button
-                        onClick={() => profile?.is_premium ? setShowSaveModal(true) : setShowPremiumModal(true)}
-                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-                    >
-                        <Download size={16} /> Guardar
-                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
-                    </button>
-                    <button
-                        onClick={() => profile?.is_premium ? setShowLoadModal(true) : setShowPremiumModal(true)}
-                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-                    >
-                        <ArrowDownToLine size={16} /> Cargar
-                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
-                    </button>
-                </div>
+            {/* Cloud Save/Load (Premium) - Collapsible */}
+            <div className={`p-2 border-b ${headerBorder}`}>
+                <button
+                    onClick={() => setShowCloudOptions(!showCloudOptions)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                >
+                    <span className="flex items-center gap-2">
+                        <Download size={16} /> Proyectos {!profile?.is_premium && '🔒'}
+                    </span>
+                    {showCloudOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+                {showCloudOptions && (
+                    <div className="flex gap-2 px-2 mt-2">
+                        <button
+                            onClick={() => profile?.is_premium ? setShowSaveModal(true) : setShowPremiumModal(true)}
+                            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                        >
+                            <Download size={16} /> Guardar
+                            {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                        </button>
+                        <button
+                            onClick={() => profile?.is_premium ? setShowLoadModal(true) : setShowPremiumModal(true)}
+                            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                        >
+                            <ArrowDownToLine size={16} /> Cargar
+                            {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                        </button>
+                    </div>
+                )}
             </div>
 
-            {/* Export Options */}
-            <div className={`p-2 border-b ${headerBorder} space-y-2`}>
-                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Exportar {!profile?.is_premium && '🔒'}
-                </h3>
-                <div className="px-2 space-y-2">
-                    <button
-                        onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-                    >
-                        <span className="flex items-center gap-2">
-                            <Download size={16} /> Vista Actual
-                        </span>
-                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
-                    </button>
-                    <button
-                        onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-                    >
-                        <span className="flex items-center gap-2">
-                            <Download size={16} /> Todas las Vistas
-                        </span>
-                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
-                    </button>
-                </div>
+            {/* Export Options - Collapsible */}
+            <div className={`p-2 border-b ${headerBorder}`}>
+                <button
+                    onClick={() => setShowExportOptions(!showExportOptions)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                >
+                    <span className="flex items-center gap-2">
+                        <Download size={16} /> Exportar {!profile?.is_premium && '🔒'}
+                    </span>
+                    {showExportOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+                {showExportOptions && (
+                    <div className="px-2 space-y-2 mt-2">
+                        <button
+                            onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Download size={16} /> Vista Actual
+                            </span>
+                            {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                        </button>
+                        <button
+                            onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Download size={16} /> Todas las Vistas
+                            </span>
+                            {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Premium Modal */}
