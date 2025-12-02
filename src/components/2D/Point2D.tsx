@@ -2,10 +2,13 @@ import type { PointElement } from '../../types';
 
 const SCALE = 40;
 
-export default function Point2D({ element, onClick }: { element: PointElement, onClick?: (e: React.MouseEvent) => void }) {
+export default function Point2D({ element, onClick, isDark = false }: { element: PointElement, onClick?: (e: React.MouseEvent) => void, isDark?: boolean }) {
     const px = element.coords.x * SCALE;
     const py_h = element.coords.y * SCALE; // Horizontal projection (y)
     const py_v = -element.coords.z * SCALE; // Vertical projection (z) - negative because SVG y increases downwards
+
+    // Use theme-aware fill color for horizontal projection
+    const horizontalFill = isDark ? '#1f2937' : '#ffffff';
 
     return (
         <>
@@ -15,7 +18,7 @@ export default function Point2D({ element, onClick }: { element: PointElement, o
                 <circle cx={px} cy={py_v} r="4" fill={element.color} />
 
                 {/* Horizontal Projection (y) */}
-                <circle cx={px} cy={py_h} r="4" fill="white" stroke={element.color} strokeWidth="2" />
+                <circle cx={px} cy={py_h} r="4" fill={horizontalFill} stroke={element.color} strokeWidth="2" />
 
                 {/* Connection Line */}
                 <line x1={px} y1={py_v} x2={px} y2={py_h} stroke={element.color} strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />

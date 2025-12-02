@@ -3,7 +3,7 @@ import { calculateLineTraces } from '../../utils/mathUtils';
 
 const SCALE = 40;
 
-export default function Line2D({ element, onClick }: { element: LineElement, onClick?: (e: React.MouseEvent) => void }) {
+export default function Line2D({ element, onClick, isDark = false }: { element: LineElement, onClick?: (e: React.MouseEvent) => void, isDark?: boolean }) {
     // Calculate two points on the line to draw it
     const t1 = -15;
     const t2 = 15;
@@ -107,6 +107,9 @@ export default function Line2D({ element, onClick }: { element: LineElement, onC
         );
     };
 
+    // Use theme-aware fill color for text labels
+    const textFill = isDark ? '#ffffff' : '#000000';
+
     return (
         <g onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
             {/* Vertical Projection (r'') */}
@@ -200,7 +203,7 @@ export default function Line2D({ element, onClick }: { element: LineElement, onC
                         x={element.point.x * SCALE}
                         y={-element.point.z * SCALE}
                         fontSize="4"
-                        fill="white"
+                        fill={textFill}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         style={{ fontWeight: 'bold', pointerEvents: 'none' }}
@@ -213,7 +216,7 @@ export default function Line2D({ element, onClick }: { element: LineElement, onC
                         x={element.point.x * SCALE}
                         y={element.point.y * SCALE}
                         fontSize="4"
-                        fill="white"
+                        fill={textFill}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         style={{ fontWeight: 'bold', pointerEvents: 'none' }}

@@ -3,7 +3,7 @@ import type { PlaneElement } from '../../types';
 const SCALE = 40;
 const DRAW_RANGE = 15; // Draw lines long enough but keep labels visible
 
-export default function Plane2D({ element, onClick }: { element: PlaneElement, onClick?: (e: React.MouseEvent) => void }) {
+export default function Plane2D({ element, onClick, isDark = false }: { element: PlaneElement, onClick?: (e: React.MouseEvent) => void, isDark?: boolean }) {
     const { normal, constant, color, name } = element;
     const { x: A, y: B, z: C } = normal;
     const D = constant;

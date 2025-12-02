@@ -1104,9 +1104,9 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         };
 
                         switch (el.type) {
-                            case 'point': return <Point2D key={el.id} element={el as any} onClick={handleClick} />;
-                            case 'line': return <Line2D key={el.id} element={el as any} onClick={handleClick} />;
-                            case 'plane': return <Plane2D key={el.id} element={el as any} onClick={handleClick} />;
+                            case 'point': return <Point2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
+                            case 'line': return <Line2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
+                            case 'plane': return <Plane2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             default: return null;
                         }
                     })}
