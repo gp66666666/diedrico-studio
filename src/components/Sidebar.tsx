@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown
 } from 'lucide-react';
 import { useGeometryStore } from '../store/geometryStore';
 import type { GeometryElement, PointElement, LineElement, PlaneElement } from '../types';
@@ -50,6 +50,7 @@ export default function Sidebar() {
     const [showPremiumModal, setShowPremiumModal] = useState(false);
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [showLoadModal, setShowLoadModal] = useState(false);
+    const [showViewControls, setShowViewControls] = useState(false);
 
     const { profile } = useUserStore();
 
@@ -547,54 +548,67 @@ export default function Sidebar() {
                 </button>
             </div>
 
-            {/* View Controls */}
-            <div className={`p-4 border-b ${headerBorder} space-y-2`}>
+            {/* View Controls - Collapsible */}
+            <div className={`p-2 border-b ${headerBorder}`}>
                 <button
-                    onClick={toggleIntersections}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${showIntersections
-                        ? 'bg-yellow-500/20 text-yellow-600 border border-yellow-500/50'
-                        : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
-                        }`}
+                    onClick={() => setShowViewControls(!showViewControls)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                 >
                     <span className="flex items-center gap-2">
-                        <Layers size={16} /> Intersecciones
+                        <Settings size={16} /> Controles de Vista
                     </span>
-                    {showIntersections ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                    {showViewControls ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
+                {showViewControls && (
+                    <div className="mt-2 space-y-2">
+                        <button
+                            onClick={toggleIntersections}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${showIntersections
+                                ? 'bg-yellow-500/20 text-yellow-600 border border-yellow-500/50'
+                                : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
+                                }`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Layers size={16} /> Intersecciones
+                            </span>
+                            {showIntersections ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                        </button>
 
-                <button
-                    onClick={toggleBisectors}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${showBisectors
-                        ? 'bg-purple-500/20 text-purple-600 border border-purple-500/50'
-                        : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
-                        }`}
-                >
-                    <span className="flex items-center gap-2">
-                        <Box size={16} /> Bisectores
-                    </span>
-                    {showBisectors ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-                </button>
+                        <button
+                            onClick={toggleBisectors}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${showBisectors
+                                ? 'bg-purple-500/20 text-purple-600 border border-purple-500/50'
+                                : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
+                                }`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Box size={16} /> Bisectores
+                            </span>
+                            {showBisectors ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                        </button>
 
-                <button
-                    onClick={toggleFlattening}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${isFlattened
-                        ? 'bg-green-500/20 text-green-600 border border-green-500/50'
-                        : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
-                        }`}
-                >
-                    <span className="flex items-center gap-2">
-                        <ArrowDownToLine size={16} /> Abatir Plano Horizontal
-                    </span>
-                    {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-                </button>
+                        <button
+                            onClick={toggleFlattening}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${isFlattened
+                                ? 'bg-green-500/20 text-green-600 border border-green-500/50'
+                                : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
+                                }`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <ArrowDownToLine size={16} /> Abatir Plano Horizontal
+                            </span>
+                            {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Cloud Save/Load (Premium) */}
-            <div className={`p-4 border-b ${headerBorder} space-y-2`}>
-                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <div className={`p-2 border-b ${headerBorder} space-y-2`}>
+                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     Proyectos {!profile?.is_premium && '🔒'}
                 </h3>
-                <div className="flex gap-2">
+                <div className="flex gap-2 px-2">
                     <button
                         onClick={() => profile?.is_premium ? setShowSaveModal(true) : setShowPremiumModal(true)}
                         className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
@@ -613,28 +627,30 @@ export default function Sidebar() {
             </div>
 
             {/* Export Options */}
-            <div className={`p-4 border-b ${headerBorder} space-y-2`}>
-                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <div className={`p-2 border-b ${headerBorder} space-y-2`}>
+                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     Exportar {!profile?.is_premium && '🔒'}
                 </h3>
-                <button
-                    onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-                >
-                    <span className="flex items-center gap-2">
-                        <Download size={16} /> Vista Actual
-                    </span>
-                    {!profile?.is_premium && <span className="text-xs">🔒</span>}
-                </button>
-                <button
-                    onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-                >
-                    <span className="flex items-center gap-2">
-                        <Download size={16} /> Todas las Vistas
-                    </span>
-                    {!profile?.is_premium && <span className="text-xs">🔒</span>}
-                </button>
+                <div className="px-2 space-y-2">
+                    <button
+                        onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                    >
+                        <span className="flex items-center gap-2">
+                            <Download size={16} /> Vista Actual
+                        </span>
+                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                    </button>
+                    <button
+                        onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                    >
+                        <span className="flex items-center gap-2">
+                            <Download size={16} /> Todas las Vistas
+                        </span>
+                        {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                    </button>
+                </div>
             </div>
 
             {/* Premium Modal */}
