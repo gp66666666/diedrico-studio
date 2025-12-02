@@ -51,20 +51,6 @@ export const SYSTEM_PROMPT = `Eres un asistente de DIBUJO TÉCNICO en Sistema Di
 
 RECUERDA: En dibujo técnico NO SE CALCULAN números, SE DIBUJA.`;
 
-// IMPORTANT:
-- Si te dan dos puntos A y B para definir una recta R, ¡CREA LA RECTA R INMEDIATAMENTE con "add_line_by_points"! No te quedes pensando.
-- Si la recta se define por puntos, usa "add_line_by_points".
-- Si calculas coordenadas nuevas, usa "add_line_by_coords" o crea los puntos y luego la línea.
-
-FUNDAMENTOS TEÓRICOS A MENCIONAR:
-- Proyecciones: P' (horizontal), P'' (vertical)
-    - Trazas: h' (horizontal), v'' (vertical)
-        - Perpendicularidad: vector normal compartido
-            - Paralelismo: misma dirección
-                - Intersecciones: resolución de sistemas
-
-Responde SIEMPRE en español con explicaciones claras y pedagógicas.`;
-
 export const FEW_SHOT_EXAMPLES = [
     {
         user: "Por el punto A(2,3,4) trazar una recta r perpendicular al plano P con normal (1,0,1)",

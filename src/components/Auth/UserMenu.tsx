@@ -41,7 +41,7 @@ export default function UserMenu() {
                         </button>
 
                         <a
-                            href="https://ko-fi.com/diedricostudio"
+                            href="https://ko-fi.com/eloigperezzds"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2 w-full p-2 rounded-lg bg-pink-100 text-pink-600 hover:bg-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:hover:bg-pink-900/30 transition-colors text-xs font-medium"
