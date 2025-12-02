@@ -5,7 +5,11 @@ import { useAIAssistant } from '../hooks/useAIAssistant';
 import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
 
-export default function AIChatPanel() {
+interface AIChatPanelProps {
+    isSidebarOpen?: boolean;
+}
+
+export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps) {
     const [input, setInput] = useState('');
     const [isMinimized, setIsMinimized] = useState(true); // Inicia minimizado
 
@@ -34,7 +38,7 @@ export default function AIChatPanel() {
 
     if (isMinimized) {
         return (
-            <div className="fixed bottom-24 left-4 md:right-4 md:left-auto z-[60]">
+            <div className={`fixed bottom-24 left-4 md:right-4 md:left-auto z-[60] transition-opacity ${isSidebarOpen ? 'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto' : 'opacity-100'}`}>
                 <button
                     onClick={() => setIsMinimized(false)}
                     className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
@@ -46,7 +50,7 @@ export default function AIChatPanel() {
     }
 
     return (
-        <div className="fixed bottom-24 left-4 md:right-4 md:left-auto z-50 w-96 max-h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col">
+        <div className={`fixed bottom-24 left-4 md:right-4 md:left-auto z-50 w-96 max-h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col transition-opacity ${isSidebarOpen ? 'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto' : 'opacity-100'}`}>
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-600 to-blue-600 rounded-t-lg">
                 <div className="flex items-center gap-2">
