@@ -7,10 +7,10 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
     const isDark = theme === 'dark';
 
     const size = 40;
-    // Dark Mode: Opacity 0.1 (Original), Color #c55dc5ff (Original)
-    // Light Mode: Opacity 0.3 (Higher), Color #4c1d95 (Deep Violet)
-    const opacity = isDark ? 0.1 : 0.3;
-    const planeColor = isDark ? "#c55dc5ff" : "#4c1d95";
+    // Dark Mode: White/Light gray planes
+    // Light Mode: Purple planes
+    const opacity = isDark ? 0.15 : 0.25;
+    const planeColor = isDark ? "#e5e7eb" : "#8b5cf6";
     const gridColor = isDark ? "white" : "black";
     const bisectorOpacity = 0.15;
 
@@ -23,7 +23,7 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             {/* Horizontal Plane (XY) - Ground */}
             {/* Offset slightly to avoid Z-fighting with the grid */}
             <Plane args={[size, size]} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-                <meshBasicMaterial color={planeColor} transparent opacity={isDark ? 0.3 : 0.1} side={THREE.DoubleSide} depthWrite={false} />
+                <meshBasicMaterial color={planeColor} transparent opacity={opacity} side={THREE.DoubleSide} depthWrite={false} />
             </Plane>
 
             {/* Vertical Plane (XZ) - Wall */}
@@ -31,7 +31,7 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             {/* Vertical Plane (XZ) - Wall */}
             {/* Offset slightly to avoid Z-fighting */}
             <Plane args={[size, size]} position={[0, 0, -0.02]}>
-                <meshBasicMaterial color={planeColor} transparent opacity={isDark ? 0.3 : 0.1} side={THREE.DoubleSide} depthWrite={false} />
+                <meshBasicMaterial color={planeColor} transparent opacity={opacity} side={THREE.DoubleSide} depthWrite={false} />
             </Plane>
 
 
