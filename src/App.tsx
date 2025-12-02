@@ -98,7 +98,7 @@ function App() {
 
                 {/* Watermark */}
                 <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    Hecho por Eloi Garc\u00EDa
+                    Hecho por Eloi García
                 </div>
             </div>
 
