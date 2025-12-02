@@ -39,7 +39,9 @@ export type AIAction =
     | 'toggle_visibility'
     | 'clear_canvas'
     | 'delete_element'
-    | 'add_line_by_coords';
+    | 'add_line_by_coords'
+    | 'add_perpendicular_line'
+    | 'add_parallel_line';
 
 export interface AddPointParams {
     name: string;

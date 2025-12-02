@@ -4,24 +4,35 @@ import type { AIStep } from '../types/ai.types';
 
 export class AIExecutor {
     async executeStep(step: AIStep): Promise<void> {
+        console.log('[AI Executor] 🚀 Starting step:', step.stepNumber, '-', step.action);
+        console.log('[AI Executor] Parameters:', JSON.stringify(step.params, null, 2));
+
         const store = useGeometryStore.getState();
 
         try {
             switch (step.action) {
                 case 'add_point':
+                    console.log('[AI] Creating point...');
                     this.executeAddPoint(step, store);
+                    console.log('[AI] ✓ Point created');
                     break;
 
                 case 'add_line_by_points':
+                    console.log('[AI] Creating line by points...');
                     this.executeAddLineByPoints(step, store);
+                    console.log('[AI] ✓ Line created');
                     break;
 
                 case 'add_plane_by_normal':
+                    console.log('[AI] Creating plane by normal...');
                     this.executeAddPlaneByNormal(step, store);
+                    console.log('[AI] ✓ Plane created');
                     break;
 
                 case 'add_plane_by_traces':
+                    console.log('[AI] Creating plane by traces...');
                     this.executeAddPlaneByTraces(step, store);
+                    console.log('[AI] ✓ Plane created');
                     break;
 
                 case 'set_view_mode':
@@ -41,13 +52,17 @@ export class AIExecutor {
                     break;
 
                 case 'add_line_by_coords':
+                    console.log('[AI] Creating line by coords...');
                     this.executeAddLineByCoords(step, store);
+                    console.log('[AI] ✓ Line by coords created');
                     break;
 
                 default:
                     throw new Error(`Unknown action: ${step.action}`);
             }
+            console.log('[AI Executor] ✅ Step completed successfully');
         } catch (error: any) {
+            console.error('[AI Executor] ❌ Error in step:', error);
             throw new Error(`Error executing step ${step.stepNumber}: ${error.message}`);
         }
     }
@@ -65,35 +80,57 @@ export class AIExecutor {
 
     private executeAddLineByPoints(step: AIStep, store: any): void {
         const { name, point1_name, point2_name, color } = step.params;
+        console.log('[AI] Finding points:', point1_name, 'and', point2_name);
 
         // Helper to find point by name with priority: Exact match > Case-insensitive match > Contains match
         const findPoint = (searchName: string) => {
+            console.log('[AI] Searching for point:', searchName);
             if (!searchName) return null;
             const elements = store.elements.filter((el: any) => el.type === 'point');
+            console.log('[AI] Available points:', elements.map((el: any) => el.name));
 
             // 1. Exact match (e.g. "A" === "A")
             let found = elements.find((el: any) => el.name === searchName);
-            if (found) return found;
+            if (found) {
+                console.log('[AI] ✓ Found exact match:', found.name);
+                return found;
+            }
 
             // 2. Case-insensitive match (e.g. "a" === "A")
             found = elements.find((el: any) => el.name.toLowerCase() === searchName.toLowerCase());
-            if (found) return found;
+            if (found) {
+                console.log('[AI] ✓ Found case-insensitive match:', found.name);
+                return found;
+            }
 
             // 3. "Punto X" match (e.g. search "A", find "Punto A")
             found = elements.find((el: any) => el.name.toLowerCase() === `punto ${searchName.toLowerCase()}`);
-            if (found) return found;
+            if (found) {
+                console.log('[AI] ✓ Found "Punto X" match:', found.name);
+                return found;
+            }
 
             // 4. Contains match (fallback)
-            return elements.find((el: any) => el.name.toLowerCase().includes(searchName.toLowerCase()));
+            found = elements.find((el: any) => el.name.toLowerCase().includes(searchName.toLowerCase()));
+            if (found) {
+                console.log('[AI] ✓ Found contains match:', found.name);
+                return found;
+            }
+
+            console.log('[AI] ❌ Point not found:', searchName);
+            return null;
         };
 
         const p1 = findPoint(point1_name);
         const p2 = findPoint(point2_name);
 
         if (!p1 || !p2) {
-            throw new Error(`Puntos "${point1_name}" o "${point2_name}" no encontrados. Asegúrate de crearlos primero.`);
+            const error = `Puntos "${point1_name}" o "${point2_name}" no encontrados. Asegúrate de crearlos primero.`;
+            console.error('[AI] ❌', error);
+            throw new Error(error);
         }
 
+        console.log('[AI] Points found. Calculating direction vector...');
         // Calculate direction vector
         const direction = {
             x: p2.coords.x - p1.coords.x,
@@ -108,7 +145,9 @@ export class AIExecutor {
             direction.y /= length;
             direction.z /= length;
         }
+        console.log('[AI] Direction vector:', direction);
 
+        console.log('[AI] Adding line element to store...');
         store.addElement({
             type: 'line',
             point: p1.coords,
@@ -118,6 +157,7 @@ export class AIExecutor {
             p2: p2.coords,
             lineType: 'generic'
         });
+        console.log('[AI] ✓ Line element added to store');
     }
 
     private executeAddPlaneByNormal(step: AIStep, store: any): void {
