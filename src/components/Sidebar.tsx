@@ -12,6 +12,7 @@ import PremiumModal from './Auth/PremiumModal';
 import { useUserStore } from '../store/userStore';
 import SaveProjectModal from './Cloud/SaveProjectModal';
 import LoadProjectModal from './Cloud/LoadProjectModal';
+import LineCreator from './LineCreator';
 
 export default function Sidebar() {
     const {
@@ -853,6 +854,12 @@ export default function Sidebar() {
                                 <button onClick={handleAddLine} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
                                     {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Recta' : 'Añadir Recta'}
                                 </button>
+
+                                {/* Alternativa: Crear recta desde puntos existentes */}
+                                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">O selecciona puntos existentes:</p>
+                                    <LineCreator />
+                                </div>
                             </div>
                         )}
 
@@ -1049,6 +1056,8 @@ export default function Sidebar() {
                                 </button>
                             </div>
                         )}
+
+                        {/* Herramienta para crear rectas por puntos - MOVIDO A LA SECCIÓN DE RECTAS */}
                     </div>
                 ) : activeTab === 'tools' ? (
                     <AdvancedToolsPanel isDark={isDark} />

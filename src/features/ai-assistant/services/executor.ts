@@ -80,44 +80,44 @@ export class AIExecutor {
 
     private executeAddLineByPoints(step: AIStep, store: any): void {
         const { name, point1_name, point2_name, color } = step.params;
-        console.log('[AI] Finding points:', point1_name, 'and', point2_name);
+        console.log('[AI] 🔍 Finding points:', point1_name, 'and', point2_name);
+
+        // Get all available points
+        const points = store.elements.filter((el: any) => el.type === 'point');
+        console.log('[AI] 📍 Available points:', points.map((p: any) => p.name));
 
         // Helper to find point by name with priority: Exact match > Case-insensitive match > Contains match
         const findPoint = (searchName: string) => {
-            console.log('[AI] Searching for point:', searchName);
             if (!searchName) return null;
-            const elements = store.elements.filter((el: any) => el.type === 'point');
-            console.log('[AI] Available points:', elements.map((el: any) => el.name));
 
             // 1. Exact match (e.g. "A" === "A")
-            let found = elements.find((el: any) => el.name === searchName);
+            let found = points.find((el: any) => el.name === searchName);
             if (found) {
                 console.log('[AI] ✓ Found exact match:', found.name);
                 return found;
             }
 
             // 2. Case-insensitive match (e.g. "a" === "A")
-            found = elements.find((el: any) => el.name.toLowerCase() === searchName.toLowerCase());
+            found = points.find((el: any) => el.name.toLowerCase() === searchName.toLowerCase());
             if (found) {
                 console.log('[AI] ✓ Found case-insensitive match:', found.name);
                 return found;
             }
 
             // 3. "Punto X" match (e.g. search "A", find "Punto A")
-            found = elements.find((el: any) => el.name.toLowerCase() === `punto ${searchName.toLowerCase()}`);
+            found = points.find((el: any) => el.name.toLowerCase() === `punto ${searchName.toLowerCase()}`);
             if (found) {
                 console.log('[AI] ✓ Found "Punto X" match:', found.name);
                 return found;
             }
 
             // 4. Contains match (fallback)
-            found = elements.find((el: any) => el.name.toLowerCase().includes(searchName.toLowerCase()));
+            found = points.find((el: any) => el.name.toLowerCase().includes(searchName.toLowerCase()));
             if (found) {
                 console.log('[AI] ✓ Found contains match:', found.name);
                 return found;
             }
 
-            console.log('[AI] ❌ Point not found:', searchName);
             return null;
         };
 
@@ -125,13 +125,15 @@ export class AIExecutor {
         const p2 = findPoint(point2_name);
 
         if (!p1 || !p2) {
-            const error = `Puntos "${point1_name}" o "${point2_name}" no encontrados. Asegúrate de crearlos primero.`;
-            console.error('[AI] ❌', error);
+            const error = `❌ Puntos "${point1_name}" o "${point2_name}" no encontrados. Asegúrate de crearlos primero.`;
+            console.error('[AI]', error);
             throw new Error(error);
         }
 
-        console.log('[AI] Points found. Calculating direction vector...');
-        // Calculate direction vector
+        console.log('[AI] ✓ Points found:', p1.name, 'and', p2.name);
+        console.log('[AI] 📐 Calculating direction vector...');
+
+        // Calculate direction vector (same as LineCreator)
         const direction = {
             x: p2.coords.x - p1.coords.x,
             y: p2.coords.y - p1.coords.y,
@@ -145,19 +147,22 @@ export class AIExecutor {
             direction.y /= length;
             direction.z /= length;
         }
-        console.log('[AI] Direction vector:', direction);
+        console.log('[AI] ✓ Direction vector:', direction);
 
-        console.log('[AI] Adding line element to store...');
-        store.addElement({
+        console.log('[AI] 📝 Creating line element...');
+
+        // Use same structure as LineCreator - this is proven to work!
+        const lineElement: any = {
             type: 'line',
+            name: name || `L${Date.now()}`,
+            color: color || step.color || '#ef4444',
             point: p1.coords,
             direction,
-            color: color || step.color,
-            name: name || `r${Date.now()}`,
-            p2: p2.coords,
-            lineType: 'generic'
-        });
-        console.log('[AI] ✓ Line element added to store');
+            p2: p2.coords
+        };
+
+        store.addElement(lineElement);
+        console.log('[AI] ✅ Line created successfully:', lineElement.name);
     }
 
     private executeAddPlaneByNormal(step: AIStep, store: any): void {

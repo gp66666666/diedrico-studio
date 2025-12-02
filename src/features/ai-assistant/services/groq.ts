@@ -270,6 +270,44 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
 
     private parseResponseToSteps(text: string): AIStep[] {
         const steps: AIStep[] = [];
+
+        // 1. Try to parse JSON blocks first (Robust method)
+        const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/g;
+        let jsonMatch;
+        let stepCount = 0;
+
+        while ((jsonMatch = jsonBlockRegex.exec(text)) !== null) {
+            try {
+                const jsonContent = jsonMatch[1].trim();
+                const stepData = JSON.parse(jsonContent);
+
+                if (stepData.name && stepData.params) {
+                    stepCount++;
+                    steps.push({
+                        id: `step-${stepCount}`,
+                        stepNumber: stepCount,
+                        description: stepData.params.step_description || `Paso ${stepCount}`,
+                        action: stepData.name,
+                        params: {
+                            ...stepData.params,
+                            color: colorManager.getColorForStep(stepCount),
+                        },
+                        color: colorManager.getColorForStep(stepCount),
+                        status: 'pending',
+                    });
+                }
+            } catch (e) {
+                console.error('Error parsing JSON step:', e);
+            }
+        }
+
+        // If JSON blocks found, return them
+        if (steps.length > 0) {
+            return steps;
+        }
+
+        // 2. Fallback to legacy text parsing (Fragile method)
+        console.warn('No JSON blocks found, falling back to text parsing');
         const stepRegex = /\*\*Paso (\d+)\*\*:(.+?)(?=\*\*Paso \d+\*\*|$)/gs;
         let stepMatch;
 
@@ -417,19 +455,33 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
                 break;
 
             case 'add_line_by_points':
-                // Try to find two point names (single uppercase letters)
-                const points = description.match(/\b[A-Z]\b/g);
-                if (points && points.length >= 2) {
-                    // Extract line name if present (e.g. "recta r")
-                    const lineNameMatch = description.match(/recta\s+([a-z0-9]+)/i);
-                    const lineName = lineNameMatch ? lineNameMatch[1] : 'r';
+                // Extract line name first (e.g. "recta r", "recta R")
+                const lineNameMatch = description.match(/recta\s+([a-zA-Z0-9]+)/i);
+                const lineName = lineNameMatch ? lineNameMatch[1] : 'r';
 
+                // Find all potential point names (single uppercase letters)
+                let potentialPoints: string[] = description.match(/\b[A-Z]\b/g) || [];
+
+                console.log('[Parser Debug] Line:', lineName, 'Points found:', potentialPoints);
+
+                // Filter out the line name if it was found in the uppercase letters
+                // (e.g. if line is "R", ignore "R" in the points list)
+                if (lineNameMatch) {
+                    potentialPoints = potentialPoints.filter(p => p !== lineName);
+                }
+
+                console.log('[Parser Debug] Points after filter:', potentialPoints);
+
+                // We need at least 2 points remaining
+                if (potentialPoints.length >= 2) {
                     return {
                         name: lineName,
-                        point1_name: points[0],
-                        point2_name: points[1],
+                        point1_name: potentialPoints[0],
+                        point2_name: potentialPoints[1],
                         step_description: description
                     };
+                } else {
+                    console.warn('[Parser Debug] Not enough points found for line creation');
                 }
                 break;
         }

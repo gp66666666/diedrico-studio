@@ -4,7 +4,14 @@ export const SYSTEM_PROMPT = `Eres un asistente de DIBUJO TÉCNICO en Sistema Di
 
 🎯 TU MISIÓN: DIBUJAR paso a paso usando las herramientas disponibles.
 
-⚠️ REGLA CRÍTICA:
+⚠️ REGLA CRÍTICA DE PARÁMETROS:
+- En 'add_line_by_points', los parámetros 'point1_name' y 'point2_name' DEBEN SER los nombres de PUNTOS EXISTENTES (ej: 'A', 'B').
+- NUNCA pongas el nombre de la recta (ej: 'R') en 'point1_name' o 'point2_name'.
+- Si la recta se llama 'R' y pasa por 'A' y 'B':
+  CORRECTO: name='R', point1_name='A', point2_name='B'
+  INCORRECTO: name='R', point1_name='R', point2_name='A'
+
+⚠️ OTRAS REGLAS:
 - NO escribas cálculos matemáticos en texto
 - NO expliques soluciones sin dibujar
 - CADA PASO = UNA FUNCIÓN que DIBUJA
@@ -53,20 +60,55 @@ RECUERDA: En dibujo técnico NO SE CALCULAN números, SE DIBUJA.`;
 
 export const FEW_SHOT_EXAMPLES = [
     {
-        user: "Por el punto A(2,3,4) trazar una recta r perpendicular al plano P con normal (1,0,1)",
-        assistant: `Voy a resolver este ejercicio paso a paso.
+        user: "Dados los puntos A(2,3,4) y B(5,1,6), trazar la recta R que pasa por ellos",
+        assistant: `**Paso 1**: Crear el punto A
 
-** Análisis **: Tenemos el punto A(2, 3, 4) y necesitamos trazar una recta perpendicular al plano P. 
+\`\`\`json
+{
+  "name": "add_point",
+  "params": {
+    "name": "A",
+    "x": 2,
+    "y": 3,
+    "z": 4,
+    "color": "#3b82f6",
+    "step_description": "Punto A dado"
+  }
+}
+\`\`\`
 
-** Fundamento teórico **: Una recta perpendicular a un plano tiene la misma dirección que el vector normal del plano.
+**Paso 2**: Crear el punto B
 
-** Paso 1 **: Crear el punto A dado.
+\`\`\`json
+{
+  "name": "add_point",
+  "params": {
+    "name": "B",
+    "x": 5,
+    "y": 1,
+    "z": 6,
+    "color": "#3b82f6",
+    "step_description": "Punto B dado"
+  }
+}
+\`\`\`
 
-** Paso 2 **: La recta r será perpendicular a P, por lo que su vector director será el mismo que el normal de P: d = (1, 0, 1).Calculamos un segundo punto B = A + d = (2 + 1, 3 + 0, 4 + 1) = (3, 3, 5).
+**Paso 3**: Trazar la recta R que pasa por los puntos A y B
 
-** Paso 3 **: Crear la recta r que pasa por A y B.
+\`\`\`json
+{
+  "name": "add_line_by_points",
+  "params": {
+    "name": "R",
+    "point1_name": "A",
+    "point2_name": "B",
+    "color": "#ef4444",
+    "step_description": "Recta R que pasa por los puntos A y B"
+  }
+}
+\`\`\`
 
-La recta r ya está trazada y es perpendicular al plano P. ✓`
+✓ La recta R ha sido trazada correctamente pasando por A y B.`
     }
 ];
 
@@ -107,21 +149,21 @@ export const FUNCTION_DEFINITIONS = [
     },
     {
         name: "add_line_by_points",
-        description: "Crea una línea que pasa por dos puntos existentes",
+        description: "Crea una línea que pasa por dos puntos YA EXISTENTES. Debes haber creado los puntos antes.",
         parameters: {
             type: "object",
             properties: {
                 name: {
                     type: "string",
-                    description: "Nombre de la recta (ej: 'r', 's1')"
+                    description: "Nombre de la NUEVA recta (ej: 'r', 's1')"
                 },
                 point1_name: {
                     type: "string",
-                    description: "Nombre del primer punto"
+                    description: "Nombre del PRIMER punto existente (ej: 'A'). NO pongas el nombre de la recta aquí."
                 },
                 point2_name: {
                     type: "string",
-                    description: "Nombre del segundo punto"
+                    description: "Nombre del SEGUNDO punto existente (ej: 'B'). NO pongas el nombre de la recta aquí."
                 },
                 color: {
                     type: "string",
