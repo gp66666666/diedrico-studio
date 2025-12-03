@@ -32,8 +32,8 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
 
     const contentClass = `ml-4 mt-2 space-y-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`;
     const getButtonClass = (tool: string) => `w-full text-left px-3 py-2 text-xs rounded-md transition-colors ${activeTool === tool
-            ? 'bg-blue-500/20 text-blue-600 border border-blue-500/50 font-semibold'
-            : isDark ? 'hover:bg-white/5 text-gray-400' : 'hover:bg-gray-50 text-gray-600'
+        ? 'bg-blue-500/20 text-blue-600 border border-blue-500/50 font-semibold'
+        : isDark ? 'hover:bg-white/5 text-gray-400' : 'hover:bg-gray-50 text-gray-600'
         }`;
 
     return (
@@ -111,16 +111,25 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
 
                 {expandedSections.abatimientos && (
                     <div className={contentClass}>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('abatir-ph')}
+                            onClick={() => setActiveTool(activeTool === 'abatir-ph' ? 'none' : 'abatir-ph')}
+                        >
                             ⬇️ Abatir sobre PH
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('abatir-pv')}
+                            onClick={() => setActiveTool(activeTool === 'abatir-pv' ? 'none' : 'abatir-pv')}
+                        >
                             ➡️ Abatir sobre PV
                         </button>
                         <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
                             🔄 Abatir sobre Traza
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('desabatir')}
+                            onClick={() => setActiveTool(activeTool === 'desabatir' ? 'none' : 'desabatir')}
+                        >
                             ↩️ Desabatir
                         </button>
                         <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>

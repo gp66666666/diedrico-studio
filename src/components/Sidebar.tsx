@@ -13,6 +13,7 @@ import { useUserStore } from '../store/userStore';
 import SaveProjectModal from './Cloud/SaveProjectModal';
 import LoadProjectModal from './Cloud/LoadProjectModal';
 import LineCreator from './LineCreator';
+import AbatimientoTool from './tools/AbatimientoTool';
 
 export default function Sidebar() {
     const {

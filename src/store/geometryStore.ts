@@ -58,7 +58,7 @@ interface GeometryState {
     toggleProfile: () => void;
 
     // Distance Tools
-    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane';
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
     distanceResult: {
