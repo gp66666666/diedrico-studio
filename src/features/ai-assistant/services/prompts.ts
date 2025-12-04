@@ -1,118 +1,38 @@
 // System Prompts and Function Definitions for Gemini AI
+import { AI_ADVANCED_TOOLS_DEFINITIONS } from './aiAdvancedTools';
 
-export const SYSTEM_PROMPT = `Eres un asistente de DIBUJO TÉCNICO en Sistema Diédrico.
+export const SYSTEM_PROMPT = `Eres un asistente experto en DIBUJO TÉCNICO y GEOMETRÍA DESCRIPTIVA (Sistema Diédrico).
 
-🎯 TU MISIÓN: DIBUJAR paso a paso usando las herramientas disponibles.
+🎯 TU OBJETIVO PRINCIPAL:
+Resolver los problemas geométricos planteados por el usuario UTILIZANDO LAS HERRAMIENTAS DISPONIBLES.
+No te limites a explicar; DEBES EJECUTAR LAS ACCIONES para dibujar la solución.
 
-⚠️ REGLA CRÍTICA DE PARÁMETROS:
-- En 'add_line_by_points', los parámetros 'point1_name' y 'point2_name' DEBEN SER los nombres de PUNTOS EXISTENTES (ej: 'A', 'B').
-- NUNCA pongas el nombre de la recta (ej: 'R') en 'point1_name' o 'point2_name'.
-- Si la recta se llama 'R' y pasa por 'A' y 'B':
-  CORRECTO: name='R', point1_name='A', point2_name='B'
-  INCORRECTO: name='R', point1_name='R', point2_name='A'
+🛠️ HERRAMIENTAS DISPONIBLES:
+Tienes acceso a funciones para crear puntos, rectas, planos y realizar operaciones avanzadas (intersecciones, paralelismo, perpendicularidad, giros, abatimientos).
+¡ÚSALAS! Si el usuario pide "traza una paralela", USA 'add_parallel_line'. Si pide "intersección", USA 'intersection_line_plane', etc.
 
-⚠️ OTRAS REGLAS:
-- NO escribas cálculos matemáticos en texto
-- NO expliques soluciones sin dibujar
-- CADA PASO = UNA FUNCIÓN que DIBUJA
+⚠️ REGLAS IMPORTANTES:
+1.  **Primero DIBUJA los datos**: Si el enunciado da puntos o rectas, créalos primero con 'add_point' o 'add_line...'.
+2.  **Usa Nombres EXACTOS**: Debes llamar a los elementos EXACTAMENTE como pide el usuario. Si pide "Punto A", llámalo "A". Si pide "Recta r", llámala "r".
+3.  **SOLUCIÓN FINAL**:
+    *   **Nombre**: Si el usuario especifica un nombre para la solución (ej: "recta s"), el elemento debe llamarse **"s (solución)"**. Si no especifica nombre, llámalo **"Solución"**.
+    *   Usa un **COLOR DIFERENTE** para la solución (ej: '#FFD700' Dorado o '#00FFFF' Cian) para que destaque sobre el resto.
+    *   Si la solución es un valor numérico (ángulo, distancia), **DESTÁCALO EN NEGRITA** en tu respuesta de texto (ej: "El ángulo es de **90°**").
+4.  **Paso a Paso**: Divide el problema en pasos lógicos.
+    *   Paso 1: Dibujar datos.
+    *   Paso 2: Operaciones auxiliares.
+    *   Paso 3: Solución final (Destacada).
+5.  **No alucines coordenadas**: Si necesitas un punto arbitrario, dilo, pero intenta usar los datos del problema.
+6.  **PROHIBIDO CALCULAR A MANO**: Para paralelas, perpendiculares o giros, **ESTÁ PROHIBIDO** calcular coordenadas manualmente (sumar vectores, etc.). **DEBES USAR** las herramientas 'add_parallel_line', 'add_perpendicular...', etc. Si lo haces a mano, fallarás.
 
-📐 PROCESO OBLIGATORIO:
+💡 CONSEJO:
+Si el usuario dice "Dibuja un punto A en (0,0,0)", responde LLAMANDO a la función 'add_point'.
+Si el usuario dice "Calcula la verdadera magnitud", busca si hay una herramienta para ello o realiza el abatimiento necesario.
 
-1️⃣ **DIBUJAR LOS DATOS** (function calls)
-   → Crea TODOS los puntos y rectas dados INMEDIATAMENTE
-   → Usa add_point o add_line_by_coords
-
-2️⃣ **EXPLICAR GRÁFICAMENTE** (texto)
-   → "Paso 1: [Descripción breve de qué se dibuja]"
-   → "Paso 2: [Lo que aparecerá en pantalla]"
-
-3️⃣ **DIBUJAR LA SOLUCIÓN** (function calls)
-   → Usa las herramientas para construir  la solución
-   → IMPORTANTE: Si necesitas calcular puntos intermedios (intersecciones, etc.), usa add_point para crearlos
-
-4️⃣ **RESULTADO VISIBLE** (texto final)
-   → "Solución completa. Se han dibujado X elementos."
-
-🎨 COLORES (rotar):
-- Datos iniciales: #3b82f6 (azul)
-- Construcciones auxiliares: #10b981 (verde)
-- Solución final: #ef4444 (rojo)
-
-✅ EJEMPLO DE RESPUESTA CORRECTA:
-
-"**Paso 1**: Dibujar los puntos dados M, A y B con sus proyecciones"  
-[function call: add_point para M]
-[function call: add_point para A]
-[function call: add_point para B]
-
-"**Paso 2**: Trazar la recta R por A y B"
-[function call: add_line_by_points con A y B]
-
-"**Paso 3**: Construir recta perpendicular S"
-[function call: add_perpendicular_line]
-
-❌ NUNCA HAGAS ESTO:
-- "Calculamos el punto I como..."
-- "La coordenada X es..."
-- Explicar sin dibujar
-
-RECUERDA: En dibujo técnico NO SE CALCULAN números, SE DIBUJA.`;
-
-export const FEW_SHOT_EXAMPLES = [
-    {
-        user: "Dados los puntos A(2,3,4) y B(5,1,6), trazar la recta R que pasa por ellos",
-        assistant: `**Paso 1**: Crear el punto A
-
-\`\`\`json
-{
-  "name": "add_point",
-  "params": {
-    "name": "A",
-    "x": 2,
-    "y": 3,
-    "z": 4,
-    "color": "#3b82f6",
-    "step_description": "Punto A dado"
-  }
-}
-\`\`\`
-
-**Paso 2**: Crear el punto B
-
-\`\`\`json
-{
-  "name": "add_point",
-  "params": {
-    "name": "B",
-    "x": 5,
-    "y": 1,
-    "z": 6,
-    "color": "#3b82f6",
-    "step_description": "Punto B dado"
-  }
-}
-\`\`\`
-
-**Paso 3**: Trazar la recta R que pasa por los puntos A y B
-
-\`\`\`json
-{
-  "name": "add_line_by_points",
-  "params": {
-    "name": "R",
-    "point1_name": "A",
-    "point2_name": "B",
-    "color": "#ef4444",
-    "step_description": "Recta R que pasa por los puntos A y B"
-  }
-}
-\`\`\`
-
-✓ La recta R ha sido trazada correctamente pasando por A y B.`
-    }
-];
+¡TÚ TIENES EL CONTROL DEL DIBUJO! Haz que aparezca en la pantalla.`;
 
 export const FUNCTION_DEFINITIONS = [
+    ...AI_ADVANCED_TOOLS_DEFINITIONS,
     {
         name: "add_point",
         description: "Añade un punto en el espacio 3D con coordenadas (x, y, z)",
@@ -241,6 +161,93 @@ export const FUNCTION_DEFINITIONS = [
                 }
             },
             required: ["name", "normal_x", "normal_y", "normal_z", "constant", "color", "step_description"]
+        }
+    },
+    {
+        name: "add_plane_by_traces",
+        description: "Crea un plano definido por sus trazas (intersecciones con los ejes)",
+        parameters: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "string",
+                    description: "Nombre del plano (ej: 'α', 'Beta')"
+                },
+                x_intercept: {
+                    type: "number",
+                    description: "Corte con eje X (alejamiento)"
+                },
+                y_intercept: {
+                    type: "number",
+                    description: "Corte con eje Y (cota)"
+                },
+                z_intercept: {
+                    type: "number",
+                    description: "Corte con eje Z (altura)"
+                },
+                color: {
+                    type: "string",
+                    description: "Color hexadecimal"
+                },
+                step_description: {
+                    type: "string",
+                    description: "Explicación"
+                }
+            },
+            required: ["name", "x_intercept", "y_intercept", "z_intercept", "color", "step_description"]
+        }
+    },
+    {
+        name: "set_view_mode",
+        description: "Cambia el modo de visualización (3D, 2D, Croquis)",
+        parameters: {
+            type: "object",
+            properties: {
+                mode: {
+                    type: "string",
+                    enum: ["3d", "2d", "sketch"],
+                    description: "Modo de vista"
+                }
+            },
+            required: ["mode"]
+        }
+    },
+    {
+        name: "toggle_visibility",
+        description: "Activa/desactiva elementos visuales auxiliares",
+        parameters: {
+            type: "object",
+            properties: {
+                target: {
+                    type: "string",
+                    enum: ["intersections", "bisectors", "flattening", "profile", "help"],
+                    description: "Qué elemento mostrar/ocultar"
+                }
+            },
+            required: ["target"]
+        }
+    },
+    {
+        name: "delete_element",
+        description: "Elimina un elemento existente por su nombre",
+        parameters: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "string",
+                    description: "Nombre del elemento a eliminar"
+                }
+            },
+            required: ["name"]
+        }
+    },
+    {
+        name: "clear_canvas",
+        description: "Borra TODOS los elementos del lienzo",
+        parameters: {
+            type: "object",
+            properties: {},
+            required: []
         }
     }
 ];

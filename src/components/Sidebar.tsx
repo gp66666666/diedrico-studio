@@ -14,6 +14,11 @@ import SaveProjectModal from './Cloud/SaveProjectModal';
 import LoadProjectModal from './Cloud/LoadProjectModal';
 import LineCreator from './LineCreator';
 import AbatimientoTool from './tools/AbatimientoTool';
+import IntersectionTool from './tools/IntersectionTool';
+import TrueMagnitudeTool from './tools/TrueMagnitudeTool';
+import ParallelismTool from './tools/ParallelismTool';
+import DistanceTool from './tools/DistanceTool';
+import RotationTool from './tools/RotationTool';
 
 export default function Sidebar() {
     const {
@@ -36,6 +41,10 @@ export default function Sidebar() {
         theme,
         toggleTheme,
         toggleHelp,
+        clearAll,
+        measurements,
+        removeMeasurement,
+        clearAllMeasurements,
         activeTool,
         selectForDistance,
         selectedForDistance,
@@ -1061,7 +1070,46 @@ export default function Sidebar() {
                         {/* Herramienta para crear rectas por puntos - MOVIDO A LA SECCIÓN DE RECTAS */}
                     </div>
                 ) : activeTab === 'tools' ? (
-                    <AdvancedToolsPanel isDark={isDark} />
+                    <>
+                        <AbatimientoTool />
+                        <IntersectionTool />
+                        <TrueMagnitudeTool />
+                        <ParallelismTool />
+                        <DistanceTool />
+                        <RotationTool />
+                        <AdvancedToolsPanel isDark={isDark} />
+
+                        {/* Measurements Panel */}
+                        {measurements.length > 0 && (
+                            <div className={`mt-4 p-3 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-semibold">Mediciones</h3>
+                                    <button
+                                        onClick={clearAllMeasurements}
+                                        className="text-xs text-red-500 hover:text-red-700"
+                                    >
+                                        Limpiar Todo
+                                    </button>
+                                </div>
+                                <div className="space-y-1">
+                                    {measurements.map(m => (
+                                        <div key={m.id} className={`flex items-center justify-between text-xs p-2 rounded ${isDark ? 'bg-gray-700' : 'bg-white'}`}>
+                                            <span className="font-medium">{m.label}:</span>
+                                            <span className={m.type === 'length' ? 'text-blue-400' : 'text-green-400'}>
+                                                {m.type === 'length' ? `${m.value.toFixed(2)} u` : `${m.value.toFixed(1)}°`}
+                                            </span>
+                                            <button
+                                                onClick={() => removeMeasurement(m.id)}
+                                                className="ml-2 text-red-500 hover:text-red-700"
+                                            >
+                                                <Trash2 size={12} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className="space-y-2">
                         {elements.length === 0 ? (
@@ -1069,70 +1117,72 @@ export default function Sidebar() {
                                 <p>No hay elementos creados.</p>
                             </div>
                         ) : (
-                            elements.map((el: GeometryElement) => (
-                                <div
-                                    key={el.id}
-                                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id))
-                                        ? 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400'
-                                        : `${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 hover:bg-gray-50'}`
-                                        }`}
-                                >
+                            elements
+                                .filter(el => !el.name.startsWith('proc_'))
+                                .map((el: GeometryElement) => (
                                     <div
-                                        className="flex items-center gap-3 flex-1 cursor-pointer"
-                                        onClick={() => {
-                                            if (activeTool !== 'none') {
-                                                selectForDistance(el.id);
-                                            } else {
-                                                selectElement(el.id);
-                                            }
-                                        }}
+                                        key={el.id}
+                                        className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id))
+                                            ? 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400'
+                                            : `${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 hover:bg-gray-50'}`
+                                            }`}
                                     >
-                                        <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: el.color }} />
-                                        <div>
-                                            <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
-                                                {el.name}
-                                            </p>
-                                            <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                {el.type === 'point' && `(${el.coords.x}, ${el.coords.y}, ${el.coords.z})`}
-                                                {el.type === 'line' && 'Recta'}
-                                                {el.type === 'plane' && 'Plano'}
-                                            </p>
+                                        <div
+                                            className="flex items-center gap-3 flex-1 cursor-pointer"
+                                            onClick={() => {
+                                                if (activeTool !== 'none') {
+                                                    selectForDistance(el.id);
+                                                } else {
+                                                    selectElement(el.id);
+                                                }
+                                            }}
+                                        >
+                                            <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: el.color }} />
+                                            <div>
+                                                <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
+                                                    {el.name}
+                                                </p>
+                                                <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                    {el.type === 'point' && `(${el.coords.x}, ${el.coords.y}, ${el.coords.z})`}
+                                                    {el.type === 'line' && 'Recta'}
+                                                    {el.type === 'plane' && 'Plano'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleVisibility(el.id);
+                                                }}
+                                                className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
+                                                title={el.visible ? "Ocultar" : "Mostrar"}
+                                            >
+                                                {el.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    startEditing(el);
+                                                }}
+                                                className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
+                                                title="Editar"
+                                            >
+                                                <Settings size={14} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    removeElement(el.id);
+                                                }}
+                                                className={`p-1.5 rounded-md transition-colors hover:bg-red-100 hover:text-red-600 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                                                title="Eliminar"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleVisibility(el.id);
-                                            }}
-                                            className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
-                                            title={el.visible ? "Ocultar" : "Mostrar"}
-                                        >
-                                            {el.visible ? <Eye size={14} /> : <EyeOff size={14} />}
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                startEditing(el);
-                                            }}
-                                            className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
-                                            title="Editar"
-                                        >
-                                            <Settings size={14} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                removeElement(el.id);
-                                            }}
-                                            className={`p-1.5 rounded-md transition-colors hover:bg-red-100 hover:text-red-600 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
-                                            title="Eliminar"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
+                                ))
                         )}
                     </div>
                 )}

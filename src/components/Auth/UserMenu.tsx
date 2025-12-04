@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { LogIn, LogOut, Crown, User as UserIcon, ChevronUp, ChevronDown } from 'lucide-react';
+import { LogIn, LogOut, Crown, User as UserIcon, ChevronUp, ChevronDown, Info, Mail, Shield, FileText } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
 
 export default function UserMenu() {
@@ -39,6 +40,41 @@ export default function UserMenu() {
                             <LogIn size={16} />
                             <span>Iniciar Sesión</span>
                         </button>
+
+                        {/* Conócenos Section */}
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 px-2">CONÓCENOS</p>
+                            <div className="space-y-1">
+                                <Link
+                                    to="/about"
+                                    className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                                >
+                                    <Info size={14} />
+                                    <span>Quiénes Somos</span>
+                                </Link>
+                                <Link
+                                    to="/contact"
+                                    className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                                >
+                                    <Mail size={14} />
+                                    <span>Contacto</span>
+                                </Link>
+                                <Link
+                                    to="/privacy"
+                                    className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                                >
+                                    <Shield size={14} />
+                                    <span>Privacidad</span>
+                                </Link>
+                                <Link
+                                    to="/terms"
+                                    className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                                >
+                                    <FileText size={14} />
+                                    <span>Términos</span>
+                                </Link>
+                            </div>
+                        </div>
 
                         <a
                             href="https://ko-fi.com/eloigperezzds"
@@ -112,6 +148,41 @@ export default function UserMenu() {
                     >
                         <span>☕ Invítame a un café</span>
                     </a>
+
+                    {/* Conócenos Section */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 px-2">CONÓCENOS</p>
+                        <div className="space-y-1">
+                            <Link
+                                to="/about"
+                                className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                            >
+                                <Info size={14} />
+                                <span>Quiénes Somos</span>
+                            </Link>
+                            <Link
+                                to="/contact"
+                                className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                            >
+                                <Mail size={14} />
+                                <span>Contacto</span>
+                            </Link>
+                            <Link
+                                to="/privacy"
+                                className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                            >
+                                <Shield size={14} />
+                                <span>Privacidad</span>
+                            </Link>
+                            <Link
+                                to="/terms"
+                                className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs text-gray-700 dark:text-gray-300"
+                            >
+                                <FileText size={14} />
+                                <span>Términos</span>
+                            </Link>
+                        </div>
+                    </div>
 
                     <button
                         onClick={signOut}

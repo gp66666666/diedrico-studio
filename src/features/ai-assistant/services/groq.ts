@@ -2,6 +2,7 @@
 import { colorManager } from './colorManager';
 import { rateLimiter } from './rateLimiter';
 import type { AIStep, GeminiResponse } from '../types/ai.types';
+import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
 
 export class GroqService {
     private apiKey: string;
@@ -27,204 +28,9 @@ export class GroqService {
                     messages: [
                         {
                             role: 'system',
-                            content: `Eres "DiédricoGPT", el asistente de IA más avanzado en Geometría Descriptiva y Sistema Diédrico.
-Resuelves ejercicios complejos descomponiéndolos en operaciones primitivas ejecutables.
-
-═══════════════════════════════════════════════════════════════════
-CAPACIDADES PRIMITIVAS (Lo único que puedes hacer directamente):
-═══════════════════════════════════════════════════════════════════
-
-1. add_point(name, x, y, z) - Crear punto
-2. add_line_by_points(name, point1, point2) - Recta por 2 puntos
-3. add_plane_by_normal(name, nx, ny, nz, D) - Plano Ax+By+Cz+D=0
-4. add_plane_by_traces(name, a, b, c) - Plano P(a,b,c) por trazas
-5. set_view_mode(mode) - Vista: '2d', '3d', 'sketch'
-6. toggle_visibility(target) - Mostrar/ocultar herramientas
-7. delete_element(name) - Borrar elemento
-8. clear_canvas() - Limpiar todo
-
-═══════════════════════════════════════════════════════════════════
-CONOCIMIENTO EXPERTO - FUNDAMENTOS:
-═══════════════════════════════════════════════════════════════════
-
-🔸 COORDENADAS: (x, y, z) = (Alejamiento, Cota, Referencia/X)
-   - Alejamiento (y): Distancia perpendicular al Plano Vertical (PV)
-   - Cota (z): Altura sobre el Plano Horizontal (PH)
-   - Referencia (x): Posición sobre la Línea de Tierra (LT)
-
-🔸 PLANOS PRINCIPALES:
-   - PH (Plano Horizontal): z=0, Normal=(0,0,1)
-   - PV (Plano Frontal): y=0, Normal=(0,1,0)
-   - PP (Plano de Perfil): x=0, Normal=(1,0,0)
-
-🔸 PLANOS POR TRAZAS P(a, b, c):
-   - a = corte con eje X
-   - b = corte con eje Y
-   - c = corte con eje Z
-   - Ecuación: x/a + y/b + z/c = 1
-   - Normal: N = (1/a, 1/b, 1/c)
-   ⚠️ USA SIEMPRE add_plane_by_traces para planos dados así
-   - NOTACIÓN ESPECIAL: Si un eje no se corta (paralelo), usa 0 o la letra del eje:
-     * P(8, 0, 3) o P(8, Y, 3) = Plano paralelo al eje Y
-     * P(0, 5, 2) o P(X, 5, 2) = Plano paralelo al eje X
-     * P(4, 6, 0) o P(4, 6, Z) = Plano paralelo al eje Z (horizontal)
-
-🔸 RECTAS NOTABLES:
-   - Horizontal: z constante, paralela a PH
-   - Frontal: y constante, paralela a PV
-   - De Punta: perpendicular a PV, dirección (0,1,0)
-   - Vertical: perpendicular a PH, dirección (0,0,1)
-   - Paralela a LT: y=0, z=0
-
-🔸 OPERACIONES VECTORIALES:
-   - Producto Cruz: (a,b,c) × (d,e,f) = (bf-ce, cd-af, ae-bd)
-   - Útil para: Perpendicular a 2 vectores, normal a plano por 3 puntos
-   - Plano por punto A con normal N: N·(P-A) = 0 → Nx·x + Ny·y + Nz·z + D = 0
-     donde D = -(Nx·Ax + Ny·Ay + Nz·Az)
-
-═══════════════════════════════════════════════════════════════════
-EJERCICIOS RESUELTOS (Aprende de estos):
-═══════════════════════════════════════════════════════════════════
-
-📚 EJERCICIO 1: Recta horizontal por A(5, 10, 15)
-Razonamiento:
-- Horizontal → z constante, puedo variar x e y
-- Necesito 2 puntos. A ya existe.
-- B debe tener misma cota: B = A + (10, 0, 0) = (15, 10, 15)
-
-Pasos:
-**Paso 1**: Crear punto A(5, 10, 15)
-**Paso 2**: Crear punto auxiliar B(15, 10, 15) para dirección horizontal
-**Paso 3**: Crear recta r que pasa por A y B
-
-═══════════════════════════════════════════════════════════════════
-
-📚 EJERCICIO 2: Plano bisector 1º-3º cuadrante
-Razonamiento:
-- Bisector 1º-3º: y = z (iguala alejamiento y cota)
-- Forma general: 0x + 1y - 1z = 0
-- Normal: (0, 1, -1), Constante: 0
-
-Pasos:
-**Paso 1**: Crear plano Beta con normal (0, 1, -1) y constante 0
-
-═══════════════════════════════════════════════════════════════════
-
-📚 EJERCICIO 3: Plano perpendicular a P(4,0,0) y Q(0,5,0) por A(1,2,3)
-Razonamiento:
-- P(4,0,0): normal Np = (1/4, 0, 0) = (0.25, 0, 0)
-- Q(0,5,0): normal Nq = (0, 1/5, 0) = (0, 0.2, 0)
-- R ⊥ P,Q → Nr = Np × Nq = (0, 0, 0.05)
-- Normalizo: Nr = (0, 0, 1) (plano horizontal)
-- Pasa por A(1,2,3): 0·1 + 0·2 + 1·3 + D = 0 → D = -3
-- Ecuación: z = 3
-
-Pasos:
-**Paso 1**: Crear plano P por trazas (4, 0, 0)
-**Paso 2**: Crear plano Q por trazas (0, 5, 0)
-**Paso 3**: Crear punto A(1, 2, 3)
-**Paso 4**: Crear plano R con normal (0, 0, 1) y constante -3
-
-═══════════════════════════════════════════════════════════════════
-
-📚 EJERCICIO 4: Tetraedro regular con base ABC en PH
-Razonamiento:
-- Base equilátera en z=0
-- A(0,0,0), B(10,0,0), C(5, 8.66, 0) [triángulo equilátero lado 10]
-- D (vértice superior): centro de base + altura
-- Centro: G = ((0+10+5)/3, (0+0+8.66)/3, 0) = (5, 2.89, 0)
-- Altura tetraedro: h = lado·√(2/3) = 10·0.816 = 8.16
-- D = (5, 2.89, 8.16)
-
-Pasos:
-**Paso 1**: Crear punto A(0, 0, 0)
-**Paso 2**: Crear punto B(10, 0, 0)
-**Paso 3**: Crear punto C(5, 8.66, 0)
-**Paso 4**: Crear punto D(5, 2.89, 8.16)
-**Paso 5**: Crear recta arista AB que pasa por A y B
-**Paso 6**: Crear recta arista BC que pasa por B y C
-**Paso 7**: Crear recta arista CA que pasa por C y A
-**Paso 8**: Crear recta arista AD que pasa por A y D
-**Paso 9**: Crear recta arista BD que pasa por B y D
-**Paso 10**: Crear recta arista CD que pasa por C y D
-
-═══════════════════════════════════════════════════════════════════
-
-📚 EJERCICIO 5: Intersección de recta r con plano P
-(Este es conceptual, aún no tenemos primitiva para calcular intersecciones)
-Si te piden esto, CALCULA tú la intersección y crea el punto resultado.
-
-Ejemplo: r pasa por A(0,0,0) con dirección (1,1,1)
-         P: x + y + z = 6
-Razonamiento:
-- Paramétrica de r: (x,y,z) = (0,0,0) + t(1,1,1) = (t,t,t)
-- Sustituir en P: t + t + t = 6 → 3t = 6 → t = 2
-- Punto I = (2, 2, 2)
-
-Pasos:
-**Paso 1**: Crear punto A(0, 0, 0)
-**Paso 2**: Crear punto auxiliar B(1, 1, 1)
-**Paso 3**: Crear recta r que pasa por A y B
-**Paso 4**: Crear plano P con normal (1, 1, 1) y constante -6
-**Paso 5**: Crear punto I(2, 2, 2) intersección calculada
-
-═══════════════════════════════════════════════════════════════════
-ESTRATEGIAS AVANZADAS:
-═══════════════════════════════════════════════════════════════════
-
-✅ Problema: "Recta paralela a r por punto P"
-   Solución: Copia la dirección de r, crea otro punto auxiliar desde P
-
-✅ Problema: "Plano que contiene recta r y punto P"
-   Solución: Toma 2 puntos de r (A,B) + P. Normal = (B-A) × (P-A)
-
-✅ Problema: "Distancia punto-plano"
-   Solución: d = |N·P + D| / |N|. Luego crea punto proyección si hace falta
-
-✅ Problema: "Abatimiento de punto A sobre PH"
-   Solución: Conserva x,y. Nueva z = 0 + alejamiento original
-
-✅ Problema: Figuras complejas (cubos, pirámides, etc.)
-   Solución: Calcula TODOS los vértices primero, luego crea aristas
-
-═══════════════════════════════════════════════════════════════════
-FORMATO DE RESPUESTA OBLIGATORIO:
-═══════════════════════════════════════════════════════════════════
-
-**Paso N**: [Descripción exacta con coordenadas calculadas]
-
-Ejemplo CORRECTO:
-**Paso 1**: Crear punto A(5, 10.5, -3.2)
-
-Ejemplo INCORRECTO:
-**Paso 1**: Calcula el punto A
-
-═══════════════════════════════════════════════════════════════════
-REGLAS IMPERATIVAS:
-═══════════════════════════════════════════════════════════════════
-
-1. CALCULA TODO: Coordenadas, normales, constantes. NUNCA dejes cálculos al usuario.
-2. PRECISIÓN: Usa decimales (1.5, NO "1,5"). Redondea a 2 decimales.
-3. TRAZAS: Si P(a,b,c) → usa add_plane_by_traces SIEMPRE.
-4. NOMENCLATURA: Puntos (A,B,C...), Rectas (r,s,t...), Planos (P,Q,α,β...)
-5. DIDÁCTICA: Explica brevemente tu razonamiento antes de los pasos.
-6. ESPAÑOL: Responde siempre en español.
-7. ⚡ MINIMALISMO: Genera SOLO los pasos ESENCIALES. No crees elementos auxiliares innecesarios.
-   - Si puedes resolver sin puntos intermedios, hazlo.
-   - Evita rectas de construcción a menos que sean parte del resultado final.
-   - Prioriza la simplicidad sobre la exhaustividad.
-
-⚠️ CRÍTICO - ORDEN DE PASOS:
-Si te dan planos P y Q de entrada y piden crear R:
-1. PRIMERO crea P (con add_plane_by_traces si aplica)
-2. LUEGO crea Q (con add_plane_by_traces si aplica)
-3. LUEGO crea puntos dados (A, B, etc.)
-4. FINALMENTE crea el resultado (plano R, recta s, etc.)
-
-NO OMITAS LOS PASOS DE CREAR LOS DATOS DE ENTRADA.
-Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
-→ DEBES generar 4 pasos (P, Q, A, R), NO solo 2 (A, R).`
+                            content: SYSTEM_PROMPT + "\n\nDEFINICIONES DE FUNCIONES DISPONIBLES (ÚSALAS):\n" + JSON.stringify(FUNCTION_DEFINITIONS, null, 2)
                         },
+
                         {
                             role: 'user',
                             content: userPrompt
@@ -316,9 +122,11 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
             const description = stepMatch[2].trim();
 
             const action = this.identifyAction(description);
+            if (!action) continue;
+
             const params = this.extractParams(description, action);
 
-            if (action && params) {
+            if (params) {
                 steps.push({
                     id: `step-${stepNumber}`,
                     stepNumber,
@@ -337,7 +145,7 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
         return steps;
     }
 
-    private identifyAction(description: string): any {
+    private identifyAction(description: string): string | null {
         const lowerDesc = description.toLowerCase();
 
         // Control Actions
@@ -353,8 +161,14 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
             if (lowerDesc.includes('trazas') || lowerDesc.includes('cortes') || lowerDesc.includes('ejes')) {
                 return 'add_plane_by_traces';
             }
+            if (lowerDesc.includes('paralelo')) return 'add_plane_parallel_to_plane';
             return 'add_plane_by_normal';
         }
+
+        // Advanced Tools
+        if (lowerDesc.includes('add_parallel_line') || (lowerDesc.includes('paralela') && lowerDesc.includes('recta'))) return 'add_parallel_line';
+        if (lowerDesc.includes('add_perpendicular_line') || (lowerDesc.includes('perpendicular') && lowerDesc.includes('recta'))) return 'add_perpendicular_line_to_plane';
+        if (lowerDesc.includes('rotate') || lowerDesc.includes('girar')) return 'rotate_point_around_axis';
 
         return null;
     }
@@ -368,17 +182,13 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
         while ((match = coordRegex.exec(description)) !== null) {
             const parts = match[1].split(',').map(v => v.trim());
             if (parts.length === 3) {
-                // Parse each coordinate: number or symbolic (X, Y, Z = infinity/parallel)
                 const values = parts.map(part => {
                     const upper = part.toUpperCase();
-                    // If it's X, Y, or Z (symbolic), treat as 0 (parallel to that axis)
                     if (upper === 'X' || upper === 'Y' || upper === 'Z') {
                         return 0;
                     }
                     return parseFloat(part);
                 });
-
-                // Only add if all are valid numbers (or symbolic)
                 if (values.every(v => !isNaN(v))) {
                     coords.push(values);
                 }
@@ -388,8 +198,7 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
         const nameMatch = description.match(/([A-Z])\s*\(/);
         let name = nameMatch ? nameMatch[1] : 'X';
 
-        // For planes, also try to match "plano X" pattern
-        if (action === 'add_plane_by_traces' || action === 'add_plane_by_normal') {
+        if (action === 'add_plane_by_traces' || action === 'add_plane_by_normal' || action === 'add_plane_parallel_to_plane') {
             const planeNameMatch = description.match(/plano\s+([A-Za-zα-ωΑ-Ω]+)/i);
             if (planeNameMatch) {
                 name = planeNameMatch[1];
@@ -411,8 +220,10 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
                 if (lowerDesc.includes('ayuda')) return { target: 'help' };
                 break;
 
+            case 'clear_canvas':
+                return {};
+
             case 'delete_element':
-                // Extract name of element to delete (e.g. "Borrar punto A")
                 const deleteNameMatch = description.match(/borrar\s+(?:el\s+)?(?:punto|recta|plano)?\s*([a-zA-Z0-9]+)/i);
                 if (deleteNameMatch) return { name: deleteNameMatch[1] };
                 break;
@@ -454,25 +265,24 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
                 }
                 break;
 
+            case 'add_plane_parallel_to_plane':
+                const targetPlaneMatch = description.match(/paralelo\s+al\s+plano\s+([A-Za-zα-ωΑ-Ω]+)/i);
+                if (targetPlaneMatch) {
+                    return {
+                        name,
+                        target_plane_name: targetPlaneMatch[1],
+                        step_description: description,
+                    };
+                }
+                break;
+
             case 'add_line_by_points':
-                // Extract line name first (e.g. "recta r", "recta R")
                 const lineNameMatch = description.match(/recta\s+([a-zA-Z0-9]+)/i);
                 const lineName = lineNameMatch ? lineNameMatch[1] : 'r';
-
-                // Find all potential point names (single uppercase letters)
                 let potentialPoints: string[] = description.match(/\b[A-Z]\b/g) || [];
-
-                console.log('[Parser Debug] Line:', lineName, 'Points found:', potentialPoints);
-
-                // Filter out the line name if it was found in the uppercase letters
-                // (e.g. if line is "R", ignore "R" in the points list)
                 if (lineNameMatch) {
                     potentialPoints = potentialPoints.filter(p => p !== lineName);
                 }
-
-                console.log('[Parser Debug] Points after filter:', potentialPoints);
-
-                // We need at least 2 points remaining
                 if (potentialPoints.length >= 2) {
                     return {
                         name: lineName,
@@ -480,8 +290,54 @@ Ejemplo: Si te piden "Plano R perpendicular a P(1,0,0) y Q(0,1,0) por A(5,5,5)"
                         point2_name: potentialPoints[1],
                         step_description: description
                     };
-                } else {
-                    console.warn('[Parser Debug] Not enough points found for line creation');
+                }
+                break;
+
+            case 'add_parallel_line':
+                const parallelLineNameMatch = description.match(/recta\s+([a-zA-Z0-9]+)\s+paralela/i);
+                const parallelLineName = parallelLineNameMatch ? parallelLineNameMatch[1] : 'r_parallel';
+                const throughPointMatch = description.match(/por\s+el\s+punto\s+([A-Z])/i);
+                const parallelToLineMatch = description.match(/a\s+la\s+recta\s+([a-zA-Z0-9]+)/i);
+
+                if (throughPointMatch && parallelToLineMatch) {
+                    return {
+                        name: parallelLineName,
+                        through_point_name: throughPointMatch[1],
+                        parallel_to_line_name: parallelToLineMatch[1],
+                        step_description: description,
+                    };
+                }
+                break;
+
+            case 'add_perpendicular_line_to_plane':
+                const perpLineNameMatch = description.match(/recta\s+([a-zA-Z0-9]+)\s+perpendicular/i);
+                const perpLineName = perpLineNameMatch ? perpLineNameMatch[1] : 'r_perp';
+                const perpThroughPointMatch = description.match(/por\s+el\s+punto\s+([A-Z])/i);
+                const perpToPlaneMatch = description.match(/al\s+plano\s+([A-Za-zα-ωΑ-Ω]+)/i);
+
+                if (perpThroughPointMatch && perpToPlaneMatch) {
+                    return {
+                        name: perpLineName,
+                        through_point_name: perpThroughPointMatch[1],
+                        perpendicular_to_plane_name: perpToPlaneMatch[1],
+                        step_description: description,
+                    };
+                }
+                break;
+
+            case 'rotate_point_around_axis':
+                const pointToRotateMatch = description.match(/punto\s+([A-Z])\s+alrededor/i);
+                const axisPoint1Match = description.match(/eje\s+que\s+pasa\s+por\s+([A-Z])\s+y\s+([A-Z])/i);
+                const angleMatch = description.match(/(\d+)\s*grados/i);
+
+                if (pointToRotateMatch && axisPoint1Match && angleMatch) {
+                    return {
+                        point_name: pointToRotateMatch[1],
+                        axis_point1_name: axisPoint1Match[1],
+                        axis_point2_name: axisPoint1Match[2],
+                        angle_degrees: parseFloat(angleMatch[1]),
+                        step_description: description,
+                    };
                 }
                 break;
         }

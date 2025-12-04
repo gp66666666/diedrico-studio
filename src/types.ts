@@ -25,6 +25,7 @@ export interface LineElement extends BaseElement {
     point: Vector3;
     direction: Vector3;
     p2?: Vector3; // Optional second point if defined by 2 points
+    dashed?: boolean;
 }
 
 export interface PlaneElement extends BaseElement {

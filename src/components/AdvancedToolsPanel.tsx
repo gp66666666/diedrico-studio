@@ -15,6 +15,9 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
         distances: true,  // Open by default
         abatimientos: false,
+        intersecciones: false,
+        verdaderaMagnitud: false,
+        paralelismo: false,
         giros: false,
         cambiosPlano: false,
         solidos: false
@@ -65,20 +68,14 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         <button
                             className={getButtonClass('distance-point-line')}
                             onClick={() => setActiveTool(activeTool === 'distance-point-line' ? 'none' : 'distance-point-line')}
-                            disabled
-                            title="Próximamente"
                         >
                             📐 Punto - Recta
-                            <span className="ml-2 text-xs opacity-50">(pronto)</span>
                         </button>
                         <button
                             className={getButtonClass('distance-point-plane')}
                             onClick={() => setActiveTool(activeTool === 'distance-point-plane' ? 'none' : 'distance-point-plane')}
-                            disabled
-                            title="Próximamente"
                         >
                             📋 Punto - Plano
-                            <span className="ml-2 text-xs opacity-50">(pronto)</span>
                         </button>
                         <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
                             ↔️ Recta - Recta
@@ -139,6 +136,166 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                 )}
             </div>
 
+            {/* INTERSECCIONES */}
+            <div>
+                <button
+                    onClick={() => toggleSection('intersecciones')}
+                    className={sectionClass}
+                >
+                    <span className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M3 7v10M21 7v10M7 3h10M7 21h10" />
+                        </svg>
+                        Intersecciones
+                    </span>
+                    {expandedSections.intersecciones ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+
+                {expandedSections.intersecciones && (
+                    <div className={contentClass}>
+                        <button
+                            className={getButtonClass('intersection-line-line')}
+                            onClick={() => setActiveTool(activeTool === 'intersection-line-line' ? 'none' : 'intersection-line-line')}
+                        >
+                            ✖️ Recta-Recta
+                        </button>
+                        <button
+                            className={getButtonClass('intersection-line-plane')}
+                            onClick={() => setActiveTool(activeTool === 'intersection-line-plane' ? 'none' : 'intersection-line-plane')}
+                        >
+                            ⊕ Recta-Plano
+                        </button>
+                        <button
+                            className={getButtonClass('intersection-plane-plane')}
+                            onClick={() => setActiveTool(activeTool === 'intersection-plane-plane' ? 'none' : 'intersection-plane-plane')}
+                        >
+                            ⊞ Plano-Plano
+                        </button>
+                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Selecciona elementos para calcular intersecciones
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* VERDADERA MAGNITUD */}
+            <div>
+                <button
+                    onClick={() => toggleSection('verdaderaMagnitud')}
+                    className={sectionClass}
+                >
+                    <span className="flex items-center gap-2">
+                        <Ruler size={16} />
+                        Verdadera Magnitud
+                    </span>
+                    {expandedSections.verdaderaMagnitud ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+
+                {expandedSections.verdaderaMagnitud && (
+                    <div className={contentClass}>
+                        <button
+                            className={getButtonClass('true-length')}
+                            onClick={() => setActiveTool(activeTool === 'true-length' ? 'none' : 'true-length')}
+                        >
+                            📏 Longitud de Recta
+                        </button>
+                        <button
+                            className={getButtonClass('angle-line-line')}
+                            onClick={() => setActiveTool(activeTool === 'angle-line-line' ? 'none' : 'angle-line-line')}
+                        >
+                            📐 Ángulo Recta-Recta
+                        </button>
+                        <button
+                            className={getButtonClass('angle-line-plane')}
+                            onClick={() => setActiveTool(activeTool === 'angle-line-plane' ? 'none' : 'angle-line-plane')}
+                        >
+                            📐 Ángulo Recta-Plano
+                        </button>
+                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Calcula dimensiones reales
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* PARALELISMO Y PERPENDICULARIDAD */}
+            <div>
+                <button
+                    onClick={() => toggleSection('paralelismo')}
+                    className={sectionClass}
+                >
+                    <span className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M3 6h18M3 12h18M3 18h18" />
+                        </svg>
+                        Paralelismo / Perpendicularidad
+                    </span>
+                    {expandedSections.paralelismo ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+
+                {expandedSections.paralelismo && (
+                    <div className={contentClass}>
+                        <div className="mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Básicos (1 Referencia)</div>
+                        <button
+                            className={getButtonClass('parallel-line-line')}
+                            onClick={() => setActiveTool(activeTool === 'parallel-line-line' ? 'none' : 'parallel-line-line')}
+                        >
+                            ∥ Recta Paralela a Recta
+                        </button>
+                        <button
+                            className={getButtonClass('plane-parallel-plane')}
+                            onClick={() => setActiveTool(activeTool === 'plane-parallel-plane' ? 'none' : 'plane-parallel-plane')}
+                        >
+                            ∥ Plano Paralelo a Plano
+                        </button>
+                        <button
+                            className={getButtonClass('perp-line-plane')}
+                            onClick={() => setActiveTool(activeTool === 'perp-line-plane' ? 'none' : 'perp-line-plane')}
+                        >
+                            ⊥ Recta Perpendicular a Plano
+                        </button>
+                        <button
+                            className={getButtonClass('perp-plane-line')}
+                            onClick={() => setActiveTool(activeTool === 'perp-plane-line' ? 'none' : 'perp-plane-line')}
+                        >
+                            ⊥ Plano Perpendicular a Recta
+                        </button>
+                        <button
+                            className={getButtonClass('perp-line-line')}
+                            onClick={() => setActiveTool(activeTool === 'perp-line-line' ? 'none' : 'perp-line-line')}
+                        >
+                            ⊥ Recta Perpendicular a Recta
+                        </button>
+
+                        <div className="mt-3 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Avanzados (2 Referencias)</div>
+                        <button
+                            className={getButtonClass('plane-perp-2-planes')}
+                            onClick={() => setActiveTool(activeTool === 'plane-perp-2-planes' ? 'none' : 'plane-perp-2-planes')}
+                        >
+                            ⊥ Plano Perpendicular a 2 Planos
+                        </button>
+                        <button
+                            className={getButtonClass('line-parallel-2-planes')}
+                            onClick={() => setActiveTool(activeTool === 'line-parallel-2-planes' ? 'none' : 'line-parallel-2-planes')}
+                        >
+                            ∥ Recta Paralela a 2 Planos
+                        </button>
+                        <button
+                            className={getButtonClass('plane-parallel-2-lines')}
+                            onClick={() => setActiveTool(activeTool === 'plane-parallel-2-lines' ? 'none' : 'plane-parallel-2-lines')}
+                        >
+                            ∥ Plano Paralelo a 2 Rectas
+                        </button>
+
+                        <div className={`mt-2 px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Selecciona Punto + Referencias
+                        </div>
+                    </div>
+                )}
+            </div>
+
+
             {/* GIROS */}
             <div>
                 <button
@@ -154,11 +311,11 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
 
                 {expandedSections.giros && (
                     <div className={contentClass}>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
-                            🔄 Giro Vertical
-                        </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
-                            🔁 Giro de Punta
+                        <button
+                            className={getButtonClass('rotation-point-axis')}
+                            onClick={() => setActiveTool(activeTool === 'rotation-point-axis' ? 'none' : 'rotation-point-axis')}
+                        >
+                            🔄 Girar Punto sobre Eje
                         </button>
                         <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
                             ↔️ Giro Paralelo a LT
@@ -166,6 +323,9 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
                             🌀 Giro Eje Cualquiera
                         </button>
+                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Rota elementos alrededor de un eje
+                        </div>
                     </div>
                 )}
             </div>
@@ -293,6 +453,6 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                     </p>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

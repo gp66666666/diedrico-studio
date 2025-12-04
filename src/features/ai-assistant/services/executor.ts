@@ -1,6 +1,7 @@
 // AI Step Executor - Executes construction steps on the geometry store
 import { useGeometryStore } from '../../../store/geometryStore';
 import type { AIStep } from '../types/ai.types';
+import { executeAdvancedTool } from './aiAdvancedTools';
 
 export class AIExecutor {
     async executeStep(step: AIStep): Promise<void> {
@@ -58,7 +59,13 @@ export class AIExecutor {
                     break;
 
                 default:
-                    throw new Error(`Unknown action: ${step.action}`);
+                    // Try to execute as an advanced tool
+                    const advancedResult = executeAdvancedTool(step.action, step.params, store.elements, store.addElement);
+                    if (advancedResult) {
+                        console.log(`[AI] ✓ Advanced tool ${step.action} executed successfully`);
+                    } else {
+                        console.warn(`[AI Executor] Unknown action: ${step.action}`);
+                    }
             }
             console.log('[AI Executor] ✅ Step completed successfully');
         } catch (error: any) {

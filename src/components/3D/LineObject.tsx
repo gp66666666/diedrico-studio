@@ -83,18 +83,23 @@ export default function LineObject({ element }: Props) {
                     points={[p1, p2]}
                     color={isSelected ? '#ffff00' : color}
                     lineWidth={isSelected ? 3 : 2}
+                    dashed={element.dashed}
+                    dashScale={2}
+                    gapSize={1}
                 />
                 <Billboard position={[point.x, point.y + 0.5, point.z]}>
-                    <Text
-                        fontSize={isSelected ? 0.8 : 0.5}
-                        color={isSelected ? '#ffff00' : 'white'}
-                        anchorX="center"
-                        anchorY="middle"
-                        outlineWidth={0.05}
-                        outlineColor="#000000"
-                    >
-                        {name}
-                    </Text>
+                    {!name.startsWith('proc_') && (
+                        <Text
+                            fontSize={isSelected ? 0.8 : 0.5}
+                            color={isSelected ? '#ffff00' : 'white'}
+                            anchorX="center"
+                            anchorY="middle"
+                            outlineWidth={0.05}
+                            outlineColor="#000000"
+                        >
+                            {name}
+                        </Text>
+                    )}
                 </Billboard>
 
                 {/* Traces Markers in 3D */}

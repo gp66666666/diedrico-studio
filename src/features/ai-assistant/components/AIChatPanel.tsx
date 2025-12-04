@@ -1,6 +1,6 @@
 // AI Chat Panel - Main UI Component
 import { useState } from 'react';
-import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X } from 'lucide-react';
+import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAIAssistant } from '../hooks/useAIAssistant';
 import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
@@ -12,6 +12,7 @@ interface AIChatPanelProps {
 export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps) {
     const [input, setInput] = useState('');
     const [isMinimized, setIsMinimized] = useState(true); // Inicia minimizado
+    const [isStepsExpanded, setIsStepsExpanded] = useState(false); // Pasos colapsados por defecto
 
     const {
         messages,
@@ -117,8 +118,21 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
             {/* Steps Control */}
             {hasSteps && (
                 <div className="border-t border-gray-200 dark:border-gray-700 p-3">
-                    <AIStepsList steps={lastMessage.steps!} currentStep={currentStep} />
-                    <div className="flex gap-2 mt-3">
+                    <button
+                        onClick={() => setIsStepsExpanded(!isStepsExpanded)}
+                        className="flex items-center justify-between w-full text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    >
+                        <span>Pasos de Ejecución ({lastMessage.steps!.length})</span>
+                        {isStepsExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </button>
+
+                    {isStepsExpanded && (
+                        <div className="mb-3">
+                            <AIStepsList steps={lastMessage.steps!} currentStep={currentStep} />
+                        </div>
+                    )}
+
+                    <div className="flex gap-2">
                         <button
                             onClick={executeSteps}
                             disabled={isProcessing}

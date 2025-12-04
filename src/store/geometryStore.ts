@@ -58,7 +58,7 @@ interface GeometryState {
     toggleProfile: () => void;
 
     // Distance Tools
-    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir';
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
     distanceResult: {
@@ -68,6 +68,18 @@ interface GeometryState {
     } | null;
     selectForDistance: (id: string) => void;
     clearDistanceTool: () => void;
+
+    // Measurements (True Magnitude)
+    measurements: Array<{
+        id: string;
+        type: 'length' | 'angle' | 'distance';
+        value: number;
+        label: string;
+        elementIds: string[];
+    }>;
+    addMeasurement: (measurement: Omit<GeometryState['measurements'][0], 'id'>) => void;
+    removeMeasurement: (id: string) => void;
+    clearAllMeasurements: () => void;
 
     // Cloud Save/Load (Premium)
     saveProject: (title: string, description?: string) => Promise<string>;
@@ -230,10 +242,25 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         if (activeTool === 'distance-point-point') maxSelection = 2;
         else if (activeTool === 'distance-point-line') maxSelection = 2;
         else if (activeTool === 'distance-point-plane') maxSelection = 2;
+        else if (activeTool === 'parallel-line-line') maxSelection = 2;
+        else if (activeTool === 'perp-line-plane') maxSelection = 2;
+        else if (activeTool === 'perp-plane-line') maxSelection = 2;
+        else if (activeTool === 'perp-line-line') maxSelection = 2;
+        else if (activeTool === 'plane-parallel-plane') maxSelection = 2;
+        else if (activeTool === 'plane-perp-2-planes') maxSelection = 3;
+        else if (activeTool === 'line-parallel-2-planes') maxSelection = 3;
+        else if (activeTool === 'plane-parallel-2-lines') maxSelection = 3;
+        else if (activeTool === 'rotation-point-axis') maxSelection = 2;
+        else if (activeTool === 'angle-line-line') maxSelection = 2;
+        else if (activeTool === 'angle-line-plane') maxSelection = 2;
+        else if (activeTool === 'true-length') maxSelection = 1;
+
+        console.log(`[Store] selectForDistance: id=${id}, activeTool=${activeTool}, maxSelection=${maxSelection}`);
 
         // Add element if not already selected
         if (!selectedForDistance.includes(id)) {
             const newSelection = [...selectedForDistance, id].slice(-maxSelection);
+            console.log(`[Store] New selection:`, newSelection);
             set({ selectedForDistance: newSelection });
 
             // Calculate distance if we have enough elements
@@ -265,6 +292,16 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     clearDistanceTool: () => {
         set({ activeTool: 'none', selectedForDistance: [], distanceResult: null });
     },
+
+    // Measurements (True Magnitude)
+    measurements: [],
+    addMeasurement: (measurement) => set((state) => ({
+        measurements: [...state.measurements, { ...measurement, id: Math.random().toString(36).substr(2, 9) }]
+    })),
+    removeMeasurement: (id) => set((state) => ({
+        measurements: state.measurements.filter(m => m.id !== id)
+    })),
+    clearAllMeasurements: () => set({ measurements: [] }),
 
     // Cloud Save/Load (Premium)
     saveProject: async (title: string, description?: string) => {

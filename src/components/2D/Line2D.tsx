@@ -45,14 +45,15 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
         }
     }
 
-    splitPointsH.sort((a, b) => a - b);
-    splitPointsV.sort((a, b) => a - b);
+    // Deduplicate and sort split points
+    const uniqueSplitPointsH = [...new Set(splitPointsH)].sort((a, b) => a - b);
+    const uniqueSplitPointsV = [...new Set(splitPointsV)].sort((a, b) => a - b);
 
     // Build segments for Horizontal Projection (r')
     const segmentsH = [];
-    for (let i = 0; i < splitPointsH.length - 1; i++) {
-        const ta = splitPointsH[i];
-        const tb = splitPointsH[i + 1];
+    for (let i = 0; i < uniqueSplitPointsH.length - 1; i++) {
+        const ta = uniqueSplitPointsH[i];
+        const tb = uniqueSplitPointsH[i + 1];
         const tmid = (ta + tb) / 2;
         const midY = element.point.y + element.direction.y * tmid;
         // Horizontal projection: visible if y > 0 (in front of VP)
@@ -62,9 +63,9 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
 
     // Build segments for Vertical Projection (r'')
     const segmentsV = [];
-    for (let i = 0; i < splitPointsV.length - 1; i++) {
-        const ta = splitPointsV[i];
-        const tb = splitPointsV[i + 1];
+    for (let i = 0; i < uniqueSplitPointsV.length - 1; i++) {
+        const ta = uniqueSplitPointsV[i];
+        const tb = uniqueSplitPointsV[i + 1];
         const tmid = (ta + tb) / 2;
         const midZ = element.point.z + element.direction.z * tmid;
         // Vertical projection: visible if z > 0 (above HP)
@@ -72,7 +73,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
         segmentsV.push({ ta, tb, isVisible });
     }
 
-    const renderLineSegment = (ta: number, tb: number, isVisible: boolean, projection: 'h' | 'v') => {
+    const renderLineSegment = (ta: number, tb: number, isVisible: boolean, projection: 'h' | 'v', index: number) => {
         const pA = {
             x: element.point.x + element.direction.x * ta,
             y: element.point.y + element.direction.y * ta,
@@ -98,7 +99,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
 
         return (
             <line
-                key={`${projection}-${ta.toFixed(4)}`}
+                key={`${projection}-${index}-${ta.toFixed(4)}`}
                 x1={x1} y1={y1} x2={x2} y2={y2}
                 stroke={element.color}
                 strokeWidth="2"
@@ -127,7 +128,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                 </g>
             ) : (
                 <g>
-                    {segmentsV.map(seg => renderLineSegment(seg.ta, seg.tb, seg.isVisible, 'v'))}
+                    {segmentsV.map((seg, i) => renderLineSegment(seg.ta, seg.tb, seg.isVisible, 'v', i))}
                 </g>
             )}
 
@@ -146,7 +147,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                 </g>
             ) : (
                 <g>
-                    {segmentsH.map(seg => renderLineSegment(seg.ta, seg.tb, seg.isVisible, 'h'))}
+                    {segmentsH.map((seg, i) => renderLineSegment(seg.ta, seg.tb, seg.isVisible, 'h', i))}
                 </g>
             )}
 
