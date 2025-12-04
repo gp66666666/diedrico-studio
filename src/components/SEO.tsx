@@ -10,7 +10,7 @@ interface SEOProps {
 }
 
 export default function SEO({
-    title = 'Diedrico 3D - Herramienta Educativa de Sistema Diédrico',
+    title = 'Diédrico Studio - Herramienta Educativa de Sistema Diédrico',
     description = 'Aprende sistema diédrico de forma interactiva con visualización 3D en tiempo real. Herramientas de geometría descriptiva, proyecciones diédricas automáticas y asistente AI. Gratis y educativo.',
     keywords = 'sistema diédrico, geometría descriptiva, dibujo técnico, visualización 3D, educación, ingeniería, arquitectura, proyecciones diédricas, alzado, planta, perfil',
     ogImage = 'https://https://diedrico-studio.vercel.app//og-image.png',
@@ -20,7 +20,7 @@ export default function SEO({
     const structuredData = {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "Diedrico 3D",
+        "name": "Diédrico Studio",
         "description": description,
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Web Browser",
@@ -62,7 +62,7 @@ export default function SEO({
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={ogImage} />
-            <meta property="og:site_name" content="Diedrico 3D" />
+            <meta property="og:site_name" content="Diédrico Studio" />
             <meta property="og:locale" content="es_ES" />
 
             {/* Twitter */}

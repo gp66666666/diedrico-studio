@@ -8,7 +8,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                     {/* About Section */}
                     <div>
-                        <h3 className="font-semibold mb-3 text-blue-400">Diedrico 3D</h3>
+                        <h3 className="font-semibold mb-3 text-blue-400">Diédrico Studio</h3>
                         <p className="text-white/70 text-xs leading-relaxed mb-2">
                             Herramienta educativa interactiva para aprender sistema diédrico
                             con visualización 3D en tiempo real.

@@ -6,9 +6,9 @@ export default function AboutPage() {
     return (
         <>
             <SEO
-                title="Quiénes Somos - Diedrico 3D"
-                description="Conoce más sobre Diedrico 3D, la herramienta educativa gratuita para aprender sistema diédrico con visualización 3D. Proyecto creado por Eloi García."
-                keywords="sobre diedrico 3d, equipo, proyecto educativo, geometría descriptiva online, herramienta educativa"
+                title="Quiénes Somos - Diédrico Studio"
+                description="Conoce más sobre Diédrico Studio, la herramienta educativa gratuita para aprender sistema diédrico con visualización 3D. Proyecto creado por Eloi García."
+                keywords="sobre Diédrico Studio, equipo, proyecto educativo, geometría descriptiva online, herramienta educativa"
                 canonicalUrl="https://diedrico-studio.vercel.app/about"
             />
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950 text-white p-8">
@@ -22,9 +22,9 @@ export default function AboutPage() {
 
                     <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20 space-y-6">
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">Sobre Diedrico 3D</h2>
+                            <h2 className="text-2xl font-semibold mb-4">Sobre Diédrico Studio</h2>
                             <p className="text-white/80 leading-relaxed">
-                                Diedrico 3D es una herramienta educativa interactiva diseñada para facilitar el aprendizaje
+                                Diédrico Studio es una herramienta educativa interactiva diseñada para facilitar el aprendizaje
                                 del sistema diédrico, una técnica fundamental en geometría descriptiva y dibujo técnico.
                                 Nuestra plataforma combina visualización 3D en tiempo real con proyecciones diédricas tradicionales,
                                 permitiendo a estudiantes y profesionales comprender mejor los conceptos espaciales.
@@ -56,7 +56,7 @@ export default function AboutPage() {
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">Para Quién</h2>
                             <p className="text-white/80 leading-relaxed mb-4">
-                                Diedrico 3D está diseñado para:
+                                Diédrico Studio está diseñado para:
                             </p>
                             <ul className="list-disc list-inside space-y-2 text-white/80">
                                 <li>Estudiantes de ingeniería y arquitectura</li>
@@ -104,7 +104,7 @@ export default function AboutPage() {
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">Tecnología</h2>
                             <p className="text-white/80 leading-relaxed mb-3">
-                                Diedrico 3D está construido con tecnologías web modernas:
+                                Diédrico Studio está construido con tecnologías web modernas:
                             </p>
                             <ul className="list-disc list-inside space-y-2 text-white/80">
                                 <li>React + TypeScript para la interfaz de usuario</li>
@@ -119,7 +119,7 @@ export default function AboutPage() {
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">Desarrollo Continuo</h2>
                             <p className="text-white/80 leading-relaxed">
-                                Estamos constantemente mejorando Diedrico 3D con nuevas características y herramientas.
+                                Estamos constantemente mejorando Diédrico Studio con nuevas características y herramientas.
                                 Si tienes sugerencias o encuentras algún problema, no dudes en contactarnos.
                                 Tu feedback es invaluable para hacer de esta plataforma la mejor herramienta
                                 de aprendizaje del sistema diédrico.

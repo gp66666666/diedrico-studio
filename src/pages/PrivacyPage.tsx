@@ -23,7 +23,7 @@ export default function PrivacyPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">1. Información que Recopilamos</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            Diedrico 3D recopila la siguiente información:
+                            Diédrico Studio recopila la siguiente información:
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
                             <li><strong>Información de cuenta:</strong> Si creas una cuenta, recopilamos tu email y nombre de usuario.</li>
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
 
                     <div className="border-t border-white/20 pt-6 mt-8">
                         <p className="text-xs text-white/50">
-                            Al utilizar Diedrico 3D, aceptas esta política de privacidad y el uso de cookies
+                            Al utilizar Diédrico Studio, aceptas esta política de privacidad y el uso de cookies
                             según lo descrito.
                         </p>
                     </div>

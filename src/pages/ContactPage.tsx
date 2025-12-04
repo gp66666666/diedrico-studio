@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, MessageSquare, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
+import emailjs from '@emailjs/browser';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -10,13 +11,44 @@ export default function ContactPage() {
         message: ''
     });
     const [submitted, setSubmitted] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // For now, just show a confirmation message
-        // In production, this would send to a backend or email service
-        setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 5000);
+        setSending(true);
+        setError('');
+
+        try {
+            // EmailJS configuration
+            const serviceId = 'service_okhmw6d';
+            const templateId = 'template_y6rqi5j';
+            const publicKey = 'SIyk3MPIy99O0HZxY';
+
+            // Prepare template parameters
+            const templateParams = {
+                from_name: formData.name,
+                from_email: formData.email,
+                subject: formData.subject,
+                message: formData.message,
+                to_email: 'eloigperezz@gmail.com'
+            };
+
+            // Send email via EmailJS
+            await emailjs.send(serviceId, templateId, templateParams, publicKey);
+
+            // Show success message
+            setSubmitted(true);
+            setFormData({ name: '', email: '', subject: '', message: '' });
+
+            // Hide success message after 5 seconds
+            setTimeout(() => setSubmitted(false), 5000);
+        } catch (err) {
+            console.error('Error sending email:', err);
+            setError('Hubo un error al enviar el mensaje. Por favor intenta de nuevo o escríbeme directamente a eloigperezz@gmail.com');
+        } finally {
+            setSending(false);
+        }
     };
 
     return (
@@ -96,7 +128,15 @@ export default function ContactPage() {
                         {submitted && (
                             <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4 mb-4">
                                 <p className="text-green-300 text-sm">
-                                    ✓ Mensaje enviado correctamente. Te responderemos pronto.
+                                    ✓ ¡Mensaje enviado correctamente! Te responderé lo antes posible a tu email.
+                                </p>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-4">
+                                <p className="text-red-300 text-sm">
+                                    {error}
                                 </p>
                             </div>
                         )}
@@ -165,10 +205,14 @@ export default function ContactPage() {
 
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                disabled={sending}
+                                className={`w-full font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 ${sending
+                                        ? 'bg-gray-500 cursor-not-allowed'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    }`}
                             >
                                 <Mail size={20} />
-                                Enviar Mensaje
+                                {sending ? 'Enviando...' : 'Enviar Mensaje'}
                             </button>
 
                             <p className="text-xs text-white/50 text-center">
@@ -182,9 +226,9 @@ export default function ContactPage() {
                     <h3 className="text-xl font-semibold mb-3">Preguntas Frecuentes</h3>
                     <div className="space-y-4 text-sm">
                         <div>
-                            <p className="font-medium text-white mb-1">¿Es gratuito usar Diedrico 3D?</p>
+                            <p className="font-medium text-white mb-1">¿Es gratuito usar Diédrico Studio?</p>
                             <p className="text-white/70">
-                                Sí, Diedrico 3D es completamente gratuito. Los anuncios nos ayudan a mantener
+                                Sí, Diédrico Studio es completamente gratuito. Los anuncios nos ayudan a mantener
                                 el servidor y seguir desarrollando nuevas características.
                             </p>
                         </div>

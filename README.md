@@ -1,4 +1,4 @@
-# Diedrico 3D - Herramienta para Estudiantes
+# Diédrico Studio - Herramienta para Estudiantes
 
 Aplicación web interactiva para visualizar y resolver problemas de geometría analítica 3D y sistema diédrico, con asistente IA.
 

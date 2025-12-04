@@ -112,7 +112,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
 
                 {/* Footer */}
                 <div className={`p-4 border-t text-xs opacity-50 text-center ${headerClass}`}>
-                    Diedrico 3D - Manual de Usuario v1.0
+                    Diédrico Studio - Manual de Usuario v1.0
                 </div>
             </div>
         </div>

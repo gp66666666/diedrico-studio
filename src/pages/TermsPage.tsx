@@ -23,7 +23,7 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">1. Aceptación de los Términos</h2>
                         <p className="text-white/80 leading-relaxed">
-                            Al acceder y utilizar Diedrico 3D, aceptas estar sujeto a estos Términos de Uso
+                            Al acceder y utilizar Diédrico Studio, aceptas estar sujeto a estos Términos de Uso
                             y a nuestra Política de Privacidad. Si no estás de acuerdo con alguno de estos términos,
                             no debes utilizar este sitio web.
                         </p>
@@ -32,7 +32,7 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">2. Descripción del Servicio</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            Diedrico 3D es una herramienta educativa gratuita para el aprendizaje del sistema
+                            Diédrico Studio es una herramienta educativa gratuita para el aprendizaje del sistema
                             diédrico. Proporcionamos:
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
@@ -47,7 +47,7 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">3. Uso Aceptable</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            Al utilizar Diedrico 3D, te comprometes a:
+                            Al utilizar Diédrico Studio, te comprometes a:
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
                             <li>Utilizar el servicio solo con fines educativos y legales</li>
@@ -75,7 +75,7 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">5. Propiedad Intelectual</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            <strong>Contenido del sitio:</strong> Todo el contenido de Diedrico 3D (código, diseño,
+                            <strong>Contenido del sitio:</strong> Todo el contenido de Diédrico Studio (código, diseño,
                             textos, gráficos) es propiedad de Eloi García y está protegido por derechos de autor.
                         </p>
                         <p className="text-white/80 leading-relaxed">
@@ -101,7 +101,7 @@ export default function TermsPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">7. Limitación de Responsabilidad</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            Diedrico 3D se proporciona "tal cual" sin garantías de ningún tipo:
+                            Diédrico Studio se proporciona "tal cual" sin garantías de ningún tipo:
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
                             <li>No garantizamos que el servicio esté disponible sin interrupciones</li>
@@ -181,7 +181,7 @@ export default function TermsPage() {
 
                     <div className="border-t border-white/20 pt-6 mt-8">
                         <p className="text-xs text-white/50">
-                            Al utilizar Diedrico 3D, confirmas que has leído, entendido y aceptado estos
+                            Al utilizar Diédrico Studio, confirmas que has leído, entendido y aceptado estos
                             Términos de Uso y nuestra Política de Privacidad.
                         </p>
                     </div>
