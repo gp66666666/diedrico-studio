@@ -1,0 +1,25 @@
+# Robots.txt para Diedrico 3D
+# Permite el rastreo de todas las páginas importantes
+
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+
+# Bloquear archivos de configuración y desarrollo
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /*.json
+Disallow: /*.config.*
+
+# Permitir bots de búsqueda principales
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap
+Sitemap: https://https://diedrico-studio.vercel.app//sitemap.xml
