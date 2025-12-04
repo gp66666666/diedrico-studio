@@ -9,7 +9,7 @@ export default function AboutPage() {
                 title="Quiénes Somos - Diedrico 3D"
                 description="Conoce más sobre Diedrico 3D, la herramienta educativa gratuita para aprender sistema diédrico con visualización 3D. Proyecto creado por Eloi García."
                 keywords="sobre diedrico 3d, equipo, proyecto educativo, geometría descriptiva online, herramienta educativa"
-                canonicalUrl="https://https://diedrico-studio.vercel.app//about"
+                canonicalUrl="https://diedrico-studio.vercel.app/about"
             />
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950 text-white p-8">
                 <div className="max-w-4xl mx-auto">
@@ -85,7 +85,6 @@ export default function AboutPage() {
                                         <Github size={20} />
                                         GitHub
                                     </a>
-
                                     <div>
                                         <a
                                             href="mailto:eloigperezz@gmail.com"
@@ -139,5 +138,6 @@ export default function AboutPage() {
                     </div>
                 </div>
             </div>
-            );
+        </>
+    );
 }
