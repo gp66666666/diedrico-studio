@@ -1,7 +1,7 @@
 // Groq AI Service - Alternative to Gemini
 import { colorManager } from './colorManager';
 import { rateLimiter } from './rateLimiter';
-import type { AIStep, GeminiResponse } from '../types/ai.types';
+import type { AIStep, GeminiResponse, AIAction } from '../types/ai.types';
 import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
 
 export class GroqService {
@@ -131,7 +131,7 @@ export class GroqService {
                     id: `step-${stepNumber}`,
                     stepNumber,
                     description,
-                    action,
+                    action: action as AIAction, // Cast to AIAction since it's already validated above
                     params: {
                         ...params,
                         color: colorManager.getColorForStep(stepNumber),
