@@ -707,6 +707,29 @@ export default function Sidebar() {
                 {activeTab === 'add' ? (
                     <div className="space-y-4">
                         {/* Type selector */}
+                        {!editingElementId && (
+                            <div className="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-lg mb-4">
+                                <button
+                                    onClick={() => setGeometryType('point')}
+                                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${geometryType === 'point' ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                >
+                                    Punto
+                                </button>
+                                <button
+                                    onClick={() => setGeometryType('line')}
+                                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${geometryType === 'line' ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                >
+                                    Recta
+                                </button>
+                                <button
+                                    onClick={() => setGeometryType('plane')}
+                                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${geometryType === 'plane' ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                >
+                                    Plano
+                                </button>
+                            </div>
+                        )}
+
                         {editingElementId && (
                             <div className="bg-yellow-50 border border-yellow-200 p-2 rounded-lg mb-2 flex items-center justify-between">
                                 <span className="text-xs font-bold text-yellow-700">Editando: {elements.find(e => e.id === editingElementId)?.name}</span>
