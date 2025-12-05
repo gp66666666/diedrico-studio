@@ -115,11 +115,11 @@ export default function AcademyPage() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 bg-gray-950 flex flex-col overflow-hidden">
+            <div className="flex-1 bg-gray-950 flex flex-col overflow-hidden print:overflow-visible print:block print:bg-white print:h-auto">
                 {selectedTopic && (
-                    <div className="h-full overflow-y-auto p-12 max-w-5xl mx-auto w-full custom-scrollbar print:custom-none print:p-0 print:overflow-visible">
-                        <div className="mb-8 flex justify-between items-start">
-                            <div className="print:w-full">
+                    <div className="h-full overflow-y-auto p-12 max-w-5xl mx-auto w-full custom-scrollbar print:custom-none print:p-0 print:overflow-visible print:h-auto print:block">
+                        <div className="mb-8 flex justify-between items-start print:block">
+                            <div className="print:w-full print:mb-4">
                                 <span className="text-blue-500 font-bold tracking-wider text-sm uppercase print:text-black">Tema Teórico</span>
                                 <h2 className="text-4xl font-bold mt-2 mb-4 print:text-black">{selectedTopic.title}</h2>
                                 <p className="text-xl text-gray-400 leading-relaxed print:text-gray-600">{selectedTopic.description}</p>

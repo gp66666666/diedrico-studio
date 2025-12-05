@@ -1,22 +1,4 @@
-import { GeometryElement } from "../types";
-
-export interface AcademyExercise {
-    id: string;
-    title: string;
-    level: 'Fácil' | 'Medio' | 'Difícil';
-    statement: string;
-    setup: Partial<GeometryElement>[]; // Elements to load
-    solutionHint?: string;
-}
-
-export interface AcademyTopic {
-    id: string;
-    title: string;
-    description: string;
-    category: 'Teoría' | 'Aplicación' | 'Exámenes';
-    theoryContent: string; // Markdown-like or HTML
-    exercises: AcademyExercise[];
-}
+import { AcademyTopic } from '../types';
 
 export const ACADEMY_CONTENT: AcademyTopic[] = [
     // 1. EL PUNTO
@@ -59,7 +41,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                             <text x="40" y="125" font-size="12" fill="#166534" font-weight="bold">PH</text>
                             
                             <line x1="50" y1="100" x2="150" y2="100" stroke="black" stroke-width="3" />
-                            <text x="160" y="105" font-size="12" font-weight="bold">LT</text>
+                            <!-- LT Marks -->
+                            <line x1="60" y1="105" x2="75" y2="105" stroke="black" stroke-width="2" />
+                            <line x1="125" y1="105" x2="140" y2="105" stroke="black" stroke-width="2" />
+                            <text x="160" y="105" font-size="12" font-weight="bold" fill="black">LT</text>
                             
                             <!-- Point P in space -->
                             <circle cx="100" cy="70" r="3" fill="red" />
@@ -78,6 +63,9 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <strong class="text-white block text-center mb-2">I Cuadrante</strong>
                         <svg width="100%" height="120" viewBox="0 0 100 120" class="bg-white rounded cursor-zoom-in">
                             <line x1="10" y1="60" x2="90" y2="60" stroke="black" stroke-width="2" />
+                            <!-- LT Marks -->
+                            <line x1="20" y1="65" x2="30" y2="65" stroke="black" stroke-width="2" />
+                            <line x1="70" y1="65" x2="80" y2="65" stroke="black" stroke-width="2" />
                             <line x1="50" y1="30" x2="50" y2="90" stroke="#9ca3af" stroke-dasharray="4" />
                             <circle cx="50" cy="30" r="4" fill="blue" /> <text x="58" y="35" font-size="12" fill="blue">a''</text>
                             <circle cx="50" cy="90" r="4" fill="green" /> <text x="58" y="95" font-size="12" fill="green">a'</text>
@@ -88,6 +76,9 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <strong class="text-white block text-center mb-2">II Cuadrante</strong>
                         <svg width="100%" height="120" viewBox="0 0 100 120" class="bg-white rounded cursor-zoom-in">
                             <line x1="10" y1="60" x2="90" y2="60" stroke="black" stroke-width="2" />
+                             <!-- LT Marks -->
+                            <line x1="20" y1="65" x2="30" y2="65" stroke="black" stroke-width="2" />
+                            <line x1="70" y1="65" x2="80" y2="65" stroke="black" stroke-width="2" />
                             <line x1="50" y1="20" x2="50" y2="45" stroke="#9ca3af" stroke-dasharray="4" />
                             <circle cx="50" cy="20" r="4" fill="green" /> <text x="58" y="25" font-size="12" fill="green">b'</text>
                             <circle cx="50" cy="45" r="4" fill="blue" /> <text x="58" y="50" font-size="12" fill="blue">b''</text>
@@ -98,6 +89,9 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <strong class="text-white block text-center mb-2">III Cuadrante</strong>
                         <svg width="100%" height="120" viewBox="0 0 100 120" class="bg-white rounded cursor-zoom-in">
                             <line x1="10" y1="60" x2="90" y2="60" stroke="black" stroke-width="2" />
+                             <!-- LT Marks -->
+                            <line x1="20" y1="65" x2="30" y2="65" stroke="black" stroke-width="2" />
+                            <line x1="70" y1="65" x2="80" y2="65" stroke="black" stroke-width="2" />
                             <line x1="50" y1="30" x2="50" y2="90" stroke="#9ca3af" stroke-dasharray="4" />
                             <circle cx="50" cy="30" r="4" fill="green" /> <text x="58" y="35" font-size="12" fill="green">c'</text>
                             <circle cx="50" cy="90" r="4" fill="blue" /> <text x="58" y="95" font-size="12" fill="blue">c''</text>
@@ -108,6 +102,9 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <strong class="text-white block text-center mb-2">IV Cuadrante</strong>
                         <svg width="100%" height="120" viewBox="0 0 100 120" class="bg-white rounded cursor-zoom-in">
                             <line x1="10" y1="60" x2="90" y2="60" stroke="black" stroke-width="2" />
+                             <!-- LT Marks -->
+                            <line x1="20" y1="65" x2="30" y2="65" stroke="black" stroke-width="2" />
+                            <line x1="70" y1="65" x2="80" y2="65" stroke="black" stroke-width="2" />
                             <line x1="50" y1="75" x2="50" y2="100" stroke="#9ca3af" stroke-dasharray="4" />
                             <circle cx="50" cy="75" r="4" fill="blue" /> <text x="58" y="80" font-size="12" fill="blue">d''</text>
                             <circle cx="50" cy="100" r="4" fill="green" /> <text x="58" y="105" font-size="12" fill="green">d'</text>
@@ -148,6 +145,9 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                     <div class="bg-white p-2 rounded cursor-zoom-in">
                         <svg width="200" height="150" viewBox="0 0 200 150">
                             <line x1="10" y1="75" x2="190" y2="75" stroke="black" stroke-width="2" /> <!-- LT -->
+                            <!-- LT Marks -->
+                            <line x1="20" y1="80" x2="35" y2="80" stroke="black" stroke-width="2" />
+                            <line x1="165" y1="80" x2="180" y2="80" stroke="black" stroke-width="2" />
                             
                             <!-- Points A and B -->
                             <circle cx="50" cy="40" r="2" fill="blue" /> <text x="50" y="35" font-size="10" fill="blue">a''</text>
@@ -189,6 +189,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+                                
                                 <line x1="40" y1="80" x2="160" y2="20" stroke="green" stroke-width="2" /> <text x="165" y="25" font-size="10" fill="green">r'</text>
                                 <line x1="40" y1="20" x2="160" y2="80" stroke="blue" stroke-width="2" /> <text x="165" y="85" font-size="10" fill="blue">r''</text>
                             </svg>
@@ -202,6 +206,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="40" y1="20" x2="160" y2="20" stroke="blue" stroke-width="2" /> <text x="165" y="25" font-size="10" fill="blue">r'' // LT</text>
                                 <line x1="40" y1="80" x2="160" y2="60" stroke="green" stroke-width="2" /> <text x="165" y="65" font-size="10" fill="green">r'</text>
                             </svg>
@@ -215,6 +223,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="40" y1="20" x2="160" y2="40" stroke="blue" stroke-width="2" /> <text x="165" y="45" font-size="10" fill="blue">r''</text>
                                 <line x1="40" y1="80" x2="160" y2="80" stroke="green" stroke-width="2" /> <text x="165" y="85" font-size="10" fill="green">r' // LT</text>
                             </svg>
@@ -231,6 +243,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="40" y1="20" x2="160" y2="20" stroke="blue" stroke-width="2" /> <text x="165" y="25" font-size="10" fill="blue">r'' // LT</text>
                                 <line x1="40" y1="80" x2="160" y2="80" stroke="green" stroke-width="2" /> <text x="165" y="85" font-size="10" fill="green">r' // LT</text>
                             </svg>
@@ -244,6 +260,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="100" y1="10" x2="100" y2="90" stroke="purple" stroke-width="2" />
                                 <text x="105" y="20" font-size="10" fill="blue">r''</text>
                                 <text x="105" y="80" font-size="10" fill="green">r'</text>
@@ -258,6 +278,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 flex items-center justify-center cursor-zoom-in">
                              <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="100" y1="50" x2="160" y2="10" stroke="blue" stroke-width="2" />
                                 <line x1="100" y1="50" x2="160" y2="80" stroke="green" stroke-width="2" />
                                 <circle cx="100" cy="50" r="3" fill="red" />
@@ -310,6 +334,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="60" y1="10" x2="90" y2="50" stroke="orange" stroke-width="2" /> <text x="65" y="20" font-size="10" fill="orange">a2</text>
                                 <line x1="90" y1="50" x2="130" y2="90" stroke="orange" stroke-width="2" /> <text x="120" y="80" font-size="10" fill="orange">a1</text>
                             </svg>
@@ -324,6 +352,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                              <!-- Proj Horiz -->
                             <svg width="90" height="80" viewBox="0 0 100 80">
                                 <line x1="0" y1="40" x2="100" y2="40" stroke="black" />
+                                 <!-- LT Marks -->
+                                <line x1="10" y1="45" x2="20" y2="45" stroke="black" stroke-width="2" />
+                                <line x1="80" y1="45" x2="90" y2="45" stroke="black" stroke-width="2" />
+
                                 <line x1="50" y1="10" x2="50" y2="40" stroke="orange" stroke-width="2" />
                                 <line x1="50" y1="40" x2="20" y2="70" stroke="orange" stroke-width="2" />
                                 <text x="10" y="20" font-size="8">Proj. H</text>
@@ -331,6 +363,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                             <!-- Proj Vert -->
                             <svg width="90" height="80" viewBox="0 0 100 80">
                                 <line x1="0" y1="40" x2="100" y2="40" stroke="black" />
+                                 <!-- LT Marks -->
+                                <line x1="10" y1="45" x2="20" y2="45" stroke="black" stroke-width="2" />
+                                <line x1="80" y1="45" x2="90" y2="45" stroke="black" stroke-width="2" />
+
                                 <line x1="20" y1="10" x2="50" y2="40" stroke="orange" stroke-width="2" />
                                 <line x1="50" y1="40" x2="50" y2="70" stroke="orange" stroke-width="2" />
                                 <text x="10" y="20" font-size="8">Proj. V</text>
@@ -345,6 +381,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="20" y1="20" x2="180" y2="20" stroke="orange" stroke-width="2" /> <text x="185" y="25" font-size="10" fill="orange">a2</text>
                                 <line x1="20" y1="80" x2="180" y2="80" stroke="orange" stroke-width="2" /> <text x="185" y="85" font-size="10" fill="orange">a1</text>
                             </svg>
@@ -358,6 +398,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <line x1="100" y1="10" x2="100" y2="90" stroke="orange" stroke-width="2" />
                                 <text x="105" y="20" font-size="10" fill="orange">a2</text>
                                 <text x="105" y="80" font-size="10" fill="orange">a1</text>
@@ -372,6 +416,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <div class="bg-white rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in">
                             <svg width="200" height="100" viewBox="0 0 200 100">
                                 <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
                                 <circle cx="100" cy="50" r="3" fill="orange" />
                                 <text x="100" y="40" font-size="10" fill="orange">a1 = a2 = LT</text>
                                 <circle cx="140" cy="30" r="2" fill="blue" /> <text x="145" y="30" font-size="8">P''</text>
