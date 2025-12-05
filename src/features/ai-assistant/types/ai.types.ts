@@ -44,7 +44,10 @@ export type AIAction =
     | 'add_parallel_line'
     | 'add_perpendicular_line_to_plane'
     | 'rotate_point_around_axis'
-    | 'add_plane_parallel_to_plane';
+    | 'add_perpendicular_line_to_plane'
+    | 'rotate_point_around_axis'
+    | 'add_plane_parallel_to_plane'
+    | 'calculate_math';
 
 export interface AddPointParams {
     name: string;
