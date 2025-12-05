@@ -1096,10 +1096,8 @@ export default function Sidebar() {
                 ) : activeTab === 'tools' ? (
                     <>
                         <AbatimientoTool />
-                        <IntersectionTool />
                         <TrueMagnitudeTool />
                         <ParallelismTool />
-                        <DistanceTool />
                         <RotationTool />
                         <AdvancedToolsPanel isDark={isDark} />
 
