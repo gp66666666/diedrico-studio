@@ -1,12 +1,12 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Grid, GizmoHelper, GizmoViewport } from '@react-three/drei';
+import { OrbitControls, Grid, GizmoHelper, GizmoViewport, Loader } from '@react-three/drei';
 import { useGeometryStore } from '../store/geometryStore';
 import PointObject from './3D/PointObject';
 import LineObject from './3D/LineObject';
 import PlaneObject from './3D/PlaneObject';
 import IntersectionsRenderer from './3D/IntersectionsRenderer';
 import SystemPlanes from './3D/SystemPlanes';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, Suspense } from 'react';
 import * as THREE from 'three';
 
 function CameraHandler() {
@@ -29,12 +29,7 @@ function CameraHandler() {
         }
     }, [camera, controls]); // Run once when controls are available
 
-    // Save on unmount or view change is not easily detectable within Canvas effectively enough 
-    // without performance hit of listening to every change.
-    // Instead, we can listen to controls 'change' event?
-    // Or simpler: Save strictly on unmount? 
-    // Problem: unmount happens when component is destroyed.
-
+    // Save on unmount
     useEffect(() => {
         const saveState = () => {
             if (controls) {
@@ -45,8 +40,6 @@ function CameraHandler() {
             }
         };
 
-        // Save periodically or on unmount?
-        // Let's safe on unmount.
         return () => {
             saveState();
         };
@@ -64,64 +57,67 @@ export default function Scene() {
     const gridCellColor = isDark ? '#1f2937' : '#e5e7eb';
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full relative">
             <Canvas
                 camera={{ position: [12, 10, 12], fov: 50 }}
                 shadows
                 onPointerMissed={() => selectElement(null)}
                 gl={{ preserveDrawingBuffer: true }}
             >
-                {/* Background */}
-                <color attach="background" args={[bgColor]} />
+                <Suspense fallback={null}>
+                    {/* Background */}
+                    <color attach="background" args={[bgColor]} />
 
-                {/* Improved lighting */}
-                <ambientLight intensity={0.5} />
-                <directionalLight position={[10, 15, 10]} intensity={1.2} castShadow />
-                <pointLight position={[-8, 5, -8]} intensity={0.4} color="#818cf8" />
-                <pointLight position={[8, 5, 8]} intensity={0.4} color="#a78bfa" />
+                    {/* Improved lighting */}
+                    <ambientLight intensity={0.5} />
+                    <directionalLight position={[10, 15, 10]} intensity={1.2} castShadow />
+                    <pointLight position={[-8, 5, -8]} intensity={0.4} color="#818cf8" />
+                    <pointLight position={[8, 5, 8]} intensity={0.4} color="#a78bfa" />
 
-                {/* Grid */}
-                <Grid
-                    infiniteGrid
-                    fadeDistance={80}
-                    sectionColor={gridSectionColor}
-                    cellColor={gridCellColor}
-                    sectionThickness={1.2}
-                    cellThickness={0.6}
-                />
-
-                {/* System Planes (Quadrants always visible, Bisectors toggleable) */}
-                <SystemPlanes showBisectors={showBisectors} />
-
-                {/* Render all geometry elements */}
-                {elements.map((element) => {
-                    switch (element.type) {
-                        case 'point':
-                            return <PointObject key={element.id} element={element} />;
-                        case 'line':
-                            return <LineObject key={element.id} element={element} />;
-                        case 'plane':
-                            return <PlaneObject key={element.id} element={element} />;
-                        default:
-                            return null;
-                    }
-                })}
-
-                {/* Render Intersections */}
-                <IntersectionsRenderer />
-
-                {/* Camera controls */}
-                <CameraHandler />
-                <OrbitControls makeDefault enableDamping dampingFactor={0.05} />
-
-                {/* Gizmo for orientation */}
-                <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-                    <GizmoViewport
-                        axisColors={['#ef4444', '#10b981', '#3b82f6']}
-                        labelColor="white"
+                    {/* Grid */}
+                    <Grid
+                        infiniteGrid
+                        fadeDistance={80}
+                        sectionColor={gridSectionColor}
+                        cellColor={gridCellColor}
+                        sectionThickness={1.2}
+                        cellThickness={0.6}
                     />
-                </GizmoHelper>
+
+                    {/* System Planes (Quadrants always visible, Bisectors toggleable) */}
+                    <SystemPlanes showBisectors={showBisectors} />
+
+                    {/* Render all geometry elements */}
+                    {elements.map((element) => {
+                        switch (element.type) {
+                            case 'point':
+                                return <PointObject key={element.id} element={element} />;
+                            case 'line':
+                                return <LineObject key={element.id} element={element} />;
+                            case 'plane':
+                                return <PlaneObject key={element.id} element={element} />;
+                            default:
+                                return null;
+                        }
+                    })}
+
+                    {/* Render Intersections */}
+                    <IntersectionsRenderer />
+
+                    {/* Camera controls */}
+                    <CameraHandler />
+                    <OrbitControls makeDefault enableDamping dampingFactor={0.05} />
+
+                    {/* Gizmo for orientation */}
+                    <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+                        <GizmoViewport
+                            axisColors={['#ef4444', '#10b981', '#3b82f6']}
+                            labelColor="white"
+                        />
+                    </GizmoHelper>
+                </Suspense>
             </Canvas>
+            <Loader />
         </div>
     );
 }
