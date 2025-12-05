@@ -77,17 +77,23 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         >
                             📋 Punto - Plano
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('distance-line-line')}
+                            onClick={() => setActiveTool(activeTool === 'distance-line-line' ? 'none' : 'distance-line-line')}
+                        >
                             ↔️ Recta - Recta
-                            <span className="ml-2 text-xs opacity-50">(pronto)</span>
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('distance-line-plane')}
+                            onClick={() => setActiveTool(activeTool === 'distance-line-plane' ? 'none' : 'distance-line-plane')}
+                        >
                             ⬌ Recta - Plano
-                            <span className="ml-2 text-xs opacity-50">(pronto)</span>
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('distance-plane-plane')}
+                            onClick={() => setActiveTool(activeTool === 'distance-plane-plane' ? 'none' : 'distance-plane-plane')}
+                        >
                             ▭ Plano - Plano
-                            <span className="ml-2 text-xs opacity-50">(pronto)</span>
                         </button>
                     </div>
                 )}
@@ -240,6 +246,12 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         >
                             📐 Ángulo Recta-Plano
                         </button>
+                        <button
+                            className={getButtonClass('angle-plane-plane')}
+                            onClick={() => setActiveTool(activeTool === 'angle-plane-plane' ? 'none' : 'angle-plane-plane')}
+                        >
+                            📐 Ángulo Plano-Plano
+                        </button>
                         <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                             Calcula dimensiones reales
                         </div>
@@ -345,10 +357,16 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         >
                             🔄 Girar Punto sobre Eje
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('rotation-parallel-lt')}
+                            onClick={() => setActiveTool(activeTool === 'rotation-parallel-lt' ? 'none' : 'rotation-parallel-lt')}
+                        >
                             ↔️ Giro Paralelo a LT
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('rotation-any')}
+                            onClick={() => setActiveTool(activeTool === 'rotation-any' ? 'none' : 'rotation-any')}
+                        >
                             🌀 Giro Eje Cualquiera
                         </button>
                         <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>

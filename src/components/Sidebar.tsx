@@ -1198,8 +1198,12 @@ export default function Sidebar() {
 
             {/* Tools that need to be always active - outside tabs */}
             <IntersectionTool />
+            <ParallelismTool />
             <DistanceTool />
             <AdvancedIntersectionTool />
+            <RotationTool />
+            <AbatimientoTool />
+            <TrueMagnitudeTool />
             {/* Modals */}
             <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />

@@ -17,7 +17,7 @@ export default function TermsPage() {
 
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20 space-y-6 text-sm">
                     <p className="text-white/70">
-                        <strong>Última actualización:</strong> Diciembre 2024
+                        <strong>Última actualización:</strong> Diciembre 2025
                     </p>
 
                     <section>

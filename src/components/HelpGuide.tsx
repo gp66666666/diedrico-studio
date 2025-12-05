@@ -1,4 +1,5 @@
-import { X } from 'lucide-react';
+import { useState } from 'react';
+import { X, Book, Pencil, Box, RotateCw, Ruler, MousePointer2 } from 'lucide-react';
 
 interface HelpGuideProps {
     isOpen: boolean;
@@ -7,112 +8,172 @@ interface HelpGuideProps {
 }
 
 export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
+    const [activeTab, setActiveTab] = useState<'intro' | 'sketch' | 'diedrico'>('intro');
+
     if (!isOpen) return null;
 
     const bgClass = isDark ? 'bg-gray-900 text-gray-100 border-gray-700' : 'bg-white text-gray-800 border-gray-200';
     const headerClass = isDark ? 'border-gray-700' : 'border-gray-200';
     const itemClass = isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50';
+    const tabClass = (active: boolean) => `px-4 py-2 font-medium transition-colors ${active
+        ? 'text-blue-500 border-b-2 border-blue-500'
+        : `opacity-70 hover:opacity-100 ${isDark ? 'hover:text-gray-200' : 'hover:text-gray-900'}`
+        }`;
 
-    const tools = [
+    const sketchTools = [
+        { name: "Seleccionar / Mover", desc: "Selecciona objetos con clic. Arrastra para mover puntos o figuras." },
+        { name: "Punto / Segmento", desc: "Crea puntos básicos y líneas finitas." },
+        { name: "Recta Infinita", desc: "Define una línea que atraviesa todo el espacio." },
+        { name: "Perpendicular / Paralela", desc: "Crea relaciones geométricas automáticas 2D." },
+        { name: "Mediatriz / Bisectriz", desc: "Construcciones clásicas de dibujo técnico." },
+        { name: "Tangentes", desc: "Halla tangentes a circunferencias desde puntos o entre circunferencias." },
+    ];
+
+    const diedricoTools = [
         {
-            name: "Seleccionar / Mover",
-            desc: "Herramienta principal. Haz clic para seleccionar objetos. Arrastra para mover puntos, líneas o figuras completas. Haz clic en el fondo para deseleccionar."
+            category: "Creación 3D",
+            items: [
+                { name: "Punto 3D", desc: "Introduce coordenadas X, Y, Z para situar puntos en el espacio." },
+                { name: "Recta / Plano", desc: "Define elementos mediante puntos o ecuaciones." }
+            ]
         },
         {
-            name: "Punto",
-            desc: "Haz clic en cualquier lugar del lienzo para crear un punto."
+            category: "Intersecciones",
+            items: [
+                { name: "Recta - Recta", desc: "Halla el punto de corte (si existe) entre dos rectas." },
+                { name: "Recta - Plano", desc: "Encuentra donde una recta perfora un plano." },
+                { name: "Plano - Plano", desc: "Genera la recta de intersección entre dos planos." },
+                { name: "Intersecciones Avanzadas", desc: "Halla intersecciones de 3 planos (punto común) o combinaciones complejas." }
+            ]
         },
         {
-            name: "Segmento",
-            desc: "Clic 1: Punto inicial. Clic 2: Punto final. Crea una línea finita entre dos puntos."
+            category: "Distancias y Ángulos",
+            items: [
+                { name: "Distancias", desc: "Mide distancias entre cualquier entidad: Punto, Recta y Plano (incluyendo Recta-Recta cruce y Plano-Plano paralelo)." },
+                { name: "Ángulo Recta-Recta", desc: "Calcula el ángulo entre dos vectores dirección." },
+                { name: "Ángulo Plano-Plano", desc: "Mide el ángulo diiedro entre dos planos." }
+            ]
         },
         {
-            name: "Semirrecta",
-            desc: "Clic 1: Origen. Clic 2: Dirección. Crea una línea que empieza en un punto y se extiende al infinito en una dirección."
-        },
-        {
-            name: "Recta Infinita",
-            desc: "Clic 1: Primer punto de paso. Clic 2: Segundo punto de paso. Crea una línea infinita en ambas direcciones."
-        },
-        {
-            name: "Circunferencia",
-            desc: "Clic 1: Centro. Mueve el ratón para definir el radio. Clic 2: Fija el radio."
-        },
-        {
-            name: "Arco",
-            desc: "Clic 1: Centro. Clic 2: Punto de inicio del arco. Clic 3: Punto final del arco."
-        },
-        {
-            name: "Polígono Regular",
-            desc: "Clic 1: Centro. Clic 2: Vértice (define el radio). Luego introduce el número de lados deseado."
-        },
-        {
-            name: "Mediatriz",
-            desc: "Clic 1: Primer punto. Clic 2: Segundo punto. Crea automáticamente una recta perpendicular que pasa por el punto medio de ambos."
-        },
-        {
-            name: "Bisectriz",
-            desc: "Clic 1: Punto en un lado. Clic 2: Vértice del ángulo. Clic 3: Punto en el otro lado. Crea la semirrecta que divide el ángulo en dos partes iguales."
-        },
-        {
-            name: "Tangentes",
-            desc: "Selecciona dos objetos (Punto-Circunferencia o Circunferencia-Circunferencia) para crear automáticamente todas las rectas tangentes posibles entre ellos."
-        },
-        {
-            name: "Texto",
-            desc: "Haz clic donde quieras colocar el texto. Aparecerá un cuadro para que escribas el contenido."
-        },
-        {
-            name: "Rotar (3 Puntos)",
-            desc: "1. Selecciona la herramienta. 2. Clic para definir el Centro de Rotación (Pivote). 3. Clic para definir el inicio del ángulo (palanca). 4. Mueve el ratón para rotar la figura seleccionada y haz clic para fijar."
-        },
-        {
-            name: "Escalar (Homotecia)",
-            desc: "1. Selecciona la herramienta. 2. Clic para definir el Centro de Escala. 3. Arrastra el ratón alejándote o acercándote al centro para agrandar o reducir la figura seleccionada."
-        },
-        {
-            name: "Borrador",
-            desc: "Haz clic sobre cualquier elemento (línea, punto, texto, etc.) para eliminarlo permanentemente."
+            category: "Transformaciones y Relaciones",
+            items: [
+                { name: "Perpendicularidad", desc: "Traza Rectas perpendiculares a Planos o Planos perpendiculares a Rectas pasando por un punto." },
+                { name: "Giro (Eje Cualquiera)", desc: "Gira Puntos, Rectas o Planos alrededor de un Eje arbitrario." },
+                { name: "Giro (Paralelo a LT)", desc: "Calcula el giro necesario para, dado un eje, poner una recta horizontal o frontal." },
+                { name: "Abatimientos", desc: "Abate un plano sobre el Horizontal o Vertical para trabajar en verdadera magnitud." }
+            ]
         }
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className={`w-full max-w-2xl max-h-[80vh] flex flex-col rounded-xl shadow-2xl border ${bgClass}`}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md p-4 transition-all duration-300">
+            <div className={`w-full max-w-3xl h-[80vh] flex flex-col rounded-2xl shadow-2xl border ${bgClass} ring-1 ring-white/10`}>
                 {/* Header */}
                 <div className={`flex items-center justify-between p-4 border-b ${headerClass}`}>
                     <h2 className="text-xl font-bold flex items-center gap-2">
-                        📖 Guía de Herramientas
+                        <Book size={24} className="text-blue-500" />
+                        Manual de Usuario
                     </h2>
-                    <button
-                        onClick={onClose}
-                        className="p-2 rounded-lg hover:bg-gray-500/20 transition-colors"
-                    >
+                    <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-500/20 transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    <p className="opacity-80 mb-4">
-                        Bienvenido al modo Boceto. Aquí tienes una explicación detallada de cómo usar cada herramienta disponible en la barra lateral.
-                    </p>
+                {/* Tabs */}
+                <div className={`flex gap-2 px-4 border-b ${headerClass}`}>
+                    <button onClick={() => setActiveTab('intro')} className={tabClass(activeTab === 'intro')}>
+                        Inicio
+                    </button>
+                    <button onClick={() => setActiveTab('sketch')} className={tabClass(activeTab === 'sketch')}>
+                        <span className="flex items-center gap-2"><Pencil size={16} /> Boceto 2D</span>
+                    </button>
+                    <button onClick={() => setActiveTab('diedrico')} className={tabClass(activeTab === 'diedrico')}>
+                        <span className="flex items-center gap-2"><Box size={16} /> Diédrico 3D</span>
+                    </button>
+                </div>
 
-                    <div className="grid gap-3">
-                        {tools.map((tool, index) => (
-                            <div key={index} className={`p-3 rounded-lg border transition-colors ${headerClass} ${itemClass}`}>
-                                <h3 className="font-bold text-blue-500 mb-1">{tool.name}</h3>
-                                <p className="text-sm opacity-90 leading-relaxed">
-                                    {tool.desc}
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+                    {activeTab === 'intro' && (
+                        <div className="space-y-6">
+                            <div className="text-center space-y-4 py-8">
+                                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                                    Diédrico Studio v2
+                                </h1>
+                                <p className="text-lg opacity-80 max-w-xl mx-auto">
+                                    Tu suite profesional para Geometría Descriptiva y Dibujo Técnico. Combine la potencia del 3D con la precisión del 2D.
                                 </p>
                             </div>
-                        ))}
-                    </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className={`p-4 rounded-lg border ${headerClass} space-y-2`}>
+                                    <h3 className="font-bold text-blue-400 flex items-center gap-2">
+                                        <MousePointer2 size={18} /> Navegación
+                                    </h3>
+                                    <p className="text-sm opacity-70">
+                                        • <b>Click Izquierdo:</b> Seleccionar.<br />
+                                        • <b>Click Derecho + Arrastrar:</b> Orbitar (3D) o Desplazar (2D).<br />
+                                        • <b>Rueda:</b> Zoom.
+                                    </p>
+                                </div>
+                                <div className={`p-4 rounded-lg border ${headerClass} space-y-2`}>
+                                    <h3 className="font-bold text-green-400 flex items-center gap-2">
+                                        <Box size={18} /> Modos
+                                    </h3>
+                                    <p className="text-sm opacity-70">
+                                        • <b>Boceto:</b> Dibuja libremente en 2D.<br />
+                                        • <b>Diédrico:</b> Construye en el espacio 3D con proyección automática.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'sketch' && (
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-bold mb-4">Herramientas de Boceto</h3>
+                            <div className="grid gap-3">
+                                {sketchTools.map((tool, idx) => (
+                                    <div key={idx} className={`p-3 rounded-lg border ${headerClass} ${itemClass}`}>
+                                        <div className="font-bold text-blue-400">{tool.name}</div>
+                                        <div className="text-sm opacity-80">{tool.desc}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'diedrico' && (
+                        <div className="space-y-8">
+                            <p className="opacity-80 italic border-l-4 border-blue-500 pl-4 py-1">
+                                En el modo Diédrico, usa el panel "Herramientas Avanzadas" para realizar operaciones complejas sin necesidad de dibujar trazo a trazo.
+                            </p>
+
+                            {diedricoTools.map((section, idx) => (
+                                <div key={idx} className="space-y-3">
+                                    <h3 className="text-lg font-bold flex items-center gap-2 border-b pb-2 border-gray-700/50">
+                                        {idx === 0 && <Box size={18} />}
+                                        {idx === 1 && <RotateCw size={18} />}
+                                        {idx === 2 && <Ruler size={18} />}
+                                        {section.category}
+                                    </h3>
+                                    <div className="grid gap-3 pl-2">
+                                        {section.items.map((item, i) => (
+                                            <div key={i} className={`p-3 rounded-lg border ${headerClass} ${itemClass}`}>
+                                                <div className="font-bold text-purple-400">{item.name}</div>
+                                                <div className="text-sm opacity-80">{item.desc}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}
-                <div className={`p-4 border-t text-xs opacity-50 text-center ${headerClass}`}>
-                    Diédrico Studio - Manual de Usuario v1.0
+                <div className={`p-4 border-t text-xs opacity-40 text-center ${headerClass}`}>
+                    © 2025 Eloi García - Diédrico Studio
                 </div>
             </div>
         </div>

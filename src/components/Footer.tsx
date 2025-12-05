@@ -14,7 +14,7 @@ export default function Footer() {
                             con visualización 3D en tiempo real.
                         </p>
                         <p className="text-white/50 text-xs">
-                            © 2024 Eloi García
+                            © 2025 Eloi García
                         </p>
                     </div>
 

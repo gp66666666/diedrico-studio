@@ -33,6 +33,9 @@ export default function TrueMagnitudeTool() {
                 case 'angle-line-plane':
                     calculateAngleLinePlane();
                     break;
+                case 'angle-plane-plane':
+                    calculateAnglePlanePlane();
+                    break;
             }
         } catch (error) {
             console.error('Measurement error:', error);
@@ -160,6 +163,43 @@ export default function TrueMagnitudeTool() {
         });
 
         console.log(`Angle between ${line.name} and ${plane.name}: ${angleDeg.toFixed(1)}°`);
+    };
+
+    const calculateAnglePlanePlane = () => {
+        const [id1, id2] = selectedForDistance;
+        const el1 = elements.find(e => e.id === id1);
+        const el2 = elements.find(e => e.id === id2);
+
+        if (!el1 || !el2 || el1.type !== 'plane' || el2.type !== 'plane') {
+            alert('Selecciona dos planos para medir el ángulo.');
+            return;
+        }
+
+        const plane1 = el1 as PlaneElement;
+        const plane2 = el2 as PlaneElement;
+
+        const n1 = plane1.normal;
+        const n2 = plane2.normal;
+
+        const mag1 = Math.sqrt(n1.x ** 2 + n1.y ** 2 + n1.z ** 2);
+        const mag2 = Math.sqrt(n2.x ** 2 + n2.y ** 2 + n2.z ** 2);
+
+        // Angle between planes is angle between normals (or supplement, usually acute is taken)
+        const dot = Math.abs(n1.x * n2.x + n1.y * n2.y + n1.z * n2.z);
+
+        const cosTheta = dot / (mag1 * mag2);
+        const clampedCos = Math.max(-1, Math.min(1, cosTheta));
+        const angleRad = Math.acos(clampedCos);
+        const angleDeg = (angleRad * 180) / Math.PI;
+
+        addMeasurement({
+            type: 'angle',
+            value: angleDeg,
+            label: `∠(${plane1.name}, ${plane2.name})`,
+            elementIds: [id1, id2]
+        });
+
+        console.log(`Angle between ${plane1.name} and ${plane2.name}: ${angleDeg.toFixed(1)}°`);
     };
 
     return null;
