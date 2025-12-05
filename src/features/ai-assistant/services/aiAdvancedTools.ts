@@ -128,6 +128,51 @@ export const AI_ADVANCED_TOOLS_DEFINITIONS = [
             },
             required: ["name", "line1_name", "line2_name", "point_name", "color", "step_description"]
         }
+    },
+    {
+        name: "intersection_line_plane",
+        description: "Encuentra el punto de intersección entre una recta y un plano.",
+        parameters: {
+            type: "object",
+            properties: {
+                name: { type: "string", description: "Nombre del punto solución" },
+                line_name: { type: "string", description: "Nombre de la recta" },
+                plane_name: { type: "string", description: "Nombre del plano" },
+                color: { type: "string", description: "Color de la solución" },
+                step_description: { type: "string", description: "Explicación" }
+            },
+            required: ["name", "line_name", "plane_name", "color", "step_description"]
+        }
+    },
+    {
+        name: "intersection_plane_plane",
+        description: "Encuentra la recta intersección entre dos planos.",
+        parameters: {
+            type: "object",
+            properties: {
+                name: { type: "string", description: "Nombre de la recta solución" },
+                plane1_name: { type: "string", description: "Nombre del primer plano" },
+                plane2_name: { type: "string", description: "Nombre del segundo plano" },
+                color: { type: "string", description: "Color de la solución" },
+                step_description: { type: "string", description: "Explicación" }
+            },
+            required: ["name", "plane1_name", "plane2_name", "color", "step_description"]
+        }
+    },
+    {
+        name: "intersection_line_line",
+        description: "Encuentra el punto de intersección entre dos rectas (si se cortan).",
+        parameters: {
+            type: "object",
+            properties: {
+                name: { type: "string", description: "Nombre del punto solución" },
+                line1_name: { type: "string", description: "Nombre de la primera recta" },
+                line2_name: { type: "string", description: "Nombre de la segunda recta" },
+                color: { type: "string", description: "Color de la solución" },
+                step_description: { type: "string", description: "Explicación" }
+            },
+            required: ["name", "line1_name", "line2_name", "color", "step_description"]
+        }
     }
 ];
 
@@ -159,6 +204,12 @@ export const executeAdvancedTool = (
                 return createPlaneParallelToPlane(params, elements, addElement);
             case 'add_plane_parallel_to_2_lines':
                 return createPlaneParallelTo2Lines(params, elements, addElement);
+            case 'intersection_line_plane':
+                return createIntersectionLinePlane(params, elements, addElement);
+            case 'intersection_plane_plane':
+                return createIntersectionPlanePlane(params, elements, addElement);
+            case 'intersection_line_line':
+                return createIntersectionLineLine(params, elements, addElement);
             default:
                 return false;
         }
