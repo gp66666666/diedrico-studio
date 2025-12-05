@@ -95,6 +95,7 @@ export class GroqService {
 
     private parseResponseToSteps(text: string): AIStep[] {
         const steps: AIStep[] = [];
+        let stepCount = 0;
 
         // 1. Try to parse JSON blocks first (Robust method)
         // STRATEGY 1: Extract from code blocks (Primary)
