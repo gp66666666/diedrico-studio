@@ -7,8 +7,8 @@ import { BookOpen, Lock, Play, ChevronRight, CheckCircle2, ArrowLeft, Printer } 
 import PremiumModal from '../components/Auth/PremiumModal';
 
 export default function AcademyPage() {
-    const { isPremium } = useUserStore();
-    const { addElement, clearAll } = useGeometryStore();
+    const { isPremium, profile } = useUserStore();
+    const { addElement, clearAll, setActiveExercise } = useGeometryStore(); // also need setActiveExercise!
     const navigate = useNavigate();
 
     // Premium Modal State (if user tries to access restricted content) -- 
@@ -46,6 +46,12 @@ export default function AcademyPage() {
     const loadExercise = (exercise: AcademyExercise) => {
         if (confirm('Esto borrará tu espacio de trabajo actual para cargar el ejercicio. ¿Continuar?')) {
             clearAll();
+            setActiveExercise({
+                id: exercise.id,
+                title: exercise.title,
+                statement: exercise.statement,
+                solutionHint: exercise.solutionHint
+            });
             exercise.setup.forEach(el => {
                 // Generate unique ID just in case, though adding without ID usually works if store handles it.
                 // Assuming store adds ID. If store replaces IDs, we are good.
@@ -90,15 +96,25 @@ export default function AcademyPage() {
             {/* Main Content */}
             <div className="flex-1 bg-gray-950 flex flex-col overflow-hidden">
                 {selectedTopic && (
-                    <div className="h-full overflow-y-auto p-12 max-w-5xl mx-auto w-full custom-scrollbar">
-                        <div className="mb-8">
-                            <span className="text-blue-500 font-bold tracking-wider text-sm uppercase">Tema Teórico</span>
-                            <h2 className="text-4xl font-bold mt-2 mb-4">{selectedTopic.title}</h2>
-                            <p className="text-xl text-gray-400 leading-relaxed">{selectedTopic.description}</p>
+                    <div className="h-full overflow-y-auto p-12 max-w-5xl mx-auto w-full custom-scrollbar print:custom-none print:p-0 print:overflow-visible">
+                        <div className="mb-8 flex justify-between items-start">
+                            <div className="print:w-full">
+                                <span className="text-blue-500 font-bold tracking-wider text-sm uppercase print:text-black">Tema Teórico</span>
+                                <h2 className="text-4xl font-bold mt-2 mb-4 print:text-black">{selectedTopic.title}</h2>
+                                <p className="text-xl text-gray-400 leading-relaxed print:text-gray-600">{selectedTopic.description}</p>
+                            </div>
+                            <button
+                                onClick={() => window.print()}
+                                className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors print:hidden"
+                                title="Descargar PDF"
+                            >
+                                <Printer size={20} />
+                                <span className="font-medium">PDF</span>
+                            </button>
                         </div>
 
                         {/* Theory Block */}
-                        <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 prose prose-invert max-w-none mb-12">
+                        <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 prose prose-invert max-w-none mb-12 print:bg-white print:text-black print:border-none print:prose-black">
                             <div dangerouslySetInnerHTML={{ __html: selectedTopic.theoryContent }} />
                         </div>
 
@@ -109,33 +125,46 @@ export default function AcademyPage() {
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {selectedTopic.exercises.map(ex => (
-                                <div key={ex.id} className="bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-colors p-6 rounded-2xl flex flex-col">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <span className={`px-2 py-1 rounded text-xs font-bold ${ex.level === 'Fácil' ? 'bg-green-500/20 text-green-400' :
-                                            ex.level === 'Medio' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                'bg-red-500/20 text-red-400'
-                                            }`}>
-                                            {ex.level}
-                                        </span>
-                                        <button
-                                            onClick={() => loadExercise(ex)}
-                                            className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/20"
-                                            title="Resolver en 3D"
-                                        >
-                                            <Play size={20} fill="white" className="ml-1" />
-                                        </button>
-                                    </div>
-                                    <h4 className="text-lg font-bold mb-2">{ex.title}</h4>
-                                    <p className="text-gray-400 text-sm flex-1 mb-4">{ex.statement}</p>
-
-                                    {ex.solutionHint && (
-                                        <div className="bg-blue-900/20 p-3 rounded-lg border border-blue-900/30">
-                                            <p className="text-xs text-blue-300">💡 <b>Pista:</b> {ex.solutionHint}</p>
+                            {selectedTopic.exercises.map(ex => {
+                                const isCompleted = profile?.completed_exercises?.includes(ex.id);
+                                return (
+                                    <div key={ex.id} className={`bg-gray-900 border transition-all p-6 rounded-2xl flex flex-col print:bg-white print:border-gray-300 print:text-black hover:border-blue-500/50 ${isCompleted ? 'border-green-500/30 bg-green-900/10' : 'border-gray-800'
+                                        }`}>
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex items-center gap-2">
+                                                <span className={`px-2 py-1 rounded text-xs font-bold ${ex.level === 'Fácil' ? 'bg-green-500/20 text-green-400 print:bg-gray-100 print:text-black' :
+                                                        ex.level === 'Medio' ? 'bg-yellow-500/20 text-yellow-400 print:bg-gray-100 print:text-black' :
+                                                            'bg-red-500/20 text-red-400 print:bg-gray-100 print:text-black'
+                                                    }`}>
+                                                    {ex.level}
+                                                </span>
+                                                {isCompleted && (
+                                                    <span className="flex items-center gap-1 text-xs font-bold text-green-500 print:hidden">
+                                                        <CheckCircle2 size={12} /> Completado
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <button
+                                                onClick={() => loadExercise(ex)}
+                                                className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/20 print:hidden"
+                                                title={isCompleted ? "Repetir Ejercicio" : "Resolver en 3D"}
+                                            >
+                                                <Play size={20} fill="white" className="ml-1" />
+                                            </button>
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                        <h4 className="text-lg font-bold mb-2 print:text-black flex items-center gap-2">
+                                            {ex.title}
+                                        </h4>
+                                        <p className="text-gray-400 text-sm flex-1 mb-4 print:text-gray-700">{ex.statement}</p>
+
+                                        {ex.solutionHint && (
+                                            <div className="bg-blue-900/20 p-3 rounded-lg border border-blue-900/30 print:bg-gray-100 print:border-gray-200">
+                                                <p className="text-xs text-blue-300 print:text-black">💡 <b>Pista:</b> {ex.solutionHint}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
