@@ -19,7 +19,6 @@ import AdvancedIntersectionTool from './tools/AdvancedIntersectionTool';
 import TrueMagnitudeTool from './tools/TrueMagnitudeTool';
 import ParallelismTool from './tools/ParallelismTool';
 import DistanceTool from './tools/DistanceTool';
-import AdvancedIntersections from './AdvancedIntersections';
 import RotationTool from './tools/RotationTool';
 
 export default function Sidebar() {
@@ -591,600 +590,594 @@ export default function Sidebar() {
                         </button>
 
 
-
-
-                    </span>
-                            {showBisectors ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-            </button>
-
-            <button
-                onClick={toggleFlattening}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${isFlattened
-                    ? 'bg-green-500/20 text-green-600 border border-green-500/50'
-                    : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
-                    }`}
-            >
-                <span className="flex items-center gap-2">
-                    <ArrowDownToLine size={16} /> Abatir Plano Horizontal
-                </span>
-                {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-            </button>
-        </div>
-    )
-}
-            </div >
-
-    {/* Cloud Save/Load (Premium) - Collapsible */ }
-    < div className = {`p-2 border-b ${headerBorder}`}>
-        <button
-            onClick={() => setShowCloudOptions(!showCloudOptions)}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
-        >
-            <span className="flex items-center gap-2">
-                <Download size={16} /> Proyectos {!profile?.is_premium && '🔒'}
-            </span>
-            {showCloudOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-{
-    showCloudOptions && (
-        <div className="flex gap-2 px-2 mt-2">
-            <button
-                onClick={() => profile?.is_premium ? setShowSaveModal(true) : setShowPremiumModal(true)}
-                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-            >
-                <Download size={16} /> Guardar
-                {!profile?.is_premium && <span className="text-xs">🔒</span>}
-            </button>
-            <button
-                onClick={() => profile?.is_premium ? setShowLoadModal(true) : setShowPremiumModal(true)}
-                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-            >
-                <ArrowDownToLine size={16} /> Cargar
-                {!profile?.is_premium && <span className="text-xs">🔒</span>}
-            </button>
-        </div>
-    )
-}
-            </div >
-
-    {/* Export Options - Collapsible */ }
-    < div className = {`p-2 border-b ${headerBorder}`}>
-        <button
-            onClick={() => setShowExportOptions(!showExportOptions)}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
-        >
-            <span className="flex items-center gap-2">
-                <Download size={16} /> Exportar {!profile?.is_premium && '🔒'}
-            </span>
-            {showExportOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-{
-    showExportOptions && (
-        <div className="px-2 space-y-2 mt-2">
-            <button
-                onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-            >
-                <span className="flex items-center gap-2">
-                    <Download size={16} /> Vista Actual
-                </span>
-                {!profile?.is_premium && <span className="text-xs">🔒</span>}
-            </button>
-            <button
-                onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
-            >
-                <span className="flex items-center gap-2">
-                    <Download size={16} /> Todas las Vistas
-                </span>
-                {!profile?.is_premium && <span className="text-xs">🔒</span>}
-            </button>
-        </div>
-    )
-}
-            </div >
-
-    {/* Premium Modal */ }
-    < PremiumModal isOpen = { showPremiumModal } onClose = {() => setShowPremiumModal(false)} />
-
-{/* Tabs */ }
-<div className="flex p-2 gap-2">
-    <button
-        onClick={() => setActiveTab('add')}
-        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'add' ? 'bg-blue-600 text-white shadow-lg' : `${isDark ? 'text-white/70 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}`}
-    >
-        Añadir
-    </button>
-    <button
-        onClick={() => setActiveTab('tools')}
-        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'tools' ? 'bg-blue-600 text-white shadow-lg' : `${isDark ? 'text-white/70 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}`}
-    >
-        Herramientas
-    </button>
-    <button
-        onClick={() => setActiveTab('list')}
-        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'list' ? 'bg-blue-600 text-white shadow-lg' : `${isDark ? 'text-white/70 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}`}
-    >
-        Lista ({elements.length})
-    </button>
-</div>
-
-{/* Content */ }
-<div className="flex-1 overflow-y-auto p-4 pb-24">
-    {activeTab === 'add' ? (
-        <div className="space-y-4">
-            {/* Type selector */}
-            {editingElementId && (
-                <div className="bg-yellow-50 border border-yellow-200 p-2 rounded-lg mb-2 flex items-center justify-between">
-                    <span className="text-xs font-bold text-yellow-700">Editando: {elements.find(e => e.id === editingElementId)?.name}</span>
-                    <button onClick={cancelEditing} className="text-xs text-red-600 hover:underline">Cancelar</button>
-                </div>
-            )}
-            {geometryType === 'point' && (
-                <div className="space-y-3">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="Nombre (opcional)"
-                            value={pointName}
-                            onChange={(e) => setPointName(e.target.value)}
-                            className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
-                        />
-                        {editingElementId && (
-                            <input
-                                type="color"
-                                value={elementColor}
-                                onChange={(e) => setElementColor(e.target.value)}
-                                className="w-10 h-10 p-1 rounded border cursor-pointer"
-                                title="Color del elemento"
-                            />
-                        )}
-                    </div>
-                    <div>
-                        <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Coordenadas</label>
-                        <div className="grid grid-cols-3 gap-2">
-                            <input type="number" placeholder="X" value={pointCoords.x} onChange={(e) => setPointCoords({ ...pointCoords, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                            <input type="number" placeholder="Y" value={pointCoords.y} onChange={(e) => setPointCoords({ ...pointCoords, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                            <input type="number" placeholder="Z" value={pointCoords.z} onChange={(e) => setPointCoords({ ...pointCoords, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                        </div>
-                    </div>
-                    <button onClick={handleAddPoint} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
-                        {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Punto' : 'Añadir Punto'}
-                    </button>
-                </div>
-            )}
-
-            {/* Line Form */}
-            {geometryType === 'line' && (
-                <div className="space-y-3">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="Nombre (opcional)"
-                            value={lineName}
-                            onChange={(e) => setLineName(e.target.value)}
-                            className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
-                        />
-                        {editingElementId && (
-                            <input
-                                type="color"
-                                value={elementColor}
-                                onChange={(e) => setElementColor(e.target.value)}
-                                className="w-10 h-10 p-1 rounded border cursor-pointer"
-                                title="Color del elemento"
-                            />
-                        )}
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className={`block text-xs font-medium ${labelClass}`}>Tipo de Recta</label>
-                        <select
-                            value={lineType}
-                            onChange={(e) => setLineType(e.target.value as any)}
-                            className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`}
-                        >
-                            <option value="generic">Genérica (2 Puntos / Vector)</option>
-                            <option value="vertical">Vertical (Perpendicular al PH)</option>
-                            <option value="point">De Punta (Perpendicular al PV)</option>
-                            <option value="parallel_lt">Paralela a la Línea de Tierra</option>
-                            <option value="profile">De Perfil</option>
-                        </select>
-                    </div>
-
-                    {lineType === 'generic' ? (
-                        <>
-                            <div className="flex gap-2">
-                                <button onClick={() => setLineMode('2points')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === '2points' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>2 Puntos</button>
-                                <button onClick={() => setLineMode('pointDir')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === 'pointDir' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Punto + Dir</button>
-                            </div>
-
-                            <div>
-                                <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto A (Deja vacío para infinito)</label>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <input type="number" placeholder="X" value={lineP1Str.x} onChange={(e) => setLineP1Str({ ...lineP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                    <input type="number" placeholder="Y" value={lineP1Str.y} onChange={(e) => setLineP1Str({ ...lineP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                    <input type="number" placeholder="Z" value={lineP1Str.z} onChange={(e) => setLineP1Str({ ...lineP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                </div>
-                            </div>
-
-                            {lineMode === '2points' ? (
-                                <div>
-                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto B</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        <input type="number" placeholder="X" value={lineP2Str.x} onChange={(e) => setLineP2Str({ ...lineP2Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Y" value={lineP2Str.y} onChange={(e) => setLineP2Str({ ...lineP2Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Z" value={lineP2Str.z} onChange={(e) => setLineP2Str({ ...lineP2Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                    </div>
-                                </div>
-                            ) : (
-                                <div>
-                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Vector Dirección</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        <input type="number" placeholder="X" value={lineDirStr.x} onChange={(e) => setLineDirStr({ ...lineDirStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Y" value={lineDirStr.y} onChange={(e) => setLineDirStr({ ...lineDirStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Z" value={lineDirStr.z} onChange={(e) => setLineDirStr({ ...lineDirStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                    </div>
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <div>
-                            <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto de paso</label>
-                            <div className="grid grid-cols-3 gap-2">
-                                <input type="number" placeholder="X" value={lineP1NonGenericStr.x} onChange={(e) => setLineP1NonGenericStr({ ...lineP1NonGenericStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                <input type="number" placeholder="Y" value={lineP1NonGenericStr.y} onChange={(e) => setLineP1NonGenericStr({ ...lineP1NonGenericStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                <input type="number" placeholder="Z" value={lineP1NonGenericStr.z} onChange={(e) => setLineP1NonGenericStr({ ...lineP1NonGenericStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                            </div>
-                            {lineType === 'profile' && (
-                                <div className="mt-2">
-                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Pendiente (Dirección Y/Z)</label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <input type="number" placeholder="Dir Y" value={lineDirStr.y} onChange={(e) => setLineDirStr({ ...lineDirStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Dir Z" value={lineDirStr.z} onChange={(e) => setLineDirStr({ ...lineDirStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <button onClick={handleAddLine} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
-                        {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Recta' : 'Añadir Recta'}
-                    </button>
-
-                    {/* Alternativa: Crear recta desde puntos existentes */}
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">O selecciona puntos existentes:</p>
-                        <LineCreator />
-                    </div>
-                </div>
-            )}
-
-            {/* Plane Form  */}
-            {geometryType === 'plane' && (
-                <div className="space-y-3">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="Nombre (opcional)"
-                            value={planeName}
-                            onChange={(e) => setPlaneName(e.target.value)}
-                            className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
-                        />
-                        {editingElementId && (
-                            <input
-                                type="color"
-                                value={elementColor}
-                                onChange={(e) => setElementColor(e.target.value)}
-                                className="w-10 h-10 p-1 rounded border cursor-pointer"
-                                title="Color del elemento"
-                            />
-                        )}
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className={`block text-xs font-medium ${labelClass}`}>Tipo de Plano</label>
-                        <select
-                            value={planeType}
-                            onChange={(e) => setPlaneType(e.target.value as any)}
-                            className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`}
-                        >
-                            <option value="generic">Genérico (3 Puntos / Normal / Ecuación)</option>
-                            <option value="horizontal">Horizontal (Paralelo al PH)</option>
-                            <option value="frontal">Frontal (Paralelo al PV)</option>
-                            <option value="parallel_lt">Paralelo a la Línea de Tierra</option>
-                            <option value="vertical">Proyectante Horizontal (Vertical)</option>
-                            <option value="canto">Proyectante Vertical (De Canto)</option>
-                            <option value="through_lt">Pasa por Línea de Tierra</option>
-                            <option value="profile">De Perfil</option>
-                        </select>
-                    </div>
-
-                    {planeType === 'generic' ? (
-                        <>
-                            <div className="grid grid-cols-3 gap-2">
-                                <button onClick={() => setPlaneMode('simple')} className={`py-1.5 text-xs rounded border ${planeMode === 'simple' ? 'bg-green-50 border-green-300 text-green-700 font-bold' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>⚡ Simple</button>
-                                <button onClick={() => setPlaneMode('3points')} className={`py-1.5 text-xs rounded border ${planeMode === '3points' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>3 Puntos</button>
-                                <button onClick={() => setPlaneMode('normal')} className={`py-1.5 text-xs rounded border ${planeMode === 'normal' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Normal</button>
-                            </div>
-                            <div className="grid grid-cols-3 gap-2 mt-2">
-                                <button onClick={() => setPlaneMode('equation')} className={`py-1.5 text-xs rounded border ${planeMode === 'equation' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Ecuación</button>
-                                <button onClick={() => setPlaneMode('intercepts')} className={`py-1.5 text-xs rounded border ${planeMode === 'intercepts' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Trazas</button>
-                                <button onClick={() => setPlaneMode('2lines')} className={`py-1.5 text-xs rounded border ${planeMode === '2lines' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>2 Rectas</button>
-                            </div>
-
-                            <div className="mt-3">
-                                {planeMode === 'simple' && (
-                                    <div>
-                                        <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Altura (Z)</label>
-                                        <input type="number" value={simpleValueStr} onChange={(e) => setSimpleValueStr(e.target.value)} className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`} />
-                                    </div>
-                                )}
-
-                                {planeMode === '3points' && (
-                                    <div className="space-y-3">
-                                        <div>
-                                            <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 1</label>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <input type="number" placeholder="X" value={planeP1Str.x} onChange={(e) => setPlaneP1Str({ ...planeP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Y" value={planeP1Str.y} onChange={(e) => setPlaneP1Str({ ...planeP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Z" value={planeP1Str.z} onChange={(e) => setPlaneP1Str({ ...planeP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 2</label>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <input type="number" placeholder="X" value={planeP2Str.x} onChange={(e) => setPlaneP2Str({ ...planeP2Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Y" value={planeP2Str.y} onChange={(e) => setPlaneP2Str({ ...planeP2Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Z" value={planeP2Str.z} onChange={(e) => setPlaneP2Str({ ...planeP2Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 3</label>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <input type="number" placeholder="X" value={planeP3Str.x} onChange={(e) => setPlaneP3Str({ ...planeP3Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Y" value={planeP3Str.y} onChange={(e) => setPlaneP3Str({ ...planeP3Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Z" value={planeP3Str.z} onChange={(e) => setPlaneP3Str({ ...planeP3Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {planeMode === 'normal' && (
-                                    <div className="space-y-3">
-                                        <div>
-                                            <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto de paso</label>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <input type="number" placeholder="X" value={planeP1Str.x} onChange={(e) => setPlaneP1Str({ ...planeP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Y" value={planeP1Str.y} onChange={(e) => setPlaneP1Str({ ...planeP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Z" value={planeP1Str.z} onChange={(e) => setPlaneP1Str({ ...planeP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Vector Normal</label>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <input type="number" placeholder="X" value={planeNormalStr.x} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Y" value={planeNormalStr.y} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                <input type="number" placeholder="Z" value={planeNormalStr.z} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {planeMode === 'equation' && (
-                                    <div>
-                                        <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Ecuación General (Ax + By + Cz + D = 0)</label>
-                                        <div className="grid grid-cols-4 gap-2">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 mb-1">A</span>
-                                                <input type="number" value={planeEqStr.a} onChange={(e) => setPlaneEqStr({ ...planeEqStr, a: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 mb-1">B</span>
-                                                <input type="number" value={planeEqStr.b} onChange={(e) => setPlaneEqStr({ ...planeEqStr, b: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 mb-1">C</span>
-                                                <input type="number" value={planeEqStr.c} onChange={(e) => setPlaneEqStr({ ...planeEqStr, c: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 mb-1">D</span>
-                                                <input type="number" value={planeEqStr.d} onChange={(e) => setPlaneEqStr({ ...planeEqStr, d: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {planeMode === 'intercepts' && (
-                                    <div className="space-y-3">
-                                        <label className={`block text-xs font-medium ${labelClass}`}>Trazas (Cortes con Ejes)</label>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 mb-1">X (Vértice)</span>
-                                                <input type="number" value={planeInterceptsStr.x} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 mb-1">Y (Alejamiento)</span>
-                                                <input type="number" value={planeInterceptsStr.y} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-gray-500 mb-1">Z (Cota)</span>
-                                                <input type="number" value={planeInterceptsStr.z} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="space-y-3">
-                            {(planeType !== 'through_lt') && (
-                                <div>
-                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto de paso</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        <input type="number" placeholder="X" value={planeP1Str.x} onChange={(e) => setPlaneP1Str({ ...planeP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Y" value={planeP1Str.y} onChange={(e) => setPlaneP1Str({ ...planeP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Z" value={planeP1Str.z} onChange={(e) => setPlaneP1Str({ ...planeP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                    </div>
-                                </div>
-                            )}
-
-                            {['parallel_lt', 'vertical', 'canto', 'through_lt'].includes(planeType) && (
-                                <div>
-                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Orientación (Vector Normal)</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {['vertical', 'canto'].includes(planeType) && (
-                                            <input type="number" placeholder="X" value={planeNormalStr.x} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        )}
-                                        {['parallel_lt', 'vertical', 'through_lt'].includes(planeType) && (
-                                            <input type="number" placeholder="Y" value={planeNormalStr.y} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        )}
-                                        {['parallel_lt', 'canto', 'through_lt'].includes(planeType) && (
-                                            <input type="number" placeholder="Z" value={planeNormalStr.z} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <button onClick={handleAddPlane} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
-                        {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Plano' : 'Añadir Plano'}
-                    </button>
-                </div>
-            )}
-
-            {/* Herramienta para crear rectas por puntos - MOVIDO A LA SECCIÓN DE RECTAS */}
-        </div>
-    ) : activeTab === 'tools' ? (
-        <>
-            <AbatimientoTool />
-            <TrueMagnitudeTool />
-            <ParallelismTool />
-            <RotationTool />
-
-
-
-            <AdvancedToolsPanel isDark={isDark} />
-
-            {/* Measurements Panel */}
-            {measurements.length > 0 && (
-                <div className={`mt-4 p-3 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-semibold">Mediciones</h3>
                         <button
-                            onClick={clearAllMeasurements}
-                            className="text-xs text-red-500 hover:text-red-700"
-                        >
-                            Limpiar Todo
-                        </button>
-                    </div>
-                    <div className="space-y-1">
-                        {measurements.map(m => (
-                            <div key={m.id} className={`flex items-center justify-between text-xs p-2 rounded ${isDark ? 'bg-gray-700' : 'bg-white'}`}>
-                                <span className="font-medium">{m.label}:</span>
-                                <span className={m.type === 'length' ? 'text-blue-400' : 'text-green-400'}>
-                                    {m.type === 'length' ? `${m.value.toFixed(2)} u` : `${m.value.toFixed(1)}°`}
-                                </span>
-                                <button
-                                    onClick={() => removeMeasurement(m.id)}
-                                    className="ml-2 text-red-500 hover:text-red-700"
-                                >
-                                    <Trash2 size={12} />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-        </>
-    ) : (
-        <div className="space-y-2">
-            {elements.length === 0 ? (
-                <div className="text-center py-10 text-gray-400">
-                    <p>No hay elementos creados.</p>
-                </div>
-            ) : (
-                elements
-                    .filter(el => !el.name.startsWith('proc_'))
-                    .map((el: GeometryElement) => (
-                        <div
-                            key={el.id}
-                            className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id))
-                                ? 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400'
-                                : `${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 hover:bg-gray-50'}`
+                            onClick={toggleFlattening}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${isFlattened
+                                ? 'bg-green-500/20 text-green-600 border border-green-500/50'
+                                : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
                                 }`}
                         >
-                            <div
-                                className="flex items-center gap-3 flex-1 cursor-pointer"
-                                onClick={() => {
-                                    if (activeTool !== 'none') {
-                                        selectForDistance(el.id);
-                                    } else {
-                                        selectElement(el.id);
-                                    }
-                                }}
+                            <span className="flex items-center gap-2">
+                                <ArrowDownToLine size={16} /> Abatir Plano Horizontal
+                            </span>
+                            {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                        </button>
+                    </div>
+                )
+                }
+            </div >
+
+            {/* Cloud Save/Load (Premium) - Collapsible */}
+            < div className={`p-2 border-b ${headerBorder}`}>
+                <button
+                    onClick={() => setShowCloudOptions(!showCloudOptions)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                >
+                    <span className="flex items-center gap-2">
+                        <Download size={16} /> Proyectos {!profile?.is_premium && '🔒'}
+                    </span>
+                    {showCloudOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+                {
+                    showCloudOptions && (
+                        <div className="flex gap-2 px-2 mt-2">
+                            <button
+                                onClick={() => profile?.is_premium ? setShowSaveModal(true) : setShowPremiumModal(true)}
+                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
                             >
-                                <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: el.color }} />
+                                <Download size={16} /> Guardar
+                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                            </button>
+                            <button
+                                onClick={() => profile?.is_premium ? setShowLoadModal(true) : setShowPremiumModal(true)}
+                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                            >
+                                <ArrowDownToLine size={16} /> Cargar
+                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                            </button>
+                        </div>
+                    )
+                }
+            </div >
+
+            {/* Export Options - Collapsible */}
+            < div className={`p-2 border-b ${headerBorder}`}>
+                <button
+                    onClick={() => setShowExportOptions(!showExportOptions)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                >
+                    <span className="flex items-center gap-2">
+                        <Download size={16} /> Exportar {!profile?.is_premium && '🔒'}
+                    </span>
+                    {showExportOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+                {
+                    showExportOptions && (
+                        <div className="px-2 space-y-2 mt-2">
+                            <button
+                                onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                            >
+                                <span className="flex items-center gap-2">
+                                    <Download size={16} /> Vista Actual
+                                </span>
+                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                            </button>
+                            <button
+                                onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                            >
+                                <span className="flex items-center gap-2">
+                                    <Download size={16} /> Todas las Vistas
+                                </span>
+                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
+                            </button>
+                        </div>
+                    )
+                }
+            </div >
+
+            {/* Premium Modal */}
+            < PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+
+            {/* Tabs */}
+            <div className="flex p-2 gap-2">
+                <button
+                    onClick={() => setActiveTab('add')}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'add' ? 'bg-blue-600 text-white shadow-lg' : `${isDark ? 'text-white/70 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}`}
+                >
+                    Añadir
+                </button>
+                <button
+                    onClick={() => setActiveTab('tools')}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'tools' ? 'bg-blue-600 text-white shadow-lg' : `${isDark ? 'text-white/70 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}`}
+                >
+                    Herramientas
+                </button>
+                <button
+                    onClick={() => setActiveTab('list')}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'list' ? 'bg-blue-600 text-white shadow-lg' : `${isDark ? 'text-white/70 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}`}
+                >
+                    Lista ({elements.length})
+                </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-4 pb-24">
+                {activeTab === 'add' ? (
+                    <div className="space-y-4">
+                        {/* Type selector */}
+                        {editingElementId && (
+                            <div className="bg-yellow-50 border border-yellow-200 p-2 rounded-lg mb-2 flex items-center justify-between">
+                                <span className="text-xs font-bold text-yellow-700">Editando: {elements.find(e => e.id === editingElementId)?.name}</span>
+                                <button onClick={cancelEditing} className="text-xs text-red-600 hover:underline">Cancelar</button>
+                            </div>
+                        )}
+                        {geometryType === 'point' && (
+                            <div className="space-y-3">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Nombre (opcional)"
+                                        value={pointName}
+                                        onChange={(e) => setPointName(e.target.value)}
+                                        className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
+                                    />
+                                    {editingElementId && (
+                                        <input
+                                            type="color"
+                                            value={elementColor}
+                                            onChange={(e) => setElementColor(e.target.value)}
+                                            className="w-10 h-10 p-1 rounded border cursor-pointer"
+                                            title="Color del elemento"
+                                        />
+                                    )}
+                                </div>
                                 <div>
-                                    <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
-                                        {el.name}
-                                    </p>
-                                    <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                                        {el.type === 'point' && `(${el.coords.x}, ${el.coords.y}, ${el.coords.z})`}
-                                        {el.type === 'line' && 'Recta'}
-                                        {el.type === 'plane' && 'Plano'}
-                                    </p>
+                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Coordenadas</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <input type="number" placeholder="X" value={pointCoords.x} onChange={(e) => setPointCoords({ ...pointCoords, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                        <input type="number" placeholder="Y" value={pointCoords.y} onChange={(e) => setPointCoords({ ...pointCoords, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                        <input type="number" placeholder="Z" value={pointCoords.z} onChange={(e) => setPointCoords({ ...pointCoords, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                    </div>
+                                </div>
+                                <button onClick={handleAddPoint} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
+                                    {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Punto' : 'Añadir Punto'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Line Form */}
+                        {geometryType === 'line' && (
+                            <div className="space-y-3">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Nombre (opcional)"
+                                        value={lineName}
+                                        onChange={(e) => setLineName(e.target.value)}
+                                        className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
+                                    />
+                                    {editingElementId && (
+                                        <input
+                                            type="color"
+                                            value={elementColor}
+                                            onChange={(e) => setElementColor(e.target.value)}
+                                            className="w-10 h-10 p-1 rounded border cursor-pointer"
+                                            title="Color del elemento"
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className={`block text-xs font-medium ${labelClass}`}>Tipo de Recta</label>
+                                    <select
+                                        value={lineType}
+                                        onChange={(e) => setLineType(e.target.value as any)}
+                                        className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`}
+                                    >
+                                        <option value="generic">Genérica (2 Puntos / Vector)</option>
+                                        <option value="vertical">Vertical (Perpendicular al PH)</option>
+                                        <option value="point">De Punta (Perpendicular al PV)</option>
+                                        <option value="parallel_lt">Paralela a la Línea de Tierra</option>
+                                        <option value="profile">De Perfil</option>
+                                    </select>
+                                </div>
+
+                                {lineType === 'generic' ? (
+                                    <>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => setLineMode('2points')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === '2points' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>2 Puntos</button>
+                                            <button onClick={() => setLineMode('pointDir')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === 'pointDir' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Punto + Dir</button>
+                                        </div>
+
+                                        <div>
+                                            <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto A (Deja vacío para infinito)</label>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <input type="number" placeholder="X" value={lineP1Str.x} onChange={(e) => setLineP1Str({ ...lineP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                <input type="number" placeholder="Y" value={lineP1Str.y} onChange={(e) => setLineP1Str({ ...lineP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                <input type="number" placeholder="Z" value={lineP1Str.z} onChange={(e) => setLineP1Str({ ...lineP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                            </div>
+                                        </div>
+
+                                        {lineMode === '2points' ? (
+                                            <div>
+                                                <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto B</label>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    <input type="number" placeholder="X" value={lineP2Str.x} onChange={(e) => setLineP2Str({ ...lineP2Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    <input type="number" placeholder="Y" value={lineP2Str.y} onChange={(e) => setLineP2Str({ ...lineP2Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    <input type="number" placeholder="Z" value={lineP2Str.z} onChange={(e) => setLineP2Str({ ...lineP2Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Vector Dirección</label>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    <input type="number" placeholder="X" value={lineDirStr.x} onChange={(e) => setLineDirStr({ ...lineDirStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    <input type="number" placeholder="Y" value={lineDirStr.y} onChange={(e) => setLineDirStr({ ...lineDirStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    <input type="number" placeholder="Z" value={lineDirStr.z} onChange={(e) => setLineDirStr({ ...lineDirStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div>
+                                        <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto de paso</label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <input type="number" placeholder="X" value={lineP1NonGenericStr.x} onChange={(e) => setLineP1NonGenericStr({ ...lineP1NonGenericStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                            <input type="number" placeholder="Y" value={lineP1NonGenericStr.y} onChange={(e) => setLineP1NonGenericStr({ ...lineP1NonGenericStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                            <input type="number" placeholder="Z" value={lineP1NonGenericStr.z} onChange={(e) => setLineP1NonGenericStr({ ...lineP1NonGenericStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                        </div>
+                                        {lineType === 'profile' && (
+                                            <div className="mt-2">
+                                                <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Pendiente (Dirección Y/Z)</label>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <input type="number" placeholder="Dir Y" value={lineDirStr.y} onChange={(e) => setLineDirStr({ ...lineDirStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    <input type="number" placeholder="Dir Z" value={lineDirStr.z} onChange={(e) => setLineDirStr({ ...lineDirStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                <button onClick={handleAddLine} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
+                                    {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Recta' : 'Añadir Recta'}
+                                </button>
+
+                                {/* Alternativa: Crear recta desde puntos existentes */}
+                                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">O selecciona puntos existentes:</p>
+                                    <LineCreator />
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleVisibility(el.id);
-                                    }}
-                                    className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
-                                    title={el.visible ? "Ocultar" : "Mostrar"}
-                                >
-                                    {el.visible ? <Eye size={14} /> : <EyeOff size={14} />}
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        startEditing(el);
-                                    }}
-                                    className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
-                                    title="Editar"
-                                >
-                                    <Settings size={14} />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeElement(el.id);
-                                    }}
-                                    className={`p-1.5 rounded-md transition-colors hover:bg-red-100 hover:text-red-600 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
-                                    title="Eliminar"
-                                >
-                                    <Trash2 size={14} />
+                        )}
+
+                        {/* Plane Form  */}
+                        {geometryType === 'plane' && (
+                            <div className="space-y-3">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Nombre (opcional)"
+                                        value={planeName}
+                                        onChange={(e) => setPlaneName(e.target.value)}
+                                        className={`flex-1 px-3 py-2 border rounded-lg text-sm ${inputClass}`}
+                                    />
+                                    {editingElementId && (
+                                        <input
+                                            type="color"
+                                            value={elementColor}
+                                            onChange={(e) => setElementColor(e.target.value)}
+                                            className="w-10 h-10 p-1 rounded border cursor-pointer"
+                                            title="Color del elemento"
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className={`block text-xs font-medium ${labelClass}`}>Tipo de Plano</label>
+                                    <select
+                                        value={planeType}
+                                        onChange={(e) => setPlaneType(e.target.value as any)}
+                                        className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`}
+                                    >
+                                        <option value="generic">Genérico (3 Puntos / Normal / Ecuación)</option>
+                                        <option value="horizontal">Horizontal (Paralelo al PH)</option>
+                                        <option value="frontal">Frontal (Paralelo al PV)</option>
+                                        <option value="parallel_lt">Paralelo a la Línea de Tierra</option>
+                                        <option value="vertical">Proyectante Horizontal (Vertical)</option>
+                                        <option value="canto">Proyectante Vertical (De Canto)</option>
+                                        <option value="through_lt">Pasa por Línea de Tierra</option>
+                                        <option value="profile">De Perfil</option>
+                                    </select>
+                                </div>
+
+                                {planeType === 'generic' ? (
+                                    <>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <button onClick={() => setPlaneMode('simple')} className={`py-1.5 text-xs rounded border ${planeMode === 'simple' ? 'bg-green-50 border-green-300 text-green-700 font-bold' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>⚡ Simple</button>
+                                            <button onClick={() => setPlaneMode('3points')} className={`py-1.5 text-xs rounded border ${planeMode === '3points' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>3 Puntos</button>
+                                            <button onClick={() => setPlaneMode('normal')} className={`py-1.5 text-xs rounded border ${planeMode === 'normal' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Normal</button>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2 mt-2">
+                                            <button onClick={() => setPlaneMode('equation')} className={`py-1.5 text-xs rounded border ${planeMode === 'equation' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Ecuación</button>
+                                            <button onClick={() => setPlaneMode('intercepts')} className={`py-1.5 text-xs rounded border ${planeMode === 'intercepts' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Trazas</button>
+                                            <button onClick={() => setPlaneMode('2lines')} className={`py-1.5 text-xs rounded border ${planeMode === '2lines' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>2 Rectas</button>
+                                        </div>
+
+                                        <div className="mt-3">
+                                            {planeMode === 'simple' && (
+                                                <div>
+                                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Altura (Z)</label>
+                                                    <input type="number" value={simpleValueStr} onChange={(e) => setSimpleValueStr(e.target.value)} className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`} />
+                                                </div>
+                                            )}
+
+                                            {planeMode === '3points' && (
+                                                <div className="space-y-3">
+                                                    <div>
+                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 1</label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <input type="number" placeholder="X" value={planeP1Str.x} onChange={(e) => setPlaneP1Str({ ...planeP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Y" value={planeP1Str.y} onChange={(e) => setPlaneP1Str({ ...planeP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Z" value={planeP1Str.z} onChange={(e) => setPlaneP1Str({ ...planeP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 2</label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <input type="number" placeholder="X" value={planeP2Str.x} onChange={(e) => setPlaneP2Str({ ...planeP2Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Y" value={planeP2Str.y} onChange={(e) => setPlaneP2Str({ ...planeP2Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Z" value={planeP2Str.z} onChange={(e) => setPlaneP2Str({ ...planeP2Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 3</label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <input type="number" placeholder="X" value={planeP3Str.x} onChange={(e) => setPlaneP3Str({ ...planeP3Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Y" value={planeP3Str.y} onChange={(e) => setPlaneP3Str({ ...planeP3Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Z" value={planeP3Str.z} onChange={(e) => setPlaneP3Str({ ...planeP3Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {planeMode === 'normal' && (
+                                                <div className="space-y-3">
+                                                    <div>
+                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto de paso</label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <input type="number" placeholder="X" value={planeP1Str.x} onChange={(e) => setPlaneP1Str({ ...planeP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Y" value={planeP1Str.y} onChange={(e) => setPlaneP1Str({ ...planeP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Z" value={planeP1Str.z} onChange={(e) => setPlaneP1Str({ ...planeP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Vector Normal</label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <input type="number" placeholder="X" value={planeNormalStr.x} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Y" value={planeNormalStr.y} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                            <input type="number" placeholder="Z" value={planeNormalStr.z} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {planeMode === 'equation' && (
+                                                <div>
+                                                    <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Ecuación General (Ax + By + Cz + D = 0)</label>
+                                                    <div className="grid grid-cols-4 gap-2">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-gray-500 mb-1">A</span>
+                                                            <input type="number" value={planeEqStr.a} onChange={(e) => setPlaneEqStr({ ...planeEqStr, a: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-gray-500 mb-1">B</span>
+                                                            <input type="number" value={planeEqStr.b} onChange={(e) => setPlaneEqStr({ ...planeEqStr, b: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-gray-500 mb-1">C</span>
+                                                            <input type="number" value={planeEqStr.c} onChange={(e) => setPlaneEqStr({ ...planeEqStr, c: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-gray-500 mb-1">D</span>
+                                                            <input type="number" value={planeEqStr.d} onChange={(e) => setPlaneEqStr({ ...planeEqStr, d: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {planeMode === 'intercepts' && (
+                                                <div className="space-y-3">
+                                                    <label className={`block text-xs font-medium ${labelClass}`}>Trazas (Cortes con Ejes)</label>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-gray-500 mb-1">X (Vértice)</span>
+                                                            <input type="number" value={planeInterceptsStr.x} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-gray-500 mb-1">Y (Alejamiento)</span>
+                                                            <input type="number" value={planeInterceptsStr.y} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] text-gray-500 mb-1">Z (Cota)</span>
+                                                            <input type="number" value={planeInterceptsStr.z} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {(planeType !== 'through_lt') && (
+                                            <div>
+                                                <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Punto de paso</label>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    <input type="number" placeholder="X" value={planeP1Str.x} onChange={(e) => setPlaneP1Str({ ...planeP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    <input type="number" placeholder="Y" value={planeP1Str.y} onChange={(e) => setPlaneP1Str({ ...planeP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    <input type="number" placeholder="Z" value={planeP1Str.z} onChange={(e) => setPlaneP1Str({ ...planeP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {['parallel_lt', 'vertical', 'canto', 'through_lt'].includes(planeType) && (
+                                            <div>
+                                                <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Orientación (Vector Normal)</label>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    {['vertical', 'canto'].includes(planeType) && (
+                                                        <input type="number" placeholder="X" value={planeNormalStr.x} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    )}
+                                                    {['parallel_lt', 'vertical', 'through_lt'].includes(planeType) && (
+                                                        <input type="number" placeholder="Y" value={planeNormalStr.y} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    )}
+                                                    {['parallel_lt', 'canto', 'through_lt'].includes(planeType) && (
+                                                        <input type="number" placeholder="Z" value={planeNormalStr.z} onChange={(e) => setPlaneNormalStr({ ...planeNormalStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                <button onClick={handleAddPlane} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
+                                    {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Plano' : 'Añadir Plano'}
                                 </button>
                             </div>
-                        </div>
-                    ))
-            )}
-        </div>
-    )}
-</div>
-{/* User Menu - Absolutely positioned at bottom */ }
-<div className={`absolute bottom-0 left-0 right-0 p-2 border-t ${headerBorder} ${isDark ? 'bg-gray-900' : 'bg-white'} z-10`}>
-    <UserMenu />
-</div>
+                        )}
+
+                        {/* Herramienta para crear rectas por puntos - MOVIDO A LA SECCIÓN DE RECTAS */}
+                    </div>
+                ) : activeTab === 'tools' ? (
+                    <>
+                        <AbatimientoTool />
+                        <TrueMagnitudeTool />
+                        <ParallelismTool />
+                        <RotationTool />
 
 
-{/* Tools that need to be always active - outside tabs */ }
+
+                        <AdvancedToolsPanel isDark={isDark} />
+
+                        {/* Measurements Panel */}
+                        {measurements.length > 0 && (
+                            <div className={`mt-4 p-3 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-semibold">Mediciones</h3>
+                                    <button
+                                        onClick={clearAllMeasurements}
+                                        className="text-xs text-red-500 hover:text-red-700"
+                                    >
+                                        Limpiar Todo
+                                    </button>
+                                </div>
+                                <div className="space-y-1">
+                                    {measurements.map(m => (
+                                        <div key={m.id} className={`flex items-center justify-between text-xs p-2 rounded ${isDark ? 'bg-gray-700' : 'bg-white'}`}>
+                                            <span className="font-medium">{m.label}:</span>
+                                            <span className={m.type === 'length' ? 'text-blue-400' : 'text-green-400'}>
+                                                {m.type === 'length' ? `${m.value.toFixed(2)} u` : `${m.value.toFixed(1)}°`}
+                                            </span>
+                                            <button
+                                                onClick={() => removeMeasurement(m.id)}
+                                                className="ml-2 text-red-500 hover:text-red-700"
+                                            >
+                                                <Trash2 size={12} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="space-y-2">
+                        {elements.length === 0 ? (
+                            <div className="text-center py-10 text-gray-400">
+                                <p>No hay elementos creados.</p>
+                            </div>
+                        ) : (
+                            elements
+                                .filter(el => !el.name.startsWith('proc_'))
+                                .map((el: GeometryElement) => (
+                                    <div
+                                        key={el.id}
+                                        className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id))
+                                            ? 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400'
+                                            : `${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 hover:bg-gray-50'}`
+                                            }`}
+                                    >
+                                        <div
+                                            className="flex items-center gap-3 flex-1 cursor-pointer"
+                                            onClick={() => {
+                                                if (activeTool !== 'none') {
+                                                    selectForDistance(el.id);
+                                                } else {
+                                                    selectElement(el.id);
+                                                }
+                                            }}
+                                        >
+                                            <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: el.color }} />
+                                            <div>
+                                                <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
+                                                    {el.name}
+                                                </p>
+                                                <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                    {el.type === 'point' && `(${el.coords.x}, ${el.coords.y}, ${el.coords.z})`}
+                                                    {el.type === 'line' && 'Recta'}
+                                                    {el.type === 'plane' && 'Plano'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleVisibility(el.id);
+                                                }}
+                                                className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
+                                                title={el.visible ? "Ocultar" : "Mostrar"}
+                                            >
+                                                {el.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    startEditing(el);
+                                                }}
+                                                className={`p-1.5 rounded-md transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-200 text-gray-500'}`}
+                                                title="Editar"
+                                            >
+                                                <Settings size={14} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    removeElement(el.id);
+                                                }}
+                                                className={`p-1.5 rounded-md transition-colors hover:bg-red-100 hover:text-red-600 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                                                title="Eliminar"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                        )}
+                    </div>
+                )}
+            </div>
+            {/* User Menu - Absolutely positioned at bottom */}
+            <div className={`absolute bottom-0 left-0 right-0 p-2 border-t ${headerBorder} ${isDark ? 'bg-gray-900' : 'bg-white'} z-10`}>
+                <UserMenu />
+            </div>
+
+
+            {/* Tools that need to be always active - outside tabs */}
             <IntersectionTool />
             <DistanceTool />
             <AdvancedIntersectionTool />
-{/* Modals */ }
+            {/* Modals */}
             <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />
         </div >
