@@ -271,33 +271,37 @@ export class AIExecutor {
     private executeAddLineByCoords(step: AIStep, store: any): void {
         const { name, p1_x, p1_y, p1_z, p2_x, p2_y, p2_z, color } = step.params;
 
+        // Calculate direction
+        const dx = p2_x - p1_x;
+        const dy = p2_y - p1_y;
+        const dz = p2_z - p1_z;
+        const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        const direction = {
+            x: length > 0 ? dx / length : 0,
+            y: length > 0 ? dy / length : 0,
+            z: length > 0 ? dz / length : 1
+        };
+
         store.addElement({
             type: 'line',
             name: name || `L${Date.now()}`,
-            color: color || step.color,
-            p1: { x: p1_x, y: p1_y, z: p1_z },
-            p2: { x: p2_x, y: p2_y, z: p2_z },
-            isInfinite: true
-        store.addElement({
-                type: 'line',
-                name: name || `L${Date.now()}`,
-                color: color || step.color || '#ef4444',
-                point: { x: p1_x, y: p1_y, z: p1_z },
-                direction: { x: dir.x, y: dir.y, z: dir.z },
-                p2: { x: p2_x, y: p2_y, z: p2_z }
-            });
-        }
+            color: color || step.color || '#ef4444',
+            point: { x: p1_x, y: p1_y, z: p1_z },
+            direction: direction,
+            p2: { x: p2_x, y: p2_y, z: p2_z }
+        });
+    }
 
     private executeCalculateMath(step: AIStep): void {
-            const { expression } = step.params;
-            try {
-                const result = evaluate(expression);
-                console.log(`[AI Math] ${expression} = ${result}`);
-                // TODO: In the future, feedback this to the chat. For now, alert or log.
-                alert(`🧮 Cálculo IA: ${expression} = ${ result }`);
+        const { expression } = step.params;
+        try {
+            const result = evaluate(expression);
+            console.log(`[AI Math] ${expression} = ${result}`);
+            window.alert(`🧮 Cálculo IA: ${expression} = ${result}`);
         } catch (error) {
             console.error('[AI Math] Error calculating:', error);
-            alert(`❌ Error de cálculo: ${ expression }`);
+            window.alert(`❌ Error de cálculo: ${expression}`);
         }
     }
 }
