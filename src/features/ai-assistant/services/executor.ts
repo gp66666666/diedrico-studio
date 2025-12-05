@@ -2,6 +2,7 @@
 import { useGeometryStore } from '../../../store/geometryStore';
 import type { AIStep } from '../types/ai.types';
 import { executeAdvancedTool } from './aiAdvancedTools';
+import { evaluate } from 'mathjs';
 
 export class AIExecutor {
     async executeStep(step: AIStep): Promise<void> {
@@ -52,9 +53,6 @@ export class AIExecutor {
                     this.executeDeleteElement(step, store);
                     break;
 
-                    import { evaluate } from 'mathjs';
-
-                // ...
 
                 case 'add_line_by_coords':
                     console.log('[AI] Creating line by coords...');
