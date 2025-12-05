@@ -46,7 +46,11 @@ export default function IntersectionTool() {
         try {
             switch (activeTool) {
                 case 'intersection-line-line':
-                    intersectLines(el1 as LineElement, el2 as LineElement);
+                    if (el1.type === 'line' && el2.type === 'line') {
+                        intersectLines(el1 as LineElement, el2 as LineElement);
+                    } else {
+                        alert('Selecciona dos rectas.');
+                    }
                     break;
                 case 'intersection-line-plane':
                     if (el1.type === 'line' && el2.type === 'plane') {
@@ -58,7 +62,11 @@ export default function IntersectionTool() {
                     }
                     break;
                 case 'intersection-plane-plane':
-                    intersectPlanes(el1 as PlaneElement, el2 as PlaneElement);
+                    if (el1.type === 'plane' && el2.type === 'plane') {
+                        intersectPlanes(el1 as PlaneElement, el2 as PlaneElement);
+                    } else {
+                        alert('Selecciona dos planos.');
+                    }
                     break;
             }
         } catch (error) {
@@ -100,26 +108,20 @@ export default function IntersectionTool() {
         }
 
         // Solve for parameter t where lines intersect
-        // P1 + t*d1 = P2 + s*d2
-        // Use two equations (pick the ones with largest components)
-        let t;
+        let t = 0;
         if (Math.abs(d1.x) > Math.abs(d1.y) && Math.abs(d1.x) > Math.abs(d1.z)) {
-            // Use x and y equations
             const denom = d1.x * d2.y - d1.y * d2.x;
             if (Math.abs(denom) > 1e-6) {
                 t = ((P2.x - P1.x) * d2.y - (P2.y - P1.y) * d2.x) / denom;
             } else {
-                // Use x and z
                 const denom2 = d1.x * d2.z - d1.z * d2.x;
                 t = ((P2.x - P1.x) * d2.z - (P2.z - P1.z) * d2.x) / denom2;
             }
         } else {
-            // Use y and z equations
             const denom = d1.y * d2.z - d1.z * d2.y;
             if (Math.abs(denom) > 1e-6) {
                 t = ((P2.y - P1.y) * d2.z - (P2.z - P1.z) * d2.y) / denom;
             } else {
-                // Use x and y
                 const denom2 = d1.x * d2.y - d1.y * d2.x;
                 t = ((P2.x - P1.x) * d2.y - (P2.y - P1.y) * d2.x) / denom2;
             }
@@ -132,17 +134,17 @@ export default function IntersectionTool() {
             z: P1.z + t * d1.z
         };
 
-        // Add intersection point
-        addElement({
+        // Add intersection point with proper naming using ∩ symbol
+        const newElem: PointElement = {
             type: 'point',
-            name: `I(${line1.name}, ${line2.name})`,
+            id: Math.random().toString(36).substr(2, 9),
+            name: `${line1.name}∩${line2.name}`,
             coords: intersection,
-            x: intersection.x,
-            y: intersection.y,
-            z: intersection.z,
-            color: '#FF0000', // Red for intersections
-        } as any);
+            color: '#ff0000', // Red for intersections
+            visible: true
+        };
 
+        addElement(newElem);
         console.log('Line-Line Intersection:', intersection);
     };
 
@@ -157,7 +159,7 @@ export default function IntersectionTool() {
 
         if (Math.abs(dotND) < 1e-6) {
             // Line is parallel to plane
-            const distToPlane = n.x * P.x + n.y * P.y + n.z * P.z + D;
+            const distToPlane = n.x * P.x + n.y * P.y + n.z * P.z - D;
             if (Math.abs(distToPlane) < 1e-6) {
                 alert('La recta está contenida en el plano.');
             } else {
@@ -166,8 +168,8 @@ export default function IntersectionTool() {
             return;
         }
 
-        // Calculate parameter t
-        const t = -(n.x * P.x + n.y * P.y + n.z * P.z + D) / dotND;
+        // Calculate parameter t - Fixed formula
+        const t = (D - (n.x * P.x + n.y * P.y + n.z * P.z)) / dotND;
 
         // Calculate intersection point
         const intersection = {
@@ -176,16 +178,17 @@ export default function IntersectionTool() {
             z: P.z + t * d.z
         };
 
-        addElement({
+        // Add intersection point with proper naming using ∩ symbol
+        const newElem: PointElement = {
             type: 'point',
-            name: `I(${line.name}, ${plane.name})`,
+            id: Math.random().toString(36).substr(2, 9),
+            name: `${line.name}∩${plane.name}`,
             coords: intersection,
-            x: intersection.x,
-            y: intersection.y,
-            z: intersection.z,
-            color: '#FF0000',
-        } as any);
+            color: '#ff0000',
+            visible: true
+        };
 
+        addElement(newElem);
         console.log('Line-Plane Intersection:', intersection);
     };
 
@@ -213,17 +216,16 @@ export default function IntersectionTool() {
         const direction = cross;
 
         // Find a point on the intersection line
-        // Set one coordinate to 0 and solve for the other two
-        let point;
+        let point: { x: number; y: number; z: number } | undefined;
 
         if (Math.abs(cross.z) > 1e-6) {
             // Set z = 0, solve for x and y
-            // n1.x*x + n1.y*y + D1 = 0
-            // n2.x*x + n2.y*y + D2 = 0
+            // n1.x*x + n1.y*y = D1
+            // n2.x*x + n2.y*y = D2
             const denom = n1.x * n2.y - n1.y * n2.x;
             if (Math.abs(denom) > 1e-6) {
-                const x = (-D1 * n2.y + D2 * n1.y) / denom;
-                const y = (-D2 * n1.x + D1 * n2.x) / denom;
+                const x = (D1 * n2.y - D2 * n1.y) / denom;
+                const y = (D2 * n1.x - D1 * n2.x) / denom;
                 point = { x, y, z: 0 };
             }
         }
@@ -232,8 +234,8 @@ export default function IntersectionTool() {
             // Set y = 0, solve for x and z
             const denom = n1.x * n2.z - n1.z * n2.x;
             if (Math.abs(denom) > 1e-6) {
-                const x = (-D1 * n2.z + D2 * n1.z) / denom;
-                const z = (-D2 * n1.x + D1 * n2.x) / denom;
+                const x = (D1 * n2.z - D2 * n1.z) / denom;
+                const z = (D2 * n1.x - D1 * n2.x) / denom;
                 point = { x, y: 0, z };
             }
         }
@@ -242,8 +244,8 @@ export default function IntersectionTool() {
             // Set x = 0, solve for y and z
             const denom = n1.y * n2.z - n1.z * n2.y;
             if (Math.abs(denom) > 1e-6) {
-                const y = (-D1 * n2.z + D2 * n1.z) / denom;
-                const z = (-D2 * n1.y + D1 * n2.y) / denom;
+                const y = (D1 * n2.z - D2 * n1.z) / denom;
+                const z = (D2 * n1.y - D1 * n2.y) / denom;
                 point = { x: 0, y, z };
             }
         }
@@ -253,15 +255,26 @@ export default function IntersectionTool() {
             return;
         }
 
-        // Add intersection line
-        addElement({
-            type: 'line',
-            name: `I(${plane1.name}, ${plane2.name})`,
-            color: '#9B59B6', // Purple for plane intersections
-            point: point,
-            direction: direction,
-        } as any);
+        // Calculate p2 for the line (required by LineElement)
+        const p2 = {
+            x: point.x + direction.x,
+            y: point.y + direction.y,
+            z: point.z + direction.z
+        };
 
+        // Add intersection line with proper naming using ∩ symbol
+        const newElem: LineElement = {
+            type: 'line',
+            id: Math.random().toString(36).substr(2, 9),
+            name: `${plane1.name}∩${plane2.name}`,
+            color: '#9b59b6', // Purple for plane intersections
+            point: point,
+            p2: p2,
+            direction: direction,
+            visible: true
+        };
+
+        addElement(newElem);
         console.log('Plane-Plane Intersection Line:', { point, direction });
     };
 

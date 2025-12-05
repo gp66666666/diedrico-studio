@@ -136,48 +136,8 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                 )}
             </div>
 
-            {/* INTERSECCIONES */}
-            <div>
-                <button
-                    onClick={() => toggleSection('intersecciones')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="3" />
-                            <path d="M3 7v10M21 7v10M7 3h10M7 21h10" />
-                        </svg>
-                        Intersecciones
-                    </span>
-                    {expandedSections.intersecciones ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
 
-                {expandedSections.intersecciones && (
-                    <div className={contentClass}>
-                        <button
-                            className={getButtonClass('intersection-line-line')}
-                            onClick={() => setActiveTool(activeTool === 'intersection-line-line' ? 'none' : 'intersection-line-line')}
-                        >
-                            ✖️ Recta-Recta
-                        </button>
-                        <button
-                            className={getButtonClass('intersection-line-plane')}
-                            onClick={() => setActiveTool(activeTool === 'intersection-line-plane' ? 'none' : 'intersection-line-plane')}
-                        >
-                            ⊕ Recta-Plano
-                        </button>
-                        <button
-                            className={getButtonClass('intersection-plane-plane')}
-                            onClick={() => setActiveTool(activeTool === 'intersection-plane-plane' ? 'none' : 'intersection-plane-plane')}
-                        >
-                            ⊞ Plano-Plano
-                        </button>
-                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Selecciona elementos para calcular intersecciones
-                        </div>
-                    </div>
-                )}
-            </div>
+
 
             {/* VERDADERA MAGNITUD */}
             <div>
