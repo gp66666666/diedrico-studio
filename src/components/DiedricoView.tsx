@@ -1366,10 +1366,22 @@ function SketchElementRenderer({ element, isDark, onClick, selected }: { element
             const ey1 = element.p1.y - (dy2 / len2) * 5000;
             const ex2 = element.p1.x + (dx2 / len2) * 5000;
             const ey2 = element.p1.y + (dy2 / len2) * 5000;
-            return <line x1={ex1} y1={ey1} x2={ex2} y2={ey2} fill="none" {...commonProps} />;
+            return (
+                <g onClick={onClick} className="cursor-pointer">
+                    {/* Fat Invisible Line for Touch */}
+                    <line x1={ex1} y1={ey1} x2={ex2} y2={ey2} stroke="transparent" strokeWidth="20" />
+                    <line x1={ex1} y1={ey1} x2={ex2} y2={ey2} fill="none" stroke={stroke} strokeWidth={strokeWidth} className="transition-colors" />
+                </g>
+            );
         case 'circle':
             const r = Math.hypot(element.p2.x - element.p1.x, element.p2.y - element.p1.y);
-            return <circle cx={element.p1.x} cy={element.p1.y} r={r} fill="none" {...commonProps} />;
+            return (
+                <g onClick={onClick} className="cursor-pointer">
+                    {/* Fat Invisible Circle for Touch */}
+                    <circle cx={element.p1.x} cy={element.p1.y} r={r} fill="none" stroke="transparent" strokeWidth="20" />
+                    <circle cx={element.p1.x} cy={element.p1.y} r={r} fill="none" stroke={stroke} strokeWidth={strokeWidth} className="transition-colors" />
+                </g>
+            );
         case 'arc':
             if (!element.p3) return null;
             const rArc = Math.hypot(element.p2.x - element.p1.x, element.p2.y - element.p1.y);
