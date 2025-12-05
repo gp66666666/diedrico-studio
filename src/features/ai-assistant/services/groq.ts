@@ -69,13 +69,12 @@ export class GroqService {
 
             const steps = this.parseResponseToSteps(text);
 
-            // Clean text for display: Remove JSON blocks
-            const cleanText = text.replace(/```json\s*[\s\S]*?```/g, '').trim();
+            const cleanText = this.cleanResponseText(text, steps.length > 0);
 
             console.log('Parsed Steps:', steps);
 
             return {
-                explanation: cleanText || "¡Hecho! Aquí tienes la construcción.", // Fallback if text is empty
+                text: cleanText || "¡Hecho! Aquí tienes la construcción.",
                 steps,
             };
         } catch (error: any) {
@@ -174,31 +173,43 @@ export class GroqService {
         let stepMatch;
 
         while ((stepMatch = stepRegex.exec(text)) !== null) {
-            const stepNumber = parseInt(stepMatch[1]);
-            const description = stepMatch[2].trim();
+            const stepNumber = parseInt(stepMatch[1] || '0');
+            const description = stepMatch[2] ? stepMatch[2].trim() : `Paso ${stepNumber}`;
+            const content = stepMatch[3] ? stepMatch[3].trim() : '';
 
-            const action = this.identifyAction(description);
-            if (!action) continue;
+            const action = this.identifyAction(description) || this.identifyAction(content);
+            if (!action || !content) continue;
 
-            const params = this.extractParams(description, action);
+            const params = this.extractParams(content, action);
 
             if (params) {
+                stepCount++;
                 steps.push({
-                    id: `step-${stepNumber}`,
-                    stepNumber,
-                    description,
-                    action: action as AIAction, // Cast to AIAction since it's already validated above
+                    id: `step-${stepCount}`,
+                    stepNumber: stepCount,
+                    description: description,
+                    action: action as AIAction,
                     params: {
                         ...params,
-                        color: colorManager.getColorForStep(stepNumber),
+                        color: colorManager.getColorForStep(stepCount),
                     },
-                    color: colorManager.getColorForStep(stepNumber),
+                    color: colorManager.getColorForStep(stepCount),
                     status: 'pending',
                 });
             }
         }
 
         return steps;
+    }
+
+    // Helper to clean text ONLY if steps were successfully found
+    public cleanResponseText(text: string, stepsFound: boolean): string {
+        if (!stepsFound) {
+            // If no steps found, KEEP the JSON block so the user can see the error/raw output
+            return text + "\n\n⚠️ **Alerta:** No se detectaron pasos ejecutables. Si ves código arriba, hubo un error de formato.";
+        }
+        // Otherwise, clean it up
+        return text.replace(/```(?:json|JSON)?\s*([\s\S]*?)\s*```/g, '').trim();
     }
 
     private createStepObject(stepCount: number, data: any): AIStep {
