@@ -136,6 +136,74 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                 )}
             </div>
 
+            {/* INTERSECCIONES */}
+            <div>
+                <button
+                    onClick={() => toggleSection('intersecciones')}
+                    className={sectionClass}
+                >
+                    <span className="flex items-center gap-2">
+                        <GitBranch size={16} className="rotate-0" />
+                        Intersecciones
+                    </span>
+                    {expandedSections.intersecciones ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+
+                {expandedSections.intersecciones && (
+                    <div className={contentClass}>
+                        <div className="mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Básicos (2 Elementos)</div>
+                        <button
+                            className={getButtonClass('intersection-line-line')}
+                            onClick={() => setActiveTool(activeTool === 'intersection-line-line' ? 'none' : 'intersection-line-line')}
+                        >
+                            ✖️ Recta ∩ Recta
+                        </button>
+                        <button
+                            className={getButtonClass('intersection-line-plane')}
+                            onClick={() => setActiveTool(activeTool === 'intersection-line-plane' ? 'none' : 'intersection-line-plane')}
+                        >
+                            ⊕ Recta ∩ Plano
+                        </button>
+                        <button
+                            className={getButtonClass('intersection-plane-plane')}
+                            onClick={() => setActiveTool(activeTool === 'intersection-plane-plane' ? 'none' : 'intersection-plane-plane')}
+                        >
+                            ⊞ Plano ∩ Plano
+                        </button>
+
+                        <div className="mt-3 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Avanzados (3 Elementos)</div>
+                        <button
+                            className={getButtonClass('advanced-intersection-3-planes')}
+                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-3-planes' ? 'none' : 'advanced-intersection-3-planes')}
+                        >
+                            3 Planos ∩
+                        </button>
+                        <button
+                            className={getButtonClass('advanced-intersection-3-lines')}
+                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-3-lines' ? 'none' : 'advanced-intersection-3-lines')}
+                        >
+                            3 Rectas ∩
+                        </button>
+                        <button
+                            className={getButtonClass('advanced-intersection-2planes-1line')}
+                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-2planes-1line' ? 'none' : 'advanced-intersection-2planes-1line')}
+                        >
+                            2 Planos + Recta ∩
+                        </button>
+                        <button
+                            className={getButtonClass('advanced-intersection-2lines-1plane')}
+                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-2lines-1plane' ? 'none' : 'advanced-intersection-2lines-1plane')}
+                        >
+                            2 Rectas + Plano ∩
+                        </button>
+
+                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Selecciona los elementos en la Lista
+                        </div>
+                    </div>
+                )}
+            </div>
+
 
 
 
