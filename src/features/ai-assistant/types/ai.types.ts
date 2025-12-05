@@ -73,7 +73,7 @@ export interface AddPlaneByNormalParams {
     color: string;
 }
 
-export interface GeminiResponse {
+export interface AIResponse {
     explanation: string;
     steps: AIStep[];
 }

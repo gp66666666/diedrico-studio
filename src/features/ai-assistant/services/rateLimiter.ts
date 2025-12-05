@@ -1,5 +1,5 @@
 // Rate Limiter for API Calls
-// Prevents exceeding Gemini API free tier limits (15 RPM)
+// Prevents exceeding Groq API limits
 
 export class RateLimiter {
     private requests: number[] = [];

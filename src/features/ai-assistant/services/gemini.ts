@@ -1,36 +1,32 @@
-// Gemini AI Service - Main AI Client with Function Calling
+// Gemini AI Service - Legacy Support
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { AI_CONFIG } from '../../../config/features';
+import { useGeometryStore } from '../../../store/geometryStore';
+import type { AIStep, AIResponse } from '../types/ai.types';
 import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
 import { rateLimiter } from './rateLimiter';
 import { colorManager } from './colorManager';
-import type { AIStep, GeminiResponse } from '../types/ai.types';
+
+const AI_CONFIG = {
+    geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
+    geminiModel: 'gemini-pro',
+};
 
 export class GeminiService {
-    private genAI?: GoogleGenerativeAI;
-    private model?: any;
+    private genAI: GoogleGenerativeAI | null = null;
+    private model: any = null;
 
     constructor() {
         if (!AI_CONFIG.geminiApiKey) {
-            console.warn('Gemini API key not configured. Gemini features will not work.');
-            // We don't throw here to prevent app crash on load
-        } else {
-            this.genAI = new GoogleGenerativeAI(AI_CONFIG.geminiApiKey);
-            this.model = this.genAI.getGenerativeModel({
-                model: AI_CONFIG.geminiModel,
-                generationConfig: {
-                    temperature: AI_CONFIG.temperature,
-                    maxOutputTokens: AI_CONFIG.maxTokens,
-                },
-            });
+            console.warn('Gemini API key not configured. Legacy features will not work.');
+            return;
         }
+        this.genAI = new GoogleGenerativeAI(AI_CONFIG.geminiApiKey);
+        this.model = this.genAI.getGenerativeModel({
+            model: AI_CONFIG.geminiModel,
+        });
     }
-    // ... (rest of class)
 
-    // Removed side-effect export
-    // export const geminiService = new GeminiService();
-
-    async solveExercise(userPrompt: string): Promise<GeminiResponse> {
+    async solveExercise(userPrompt: string): Promise<AIResponse> {
         if (!this.model) {
             throw new Error('Gemini API key not configured');
         }

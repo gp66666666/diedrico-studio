@@ -1,29 +1,30 @@
 // AI Service Wrapper - Supports both Gemini and Groq
-import { AI_CONFIG } from '../../../config/features';
-import { GeminiService } from './gemini';
 import { GroqService } from './groq';
-import type { GeminiResponse } from '../types/ai.types';
+import { GeminiService } from './gemini';
+import { useUserStore } from '../../../store/userStore';
+import type { AIResponse } from '../types/ai.types';
 
-class AIService {
+const AI_CONFIG = {
+    groqApiKey: import.meta.env.VITE_GROQ_API_KEY || '',
+    geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '', // Legacy
+};
+
+export class AIService {
     private service: GeminiService | GroqService;
 
     constructor() {
-        if (AI_CONFIG.provider === 'groq') {
-            // Ensure API key exists, otherwise warn and use empty string (service handles it)
-            const apiKey = AI_CONFIG.groqApiKey || '';
-            if (!apiKey) {
-                console.warn('Groq API Key is missing. AI features will not work.');
-            }
-            this.service = new GroqService(apiKey);
+        // Default to Groq
+        if (AI_CONFIG.groqApiKey) {
+            this.service = new GroqService(AI_CONFIG.groqApiKey);
         } else {
+            console.warn('Groq API key not found, falling back to Gemini/Legacy');
             this.service = new GeminiService();
         }
     }
 
-    async solveExercise(prompt: string): Promise<GeminiResponse> {
+    async solveExercise(prompt: string): Promise<AIResponse> {
         return this.service.solveExercise(prompt);
     }
 }
 
 export const aiService = new AIService();
-export { aiService as geminiService }; // Backward compatibility

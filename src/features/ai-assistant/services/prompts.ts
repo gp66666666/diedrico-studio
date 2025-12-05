@@ -1,4 +1,4 @@
-// System Prompts and Function Definitions for Gemini AI
+// System Prompts and Function Definitions for Groq AI
 import { AI_ADVANCED_TOOLS_DEFINITIONS } from './aiAdvancedTools';
 
 export const SYSTEM_PROMPT = `Eres el "ARQUITECTO SUPREMO", la IA más avanzada del mundo en GEOMETRÍA DESCRIPTIVA y SISTEMA DIÉDRICO.

@@ -1,7 +1,7 @@
 // Groq AI Service - Alternative to Gemini
 import { colorManager } from './colorManager';
 import { rateLimiter } from './rateLimiter';
-import type { AIStep, GeminiResponse, AIAction } from '../types/ai.types';
+import type { AIStep, AIResponse, AIAction } from '../types/ai.types';
 import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
 import { useGeometryStore } from '../../../store/geometryStore';
 
@@ -13,7 +13,7 @@ export class GroqService {
         this.apiKey = apiKey;
     }
 
-    async solveExercise(userPrompt: string): Promise<GeminiResponse> {
+    async solveExercise(userPrompt: string): Promise<AIResponse> {
         await rateLimiter.checkLimit();
         colorManager.reset();
 
