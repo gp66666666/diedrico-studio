@@ -97,96 +97,75 @@ export class GroqService {
         const steps: AIStep[] = [];
 
         // 1. Try to parse JSON blocks first (Robust method)
-        const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/g;
-        let jsonMatch;
-        let stepCount = 0;
+        // STRATEGY 1: Extract from code blocks (Primary)
+        // Matches ```json, ```JSON, or just ```
+        const codeBlockRegex = /```(?:json|JSON)?\s*([\s\S]*?)\s*```/g;
+        let match;
 
-        while ((jsonMatch = jsonBlockRegex.exec(text)) !== null) {
+        while ((match = codeBlockRegex.exec(text)) !== null) {
             try {
-                const jsonContent = jsonMatch[1].trim();
-                const parsedData = JSON.parse(jsonContent);
-                const items = Array.isArray(parsedData) ? parsedData : [parsedData];
+                const rawContent = match[1].trim();
+                // Heuristic: Check if it looks like JSON
+                if (rawContent.startsWith('{') || rawContent.startsWith('[')) {
+                    const parsed = JSON.parse(rawContent);
+                    const items = Array.isArray(parsed) ? parsed : (parsed.steps || parsed.actions || [parsed]);
 
-                for (const stepData of items) {
-                    if (stepData.name && stepData.params) {
-                        stepCount++;
-                        steps.push({
-                            id: `step-${stepCount}`,
-                            stepNumber: stepCount,
-                            description: stepData.params.step_description || `Paso ${stepCount}`,
-                            action: stepData.name,
-                            params: {
-                                ...stepData.params,
-                                color: colorManager.getColorForStep(stepCount),
-                            },
-                            color: colorManager.getColorForStep(stepCount),
-                            status: 'pending',
-                        });
+                    if (Array.isArray(items)) {
+                        for (const item of items) {
+                            if (item.name && item.params) {
+                                stepCount++;
+                                steps.push(this.createStepObject(stepCount, item));
+                            }
+                        }
                     }
                 }
             } catch (e) {
-                console.error('Error parsing JSON step:', e);
+                console.warn('Failed to parse code block JSON:', e);
             }
         }
 
-        // If JSON blocks found, return them
-        if (steps.length > 0) {
-            return steps;
-        }
+        // STRATEGY 2: If no steps found, search for raw JSON arrays/objects in text
+        if (steps.length === 0) {
+            try {
+                // Find potential JSON array or object
+                const firstBracket = text.indexOf('[');
+                const firstBrace = text.indexOf('{');
 
-        // 1.5 Try to find raw JSON object in text (if model forgot code blocks)
-        try {
-            // Find first '{' and last '}'
-            const firstBrace = text.indexOf('{');
-            const lastBrace = text.lastIndexOf('}');
+                let start = -1;
+                // Pick the earliest occurrence
+                if (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) start = firstBracket;
+                else if (firstBrace !== -1) start = firstBrace;
 
-            if (firstBrace !== -1 && lastBrace !== -1) {
-                const potentialJson = text.substring(firstBrace, lastBrace + 1);
-                const data = JSON.parse(potentialJson);
+                if (start !== -1) {
+                    // Try to find the matching closing character by balancing
+                    // Simple approach: find last ']' or '}'
+                    const lastBracket = text.lastIndexOf(']');
+                    const lastBrace = text.lastIndexOf('}');
+                    let end = Math.max(lastBracket, lastBrace);
 
-                // Handle different JSON formats the model might return
-                let stepData = data;
-
-                // Case A: Model returns OpenAI function calling format (as seen in screenshot)
-                if (data.type === 'function' && data.name && data.parameters) {
-                    // Normalize parameters: recursively extract 'value' if present
-                    const normalizeParams = (params: any) => {
-                        const newParams: any = {};
-                        for (const key in params) {
-                            if (params[key] && typeof params[key] === 'object' && 'value' in params[key]) {
-                                newParams[key] = params[key].value;
-                            } else {
-                                newParams[key] = params[key];
+                    if (end > start) {
+                        const candidate = text.substring(start, end + 1);
+                        try {
+                            const parsed = JSON.parse(candidate);
+                            const items = Array.isArray(parsed) ? parsed : (parsed.steps || parsed.actions || [parsed]);
+                            if (Array.isArray(items)) {
+                                for (const item of items) {
+                                    if (item.name && item.params) {
+                                        stepCount++;
+                                        steps.push(this.createStepObject(stepCount, item));
+                                    }
+                                }
                             }
-                        }
-                        return newParams;
-                    };
-
-                    stepData = {
-                        name: data.name,
-                        params: normalizeParams(data.parameters)
-                    };
+                        } catch (e) { /* Ignore partial matches */ }
+                    }
                 }
-
-                if (stepData.name && stepData.params) {
-                    steps.push({
-                        id: `step-1`,
-                        stepNumber: 1,
-                        description: stepData.params.step_description || "Paso generado por IA",
-                        action: stepData.name,
-                        params: {
-                            ...stepData.params,
-                            color: colorManager.getColorForStep(1),
-                        },
-                        color: colorManager.getColorForStep(1),
-                        status: 'pending',
-                    });
-                    return steps;
-                }
+            } catch (e) {
+                console.warn('Failed to search raw JSON:', e);
             }
-        } catch (e) {
-            console.warn('Failed to parse raw JSON fallback', e);
         }
+
+        if (steps.length > 0) return steps;
+
 
         // 2. Fallback to legacy text parsing (Fragile method)
         console.warn('No JSON blocks found, falling back to text parsing');
@@ -219,6 +198,21 @@ export class GroqService {
         }
 
         return steps;
+    }
+
+    private createStepObject(stepCount: number, data: any): AIStep {
+        return {
+            id: `step-${stepCount}`,
+            stepNumber: stepCount,
+            description: data.params?.step_description || `Paso ${stepCount}`,
+            action: data.name,
+            params: {
+                ...data.params,
+                color: colorManager.getColorForStep(stepCount),
+            },
+            color: colorManager.getColorForStep(stepCount),
+            status: 'pending',
+        };
     }
 
     private identifyAction(description: string): string | null {
