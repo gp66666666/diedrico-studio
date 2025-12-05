@@ -9,6 +9,7 @@ interface UserProfile {
     avatar_url?: string;
     is_premium: boolean;
     completed_exercises?: string[]; // Array of Exercise IDs
+    completed_topics?: string[]; // Array of Topic IDs (Lessons)
     role: 'user' | 'admin';
 }
 
@@ -24,6 +25,7 @@ interface UserState {
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
     markExerciseComplete: (id: string) => Promise<void>;
+    markTopicComplete: (id: string, completed: boolean) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -106,6 +108,33 @@ export const useUserStore = create<UserState>((set, get) => ({
         } catch (error) {
             console.error('Failed to save progress', error);
             // Revert on critical failure? Nah, keep optimistic for now.
+        }
+    },
+
+    markTopicComplete: async (id: string, completed: boolean) => {
+        const { user, profile } = get();
+        if (!user || !profile) return;
+
+        const currentCompleted = profile.completed_topics || []; // Now typed correctly
+        let newCompleted = [...currentCompleted];
+
+        if (completed) {
+            if (!newCompleted.includes(id)) newCompleted.push(id);
+        } else {
+            newCompleted = newCompleted.filter(tid => tid !== id);
+        }
+
+        // Optimistic update
+        set({ profile: { ...profile, completed_topics: newCompleted } });
+
+        // Update DB
+        try {
+            await supabase
+                .from('profiles')
+                .update({ completed_topics: newCompleted })
+                .eq('id', user.id);
+        } catch (error) {
+            console.error('Error updating topic progress:', error);
         }
     }
 }));
