@@ -52,10 +52,18 @@ export class AIExecutor {
                     this.executeDeleteElement(step, store);
                     break;
 
+                    import { evaluate } from 'mathjs';
+
+                // ...
+
                 case 'add_line_by_coords':
                     console.log('[AI] Creating line by coords...');
                     this.executeAddLineByCoords(step, store);
                     console.log('[AI] ✓ Line by coords created');
+                    break;
+
+                case 'calculate_math':
+                    this.executeCalculateMath(step);
                     break;
 
                 default:
@@ -138,6 +146,8 @@ export class AIExecutor {
         }
 
         console.log('[AI] ✓ Points found:', p1.name, 'and', p2.name);
+        console.log('[AI DEBUG] P1:', JSON.stringify(p1));
+        console.log('[AI DEBUG] P2:', JSON.stringify(p2));
         console.log('[AI] 📐 Calculating direction vector...');
 
         // Calculate direction vector (same as LineCreator)
@@ -268,7 +278,27 @@ export class AIExecutor {
             p1: { x: p1_x, y: p1_y, z: p1_z },
             p2: { x: p2_x, y: p2_y, z: p2_z },
             isInfinite: true
-        });
+        store.addElement({
+                type: 'line',
+                name: name || `L${Date.now()}`,
+                color: color || step.color || '#ef4444',
+                point: { x: p1_x, y: p1_y, z: p1_z },
+                direction: { x: dir.x, y: dir.y, z: dir.z },
+                p2: { x: p2_x, y: p2_y, z: p2_z }
+            });
+        }
+
+    private executeCalculateMath(step: AIStep): void {
+            const { expression } = step.params;
+            try {
+                const result = evaluate(expression);
+                console.log(`[AI Math] ${expression} = ${result}`);
+                // TODO: In the future, feedback this to the chat. For now, alert or log.
+                alert(`🧮 Cálculo IA: ${expression} = ${ result }`);
+        } catch (error) {
+            console.error('[AI Math] Error calculating:', error);
+            alert(`❌ Error de cálculo: ${ expression }`);
+        }
     }
 }
 

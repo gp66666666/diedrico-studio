@@ -269,5 +269,23 @@ export const FUNCTION_DEFINITIONS = [
             properties: {},
             required: []
         }
+    },
+    {
+        name: "calculate_math",
+        description: "Realiza cálculos matemáticos complejos. ÚSALO SOLO COMO ÚLTIMA OPCIÓN si no puedes resolverlo geométricamente.",
+        parameters: {
+            type: "object",
+            properties: {
+                expression: {
+                    type: "string",
+                    description: "Expresión matemática a evaluar (ej: 'sqrt(4^2 + 3^2)', 'sin(45 deg)')"
+                },
+                step_description: {
+                    type: "string",
+                    description: "Qué estás calculando"
+                }
+            },
+            required: ["expression", "step_description"]
+        }
     }
 ];
