@@ -57,6 +57,10 @@ interface GeometryState {
     showProfile: boolean;
     toggleProfile: () => void;
 
+    // Academy
+    activeExercise: { id: string; title: string; statement: string; solutionHint?: string } | null;
+    setActiveExercise: (ex: { id: string; title: string; statement: string; solutionHint?: string } | null) => void;
+
     // Camera Persistence
     cameraStates: {
         '3d': { position: [number, number, number], target: [number, number, number] };
@@ -245,6 +249,9 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
     showProfile: false,
     toggleProfile: () => set((state) => ({ showProfile: !state.showProfile })),
+
+    activeExercise: null,
+    setActiveExercise: (ex) => set({ activeExercise: ex }),
 
     // Distance Tools
     activeTool: 'none',

@@ -21,7 +21,6 @@ interface UserState {
 
     // Actions
     checkSession: () => Promise<void>;
-    checkSession: () => Promise<void>;
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
     markExerciseComplete: (id: string) => Promise<void>;
