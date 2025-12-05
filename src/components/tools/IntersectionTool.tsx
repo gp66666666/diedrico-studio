@@ -63,9 +63,7 @@ export default function IntersectionTool() {
                         addElement({
                             type: 'point',
                             name: `Intersección de ${el1.name} con ${el2.name}`,
-                            x: point.x,
-                            y: point.y,
-                            z: point.z,
+                            coords: point,
                             color: '#ff0000'
                         } as any);
                         console.log('[IntersectionTool] ✅ SUCCESS - Element added');
