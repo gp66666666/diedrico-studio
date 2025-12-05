@@ -207,8 +207,8 @@ export default function ContactPage() {
                                 type="submit"
                                 disabled={sending}
                                 className={`w-full font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 ${sending
-                                        ? 'bg-gray-500 cursor-not-allowed'
-                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    ? 'bg-gray-500 cursor-not-allowed'
+                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
                                     }`}
                             >
                                 <Mail size={20} />
@@ -228,7 +228,7 @@ export default function ContactPage() {
                         <div>
                             <p className="font-medium text-white mb-1">¿Es gratuito usar Diédrico Studio?</p>
                             <p className="text-white/70">
-                                Sí, Diédrico Studio es completamente gratuito. Los anuncios nos ayudan a mantener
+                                Sí, Diédrico Studio es completamente gratuito. Hay versión premium que te da más herramientas y características. Los anuncios nos ayudan a mantener
                                 el servidor y seguir desarrollando nuevas características.
                             </p>
                         </div>

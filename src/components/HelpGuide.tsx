@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Book, Pencil, Box, RotateCw, Ruler, MousePointer2 } from 'lucide-react';
 
 interface HelpGuideProps {
@@ -65,7 +66,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
         }
     ];
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md p-4 transition-all duration-300">
             <div className={`w-full max-w-3xl h-[80vh] flex flex-col rounded-2xl shadow-2xl border ${bgClass} ring-1 ring-white/10`}>
                 {/* Header */}
@@ -176,6 +177,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                     © 2025 Eloi García - Diédrico Studio
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
