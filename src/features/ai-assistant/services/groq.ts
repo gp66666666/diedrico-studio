@@ -112,6 +112,60 @@ export class GroqService {
             return steps;
         }
 
+        // 1.5 Try to find raw JSON object in text (if model forgot code blocks)
+        try {
+            // Find first '{' and last '}'
+            const firstBrace = text.indexOf('{');
+            const lastBrace = text.lastIndexOf('}');
+
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                const potentialJson = text.substring(firstBrace, lastBrace + 1);
+                const data = JSON.parse(potentialJson);
+
+                // Handle different JSON formats the model might return
+                let stepData = data;
+
+                // Case A: Model returns OpenAI function calling format (as seen in screenshot)
+                if (data.type === 'function' && data.name && data.parameters) {
+                    // Normalize parameters: recursively extract 'value' if present
+                    const normalizeParams = (params: any) => {
+                        const newParams: any = {};
+                        for (const key in params) {
+                            if (params[key] && typeof params[key] === 'object' && 'value' in params[key]) {
+                                newParams[key] = params[key].value;
+                            } else {
+                                newParams[key] = params[key];
+                            }
+                        }
+                        return newParams;
+                    };
+
+                    stepData = {
+                        name: data.name,
+                        params: normalizeParams(data.parameters)
+                    };
+                }
+
+                if (stepData.name && stepData.params) {
+                    steps.push({
+                        id: `step-1`,
+                        stepNumber: 1,
+                        description: stepData.params.step_description || "Paso generado por IA",
+                        action: stepData.name,
+                        params: {
+                            ...stepData.params,
+                            color: colorManager.getColorForStep(1),
+                        },
+                        color: colorManager.getColorForStep(1),
+                        status: 'pending',
+                    });
+                    return steps;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to parse raw JSON fallback', e);
+        }
+
         // 2. Fallback to legacy text parsing (Fragile method)
         console.warn('No JSON blocks found, falling back to text parsing');
         const stepRegex = /\*\*Paso (\d+)\*\*:(.+?)(?=\*\*Paso \d+\*\*|$)/gs;
