@@ -78,7 +78,7 @@ export default function MainApp() {
                         </div>
 
                         {/* View Content */}
-                        <div className="flex-1 relative w-full h-full">
+                        <div key={viewMode} className="flex-1 relative w-full h-full animate-fade-in">
                             {viewMode === '3d' ? (
                                 <>
                                     <Scene />
