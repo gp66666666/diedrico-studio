@@ -45,14 +45,12 @@ export const calculateLineTraces = (point: Vector3, direction: Vector3) => {
     let vTrace: Vector3 | null = null;
 
     // Horizontal Trace (z = 0)
-    // P + t*D = (x, y, 0) => P.z + t*D.z = 0 => t = -P.z / D.z
     if (Math.abs(direction.z) > 1e-6) {
         const t = -point.z / direction.z;
         hTrace = vectorAdd(point, vectorScale(direction, t));
     }
 
     // Vertical Trace (y = 0)
-    // P + t*D = (x, 0, z) => P.y + t*D.y = 0 => t = -P.y / D.y
     if (Math.abs(direction.y) > 1e-6) {
         const t = -point.y / direction.y;
         vTrace = vectorAdd(point, vectorScale(direction, t));
@@ -69,17 +67,10 @@ export const intersectLinePlane = (
     planeNormal: Vector3,
     planeConstant: number
 ): Vector3 | null => {
-    // Line: P + t*D
-    // Plane: N.X + C = 0
-    // N.(P + t*D) + C = 0
-    // N.P + t*(N.D) + C = 0
-    // t = -(N.P + C) / (N.D)
-
     const denom = vectorDot(planeNormal, lineDir);
 
     if (Math.abs(denom) < 1e-6) {
-        // Line is parallel to plane
-        return null;
+        return null; // Parallel
     }
 
     const t = -(vectorDot(planeNormal, linePoint) + planeConstant) / denom;
@@ -92,46 +83,26 @@ export const intersectPlanePlane = (
     n2: Vector3,
     c2: number
 ): { point: Vector3; direction: Vector3 } | null => {
-    // Direction of intersection line is cross product of normals
     const direction = vectorCross(n1, n2);
 
-    // If direction is zero, planes are parallel
     if (vectorLength(direction) < 1e-6) {
-        return null;
+        return null; // Parallel
     }
-
-    // To find a point on the line, we can set one coordinate to 0 and solve for the others
-    // Or use the formula: P = (c1 * (n2 x n12) + c2 * (n12 x n1)) / |n1 x n2|^2 ?? No, simpler:
-    // Solve system:
-    // n1.x*x + n1.y*y + n1.z*z = -c1
-    // n2.x*x + n2.y*y + n2.z*z = -c2
-
-    // Let's try setting z=0, if that fails y=0, then x=0
-    // Determinant for x,y part: n1.x*n2.y - n1.y*n2.x = direction.z
 
     let point: Vector3;
 
     if (Math.abs(direction.z) > 1e-6) {
-        // Set z = 0
-        // n1.x*x + n1.y*y = -c1
-        // n2.x*x + n2.y*y = -c2
         const det = n1.x * n2.y - n1.y * n2.x;
         const x = ((-c1) * n2.y - n1.y * (-c2)) / det;
         const y = (n1.x * (-c2) - (-c1) * n2.x) / det;
         point = { x, y, z: 0 };
     } else if (Math.abs(direction.y) > 1e-6) {
-        // Set y = 0
-        // n1.x*x + n1.z*z = -c1
-        // n2.x*x + n2.z*z = -c2
-        const det = n1.x * n2.z - n1.z * n2.x; // -direction.y
+        const det = n1.x * n2.z - n1.z * n2.x;
         const x = ((-c1) * n2.z - n1.z * (-c2)) / det;
         const z = (n1.x * (-c2) - (-c1) * n2.x) / det;
         point = { x, y: 0, z };
     } else {
-        // Set x = 0
-        // n1.y*y + n1.z*z = -c1
-        // n2.y*y + n2.z*z = -c2
-        const det = n1.y * n2.z - n1.z * n2.y; // direction.x
+        const det = n1.y * n2.z - n1.z * n2.y;
         const y = ((-c1) * n2.z - n1.z * (-c2)) / det;
         const z = (n1.y * (-c2) - (-c1) * n2.y) / det;
         point = { x: 0, y, z };
@@ -146,9 +117,6 @@ export const intersectLineLine = (
     p2: Vector3,
     d2: Vector3
 ): Vector3 | null => {
-    // Check if lines are coplanar and not parallel
-    // We can find the closest points. If distance is 0, they intersect.
-
     const w0 = vectorSub(p1, p2);
     const a = vectorDot(d1, d1);
     const b = vectorDot(d1, d2);
@@ -165,9 +133,7 @@ export const intersectLineLine = (
     const sc = (b * e - c * d) / denom;
     const tc = (a * e - b * d) / denom;
 
-    // Point on line 1
     const P1 = vectorAdd(p1, vectorScale(d1, sc));
-    // Point on line 2
     const P2 = vectorAdd(p2, vectorScale(d2, tc));
 
     const dist = vectorLength(vectorSub(P1, P2));
@@ -179,46 +145,162 @@ export const intersectLineLine = (
     return null; // Skew lines
 };
 
+// --- Advanced Intersections (3 elements) ---
+
+/**
+ * Intersect 3 planes
+ * Returns: point (unique), line (infinite solutions), or none
+ */
+export const intersectThreePlanes = (
+    n1: Vector3, c1: number,
+    n2: Vector3, c2: number,
+    n3: Vector3, c3: number
+): { type: 'point', point: Vector3 }
+    | { type: 'line', point: Vector3, direction: Vector3 }
+    | { type: 'none' } => {
+
+    // System of equations: n1·p + c1 = 0, n2·p + c2 = 0, n3·p + c3 = 0
+    // Matrix form: [n1; n2; n3] * p = -[c1; c2; c3]
+
+    // Calculate determinant using triple scalar product
+    const det = vectorDot(n1, vectorCross(n2, n3));
+
+    if (Math.abs(det) > 1e-6) {
+        // Unique solution - planes intersect at a point
+        // Using Cramer's rule
+        const detX = vectorDot(vectorCross(n2, n3), vectorScale({ x: -c1, y: -c2, z: -c3 }, 1));
+        const detY = vectorDot(vectorCross(n3, n1), vectorScale({ x: -c1, y: -c2, z: -c3 }, 1));
+        const detZ = vectorDot(vectorCross(n1, n2), vectorScale({ x: -c1, y: -c2, z: -c3 }, 1));
+
+        // Simpler approach using matrix inversion
+        const pt1 = vectorScale(vectorCross(n2, n3), -c1);
+        const pt2 = vectorScale(vectorCross(n3, n1), -c2);
+        const pt3 = vectorScale(vectorCross(n1, n2), -c3);
+
+        const point = vectorScale(vectorAdd(vectorAdd(pt1, pt2), pt3), 1 / det);
+
+        return { type: 'point', point };
+    }
+
+    // det = 0, planes don't have a unique intersection point
+    // Check if first two planes intersect in a line
+    const line12 = intersectPlanePlane(n1, c1, n2, c2);
+
+    if (!line12) {
+        return { type: 'none' }; // Planes 1 and 2 are parallel
+    }
+
+    // Check if this line lies on plane 3
+    const pointOnLine = line12.point;
+    const distToPlane3 = Math.abs(vectorDot(n3, pointOnLine) + c3);
+
+    if (distToPlane3 < 1e-4) {
+        // Line lies on plane 3 - infinite intersection
+        return { type: 'line', point: line12.point, direction: line12.direction };
+    }
+
+    return { type: 'none' }; // No common intersection
+};
+
+/**
+ * Intersect 3 lines
+ * Returns: point if all 3 lines are concurrent, null otherwise
+ */
+export const intersectThreeLines = (
+    p1: Vector3, d1: Vector3,
+    p2: Vector3, d2: Vector3,
+    p3: Vector3, d3: Vector3
+): Vector3 | null => {
+    // Find intersection of first two lines
+    const int12 = intersectLineLine(p1, d1, p2, d2);
+
+    if (!int12) {
+        return null; // Lines 1 and 2 don't intersect
+    }
+
+    // Check if third line passes through this point
+    // Line 3: p3 + t*d3
+    // We need to find  if there exists t such that p3 + t*d3 = int12
+
+    // t*d3 = int12 - p3
+    const diff = vectorSub(int12, p3);
+
+    // Check if diff is parallel to d3
+    const cross = vectorCross(diff, d3);
+
+    if (vectorLength(cross) < 1e-4) {
+        // Line 3 passes through the intersection point
+        return int12;
+    }
+
+    return null; // Not concurrent
+};
+
+/**
+ * Intersect 2 planes and 1 line
+ * Returns: point where line intersects the intersection of the two planes
+ */
+export const intersectTwoPlanesOneLine = (
+    n1: Vector3, c1: number,
+    n2: Vector3, c2: number,
+    linePoint: Vector3, lineDir: Vector3
+): Vector3 | null => {
+    // First, find the line of intersection of the two planes
+    const planeLine = intersectPlanePlane(n1, c1, n2, c2);
+
+    if (!planeLine) {
+        return null; // Planes are parallel
+    }
+
+    // Now find where the given line intersects the plane line
+    // This is the intersection of two lines
+    return intersectLineLine(
+        planeLine.point, planeLine.direction,
+        linePoint, lineDir
+    );
+};
+
+/**
+ * Intersect 2 lines and 1 plane
+ * Returns: object with point1 and point2 (each can be null)
+ */
+export const intersectTwoLinesOnePlane = (
+    p1: Vector3, d1: Vector3,
+    p2: Vector3, d2: Vector3,
+    planeNormal: Vector3, planeConstant: number
+): { point1: Vector3 | null, point2: Vector3 | null } => {
+    const point1 = intersectLinePlane(p1, d1, planeNormal, planeConstant);
+    const point2 = intersectLinePlane(p2, d2, planeNormal, planeConstant);
+
+    return { point1, point2 };
+};
+
 // --- Plane Helpers ---
 
 export const calculatePlaneFromTwoLines = (
     l1: { point: Vector3; direction: Vector3 },
     l2: { point: Vector3; direction: Vector3 }
 ): { normal: Vector3; constant: number } | null => {
-    // Check if lines are parallel (cross product is zero)
     const crossDir = vectorCross(l1.direction, l2.direction);
     const isParallel = vectorLength(crossDir) < 1e-6;
 
     let normal: Vector3;
 
     if (isParallel) {
-        // If parallel, we need a vector connecting the two lines to form the plane
         const vConnect = vectorSub(l2.point, l1.point);
-        // Normal is cross product of line direction and connection vector
         normal = vectorNormalize(vectorCross(l1.direction, vConnect));
 
-        // If lines are collinear (connection vector parallel to direction), we can't define a unique plane
         if (vectorLength(normal) < 1e-6) return null;
     } else {
-        // If intersecting/skew (we assume they define a plane, usually intersecting)
-        // Normal is cross product of the two directions
         normal = vectorNormalize(crossDir);
     }
 
-    // Plane equation: Ax + By + Cz + D = 0
-    // D = -(Ax + By + Cz) using any point on the plane (e.g., l1.point)
     const constant = -(normal.x * l1.point.x + normal.y * l1.point.y + normal.z * l1.point.z);
 
     return { normal, constant };
 };
 
 export const calculatePlaneFromIntercepts = (x: number, y: number, z: number): { normal: Vector3; constant: number } | null => {
-    // Plane passing through (x,0,0), (0,y,0), (0,0,z)
-
-    // Handle infinity/zero cases (planes parallel to axes)
-    // If any value is 0, it passes through origin, which is ambiguous with this method unless specified differently.
-    // We'll assume non-zero for standard intercepts.
-
     const p1 = { x, y: 0, z: 0 };
     const p2 = { x: 0, y, z: 0 };
     const p3 = { x: 0, y: 0, z };
@@ -233,10 +315,6 @@ export const calculatePlaneFromIntercepts = (x: number, y: number, z: number): {
 };
 
 export const calculatePlaneTraces = (normal: Vector3, constant: number) => {
-    // Plane: Ax + By + Cz + D = 0
-    // Horizontal Trace (z=0): Ax + By + D = 0. Exists unless plane is parallel to XY (Normal is 0,0,1 => A=0, B=0)
-    // Vertical Trace (y=0): Ax + Cz + D = 0. Exists unless plane is parallel to XZ (Normal is 0,1,0 => A=0, C=0)
-
     const hTrace = !(Math.abs(normal.x) < 1e-6 && Math.abs(normal.y) < 1e-6);
     const vTrace = !(Math.abs(normal.x) < 1e-6 && Math.abs(normal.z) < 1e-6);
 
