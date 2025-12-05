@@ -94,7 +94,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                     {activeTab === 'intro' && (
                         <div className="space-y-6">
                             <div className="text-center space-y-4 py-8">

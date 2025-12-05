@@ -41,6 +41,15 @@ svg .merged-label {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  }
+
   /* Custom Scrollbar for "premium" feel */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
