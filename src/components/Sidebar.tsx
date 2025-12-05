@@ -1219,4 +1219,8 @@ export default function Sidebar() {
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />
         </div>
     );
+
+            {/* Tools that need to be always active - outside tabs */}
+            <IntersectionTool />
+            <DistanceTool />
 }
