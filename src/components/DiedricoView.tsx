@@ -1436,6 +1436,15 @@ function Intersections2D({ elements, showIntersections }: { elements: GeometryEl
                             <circle cx={px} cy={py_v} r="3" fill="#fbbf24" stroke="black" strokeWidth="0.5" />
                             <circle cx={px} cy={py_h} r="3" fill="#fbbf24" stroke="black" strokeWidth="0.5" />
                             <line x1={px} y1={py_v} x2={px} y2={py_h} stroke="#fbbf24" strokeWidth="0.5" strokeDasharray="2 2" />
+                            <text
+                                x={px + 5}
+                                y={py_h - 5}
+                                fontSize="10"
+                                fill="#fbbf24"
+                                fontWeight="bold"
+                            >
+                                {line.name}∩{plane.name}
+                            </text>
                         </g>
                     );
                 }
@@ -1452,6 +1461,15 @@ function Intersections2D({ elements, showIntersections }: { elements: GeometryEl
                         <g key={`int-${key++}`}>
                             <line x1={pt1.x * SCALE} y1={-pt1.z * SCALE} x2={pt2.x * SCALE} y2={-pt2.z * SCALE} stroke="#fbbf24" strokeWidth="2" strokeDasharray="4 2" />
                             <line x1={pt1.x * SCALE} y1={pt1.y * SCALE} x2={pt2.x * SCALE} y2={pt2.y * SCALE} stroke="#fbbf24" strokeWidth="2" strokeDasharray="4 2" />
+                            <text
+                                x={intersection.point.x * SCALE + 5}
+                                y={intersection.point.y * SCALE - 5}
+                                fontSize="10"
+                                fill="#fbbf24"
+                                fontWeight="bold"
+                            >
+                                {p1.name}∩{p2.name}
+                            </text>
                         </g>
                     );
                 }
@@ -1464,6 +1482,25 @@ function Intersections2D({ elements, showIntersections }: { elements: GeometryEl
                     const px = intersection.x * SCALE;
                     const py_h = intersection.y * SCALE;
                     const py_v = -intersection.z * SCALE;
+                    results.push(
+                        <g key={`int-${key++}`}>
+                            <circle cx={px} cy={py_v} r="3" fill="#ef4444" stroke="black" strokeWidth="0.5" />
+                            <circle cx={px} cy={py_h} r="3" fill="#ef4444" stroke="black" strokeWidth="0.5" />
+                            <line x1={px} y1={py_v} x2={px} y2={py_h} stroke="#ef4444" strokeWidth="0.5" strokeDasharray="2 2" />
+                            <text
+                                x={px + 5}
+                                y={py_h - 5}
+                                fontSize="10"
+                                fill="#ef4444"
+                                fontWeight="bold"
+                            >
+                                {l1.name}∩{l2.name}
+                            </text>
+                        </g>
+                    );
                 }
-                return <>{results}</>;
             }
+        }
+    }
+    return <>{results}</>;
+}
