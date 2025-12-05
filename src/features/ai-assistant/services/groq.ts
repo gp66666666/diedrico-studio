@@ -27,8 +27,7 @@ export class GroqService {
                     model: 'llama-3.3-70b-versatile',
                     messages: [
                         {
-                            role: 'system',
-                            content: SYSTEM_PROMPT + "\n\nDEFINICIONES DE FUNCIONES DISPONIBLES (ÚSALAS):\n" + JSON.stringify(FUNCTION_DEFINITIONS, null, 2)
+                            content: SYSTEM_PROMPT + "\n\nDEFINICIONES DE FUNCIONES DISPONIBLES (ÚSALAS):\n" + JSON.stringify(FUNCTION_DEFINITIONS)
                         },
 
                         {
