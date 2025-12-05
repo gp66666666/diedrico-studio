@@ -11,14 +11,15 @@ export default function IntersectionTool() {
     const setActiveTool = useGeometryStore(state => state.setActiveTool);
     const clearDistanceTool = useGeometryStore(state => state.clearDistanceTool);
 
+    console.log('[IntersectionTool] RENDER - activeTool:', activeTool, 'selected:', selectedForDistance.length);
+
     useEffect(() => {
-        console.log('[IntersectionTool] useEffect triggered');
+        console.log('[IntersectionTool] useEffect START');
         console.log('[IntersectionTool] activeTool:', activeTool);
         console.log('[IntersectionTool] selectedForDistance:', selectedForDistance);
-        console.log('[IntersectionTool] selectedForDistance.length:', selectedForDistance.length);
 
         if (!activeTool || !activeTool.startsWith('intersection')) {
-            console.log('[IntersectionTool] No intersection tool active');
+            console.log('[IntersectionTool] Not an intersection tool, returning');
             return;
         }
 
@@ -27,163 +28,138 @@ export default function IntersectionTool() {
             return;
         }
 
+        console.log('[IntersectionTool] PROCEEDING WITH CALCULATION');
+
         const el1 = elements.find(e => e.id === selectedForDistance[0]);
         const el2 = elements.find(e => e.id === selectedForDistance[1]);
 
-        console.log('[IntersectionTool] Element 1:', el1);
-        console.log('[IntersectionTool] Element 2:', el2);
+        console.log('[IntersectionTool] el1:', el1);
+        console.log('[IntersectionTool] el2:', el2);
 
         if (!el1 || !el2) {
-            console.log('[IntersectionTool] Could not find one or both elements');
+            console.error('[IntersectionTool] Elements not found!');
             return;
         }
 
-        console.log('[IntersectionTool] Processing:', activeTool);
-
         try {
-            switch (activeTool) {
-                case 'intersection-line-line':
-                    console.log('[IntersectionTool] Line-line case');
-                    if (el1.type === 'line' && el2.type === 'line') {
-                        const line1 = el1 as LineElement;
-                        const line2 = el2 as LineElement;
+            console.log('[IntersectionTool] Switch on:', activeTool);
 
-                        const point = intersectLineLine(
-                            line1.point,
-                            line1.direction,
-                            line2.point,
-                            line2.direction
-                        );
+            if (activeTool === 'intersection-line-line') {
+                console.log('[IntersectionTool] LINE-LINE case');
+                if (el1.type === 'line' && el2.type === 'line') {
+                    const line1 = el1 as LineElement;
+                    const line2 = el2 as LineElement;
 
-                        console.log('[IntersectionTool] Intersection point:', point);
+                    const point = intersectLineLine(
+                        line1.point,
+                        line1.direction,
+                        line2.point,
+                        line2.direction
+                    );
 
-                        if (point) {
-                            const newElement = {
-                                type: 'point',
-                                name: `Intersección de ${el1.name} con ${el2.name}`,
-                                x: point.x,
-                                y: point.y,
-                                z: point.z,
-                                color: '#ff0000'
-                            };
-                            console.log('[IntersectionTool] Creating element:', newElement);
-                            addElement(newElement as any);
-                            clearDistanceTool();
-                            setActiveTool('none');
-                            console.log('[IntersectionTool] SUCCESS: Element created');
-                        } else {
-                            console.log('[IntersectionTool] No intersection found');
-                            alert('Las rectas no se intersectan (son paralelas o se cruzan)');
-                            clearDistanceTool();
-                            setActiveTool('none');
-                        }
+                    console.log('[IntersectionTool] Result:', point);
+
+                    if (point) {
+                        addElement({
+                            type: 'point',
+                            name: `Intersección de ${el1.name} con ${el2.name}`,
+                            x: point.x,
+                            y: point.y,
+                            z: point.z,
+                            color: '#ff0000'
+                        } as any);
+                        console.log('[IntersectionTool] ✅ SUCCESS - Element added');
+                        clearDistanceTool();
+                        setActiveTool('none');
                     } else {
-                        alert('Selecciona dos rectas');
+                        alert('Las rectas no se intersectan');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
-                    break;
+                }
+            } else if (activeTool === 'intersection-line-plane') {
+                console.log('[IntersectionTool] LINE-PLANE case');
+                const line = el1.type === 'line' ? el1 : el2;
+                const plane = el1.type === 'plane' ? el1 : el2;
 
-                case 'intersection-line-plane':
-                    console.log('[IntersectionTool] Line-plane case');
-                    const line = el1.type === 'line' ? el1 : el2;
-                    const plane = el1.type === 'plane' ? el1 : el2;
+                if (line.type === 'line' && plane.type === 'plane') {
+                    const lineEl = line as LineElement;
+                    const planeEl = plane as PlaneElement;
 
-                    if (line.type === 'line' && plane.type === 'plane') {
-                        const lineEl = line as LineElement;
-                        const planeEl = plane as PlaneElement;
+                    const point = intersectLinePlane(
+                        lineEl.point,
+                        lineEl.direction,
+                        planeEl.normal,
+                        planeEl.constant
+                    );
 
-                        const point = intersectLinePlane(
-                            lineEl.point,
-                            lineEl.direction,
-                            planeEl.normal,
-                            planeEl.constant
-                        );
+                    console.log('[IntersectionTool] Result:', point);
 
-                        console.log('[IntersectionTool] Intersection point:', point);
-
-                        if (point) {
-                            const newElement = {
-                                type: 'point',
-                                name: `Intersección de ${line.name} con ${plane.name}`,
-                                x: point.x,
-                                y: point.y,
-                                z: point.z,
-                                color: '#ff0000'
-                            };
-                            console.log('[IntersectionTool] Creating element:', newElement);
-                            addElement(newElement as any);
-                            clearDistanceTool();
-                            setActiveTool('none');
-                            console.log('[IntersectionTool] SUCCESS: Element created');
-                        } else {
-                            console.log('[IntersectionTool] No intersection found');
-                            alert('La recta es paralela al plano');
-                            clearDistanceTool();
-                            setActiveTool('none');
-                        }
+                    if (point) {
+                        addElement({
+                            type: 'point',
+                            name: `Intersección de ${line.name} con ${plane.name}`,
+                            x: point.x,
+                            y: point.y,
+                            z: point.z,
+                            color: '#ff0000'
+                        } as any);
+                        console.log('[IntersectionTool] ✅ SUCCESS - Element added');
+                        clearDistanceTool();
+                        setActiveTool('none');
                     } else {
-                        alert('Selecciona una recta y un plano');
+                        alert('La recta es paralela al plano');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
-                    break;
+                }
+            } else if (activeTool === 'intersection-plane-plane') {
+                console.log('[IntersectionTool] PLANE-PLANE case');
+                if (el1.type === 'plane' && el2.type === 'plane') {
+                    const plane1 = el1 as PlaneElement;
+                    const plane2 = el2 as PlaneElement;
 
-                case 'intersection-plane-plane':
-                    console.log('[IntersectionTool] Plane-plane case');
-                    if (el1.type === 'plane' && el2.type === 'plane') {
-                        const plane1 = el1 as PlaneElement;
-                        const plane2 = el2 as PlaneElement;
+                    const intersection = intersectPlanePlane(
+                        plane1.normal,
+                        plane1.constant,
+                        plane2.normal,
+                        plane2.constant
+                    );
 
-                        const intersection = intersectPlanePlane(
-                            plane1.normal,
-                            plane1.constant,
-                            plane2.normal,
-                            plane2.constant
-                        );
+                    console.log('[IntersectionTool] Result:', intersection);
 
-                        console.log('[IntersectionTool] Intersection result:', intersection);
+                    if (intersection) {
+                        const p2 = {
+                            x: intersection.point.x + intersection.direction.x,
+                            y: intersection.point.y + intersection.direction.y,
+                            z: intersection.point.z + intersection.direction.z
+                        };
 
-                        if (intersection) {
-                            const p2 = {
-                                x: intersection.point.x + intersection.direction.x,
-                                y: intersection.point.y + intersection.direction.y,
-                                z: intersection.point.z + intersection.direction.z
-                            };
-
-                            const newElement = {
-                                type: 'line',
-                                name: `Intersección de ${el1.name} con ${el2.name}`,
-                                point: intersection.point,
-                                p2: p2,
-                                direction: intersection.direction,
-                                color: '#9b59b6'
-                            };
-                            console.log('[IntersectionTool] Creating line element:', newElement);
-                            addElement(newElement as any);
-                            clearDistanceTool();
-                            setActiveTool('none');
-                            console.log('[IntersectionTool] SUCCESS: Element created');
-                        } else {
-                            console.log('[IntersectionTool] No intersection found');
-                            alert('Los planos son paralelos');
-                            clearDistanceTool();
-                            setActiveTool('none');
-                        }
+                        addElement({
+                            type: 'line',
+                            name: `Intersección de ${el1.name} con ${el2.name}`,
+                            point: intersection.point,
+                            p2: p2,
+                            direction: intersection.direction,
+                            color: '#9b59b6'
+                        } as any);
+                        console.log('[IntersectionTool] ✅ SUCCESS - Line added');
+                        clearDistanceTool();
+                        setActiveTool('none');
                     } else {
-                        alert('Selecciona dos planos');
+                        alert('Los planos son paralelos');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
-                    break;
+                }
             }
         } catch (error) {
-            console.error('[IntersectionTool] Error:', error);
-            alert('Error al calcular la intersección: ' + error);
+            console.error('[IntersectionTool] ❌ ERROR:', error);
+            alert('Error: ' + error);
             clearDistanceTool();
             setActiveTool('none');
         }
-    }, [selectedForDistance, activeTool]);
+    }, [selectedForDistance.length, activeTool]); // Simplified dependencies
 
     return null;
 }
