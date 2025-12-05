@@ -521,8 +521,7 @@ export default function Sidebar() {
     const buttonClass = isDark ? 'hover:bg-white/10 active:bg-white/20' : 'hover:bg-white/60 hover:shadow-sm active:bg-white/80';
 
     return (
-    return (
-        <div className={`h-full w-80 flex flex-col border-r pb-14 relative backdrop-blur-2xl transition-colors duration-300 ${headerBorder} ${isDark ? 'bg-gray-900/60 text-white border-white/20 shadow-2xl shadow-black/20' : 'bg-white/60 text-gray-900 border-white/60 shadow-xl'}`}>
+        <div className={`h-full w-80 max-w-[85vw] flex flex-col border-r pb-14 relative backdrop-blur-2xl transition-colors duration-300 ${headerBorder} ${isDark ? 'bg-gray-900/60 text-white border-white/20 shadow-2xl shadow-black/20' : 'bg-white/60 text-gray-900 border-white/60 shadow-xl'}`}>
             {/* Header */}
             <div className={`p-4 border-b ${headerBorder}`}>
                 <div className="flex items-center justify-between">
