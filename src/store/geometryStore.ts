@@ -58,7 +58,7 @@ interface GeometryState {
     toggleProfile: () => void;
 
     // Distance Tools
-    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines';
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
     distanceResult: {
@@ -254,6 +254,8 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         else if (activeTool === 'angle-line-line') maxSelection = 2;
         else if (activeTool === 'angle-line-plane') maxSelection = 2;
         else if (activeTool === 'true-length') maxSelection = 1;
+        else if (activeTool?.startsWith('intersection')) maxSelection = 2;
+        else if (activeTool?.startsWith('advanced-intersection')) maxSelection = 3;
 
         console.log(`[Store] selectForDistance: id=${id}, activeTool=${activeTool}, maxSelection=${maxSelection}`);
 
