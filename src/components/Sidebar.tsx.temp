@@ -1,4 +1,0 @@
-﻿
-            {/* Tools that need to be always active - outside tabs */}
-            <IntersectionTool />
-            <DistanceTool />
