@@ -49,7 +49,8 @@ export default function Sidebar() {
         selectForDistance,
         selectedForDistance,
         viewMode,
-        setViewMode
+        setViewMode,
+        setActiveTool
     } = useGeometryStore();
 
     const isDark = theme === 'dark';
@@ -582,10 +583,49 @@ export default function Sidebar() {
                                 }`}
                         >
                             <span className="flex items-center gap-2">
-                                <Layers size={16} /> Intersecciones
+                                <Layers size={16} /> Ver Intersecciones
                             </span>
                             {showIntersections ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
+
+                        {/* Manual Intersection Tools */}
+                        <div className={`pl-4 space-y-1 ${isDark ? 'border-l border-gray-700' : 'border-l border-gray-300'}`}>
+                            <p className={`text-xs font-medium mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Calcular Intersecciones:
+                            </p>
+                            <button
+                                onClick={() => activeTool === 'intersection-line-line' ? setActiveTool('none') : setActiveTool('intersection-line-line')}
+                                className={`w-full px-2 py-1.5 rounded text-xs font-medium transition-all ${activeTool === 'intersection-line-line'
+                                        ? 'bg-red-500/20 text-red-600 border border-red-500/50'
+                                        : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
+                                    }`}
+                            >
+                                ✖️ Recta ∩ Recta
+                            </button>
+                            <button
+                                onClick={() => activeTool === 'intersection-line-plane' ? setActiveTool('none') : setActiveTool('intersection-line-plane')}
+                                className={`w-full px-2 py-1.5 rounded text-xs font-medium transition-all ${activeTool === 'intersection-line-plane'
+                                        ? 'bg-red-500/20 text-red-600 border border-red-500/50'
+                                        : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
+                                    }`}
+                            >
+                                ⊕ Recta ∩ Plano
+                            </button>
+                            <button
+                                onClick={() => activeTool === 'intersection-plane-plane' ? setActiveTool('none') : setActiveTool('intersection-plane-plane')}
+                                className={`w-full px-2 py-1.5 rounded text-xs font-medium transition-all ${activeTool === 'intersection-plane-plane'
+                                        ? 'bg-red-500/20 text-red-600 border border-red-500/50'
+                                        : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
+                                    }`}
+                            >
+                                ⊞ Plano ∩ Plano
+                            </button>
+                            {activeTool?.startsWith('intersection') && (
+                                <p className={`text-[10px] mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                                    Selecciona 2 elementos en la lista
+                                </p>
+                            )}
+                        </div>
 
                         <button
                             onClick={toggleBisectors}
