@@ -15,9 +15,11 @@ import LoadProjectModal from './Cloud/LoadProjectModal';
 import LineCreator from './LineCreator';
 import AbatimientoTool from './tools/AbatimientoTool';
 import IntersectionTool from './tools/IntersectionTool';
+import AdvancedIntersectionTool from './tools/AdvancedIntersectionTool';
 import TrueMagnitudeTool from './tools/TrueMagnitudeTool';
 import ParallelismTool from './tools/ParallelismTool';
 import DistanceTool from './tools/DistanceTool';
+import AdvancedIntersections from './AdvancedIntersections';
 import RotationTool from './tools/RotationTool';
 
 export default function Sidebar() {
@@ -1099,6 +1101,10 @@ export default function Sidebar() {
                         <TrueMagnitudeTool />
                         <ParallelismTool />
                         <RotationTool />
+
+                        {/* Advanced Intersections Section */}
+                        <AdvancedIntersections isDark={isDark} />
+
                         <AdvancedToolsPanel isDark={isDark} />
 
                         {/* Measurements Panel */}
@@ -1218,6 +1224,7 @@ export default function Sidebar() {
             {/* Tools that need to be always active - outside tabs */}
             <IntersectionTool />
             <DistanceTool />
+            <AdvancedIntersectionTool />
             {/* Modals */}
             <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />
