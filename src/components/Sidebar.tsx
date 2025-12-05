@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useGeometryStore } from '../store/geometryStore';
 import type { GeometryElement, PointElement, LineElement, PlaneElement } from '../types';
 import AdvancedToolsPanel from './AdvancedToolsPanel';
@@ -60,6 +61,7 @@ export default function Sidebar() {
 
     const [activeTab, setActiveTab] = useState<'add' | 'list' | 'tools'>('add');
     const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane'>('point');
+    const navigate = useNavigate();
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
     const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -537,6 +539,13 @@ export default function Sidebar() {
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
+                        <button
+                            onClick={() => navigate('/academy')}
+                            className={`p-2 rounded-lg transition-colors ${buttonClass} group`}
+                            title="Academia (Premium)"
+                        >
+                            <BookOpen size={18} className="text-purple-500 group-hover:scale-110 transition-transform" />
+                        </button>
                         <button onClick={toggleHelp} className={`p-2 rounded-lg transition-colors ${buttonClass}`} title="Ayuda">
                             <HelpCircle size={18} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
                         </button>
