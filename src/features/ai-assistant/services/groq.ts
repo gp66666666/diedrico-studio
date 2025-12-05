@@ -104,22 +104,25 @@ export class GroqService {
         while ((jsonMatch = jsonBlockRegex.exec(text)) !== null) {
             try {
                 const jsonContent = jsonMatch[1].trim();
-                const stepData = JSON.parse(jsonContent);
+                const parsedData = JSON.parse(jsonContent);
+                const items = Array.isArray(parsedData) ? parsedData : [parsedData];
 
-                if (stepData.name && stepData.params) {
-                    stepCount++;
-                    steps.push({
-                        id: `step-${stepCount}`,
-                        stepNumber: stepCount,
-                        description: stepData.params.step_description || `Paso ${stepCount}`,
-                        action: stepData.name,
-                        params: {
-                            ...stepData.params,
+                for (const stepData of items) {
+                    if (stepData.name && stepData.params) {
+                        stepCount++;
+                        steps.push({
+                            id: `step-${stepCount}`,
+                            stepNumber: stepCount,
+                            description: stepData.params.step_description || `Paso ${stepCount}`,
+                            action: stepData.name,
+                            params: {
+                                ...stepData.params,
+                                color: colorManager.getColorForStep(stepCount),
+                            },
                             color: colorManager.getColorForStep(stepCount),
-                        },
-                        color: colorManager.getColorForStep(stepCount),
-                        status: 'pending',
-                    });
+                            status: 'pending',
+                        });
+                    }
                 }
             } catch (e) {
                 console.error('Error parsing JSON step:', e);
@@ -187,7 +190,7 @@ export class GroqService {
 
         // 2. Fallback to legacy text parsing (Fragile method)
         console.warn('No JSON blocks found, falling back to text parsing');
-        const stepRegex = /\*\*Paso (\d+)\*\*:(.+?)(?=\*\*Paso \d+\*\*|$)/gs;
+        const stepRegex = /(?:\*\*Paso (\d+)\*\*|\d+\.\s+\*\*(.+?)\*\*):?\s*(.+?)(?=(?:\*\*Paso \d+\*\*|\d+\.\s+\*\*|$))/gs;
         let stepMatch;
 
         while ((stepMatch = stepRegex.exec(text)) !== null) {
