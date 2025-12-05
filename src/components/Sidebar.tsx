@@ -596,8 +596,8 @@ export default function Sidebar() {
                             <button
                                 onClick={() => activeTool === 'intersection-line-line' ? setActiveTool('none') : setActiveTool('intersection-line-line')}
                                 className={`w-full px-2 py-1.5 rounded text-xs font-medium transition-all ${activeTool === 'intersection-line-line'
-                                        ? 'bg-red-500/20 text-red-600 border border-red-500/50'
-                                        : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
+                                    ? 'bg-red-500/20 text-red-600 border border-red-500/50'
+                                    : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
                                     }`}
                             >
                                 ✖️ Recta ∩ Recta
@@ -605,8 +605,8 @@ export default function Sidebar() {
                             <button
                                 onClick={() => activeTool === 'intersection-line-plane' ? setActiveTool('none') : setActiveTool('intersection-line-plane')}
                                 className={`w-full px-2 py-1.5 rounded text-xs font-medium transition-all ${activeTool === 'intersection-line-plane'
-                                        ? 'bg-red-500/20 text-red-600 border border-red-500/50'
-                                        : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
+                                    ? 'bg-red-500/20 text-red-600 border border-red-500/50'
+                                    : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
                                     }`}
                             >
                                 ⊕ Recta ∩ Plano
@@ -614,8 +614,8 @@ export default function Sidebar() {
                             <button
                                 onClick={() => activeTool === 'intersection-plane-plane' ? setActiveTool('none') : setActiveTool('intersection-plane-plane')}
                                 className={`w-full px-2 py-1.5 rounded text-xs font-medium transition-all ${activeTool === 'intersection-plane-plane'
-                                        ? 'bg-red-500/20 text-red-600 border border-red-500/50'
-                                        : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
+                                    ? 'bg-red-500/20 text-red-600 border border-red-500/50'
+                                    : `${buttonClass} ${isDark ? 'text-gray-400' : 'text-gray-600'}`
                                     }`}
                             >
                                 ⊞ Plano ∩ Plano
@@ -758,22 +758,6 @@ export default function Sidebar() {
                                 <button onClick={cancelEditing} className="text-xs text-red-600 hover:underline">Cancelar</button>
                             </div>
                         )}
-                        <div className={`flex gap-2 p-1 rounded-lg ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
-                            {(['point', 'line', 'plane'] as const).map((type) => (
-                                <button
-                                    key={type}
-                                    onClick={() => setGeometryType(type)}
-                                    className={`flex-1 py-2 text-xs font-medium rounded-md capitalize transition-all ${geometryType === type
-                                        ? 'bg-white text-blue-600 shadow-sm'
-                                        : `${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`
-                                        }`}
-                                >
-                                    {type === 'point' ? '🔴 Punto' : type === 'line' ? '📏 Recta' : '📐 Plano'}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Point Form */}
                         {geometryType === 'point' && (
                             <div className="space-y-3">
                                 <div className="flex gap-2">
