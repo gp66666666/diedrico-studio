@@ -3,6 +3,7 @@ import { colorManager } from './colorManager';
 import { rateLimiter } from './rateLimiter';
 import type { AIStep, GeminiResponse, AIAction } from '../types/ai.types';
 import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
+import { useGeometryStore } from '../../../store/geometryStore';
 
 export class GroqService {
     private apiKey: string;
