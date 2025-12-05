@@ -15,6 +15,8 @@ interface UserState {
     user: User | null;
     profile: UserProfile | null;
     isLoading: boolean;
+    isPremium: boolean; // Derived helper
+
 
     // Actions
     checkSession: () => Promise<void>;
@@ -26,6 +28,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     user: null,
     profile: null,
     isLoading: true,
+    isPremium: false,
 
     checkSession: async () => {
         try {
@@ -40,7 +43,7 @@ export const useUserStore = create<UserState>((set, get) => ({
                     .single();
 
                 if (profile) {
-                    set({ profile });
+                    set({ profile, isPremium: profile.is_premium });
                 } else {
                     // Create default profile if not exists
                     const newProfile = {
@@ -53,7 +56,7 @@ export const useUserStore = create<UserState>((set, get) => ({
                     };
                     // Ideally this is done via Postgres Triggers, but client-side fallback:
                     // await supabase.from('profiles').insert(newProfile);
-                    set({ profile: newProfile as UserProfile });
+                    set({ profile: newProfile as UserProfile, isPremium: false });
                 }
             }
         } catch (error) {

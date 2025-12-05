@@ -26,6 +26,7 @@ export interface LineElement extends BaseElement {
     direction: Vector3;
     p2?: Vector3; // Optional second point if defined by 2 points
     dashed?: boolean;
+    isInfinite?: boolean; // If true, drawn as infinite line
 }
 
 export interface PlaneElement extends BaseElement {
