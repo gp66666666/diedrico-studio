@@ -521,7 +521,8 @@ export default function Sidebar() {
     const buttonClass = isDark ? 'hover:bg-white/10 active:bg-white/20' : 'hover:bg-white/60 hover:shadow-sm active:bg-white/80';
 
     return (
-        <div className={`h-full w-80 flex flex-col border-r pb-14 relative backdrop-blur-xl transition-colors duration-300 ${headerBorder} ${isDark ? 'bg-gray-900/80 text-white border-white/10' : 'bg-white/70 text-gray-900 border-white/40'}`}>
+    return (
+        <div className={`h-full w-80 flex flex-col border-r pb-14 relative backdrop-blur-2xl transition-colors duration-300 ${headerBorder} ${isDark ? 'bg-gray-900/60 text-white border-white/20 shadow-2xl shadow-black/20' : 'bg-white/60 text-gray-900 border-white/60 shadow-xl'}`}>
             {/* Header */}
             <div className={`p-4 border-b ${headerBorder}`}>
                 <div className="flex items-center justify-between">
@@ -703,7 +704,7 @@ export default function Sidebar() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4 pb-24">
+            <div className="flex-1 overflow-y-auto p-4 pb-24 custom-scrollbar">
                 {activeTab === 'add' ? (
                     <div className="space-y-4">
                         {/* Type selector */}
