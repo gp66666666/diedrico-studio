@@ -35,7 +35,7 @@ export default function IntersectionsRenderer() {
                                     <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.5} />
                                 </Sphere>
                                 <Text position={[0, 0.5, 0]} fontSize={0.25} color="#fbbf24">
-                                    I ({line.name} ∩ {plane.name})
+                                    {line.name}∩{plane.name}
                                 </Text>
                             </group>
                         );
@@ -73,7 +73,7 @@ export default function IntersectionsRenderer() {
                                     gapSize={0.5}
                                 />
                                 <Text position={[intersection.point.x, intersection.point.y + 1, intersection.point.z]} fontSize={0.3} color="#fbbf24">
-                                    Recta Int. ({p1.name} ∩ {p2.name})
+                                    {p1.name}∩{p2.name}
                                 </Text>
                             </group>
                         );
@@ -94,7 +94,7 @@ export default function IntersectionsRenderer() {
                                     <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.5} />
                                 </Sphere>
                                 <Text position={[0, 0.5, 0]} fontSize={0.25} color="#ef4444">
-                                    I ({l1.name} ∩ {l2.name})
+                                    {l1.name}∩{l2.name}
                                 </Text>
                             </group>
                         );
