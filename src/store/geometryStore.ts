@@ -57,13 +57,6 @@ interface GeometryState {
     showProfile: boolean;
     toggleProfile: () => void;
 
-    // Distance Tools
-    distanceResult: number | null;
-    measureDistance: (id1: string, id2: string) => void;
-    clearDistanceTool: () => void;
-    selectedForDistance: string[];
-    selectForDistance: (id: string) => void;
-
     // Camera Persistence
     cameraStates: {
         '3d': { position: [number, number, number], target: [number, number, number] };
@@ -105,6 +98,19 @@ interface GeometryState {
 export const useGeometryStore = create<GeometryState>((set, get) => ({
     elements: [],
     sketchElements: [],
+
+    // Camera Persistence
+    cameraStates: {
+        '3d': { position: [12, 10, 12], target: [0, 0, 0] },
+        '2d': { offset: { x: 400, y: 300 }, zoom: 1 },
+        'sketch': { offset: { x: 400, y: 300 }, zoom: 1 }
+    },
+    setCameraState: (mode, state) => set((prev) => ({
+        cameraStates: {
+            ...prev.cameraStates,
+            [mode]: { ...prev.cameraStates[mode], ...state }
+        }
+    })),
 
     history: {
         past: [],

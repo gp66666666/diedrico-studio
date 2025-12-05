@@ -82,7 +82,6 @@ const TOOL_GROUPS: ToolGroup[] = [
             { id: 'rotate', icon: <RotateCw size={18} />, label: 'Rotar' },
             { id: 'scale', icon: <Scaling size={18} />, label: 'Escalar' },
         ]
-    },
     }
 ];
 
