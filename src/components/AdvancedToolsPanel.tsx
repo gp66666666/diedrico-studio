@@ -466,21 +466,7 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                 )}
             </div>
 
-            {/* Info Box */}
-            <div className={`mt-4 p-3 rounded-lg text-xs ${isDark ? 'bg-blue-500/10 text-blue-300' : 'bg-blue-50 text-blue-700'}`}>
-                <p className="font-semibold mb-1">💡 Instrucciones</p>
-                {activeTool === 'distance-point-point' ? (
-                    <p className="opacity-80">
-                        <strong>Distancia Punto-Punto:</strong><br />
-                        Haz click en dos puntos en la lista para calcular su distancia.
-                    </p>
-                ) : (
-                    <p className="opacity-80">
-                        Estas herramientas se irán habilitando progresivamente.
-                        Comenzamos con <strong>Punto-Punto</strong>.
-                    </p>
-                )}
-            </div>
+
         </div >
     );
 }
