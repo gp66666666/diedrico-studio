@@ -83,13 +83,6 @@ const TOOL_GROUPS: ToolGroup[] = [
             { id: 'scale', icon: <Scaling size={18} />, label: 'Escalar' },
         ]
     },
-    {
-        id: 'measure',
-        name: 'Medición',
-        icon: <Ruler size={18} />,
-        tools: [
-            { id: 'measure', icon: <Ruler size={18} />, label: 'Regla' },
-        ]
     }
 ];
 

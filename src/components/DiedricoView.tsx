@@ -168,15 +168,42 @@ const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisCo
 });
 
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
-    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement } = useGeometryStore();
+    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement, cameraStates, setCameraState } = useGeometryStore();
 
-    // Viewport State
-    const [offset, setOffset] = useState({ x: 400, y: 300 });
-    const [zoom, setZoom] = useState(1);
+    // Viewport State - Initialize from Store
+    // Ensure we use the correct mode key, default to 2d if undefined
+    const storageMode = mode === 'sketch' ? 'sketch' : '2d';
+    const savedState = cameraStates[storageMode];
+
+    const [offset, setOffset] = useState(savedState.offset);
+    const [zoom, setZoom] = useState(savedState.zoom);
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [lastTouchDist, setLastTouchDist] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Save state on unmount
+    useEffect(() => {
+        return () => {
+            setCameraState(storageMode, { offset, zoom });
+        };
+    }, [offset, zoom, storageMode, setCameraState]); // Update store when unmounting 
+    // IMPORTANT: Stale closure on unmount? 
+    // If I put [offset, zoom] in deps, it will fire setCameraState (and thus store update) on EVERY move/zoom.
+    // This is fine for persistence, but maybe heavy?
+    // Actually, `useEffect` cleanup runs with the values from the *previous* render.
+    // To save the LATEST values on unmount, we should use a ref to track them.
+
+    const stateRef = useRef({ offset, zoom });
+    useEffect(() => {
+        stateRef.current = { offset, zoom };
+    }, [offset, zoom]);
+
+    useEffect(() => {
+        return () => {
+            setCameraState(storageMode, stateRef.current);
+        };
+    }, [storageMode, setCameraState]); // Run only on unmount (or mode change)
 
     // Touch Helpers
     const getTouchDist = (t1: React.Touch, t2: React.Touch) => {
