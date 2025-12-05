@@ -515,13 +515,13 @@ export default function Sidebar() {
         }
     };
 
-    const headerBorder = isDark ? 'border-gray-700' : 'border-gray-200';
-    const inputClass = isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900';
+    const headerBorder = isDark ? 'border-white/10' : 'border-gray-200/50';
+    const inputClass = isDark ? 'bg-black/20 border-white/10 text-white placeholder-gray-500 focus:border-blue-500/50 focus:bg-black/30' : 'bg-white/50 border-gray-200/50 text-gray-900 placeholder-gray-400 focus:border-blue-500/50 focus:bg-white/80';
     const labelClass = isDark ? 'text-gray-300' : 'text-gray-700';
-    const buttonClass = isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100';
+    const buttonClass = isDark ? 'hover:bg-white/10 active:bg-white/20' : 'hover:bg-white/60 hover:shadow-sm active:bg-white/80';
 
     return (
-        <div className={`h-full w-80 flex flex-col border-r pb-14 relative ${headerBorder} ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+        <div className={`h-full w-80 flex flex-col border-r pb-14 relative backdrop-blur-xl transition-colors duration-300 ${headerBorder} ${isDark ? 'bg-gray-900/80 text-white border-white/10' : 'bg-white/70 text-gray-900 border-white/40'}`}>
             {/* Header */}
             <div className={`p-4 border-b ${headerBorder}`}>
                 <div className="flex items-center justify-between">

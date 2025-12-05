@@ -13,7 +13,7 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
     const { setActiveTool, activeTool } = useGeometryStore();
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-        distances: true,  // Open by default
+        distances: false,
         abatimientos: false,
         intersecciones: false,
         verdaderaMagnitud: false,

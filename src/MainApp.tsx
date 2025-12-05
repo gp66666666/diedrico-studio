@@ -15,7 +15,7 @@ export default function MainApp() {
     const isDark = theme === 'dark';
 
     // Theme Classes
-    const bgClass = isDark ? 'bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950' : 'bg-gray-50';
+    const bgClass = isDark ? 'bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50';
     const tabBg = isDark ? 'bg-white/10 border-white/20' : 'bg-white border-gray-200 shadow-sm';
     const tabActive = isDark ? 'bg-blue-600 text-white shadow-lg' : 'bg-blue-600 text-white shadow-md';
     const tabInactive = isDark ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900';
