@@ -74,7 +74,7 @@ export class GroqService {
             console.log('Parsed Steps:', steps);
 
             return {
-                text: cleanText || "¡Hecho! Aquí tienes la construcción.",
+                explanation: cleanText || "¡Hecho! Aquí tienes la construcción.",
                 steps,
             };
         } catch (error: any) {
