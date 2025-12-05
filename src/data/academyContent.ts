@@ -19,137 +19,193 @@ export interface AcademyTopic {
 }
 
 export const ACADEMY_CONTENT: AcademyTopic[] = [
-    // BLOQUE 1: TEORÍA
+    // 1. EL PUNTO (Profundizado)
     {
         id: 'theory-1-point',
-        title: '1. Introducción: El Punto',
-        description: 'Fundamentos del Sistema Diédrico. Planos de proyección, coordenadas y alfabeto del punto.',
+        title: '1. Introducción al Sistema Diédrico: El Punto',
+        description: 'Fundamentos, planos de proyección, coordenadas (X, Y, Z) y alfabeto del punto en los 4 cuadrantes.',
         category: 'Teoría',
         theoryContent: `
-            <div class="space-y-6 text-gray-300">
+            <div class="space-y-8 text-gray-300">
                 <p class="lead text-xl text-white">
-                    El <strong>Sistema Diédrico</strong> es un método de representación geométrica que utiliza dos planos de proyección principales, perpendiculares entre sí, para describir objetos tridimensionales en una superficie bidimensional (el papel).
+                    Para dominar el dibujo técnico, primero debemos entender el espacio. El <strong>Sistema Diédrico</strong> divide el espacio mediante dos planos infinitos perpendiculares:
                 </p>
 
-                <div class="bg-gray-800 p-6 rounded-xl border border-blue-900/30">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Los Elementos Fundamentales</h3>
-                    <ul class="list-disc pl-5 space-y-2">
-                        <li><strong>Plano Vertical (PV):</strong> Imagina una pared frente a ti. Aquí se proyecta la "vista frontal" o <em>Alzados</em>.</li>
-                        <li><strong>Plano Horizontal (PH):</strong> Imagina el suelo. Aquí se proyecta la "vista superior" o <em>Plantas</em>.</li>
-                        <li><strong>Línea de Tierra (LT):</strong> Es la recta de intersección entre el PV y el PH. Es el eje de referencia principal.</li>
-                    </ul>
-                </div>
-
-                <h3 class="text-xl font-bold text-white mt-8">Coordenadas del Punto (X, Y, Z)</h3>
-                <p>
-                    Todo punto en el espacio queda definido por tres valores que determinan su posición exacta:
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
-                    <div class="p-4 bg-gray-800 rounded-lg">
-                        <strong class="text-red-400 block mb-2">X: Lateralidad</strong>
-                        <p class="text-sm">Posición a lo largo de la Línea de Tierra (izquierda o derecha).</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <ul class="list-disc pl-5 space-y-3">
+                            <li><strong class="text-blue-400">Plano Vertical (PV):</strong> Lo que tenemos "enfrente". Proyecta el <em>Alzado</em> (cota).</li>
+                            <li><strong class="text-green-400">Plano Horizontal (PH):</strong> Lo que tenemos "debajo". Proyecta la <em>Planta</em> (alejamiento).</li>
+                            <li><strong class="text-white">Línea de Tierra (LT):</strong> La intersección de ambos. Eje X.</li>
+                        </ul>
                     </div>
-                    <div class="p-4 bg-gray-800 rounded-lg">
-                        <strong class="text-green-400 block mb-2">Y: Alejamiento</strong>
-                        <p class="text-sm">Distancia al Plano Vertical (cuánto se acerca a ti desde la pared).</p>
-                    </div>
-                    <div class="p-4 bg-gray-800 rounded-lg">
-                        <strong class="text-blue-400 block mb-2">Z: Cota</strong>
-                        <p class="text-sm">Altura respecto al Plano Horizontal (cuánto sube desde el suelo).</p>
+                    <!-- SVG Diagram: The Dihedral System 3D representation sketch -->
+                    <div class="bg-white p-4 rounded-xl flex justify-center items-center">
+                         <svg width="200" height="200" viewBox="0 0 200 200">
+                            <!-- PV -->
+                            <path d="M50 20 L50 100 L150 100 L150 20 Z" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+                            <text x="60" y="40" font-size="12" fill="#1e40af">PV (Alzado)</text>
+                            <!-- PH -->
+                            <path d="M20 130 L50 100 L150 100 L120 130 Z" fill="#dcfce7" stroke="#16a34a" stroke-width="2" />
+                            <text x="40" y="125" font-size="12" fill="#166534">PH (Planta)</text>
+                            <!-- LT -->
+                            <line x1="50" y1="100" x2="150" y2="100" stroke="black" stroke-width="3" />
+                            <text x="160" y="105" font-size="12" font-weight="bold">LT</text>
+                        </svg>
                     </div>
                 </div>
 
-                <h3 class="text-xl font-bold text-white mt-8">Los Cuadrantes</h3>
-                <p>
-                    Los dos planos delimitan cuatro espacios o <em>Cuadrantes</em>:
-                </p>
-                <ul class="list-disc pl-5 space-y-2">
-                    <li><strong>I Cuadrante:</strong> Cota (+) y Alejamiento (+). (Arriba y Adelante). Es el más común.</li>
-                    <li><strong>II Cuadrante:</strong> Cota (+) y Alejamiento (-). (Arriba y Atrás).</li>
-                    <li><strong>III Cuadrante:</strong> Cota (-) y Alejamiento (-). (Abajo y Atrás).</li>
-                    <li><strong>IV Cuadrante:</strong> Cota (-) y Alejamiento (+). (Abajo y Adelante).</li>
-                </ul>
+                <h3 class="text-2xl font-bold text-white mt-8 border-b border-gray-700 pb-2">Alfabeto del Punto (Visual)</h3>
+                <p>La posición de las proyecciones (p' y p'') respecto a la Línea de Tierra nos indica en qué cuadrante está el punto.</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                    <!-- I Cuadrante -->
+                    <div class="bg-gray-800 p-4 rounded-lg flex flex-col items-center border border-gray-700">
+                        <strong class="text-white mb-2">I Cuadrante</strong>
+                        <span class="text-xs text-gray-400 mb-2">Cota (+) / Alej. (+)</span>
+                        <svg width="100" height="100" viewBox="0 0 100 100" class="bg-white rounded">
+                            <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="2" /> <!-- LT -->
+                            <line x1="50" y1="20" x2="50" y2="80" stroke="#9ca3af" stroke-dasharray="4" /> <!-- Ref -->
+                            <circle cx="50" cy="20" r="3" fill="blue" /> <text x="55" y="25" font-size="10" fill="blue">a''</text>
+                            <circle cx="50" cy="80" r="3" fill="green" /> <text x="55" y="85" font-size="10" fill="green">a'</text>
+                        </svg>
+                        <p class="text-xs text-center mt-2 text-gray-300">a'' arriba<br>a' abajo</p>
+                    </div>
+
+                    <!-- II Cuadrante -->
+                    <div class="bg-gray-800 p-4 rounded-lg flex flex-col items-center border border-gray-700">
+                        <strong class="text-white mb-2">II Cuadrante</strong>
+                        <span class="text-xs text-gray-400 mb-2">Cota (+) / Alej. (-)</span>
+                        <svg width="100" height="100" viewBox="0 0 100 100" class="bg-white rounded">
+                            <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="2" />
+                            <line x1="50" y1="10" x2="50" y2="35" stroke="#9ca3af" stroke-dasharray="4" />
+                            <circle cx="50" cy="10" r="3" fill="green" /> <text x="55" y="15" font-size="10" fill="green">b'</text>
+                            <circle cx="50" cy="35" r="3" fill="blue" /> <text x="55" y="40" font-size="10" fill="blue">b''</text>
+                        </svg>
+                        <p class="text-xs text-center mt-2 text-gray-300">Ambas arriba</p>
+                    </div>
+
+                    <!-- III Cuadrante -->
+                    <div class="bg-gray-800 p-4 rounded-lg flex flex-col items-center border border-gray-700">
+                        <strong class="text-white mb-2">III Cuadrante</strong>
+                        <span class="text-xs text-gray-400 mb-2">Cota (-) / Alej. (-)</span>
+                        <svg width="100" height="100" viewBox="0 0 100 100" class="bg-white rounded">
+                            <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="2" />
+                            <line x1="50" y1="20" x2="50" y2="80" stroke="#9ca3af" stroke-dasharray="4" />
+                            <circle cx="50" cy="20" r="3" fill="green" /> <text x="55" y="25" font-size="10" fill="green">c'</text>
+                            <circle cx="50" cy="80" r="3" fill="blue" /> <text x="55" y="85" font-size="10" fill="blue">c''</text>
+                        </svg>
+                        <p class="text-xs text-center mt-2 text-gray-300">c' arriba<br>c'' abajo</p>
+                    </div>
+
+                    <!-- IV Cuadrante -->
+                    <div class="bg-gray-800 p-4 rounded-lg flex flex-col items-center border border-gray-700">
+                        <strong class="text-white mb-2">IV Cuadrante</strong>
+                        <span class="text-xs text-gray-400 mb-2">Cota (-) / Alej. (+)</span>
+                        <svg width="100" height="100" viewBox="0 0 100 100" class="bg-white rounded">
+                            <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="2" />
+                            <line x1="50" y1="60" x2="50" y2="90" stroke="#9ca3af" stroke-dasharray="4" />
+                            <circle cx="50" cy="60" r="3" fill="blue" /> <text x="55" y="65" font-size="10" fill="blue">d''</text>
+                            <circle cx="50" cy="90" r="3" fill="green" /> <text x="55" y="95" font-size="10" fill="green">d'</text>
+                        </svg>
+                        <p class="text-xs text-center mt-2 text-gray-300">Ambas abajo</p>
+                    </div>
+                </div>
             </div>
         `,
         exercises: [
             {
                 id: 'ex-point-1',
-                title: 'Situar Puntos en Cuadrantes',
+                title: 'Puntos en el Espacio',
                 level: 'Fácil',
-                statement: 'Representa tres puntos: A en el I Cuadrante, B en el II Cuadrante y C en el plano Horizontal posterior.',
-                setup: [
-                    // No setup, user draws
-                ],
-                solutionHint: 'A(+,+), B(+,-), C(0,-). Usa la herramienta "Punto 3D" e introduce las coordenadas manualmente.'
+                statement: 'Representa cuatro puntos, uno en cada cuadrante: A(I), B(II), C(III), D(IV). Observa sus cotas y alejamientos.',
+                setup: [],
+                solutionHint: 'Recuerda: I(+,+), II(+,-), III(-,-), IV(-,+).'
             }
         ]
     },
+
+    // 2. LA RECTA (Profundizado con Tablas Visuales)
     {
         id: 'theory-2-line',
         title: '2. La Recta',
-        description: 'Definición, trazas y clasificación de rectas. Rectas horizontales, frontales y de perfil.',
+        description: 'Tipología completa de rectas, sus trazas y cómo identificarlas visualmente en proyecciones.',
         category: 'Teoría',
         theoryContent: `
              <div class="space-y-6 text-gray-300">
                 <p>
-                    Una recta queda definida por dos puntos. En diédrico, sus proyecciones son también líneas rectas.
+                    La recta se define por sus dos proyecciones (r' y r''). La inclinación de estas nos dice todo sobre su posición en el espacio.
                 </p>
-                <h3 class="text-xl font-bold text-white">Trazas de la Recta</h3>
-                <p>
-                    Son los puntos donde la recta perfora a los planos de proyección:
-                </p>
-                <ul class="list-disc pl-5 space-y-2">
-                    <li><strong>Traza Vertical (Pv):</strong> Punto donde la recta corta al PV. Su alejamiento es 0.</li>
-                    <li><strong>Traza Horizontal (Ph):</strong> Punto donde la recta corta al PH. Su cota es 0.</li>
-                </ul>
 
-                <h3 class="text-xl font-bold text-white mt-8">Alfabeto de la Recta</h3>
-                <div class="grid gap-4 mt-4">
-                    <div class="border-l-4 border-yellow-500 pl-4 py-2 bg-gray-800/50">
-                        <strong class="text-white">Recta Horizontal</strong>
-                        <p class="text-sm text-gray-400">Paralela al PH. Su proyección vertical es paralela a LT.</p>
-                    </div>
-                <h3 class="text-xl font-bold text-white mt-8">Resumen: Tipos de Rectas</h3>
-                <div class="overflow-x-auto mt-4">
+                <h3 class="text-xl font-bold text-white mt-8 mb-4">Clasificación Visual de Rectas</h3>
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-300 border border-gray-700">
                         <thead class="text-xs uppercase bg-gray-800 text-gray-200">
                             <tr>
-                                <th class="px-4 py-3 border-b border-gray-700">Tipo de Recta</th>
-                                <th class="px-4 py-3 border-b border-gray-700">Proyección Vertical (r'')</th>
-                                <th class="px-4 py-3 border-b border-gray-700">Proyección Horizontal (r')</th>
-                                <th class="px-4 py-3 border-b border-gray-700">Propiedad Clave</th>
+                                <th class="px-4 py-3 border-b border-gray-700 w-1/4">Tipo</th>
+                                <th class="px-4 py-3 border-b border-gray-700 w-1/4">Visualización</th>
+                                <th class="px-4 py-3 border-b border-gray-700 w-1/2">Propiedades</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="bg-gray-900 border-b border-gray-800">
-                                <td class="px-4 py-3 font-medium text-white">Horizontal</td>
-                                <td class="px-4 py-3">Paralela a LT</td>
-                                <td class="px-4 py-3">Oblicua a LT</td>
-                                <td class="px-4 py-3 text-blue-400">Cota constante</td>
+                        <tbody class="divide-y divide-gray-800">
+                            <!-- Horizontal -->
+                            <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">Horizontal</td>
+                                <td class="px-4 py-4">
+                                    <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="black" stroke-width="1" /> <!-- LT -->
+                                        <line x1="10" y1="10" x2="90" y2="10" stroke="blue" stroke-width="2" /> <!-- r'' -->
+                                        <line x1="10" y1="50" x2="90" y2="40" stroke="green" stroke-width="2" /> <!-- r' -->
+                                        <text x="92" y="12" font-size="8" fill="blue">r''</text>
+                                        <text x="92" y="42" font-size="8" fill="green">r'</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Paralela al Plano Horizontal.<br><span class="text-blue-400">r'' Paralela a LT</span>. <br>Tiene cota constante.</td>
                             </tr>
-                            <tr class="bg-gray-900 border-b border-gray-800">
-                                <td class="px-4 py-3 font-medium text-white">Frontal</td>
-                                <td class="px-4 py-3">Oblicua a LT</td>
-                                <td class="px-4 py-3">Paralela a LT</td>
-                                <td class="px-4 py-3 text-blue-400">Alejamiento constante</td>
+                            
+                            <!-- Frontal -->
+                            <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">Frontal</td>
+                                <td class="px-4 py-4">
+                                    <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="black" stroke-width="1" /> <!-- LT -->
+                                        <line x1="10" y1="20" x2="90" y2="5" stroke="blue" stroke-width="2" /> <!-- r'' -->
+                                        <line x1="10" y1="50" x2="90" y2="50" stroke="green" stroke-width="2" /> <!-- r' -->
+                                        <text x="92" y="8" font-size="8" fill="blue">r''</text>
+                                        <text x="92" y="52" font-size="8" fill="green">r'</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Paralela al Plano Vertical.<br><span class="text-green-400">r' Paralela a LT</span>. <br>Tiene alejamiento constante.</td>
                             </tr>
-                            <tr class="bg-gray-900 border-b border-gray-800">
-                                <td class="px-4 py-3 font-medium text-white">De Perfil</td>
-                                <td class="px-4 py-3">Perpendicular a LT</td>
-                                <td class="px-4 py-3">Perpendicular a LT</td>
-                                <td class="px-4 py-3 text-blue-400">Necesita Tercera Proyección</td>
+
+                            <!-- Vertical -->
+                            <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">Vertical</td>
+                                <td class="px-4 py-4">
+                                     <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="black" stroke-width="1" /> <!-- LT -->
+                                        <line x1="50" y1="5" x2="50" y2="55" stroke="blue" stroke-width="2" /> <!-- r'' -->
+                                        <circle cx="50" cy="45" r="2" fill="green" /> <!-- r' point -->
+                                        <text x="52" y="8" font-size="8" fill="blue">r''</text>
+                                        <text x="52" y="45" font-size="8" fill="green">r'</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Perpendicular al Plano Horizontal.<br><span class="text-green-400">r' es un punto</span>.<br>r'' Perpendicular a LT.</td>
                             </tr>
-                            <tr class="bg-gray-900 border-b border-gray-800">
-                                <td class="px-4 py-3 font-medium text-white">Vertical</td>
-                                <td class="px-4 py-3">Perpendicular a LT</td>
-                                <td class="px-4 py-3">Punto</td>
-                                <td class="px-4 py-3 text-blue-400">Perpendicular al PH</td>
-                            </tr>
-                            <tr class="bg-gray-900">
-                                <td class="px-4 py-3 font-medium text-white">De Punta</td>
-                                <td class="px-4 py-3">Punto</td>
-                                <td class="px-4 py-3">Perpendicular a LT</td>
-                                <td class="px-4 py-3 text-blue-400">Perpendicular al PV</td>
+
+                            <!-- De Punta -->
+                            <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">De Punta</td>
+                                <td class="px-4 py-4">
+                                     <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="black" stroke-width="1" /> <!-- LT -->
+                                        <circle cx="50" cy="15" r="2" fill="blue" /> <!-- r'' point -->
+                                        <line x1="50" y1="5" x2="50" y2="55" stroke="green" stroke-width="2" /> <!-- r' -->
+                                        <text x="52" y="15" font-size="8" fill="blue">r''</text>
+                                        <text x="52" y="52" font-size="8" fill="green">r'</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Perpendicular al Plano Vertical.<br><span class="text-blue-400">r'' es un punto</span>.<br>r' Perpendicular a LT.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -158,63 +214,98 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         `,
         exercises: [
             {
-                id: 'ex-line-horiz',
-                title: 'Recta Horizontal',
+                id: 'ex-line-types',
+                title: 'Identificación de Rectas',
                 level: 'Fácil',
-                statement: 'Dados los puntos A(10, 20, 30) y B(50, 40, 30), únelos y verifica que es una recta horizontal.',
-                setup: [
-                    { type: 'point', name: 'A', coords: { x: 10, y: 20, z: 30 }, visible: true, color: '#3b82f6' },
-                    { type: 'point', name: 'B', coords: { x: 50, y: 40, z: 30 }, visible: true, color: '#3b82f6' }
-                ],
-                solutionHint: 'Observa que ambos tienen cota Z=30. Al unirlos, la proyección vertical será paralela a la Línea de Tierra.'
+                statement: 'Dibuja una recta Horizontal y una recta Frontal que se corten en un punto P. Verifica sus proyecciones.',
+                setup: [],
+                solutionHint: 'La horizontal debe tener r\'\' paralela a LT. La frontal debe tener s\' paralela a LT.'
             }
         ]
     },
+
+    // 3. EL PLANO (Profundizado)
     {
         id: 'theory-3-plane',
         title: '3. El Plano',
-        description: 'Definición mediante trazas. Planos proyectantes, oblicuos y paralelos a LT.',
+        description: 'Trazas del plano (Alpha), planos proyectantes, paralelos y oblicuos. Representación visual.',
         category: 'Teoría',
         theoryContent: `
              <div class="space-y-6 text-gray-300">
                 <p>
-                    Un plano se define por sus trazas (intersecciones con los planos de proyección).
+                    Un plano es infinito, pero en Diédrico lo representamos por sus <strong>Trazas</strong>: las líneas donde el plano corta al PV (Alpha_2) y al PH (Alpha_1).
                 </p>
-                <h3 class="text-xl font-bold text-white">Clasificación de Planos</h3>
-                <div class="overflow-x-auto mt-4">
+
+                <h3 class="text-xl font-bold text-white mt-8 mb-4">Catálogo de Planos</h3>
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-300 border border-gray-700">
                         <thead class="text-xs uppercase bg-gray-800 text-gray-200">
                             <tr>
-                                <th class="px-4 py-3 border-b border-gray-700">Tipo de Plano</th>
-                                <th class="px-4 py-3 border-b border-gray-700">Traza Vertical (Alpha_2)</th>
-                                <th class="px-4 py-3 border-b border-gray-700">Traza Horizontal (Alpha_1)</th>
-                                <th class="px-4 py-3 border-b border-gray-700">Característica</th>
+                                <th class="px-4 py-3 border-b border-gray-700 w-1/4">Tipo</th>
+                                <th class="px-4 py-3 border-b border-gray-700 w-1/4">Visualización</th>
+                                <th class="px-4 py-3 border-b border-gray-700 w-1/2">Propiedades</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="bg-gray-900 border-b border-gray-800">
-                                <td class="px-4 py-3 font-medium text-white">Proyectante Horizontal</td>
-                                <td class="px-4 py-3">Perpendicular a LT</td>
-                                <td class="px-4 py-3">Oblicua</td>
-                                <td class="px-4 py-3 text-green-400">Todo lo contenido se ve en planta</td>
+                       <tbody class="divide-y divide-gray-800">
+                            <!-- Oblicuo -->
+                             <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">Oblicuo (Cualquiera)</td>
+                                <td class="px-4 py-4">
+                                     <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="black" stroke-width="1" /> <!-- LT -->
+                                        <line x1="20" y1="5" x2="40" y2="30" stroke="orange" stroke-width="2" /> <!-- a2 -->
+                                        <line x1="40" y1="30" x2="20" y2="55" stroke="orange" stroke-width="2" /> <!-- a1 -->
+                                        <text x="25" y="10" font-size="8" fill="orange">a2</text>
+                                        <text x="25" y="55" font-size="8" fill="orange">a1</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Corta oblicuamente a PV y PH. Las trazas se cruzan en la LT.</td>
                             </tr>
-                            <tr class="bg-gray-900 border-b border-gray-800">
-                                <td class="px-4 py-3 font-medium text-white">Proyectante Vertical</td>
-                                <td class="px-4 py-3">Oblicua</td>
-                                <td class="px-4 py-3">Perpendicular a LT</td>
-                                <td class="px-4 py-3 text-green-400">Todo lo contenido se ve en alzado</td>
+
+                            <!-- Proyectante Horizontal -->
+                            <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">Proyectante Horizontal (Vertical)</td>
+                                <td class="px-4 py-4">
+                                     <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="black" stroke-width="1" /> <!-- LT -->
+                                        <line x1="40" y1="5" x2="40" y2="30" stroke="orange" stroke-width="2" /> <!-- a2 -->
+                                        <line x1="40" y1="30" x2="20" y2="55" stroke="orange" stroke-width="2" /> <!-- a1 -->
+                                        <rect x="35" y="25" width="5" height="5" fill="none" stroke="black" stroke-width="0.5" /> <!-- 90deg symbol -->
+                                        <text x="42" y="10" font-size="8" fill="orange">a2</text>
+                                        <text x="25" y="55" font-size="8" fill="orange">a1</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Perpendicular al PH.<br><span class="text-orange-400">Traza Vert. (a2) Perpendicular a LT</span>.<br>Contiene la "altura" de las figuras.</td>
                             </tr>
-                            <tr class="bg-gray-900 border-b border-gray-800">
-                                <td class="px-4 py-3 font-medium text-white">Horizontal</td>
-                                <td class="px-4 py-3">Paralela a LT</td>
-                                <td class="px-4 py-3 text-gray-500">-(Impropia)</td>
-                                <td class="px-4 py-3 text-green-400">Paralelo al PH</td>
+
+                             <!-- Proyectante Vertical -->
+                            <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">Proyectante Vertical (De Canto)</td>
+                                <td class="px-4 py-4">
+                                     <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="black" stroke-width="1" /> <!-- LT -->
+                                        <line x1="20" y1="5" x2="40" y2="30" stroke="orange" stroke-width="2" /> <!-- a2 -->
+                                        <line x1="40" y1="30" x2="40" y2="55" stroke="orange" stroke-width="2" /> <!-- a1 -->
+                                        <rect x="35" y="30" width="5" height="5" fill="none" stroke="black" stroke-width="0.5" /> <!-- 90deg symbol -->
+                                        <text x="25" y="10" font-size="8" fill="orange">a2</text>
+                                        <text x="42" y="50" font-size="8" fill="orange">a1</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Perpendicular al PV.<br><span class="text-orange-400">Traza Horiz. (a1) Perpendicular a LT</span>.</td>
                             </tr>
-                            <tr class="bg-gray-900">
-                                <td class="px-4 py-3 font-medium text-white">Frontal</td>
-                                <td class="px-4 py-3 text-gray-500">-(Impropia)</td>
-                                <td class="px-4 py-3">Paralela a LT</td>
-                                <td class="px-4 py-3 text-green-400">Paralelo al PV</td>
+
+                            <!-- Horizontal -->
+                            <tr class="bg-gray-900/50 hover:bg-gray-800 transition-colors">
+                                <td class="px-4 py-4 font-bold text-white">Horizontal</td>
+                                <td class="px-4 py-4">
+                                     <svg width="100" height="60" viewBox="0 0 100 60" class="bg-white rounded border border-gray-300">
+                                        <line x1="0" y1="40" x2="100" y2="40" stroke="black" stroke-width="1" /> <!-- LT lower -->
+                                        <line x1="10" y1="20" x2="90" y2="20" stroke="orange" stroke-width="2" /> <!-- a2 -->
+                                        <text x="92" y="24" font-size="8" fill="orange">a2</text>
+                                        <text x="50" y="55" font-size="8" fill="gray">(a1 infinito)</text>
+                                    </svg>
+                                </td>
+                                <td class="px-4 py-4">Paralelo al PH.<br>Solo tiene Traza Vertical (a2) paralela a LT.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -223,54 +314,27 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         `,
         exercises: [
             {
-                id: 'ex-plane-proj',
-                title: 'Plano Proyectante',
-                level: 'Medio',
-                statement: 'Dibuja un plano Proyectante Vertical que pase por el punto A(20, 20, 20) y forme 45 grados con el PH.',
+                id: 'ex-plane-creation',
+                title: 'Creación de Planos',
+                level: 'Fácil',
+                statement: 'Crea un plano definido por tres puntos A(10,10,10), B(50,10,20) y C(30,50,30). Observa las trazas resultantes.',
                 setup: [
-                    { type: 'point', name: 'A', coords: { x: 20, y: 20, z: 20 }, visible: true, color: '#3b82f6' }
+                    { type: 'point', name: 'A', coords: { x: 10, y: 10, z: 10 }, visible: true, color: '#3b82f6' },
+                    { type: 'point', name: 'B', coords: { x: 50, y: 10, z: 20 }, visible: true, color: '#3b82f6' },
+                    { type: 'point', name: 'C', coords: { x: 30, y: 50, z: 30 }, visible: true, color: '#3b82f6' }
                 ],
-                solutionHint: 'Su traza horizontal debe ser perpendicular a LT. Su traza vertical pasará por A\'\' y formará 45º con LT.'
+                solutionHint: 'Al unir 3 puntos no alineados, se forma un plano único. Diédrico Studio calculará automáticamente las trazas.'
             }
         ]
     },
-    // BLOQUE 2: APLICACIÓN
+
+    // 4. ABATIMIENTOS (Intro)
     {
-        id: 'app-1-hex',
-        title: 'Pirámide Hexagonal',
-        description: 'Construcción paso a paso de una pirámide regular con base hexagonal.',
-        category: 'Aplicación',
-        theoryContent: '<p>Ejercicio práctico de construcción.</p>',
-        exercises: [
-            {
-                id: 'ex-pyr-hex',
-                title: 'Base Hexagonal',
-                level: 'Medio',
-                statement: 'Dibuja un hexágono regular de radio 30 apoyado en el Plano Horizontal, con centro en (50, 40, 0). Luego eleva una pirámide de altura 60.',
-                setup: [],
-                solutionHint: 'Usa "Polígono" en modo Boceto o construye punto a punto.'
-            }
-        ]
-    },
-    // BLOQUE 3: EXÁMENES
-    {
-        id: 'pau-madrid-2014',
-        title: 'PAU Madrid 2014',
-        description: 'Resolución del examen de Junio 2014.',
-        category: 'Exámenes',
-        theoryContent: '<p>Análisis de los problemas de examen.</p>',
-        exercises: [
-            {
-                id: 'pau-2014-a2',
-                title: 'Ejercicio A2: Distancias',
-                level: 'Difícil',
-                statement: 'Determinar la distancia real entre las rectas r y s dadas.',
-                setup: [
-                    { type: 'line', name: 'r', point: { x: 0, y: 20, z: 10 }, direction: { x: 1, y: 1, z: 0 }, isInfinite: true, visible: true, color: '#ef4444' },
-                    { type: 'line', name: 's', point: { x: 0, y: 50, z: 60 }, direction: { x: 1, y: -1, z: 0 }, isInfinite: true, visible: true, color: '#3b82f6' }
-                ],
-                solutionHint: 'Son rectas que se cruzan. Usa la herramienta "Distancia Recta-Recta" o constrúyelo mediante plano paralelo.'
-            }
-        ]
+        id: 'theory-4-abatimientos',
+        title: '4. Abatimientos',
+        description: 'Técnica para ver la Verdadera Magnitud de figuras planas situándolas sobre el plano de proyección.',
+        category: 'Teoría',
+        theoryContent: '<div class="text-gray-300"><p>Contenido detallado próximamente...</p></div>',
+        exercises: []
     }
 ];
