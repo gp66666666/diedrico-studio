@@ -109,10 +109,50 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         <strong class="text-white">Recta Horizontal</strong>
                         <p class="text-sm text-gray-400">Paralela al PH. Su proyección vertical es paralela a LT.</p>
                     </div>
-                    <div class="border-l-4 border-yellow-500 pl-4 py-2 bg-gray-800/50">
-                        <strong class="text-white">Recta Frontal</strong>
-                        <p class="text-sm text-gray-400">Paralela al PV. Su proyección horizontal es paralela a LT.</p>
-                    </div>
+                <h3 class="text-xl font-bold text-white mt-8">Resumen: Tipos de Rectas</h3>
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-sm text-left text-gray-300 border border-gray-700">
+                        <thead class="text-xs uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th class="px-4 py-3 border-b border-gray-700">Tipo de Recta</th>
+                                <th class="px-4 py-3 border-b border-gray-700">Proyección Vertical (r'')</th>
+                                <th class="px-4 py-3 border-b border-gray-700">Proyección Horizontal (r')</th>
+                                <th class="px-4 py-3 border-b border-gray-700">Propiedad Clave</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-gray-900 border-b border-gray-800">
+                                <td class="px-4 py-3 font-medium text-white">Horizontal</td>
+                                <td class="px-4 py-3">Paralela a LT</td>
+                                <td class="px-4 py-3">Oblicua a LT</td>
+                                <td class="px-4 py-3 text-blue-400">Cota constante</td>
+                            </tr>
+                            <tr class="bg-gray-900 border-b border-gray-800">
+                                <td class="px-4 py-3 font-medium text-white">Frontal</td>
+                                <td class="px-4 py-3">Oblicua a LT</td>
+                                <td class="px-4 py-3">Paralela a LT</td>
+                                <td class="px-4 py-3 text-blue-400">Alejamiento constante</td>
+                            </tr>
+                            <tr class="bg-gray-900 border-b border-gray-800">
+                                <td class="px-4 py-3 font-medium text-white">De Perfil</td>
+                                <td class="px-4 py-3">Perpendicular a LT</td>
+                                <td class="px-4 py-3">Perpendicular a LT</td>
+                                <td class="px-4 py-3 text-blue-400">Necesita Tercera Proyección</td>
+                            </tr>
+                            <tr class="bg-gray-900 border-b border-gray-800">
+                                <td class="px-4 py-3 font-medium text-white">Vertical</td>
+                                <td class="px-4 py-3">Perpendicular a LT</td>
+                                <td class="px-4 py-3">Punto</td>
+                                <td class="px-4 py-3 text-blue-400">Perpendicular al PH</td>
+                            </tr>
+                            <tr class="bg-gray-900">
+                                <td class="px-4 py-3 font-medium text-white">De Punta</td>
+                                <td class="px-4 py-3">Punto</td>
+                                <td class="px-4 py-3">Perpendicular a LT</td>
+                                <td class="px-4 py-3 text-blue-400">Perpendicular al PV</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         `,
@@ -135,8 +175,64 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         title: '3. El Plano',
         description: 'Definición mediante trazas. Planos proyectantes, oblicuos y paralelos a LT.',
         category: 'Teoría',
-        theoryContent: '<p>Contenido en desarrollo...</p>',
-        exercises: []
+        theoryContent: `
+             <div class="space-y-6 text-gray-300">
+                <p>
+                    Un plano se define por sus trazas (intersecciones con los planos de proyección).
+                </p>
+                <h3 class="text-xl font-bold text-white">Clasificación de Planos</h3>
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-sm text-left text-gray-300 border border-gray-700">
+                        <thead class="text-xs uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th class="px-4 py-3 border-b border-gray-700">Tipo de Plano</th>
+                                <th class="px-4 py-3 border-b border-gray-700">Traza Vertical (Alpha_2)</th>
+                                <th class="px-4 py-3 border-b border-gray-700">Traza Horizontal (Alpha_1)</th>
+                                <th class="px-4 py-3 border-b border-gray-700">Característica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-gray-900 border-b border-gray-800">
+                                <td class="px-4 py-3 font-medium text-white">Proyectante Horizontal</td>
+                                <td class="px-4 py-3">Perpendicular a LT</td>
+                                <td class="px-4 py-3">Oblicua</td>
+                                <td class="px-4 py-3 text-green-400">Todo lo contenido se ve en planta</td>
+                            </tr>
+                            <tr class="bg-gray-900 border-b border-gray-800">
+                                <td class="px-4 py-3 font-medium text-white">Proyectante Vertical</td>
+                                <td class="px-4 py-3">Oblicua</td>
+                                <td class="px-4 py-3">Perpendicular a LT</td>
+                                <td class="px-4 py-3 text-green-400">Todo lo contenido se ve en alzado</td>
+                            </tr>
+                            <tr class="bg-gray-900 border-b border-gray-800">
+                                <td class="px-4 py-3 font-medium text-white">Horizontal</td>
+                                <td class="px-4 py-3">Paralela a LT</td>
+                                <td class="px-4 py-3 text-gray-500">-(Impropia)</td>
+                                <td class="px-4 py-3 text-green-400">Paralelo al PH</td>
+                            </tr>
+                            <tr class="bg-gray-900">
+                                <td class="px-4 py-3 font-medium text-white">Frontal</td>
+                                <td class="px-4 py-3 text-gray-500">-(Impropia)</td>
+                                <td class="px-4 py-3">Paralela a LT</td>
+                                <td class="px-4 py-3 text-green-400">Paralelo al PV</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `,
+        exercises: [
+            {
+                id: 'ex-plane-proj',
+                title: 'Plano Proyectante',
+                level: 'Medio',
+                statement: 'Dibuja un plano Proyectante Vertical que pase por el punto A(20, 20, 20) y forme 45 grados con el PH.',
+                setup: [
+                    { type: 'point', name: 'A', coords: { x: 20, y: 20, z: 20 }, visible: true, color: '#3b82f6' }
+                ],
+                solutionHint: 'Su traza horizontal debe ser perpendicular a LT. Su traza vertical pasará por A'' y formará 45º con LT.'
+            }
+        ]
     },
     // BLOQUE 2: APLICACIÓN
     {

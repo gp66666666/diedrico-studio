@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { useGeometryStore } from '../store/geometryStore';
 import { ACADEMY_CONTENT, AcademyTopic, AcademyExercise } from '../data/academyContent';
-import { BookOpen, Lock, Play, ChevronRight, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { BookOpen, Lock, Play, ChevronRight, CheckCircle2, ArrowLeft, Printer } from 'lucide-react';
 import PremiumModal from '../components/Auth/PremiumModal';
 
 export default function AcademyPage() {
@@ -57,9 +57,9 @@ export default function AcademyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex">
+        <div className="min-h-screen bg-gray-900 text-white flex print:bg-white print:text-black">
             {/* Sidebar Topics */}
-            <div className="w-80 border-r border-gray-800 bg-gray-900 p-6 flex flex-col">
+            <div className="w-80 border-r border-gray-800 bg-gray-900 p-6 flex flex-col print:hidden">
                 <div className="flex items-center gap-3 mb-8">
                     <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-800 rounded-lg">
                         <ArrowLeft size={20} />
@@ -76,8 +76,8 @@ export default function AcademyPage() {
                             key={topic.id}
                             onClick={() => setSelectedTopic(topic)}
                             className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTopic?.id === topic.id
-                                    ? 'bg-blue-600/20 border-blue-500 text-blue-200'
-                                    : 'bg-gray-800 border-transparent hover:bg-gray-800/80 text-gray-400'
+                                ? 'bg-blue-600/20 border-blue-500 text-blue-200'
+                                : 'bg-gray-800 border-transparent hover:bg-gray-800/80 text-gray-400'
                                 }`}
                         >
                             <h3 className="font-bold mb-1">{topic.title}</h3>
@@ -113,8 +113,8 @@ export default function AcademyPage() {
                                 <div key={ex.id} className="bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-colors p-6 rounded-2xl flex flex-col">
                                     <div className="flex justify-between items-start mb-4">
                                         <span className={`px-2 py-1 rounded text-xs font-bold ${ex.level === 'Fácil' ? 'bg-green-500/20 text-green-400' :
-                                                ex.level === 'Medio' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                    'bg-red-500/20 text-red-400'
+                                            ex.level === 'Medio' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                'bg-red-500/20 text-red-400'
                                             }`}>
                                             {ex.level}
                                         </span>
