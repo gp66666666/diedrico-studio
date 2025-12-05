@@ -230,7 +230,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                 setup: [
                     { type: 'point', name: 'A', coords: { x: 20, y: 20, z: 20 }, visible: true, color: '#3b82f6' }
                 ],
-                solutionHint: 'Su traza horizontal debe ser perpendicular a LT. Su traza vertical pasará por A'' y formará 45º con LT.'
+                solutionHint: 'Su traza horizontal debe ser perpendicular a LT. Su traza vertical pasará por A\'\' y formará 45º con LT.'
             }
         ]
     },
