@@ -1214,6 +1214,10 @@ export default function Sidebar() {
                 <UserMenu />
             </div>
 
+
+            {/* Tools that need to be always active - outside tabs */}
+            <IntersectionTool />
+            <DistanceTool />
             {/* Modals */}
             <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />
