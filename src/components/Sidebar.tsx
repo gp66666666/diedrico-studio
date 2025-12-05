@@ -20,6 +20,7 @@ import TrueMagnitudeTool from './tools/TrueMagnitudeTool';
 import ParallelismTool from './tools/ParallelismTool';
 import DistanceTool from './tools/DistanceTool';
 import RotationTool from './tools/RotationTool';
+import HelpGuide from './HelpGuide';
 
 export default function Sidebar() {
     const {
@@ -41,6 +42,7 @@ export default function Sidebar() {
         redo,
         theme,
         toggleTheme,
+        showHelp,
         toggleHelp,
         clearAll,
         measurements,
@@ -1205,6 +1207,7 @@ export default function Sidebar() {
             <AbatimientoTool />
             <TrueMagnitudeTool />
             {/* Modals */}
+            <HelpGuide isOpen={showHelp} onClose={toggleHelp} isDark={isDark} />
             <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />
         </div >
