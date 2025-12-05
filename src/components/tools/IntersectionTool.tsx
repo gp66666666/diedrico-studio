@@ -97,9 +97,7 @@ export default function IntersectionTool() {
                         addElement({
                             type: 'point',
                             name: `Intersección de ${line.name} con ${plane.name}`,
-                            x: point.x,
-                            y: point.y,
-                            z: point.z,
+                            coords: point,
                             color: '#ff0000'
                         } as any);
                         console.log('[IntersectionTool] ✅ SUCCESS - Element added');
