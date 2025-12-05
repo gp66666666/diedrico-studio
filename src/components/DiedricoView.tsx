@@ -1464,16 +1464,6 @@ function Intersections2D({ elements, showIntersections }: { elements: GeometryEl
                     const px = intersection.x * SCALE;
                     const py_h = intersection.y * SCALE;
                     const py_v = -intersection.z * SCALE;
-                    results.push(
-                        <g key={`int-${key++}`}>
-                            <circle cx={px} cy={py_v} r="3" fill="#ef4444" stroke="black" strokeWidth="0.5" />
-                            <circle cx={px} cy={py_h} r="3" fill="#ef4444" stroke="black" strokeWidth="0.5" />
-                            <line x1={px} y1={py_v} x2={px} y2={py_h} stroke="#ef4444" strokeWidth="0.5" strokeDasharray="2 2" />
-                        </g>
-                    );
                 }
+                return <>{results}</>;
             }
-        }
-    }
-    return <>{results}</>;
-}
