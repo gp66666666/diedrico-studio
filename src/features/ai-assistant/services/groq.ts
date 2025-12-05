@@ -18,7 +18,7 @@ export class GroqService {
         colorManager.reset();
 
         // 1. Get Current Context (The "Vision" of the AI)
-        const elements = useGeometryStore.getState().elements;
+        const elements: any[] = useGeometryStore.getState().elements;
         const contextDescription = elements.length > 0
             ? "ELEMENTOS EN EL LIENZO:\n" + elements.map(el => {
                 if (el.type === 'point') return `- Punto ${el.name} (${(el as any).coords.x}, ${(el as any).coords.y}, ${(el as any).coords.z})`;
