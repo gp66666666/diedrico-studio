@@ -53,10 +53,13 @@ export class GroqService {
 
             const steps = this.parseResponseToSteps(text);
 
+            // Clean text for display: Remove JSON blocks
+            const cleanText = text.replace(/```json\s*[\s\S]*?```/g, '').trim();
+
             console.log('Parsed Steps:', steps);
 
             return {
-                explanation: text,
+                explanation: cleanText || "¡Hecho! Aquí tienes la construcción.", // Fallback if text is empty
                 steps,
             };
         } catch (error: any) {
