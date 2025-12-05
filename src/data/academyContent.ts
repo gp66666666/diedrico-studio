@@ -13,82 +13,167 @@ export interface AcademyTopic {
     id: string;
     title: string;
     description: string;
+    category: 'Teoría' | 'Aplicación' | 'Exámenes';
     theoryContent: string; // Markdown-like or HTML
     exercises: AcademyExercise[];
 }
 
 export const ACADEMY_CONTENT: AcademyTopic[] = [
+    // BLOQUE 1: TEORÍA
     {
-        id: 'topic-1',
-        title: '1. El Punto y la Recta',
-        description: 'Fundamentos del Sistema Diédrico. Coordenadas y tipos de rectas.',
+        id: 'theory-1-point',
+        title: '1. Introducción: El Punto',
+        description: 'Fundamentos del Sistema Diédrico. Planos de proyección, coordenadas y alfabeto del punto.',
+        category: 'Teoría',
         theoryContent: `
-            <h3>El Punto</h3>
-            <p>Un punto en el espacio se define por sus tres coordenadas (x, y, z):</p>
-            <ul>
-                <li><b>Cota (z):</b> Altura respecto al plano horizontal.</li>
-                <li><b>Alejamiento (y):</b> Distancia al plano vertical.</li>
-                <li><b>Lateralidad (x):</b> Posición en el eje de tierra.</li>
-            </ul>
-            
-            <h3>La Recta</h3>
-            <p>Una recta queda definida por dos puntos. Existen tipos particulares:</p>
-            <ul>
-                <li><b>Recta Horizontal:</b> Paralela al plano Horizontal (Cota constante).</li>
-                <li><b>Recta Frontal:</b> Paralela al plano Vertical (Alejamiento constante).</li>
-                <li><b>Recta de Perfil:</b> Perpendicular a la Línea de Tierra.</li>
-            </ul>
+            <div class="space-y-6 text-gray-300">
+                <p class="lead text-xl text-white">
+                    El <strong>Sistema Diédrico</strong> es un método de representación geométrica que utiliza dos planos de proyección principales, perpendiculares entre sí, para describir objetos tridimensionales en una superficie bidimensional (el papel).
+                </p>
+
+                <div class="bg-gray-800 p-6 rounded-xl border border-blue-900/30">
+                    <h3 class="text-xl font-bold text-blue-400 mb-4">Los Elementos Fundamentales</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Plano Vertical (PV):</strong> Imagina una pared frente a ti. Aquí se proyecta la "vista frontal" o <em>Alzados</em>.</li>
+                        <li><strong>Plano Horizontal (PH):</strong> Imagina el suelo. Aquí se proyecta la "vista superior" o <em>Plantas</em>.</li>
+                        <li><strong>Línea de Tierra (LT):</strong> Es la recta de intersección entre el PV y el PH. Es el eje de referencia principal.</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mt-8">Coordenadas del Punto (X, Y, Z)</h3>
+                <p>
+                    Todo punto en el espacio queda definido por tres valores que determinan su posición exacta:
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <strong class="text-red-400 block mb-2">X: Lateralidad</strong>
+                        <p class="text-sm">Posición a lo largo de la Línea de Tierra (izquierda o derecha).</p>
+                    </div>
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <strong class="text-green-400 block mb-2">Y: Alejamiento</strong>
+                        <p class="text-sm">Distancia al Plano Vertical (cuánto se acerca a ti desde la pared).</p>
+                    </div>
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <strong class="text-blue-400 block mb-2">Z: Cota</strong>
+                        <p class="text-sm">Altura respecto al Plano Horizontal (cuánto sube desde el suelo).</p>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mt-8">Los Cuadrantes</h3>
+                <p>
+                    Los dos planos delimitan cuatro espacios o <em>Cuadrantes</em>:
+                </p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>I Cuadrante:</strong> Cota (+) y Alejamiento (+). (Arriba y Adelante). Es el más común.</li>
+                    <li><strong>II Cuadrante:</strong> Cota (+) y Alejamiento (-). (Arriba y Atrás).</li>
+                    <li><strong>III Cuadrante:</strong> Cota (-) y Alejamiento (-). (Abajo y Atrás).</li>
+                    <li><strong>IV Cuadrante:</strong> Cota (-) y Alejamiento (+). (Abajo y Adelante).</li>
+                </ul>
+            </div>
         `,
         exercises: [
             {
-                id: 'ex-1-1',
-                title: 'Definir una Recta Horizontal',
+                id: 'ex-point-1',
+                title: 'Situar Puntos en Cuadrantes',
                 level: 'Fácil',
-                statement: 'Dados dos puntos A(0, 10, 20) y B(50, 30, 20), observa que tienen la misma cota. Únelos para formar una recta.',
+                statement: 'Representa tres puntos: A en el I Cuadrante, B en el II Cuadrante y C en el plano Horizontal posterior.',
                 setup: [
-                    { type: 'point', name: 'A', coords: { x: 0, y: 10, z: 20 }, visible: true, color: '#3b82f6' },
-                    { type: 'point', name: 'B', coords: { x: 50, y: 30, z: 20 }, visible: true, color: '#3b82f6' }
+                    // No setup, user draws
                 ],
-                solutionHint: 'Usa la herramienta "Recta / Plano" -> "Dos Puntos" y selecciona A y B.'
-            },
-            {
-                id: 'ex-1-2',
-                title: 'Recta de Perfil',
-                level: 'Medio',
-                statement: 'Tienes dos puntos en la misma perpendicular a LT. A(20, 10, 10) y B(20, 40, 50). Crea la recta y observa su traza.',
-                setup: [
-                    { type: 'point', name: 'A', coords: { x: 20, y: 10, z: 10 }, visible: true, color: '#ef4444' },
-                    { type: 'point', name: 'B', coords: { x: 20, y: 40, z: 50 }, visible: true, color: '#ef4444' }
-                ]
+                solutionHint: 'A(+,+), B(+,-), C(0,-). Usa la herramienta "Punto 3D" e introduce las coordenadas manualmente.'
             }
         ]
     },
     {
-        id: 'topic-2',
-        title: '2. Intersecciones',
-        description: 'Cortes entre rectas y planos.',
+        id: 'theory-2-line',
+        title: '2. La Recta',
+        description: 'Definición, trazas y clasificación de rectas. Rectas horizontales, frontales y de perfil.',
+        category: 'Teoría',
         theoryContent: `
-            <h3>Intersección Recta-Plano</h3>
-            <p>Para hallar el punto donde una recta r corta a un plano Alpha:</p>
-            <ol>
-                <li>Contener la recta r en un plano auxiliar Beta (proyectante).</li>
-                <li>Hallar la intersección i (recta) entre Alpha y Beta.</li>
-                <li>El punto donde i corta a r es la solución.</li>
-            </ol>
-            <p>¡O usa la herramienta automática de Diédrico Studio!</p>
+             <div class="space-y-6 text-gray-300">
+                <p>
+                    Una recta queda definida por dos puntos. En diédrico, sus proyecciones son también líneas rectas.
+                </p>
+                <h3 class="text-xl font-bold text-white">Trazas de la Recta</h3>
+                <p>
+                    Son los puntos donde la recta perfora a los planos de proyección:
+                </p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Traza Vertical (Pv):</strong> Punto donde la recta corta al PV. Su alejamiento es 0.</li>
+                    <li><strong>Traza Horizontal (Ph):</strong> Punto donde la recta corta al PH. Su cota es 0.</li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-white mt-8">Alfabeto de la Recta</h3>
+                <div class="grid gap-4 mt-4">
+                    <div class="border-l-4 border-yellow-500 pl-4 py-2 bg-gray-800/50">
+                        <strong class="text-white">Recta Horizontal</strong>
+                        <p class="text-sm text-gray-400">Paralela al PH. Su proyección vertical es paralela a LT.</p>
+                    </div>
+                    <div class="border-l-4 border-yellow-500 pl-4 py-2 bg-gray-800/50">
+                        <strong class="text-white">Recta Frontal</strong>
+                        <p class="text-sm text-gray-400">Paralela al PV. Su proyección horizontal es paralela a LT.</p>
+                    </div>
+                </div>
+            </div>
         `,
         exercises: [
             {
-                id: 'ex-2-1',
-                title: 'Intersección Básica',
-                level: 'Difícil',
-                statement: 'Halla el punto de intersección entre la recta R dada y el plano Alpha.',
+                id: 'ex-line-horiz',
+                title: 'Recta Horizontal',
+                level: 'Fácil',
+                statement: 'Dados los puntos A(10, 20, 30) y B(50, 40, 30), únelos y verifica que es una recta horizontal.',
                 setup: [
-                    { type: 'point', name: 'P1', coords: { x: 0, y: 0, z: 0 }, visible: false }, // Hidden helper
-                    { type: 'line', name: 'r', point: { x: 10, y: 10, z: 0 }, direction: { x: 1, y: 1, z: 2 }, visible: true, color: '#ffffff', isInfinite: true },
-                    { type: 'plane', name: 'Alpha', normal: { x: 0, y: 1, z: 1 }, constant: 50, visible: true, color: '#10b981' }
+                    { type: 'point', name: 'A', coords: { x: 10, y: 20, z: 30 }, visible: true, color: '#3b82f6' },
+                    { type: 'point', name: 'B', coords: { x: 50, y: 40, z: 30 }, visible: true, color: '#3b82f6' }
                 ],
-                solutionHint: 'Selecciona "Intersección Recta-Plano", luego clica en la recta r y el plano Alpha.'
+                solutionHint: 'Observa que ambos tienen cota Z=30. Al unirlos, la proyección vertical será paralela a la Línea de Tierra.'
+            }
+        ]
+    },
+    {
+        id: 'theory-3-plane',
+        title: '3. El Plano',
+        description: 'Definición mediante trazas. Planos proyectantes, oblicuos y paralelos a LT.',
+        category: 'Teoría',
+        theoryContent: '<p>Contenido en desarrollo...</p>',
+        exercises: []
+    },
+    // BLOQUE 2: APLICACIÓN
+    {
+        id: 'app-1-hex',
+        title: 'Pirámide Hexagonal',
+        description: 'Construcción paso a paso de una pirámide regular con base hexagonal.',
+        category: 'Aplicación',
+        theoryContent: '<p>Ejercicio práctico de construcción.</p>',
+        exercises: [
+            {
+                id: 'ex-pyr-hex',
+                title: 'Base Hexagonal',
+                level: 'Medio',
+                statement: 'Dibuja un hexágono regular de radio 30 apoyado en el Plano Horizontal, con centro en (50, 40, 0). Luego eleva una pirámide de altura 60.',
+                setup: [],
+                solutionHint: 'Usa "Polígono" en modo Boceto o construye punto a punto.'
+            }
+        ]
+    },
+    // BLOQUE 3: EXÁMENES
+    {
+        id: 'pau-madrid-2014',
+        title: 'PAU Madrid 2014',
+        description: 'Resolución del examen de Junio 2014.',
+        category: 'Exámenes',
+        theoryContent: '<p>Análisis de los problemas de examen.</p>',
+        exercises: [
+            {
+                id: 'pau-2014-a2',
+                title: 'Ejercicio A2: Distancias',
+                level: 'Difícil',
+                statement: 'Determinar la distancia real entre las rectas r y s dadas.',
+                setup: [
+                    { type: 'line', name: 'r', point: { x: 0, y: 20, z: 10 }, direction: { x: 1, y: 1, z: 0 }, isInfinite: true, visible: true, color: '#ef4444' },
+                    { type: 'line', name: 's', point: { x: 0, y: 50, z: 60 }, direction: { x: 1, y: -1, z: 0 }, isInfinite: true, visible: true, color: '#3b82f6' }
+                ],
+                solutionHint: 'Son rectas que se cruzan. Usa la herramienta "Distancia Recta-Recta" o constrúyelo mediante plano paralelo.'
             }
         ]
     }

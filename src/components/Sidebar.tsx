@@ -22,6 +22,7 @@ import ParallelismTool from './tools/ParallelismTool';
 import DistanceTool from './tools/DistanceTool';
 import RotationTool from './tools/RotationTool';
 import HelpGuide from './HelpGuide';
+import ExerciseOverlay from './Academy/ExerciseOverlay';
 
 export default function Sidebar() {
     const {
@@ -1216,6 +1217,7 @@ export default function Sidebar() {
             <AbatimientoTool />
             <TrueMagnitudeTool />
             {/* Modals */}
+            <ExerciseOverlay />
             <HelpGuide isOpen={showHelp} onClose={toggleHelp} isDark={isDark} />
             <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />

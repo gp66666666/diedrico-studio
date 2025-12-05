@@ -8,6 +8,7 @@ interface UserProfile {
     full_name?: string;
     avatar_url?: string;
     is_premium: boolean;
+    completed_exercises?: string[]; // Array of Exercise IDs
     role: 'user' | 'admin';
 }
 
@@ -20,8 +21,10 @@ interface UserState {
 
     // Actions
     checkSession: () => Promise<void>;
+    checkSession: () => Promise<void>;
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
+    markExerciseComplete: (id: string) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -79,5 +82,31 @@ export const useUserStore = create<UserState>((set, get) => ({
     signOut: async () => {
         await supabase.auth.signOut();
         set({ user: null, profile: null });
+    },
+
+    markExerciseComplete: async (id: string) => {
+        const { user, profile } = get();
+        if (!user || !profile) return;
+
+        // Optimistic update
+        const currentCompleted = profile.completed_exercises || [];
+        if (currentCompleted.includes(id)) return;
+
+        const newCompleted = [...currentCompleted, id];
+
+        set({
+            profile: { ...profile, completed_exercises: newCompleted }
+        });
+
+        // Persist to DB
+        try {
+            await supabase
+                .from('profiles')
+                .update({ completed_exercises: newCompleted })
+                .eq('id', user.id);
+        } catch (error) {
+            console.error('Failed to save progress', error);
+            // Revert on critical failure? Nah, keep optimistic for now.
+        }
     }
 }));
