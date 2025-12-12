@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2,
     Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen
@@ -50,6 +50,7 @@ export default function Sidebar() {
         measurements,
         removeMeasurement,
         clearAllMeasurements,
+        toggleMeasurementVisibility,
         activeTool,
         selectForDistance,
         selectedForDistance,
@@ -61,8 +62,27 @@ export default function Sidebar() {
     const isDark = theme === 'dark';
 
     const [activeTab, setActiveTab] = useState<'add' | 'list' | 'tools'>('add');
-    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane'>('point');
     const navigate = useNavigate();
+
+    // Auto-switch to list on mobile when tool is active
+    useEffect(() => {
+        const needsSelection = activeTool.startsWith('distance-') ||
+            activeTool.startsWith('angle-') ||
+            activeTool.startsWith('parallel-') ||
+            activeTool.startsWith('perp-') ||
+            activeTool.startsWith('plane-') ||
+            activeTool.startsWith('line-') ||
+            activeTool.startsWith('intersection-') ||
+            activeTool.startsWith('rotation-') ||
+            activeTool.startsWith('true-length') ||
+            activeTool.startsWith('advanced-');
+
+        if (needsSelection && activeTool !== 'none' && window.innerWidth < 768) {
+            setActiveTab('list');
+        }
+    }, [activeTool]);
+
+    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane'>('point');
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
     const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -619,14 +639,14 @@ export default function Sidebar() {
                 }
             </div >
 
-            {/* Cloud Save/Load (Premium) - Collapsible */}
+            {/* Cloud Save/Load - Collapsible */}
             < div className={`p-2 border-b ${headerBorder}`}>
                 <button
                     onClick={() => setShowCloudOptions(!showCloudOptions)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                 >
                     <span className="flex items-center gap-2">
-                        <Download size={16} /> Proyectos {!profile?.is_premium && '🔒'}
+                        <Download size={16} /> Proyectos
                     </span>
                     {showCloudOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
@@ -634,18 +654,16 @@ export default function Sidebar() {
                     showCloudOptions && (
                         <div className="flex gap-2 px-2 mt-2">
                             <button
-                                onClick={() => profile?.is_premium ? setShowSaveModal(true) : setShowPremiumModal(true)}
-                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                                onClick={() => setShowSaveModal(true)}
+                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                             >
                                 <Download size={16} /> Guardar
-                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
                             </button>
                             <button
-                                onClick={() => profile?.is_premium ? setShowLoadModal(true) : setShowPremiumModal(true)}
-                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                                onClick={() => setShowLoadModal(true)}
+                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                             >
                                 <ArrowDownToLine size={16} /> Cargar
-                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
                             </button>
                         </div>
                     )
@@ -659,7 +677,7 @@ export default function Sidebar() {
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                 >
                     <span className="flex items-center gap-2">
-                        <Download size={16} /> Exportar {!profile?.is_premium && '🔒'}
+                        <Download size={16} /> Exportar
                     </span>
                     {showExportOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
@@ -667,22 +685,20 @@ export default function Sidebar() {
                     showExportOptions && (
                         <div className="px-2 space-y-2 mt-2">
                             <button
-                                onClick={() => profile?.is_premium ? handleExportCurrentView() : setShowPremiumModal(true)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                                onClick={() => handleExportCurrentView()}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                             >
                                 <span className="flex items-center gap-2">
                                     <Download size={16} /> Vista Actual
                                 </span>
-                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
                             </button>
                             <button
-                                onClick={() => profile?.is_premium ? handleExportAllViews() : setShowPremiumModal(true)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'} ${!profile?.is_premium ? 'opacity-60' : ''}`}
+                                onClick={() => handleExportAllViews()}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                             >
                                 <span className="flex items-center gap-2">
                                     <Download size={16} /> Todas las Vistas
                                 </span>
-                                {!profile?.is_premium && <span className="text-xs">🔒</span>}
                             </button>
                         </div>
                     )
@@ -1113,12 +1129,22 @@ export default function Sidebar() {
                                             <span className={m.type === 'length' ? 'text-blue-400' : 'text-green-400'}>
                                                 {m.type === 'length' ? `${m.value.toFixed(2)} u` : `${m.value.toFixed(1)}°`}
                                             </span>
-                                            <button
-                                                onClick={() => removeMeasurement(m.id)}
-                                                className="ml-2 text-red-500 hover:text-red-700"
-                                            >
-                                                <Trash2 size={12} />
-                                            </button>
+                                            <div className="flex items-center">
+                                                <button
+                                                    onClick={() => toggleMeasurementVisibility(m.id)}
+                                                    className={`mr-2 ${m.visible !== false ? 'text-gray-400 hover:text-gray-600' : 'text-gray-300 hover:text-gray-500'}`}
+                                                    title={m.visible !== false ? "Ocultar" : "Mostrar"}
+                                                >
+                                                    {m.visible !== false ? <Eye size={14} /> : <EyeOff size={14} />}
+                                                </button>
+                                                <button
+                                                    onClick={() => removeMeasurement(m.id)}
+                                                    className="text-red-500 hover:text-red-700"
+                                                    title="Eliminar"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

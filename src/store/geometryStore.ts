@@ -68,7 +68,7 @@ interface GeometryState {
         'sketch': { offset: { x: number, y: number }, zoom: number };
     };
     setCameraState: (mode: '3d' | '2d' | 'sketch', state: any) => void;
-    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines';
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
     distanceResult: {
@@ -79,16 +79,24 @@ interface GeometryState {
     selectForDistance: (id: string) => void;
     clearDistanceTool: () => void;
 
-    // Measurements (True Magnitude)
+    // Measurements (with Visual Lines for D, d', d'')
     measurements: Array<{
         id: string;
         type: 'length' | 'angle' | 'distance';
         value: number;
         label: string;
         elementIds: string[];
+        visible?: boolean; // New visibility toggle
+        // Visual line data for distance rendering
+        visualLine?: {
+            // 3D points (for the actual distance D)
+            p1: { x: number; y: number; z: number };
+            p2: { x: number; y: number; z: number };
+        };
     }>;
     addMeasurement: (measurement: Omit<GeometryState['measurements'][0], 'id'>) => void;
     removeMeasurement: (id: string) => void;
+    toggleMeasurementVisibility: (id: string) => void;
     clearAllMeasurements: () => void;
 
     // Cloud Save/Load (Premium)
@@ -324,10 +332,13 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     // Measurements (True Magnitude)
     measurements: [],
     addMeasurement: (measurement) => set((state) => ({
-        measurements: [...state.measurements, { ...measurement, id: Math.random().toString(36).substr(2, 9) }]
+        measurements: [...state.measurements, { ...measurement, id: Math.random().toString(36).substr(2, 9), visible: true }]
     })),
     removeMeasurement: (id) => set((state) => ({
         measurements: state.measurements.filter(m => m.id !== id)
+    })),
+    toggleMeasurementVisibility: (id) => set((state) => ({
+        measurements: state.measurements.map(m => m.id === id ? { ...m, visible: !m.visible } : m)
     })),
     clearAllMeasurements: () => set({ measurements: [] }),
 

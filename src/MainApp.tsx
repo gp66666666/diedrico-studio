@@ -5,13 +5,15 @@ import Sidebar from './components/Sidebar';
 import DiedricoView from './components/DiedricoView';
 import SEO from './components/SEO';
 import { useGeometryStore } from './store/geometryStore';
+import { useUserStore } from './store/userStore';
 import { FEATURES } from './config/features';
 import { AIChatPanel } from './features/ai-assistant';
-import AdBanner from './components/AdBanner';
+// AdBanner import removed
 
 export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { theme, viewMode, setViewMode } = useGeometryStore();
+    const { isPremium } = useUserStore();
     const isDark = theme === 'dark';
 
     // Theme Classes
@@ -96,8 +98,8 @@ export default function MainApp() {
                         </div>
                     </div>
 
-                    {/* AI Assistant Panel */}
-                    {FEATURES.AI_ASSISTANT && <AIChatPanel isSidebarOpen={isSidebarOpen} />}
+                    {/* AI Assistant Panel - Premium Only */}
+                    {FEATURES.AI_ASSISTANT && isPremium && <AIChatPanel isSidebarOpen={isSidebarOpen} />}
 
                     {/* Watermark */}
                     <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -105,8 +107,7 @@ export default function MainApp() {
                     </div>
                 </div>
 
-                {/* Ad Banner (takes its natural height in grid, pushes content up) */}
-                <AdBanner />
+                {/* Ad Banner Removed for Policy Compliance */}
             </div>
         </>
     );

@@ -168,7 +168,7 @@ const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisCo
 });
 
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
-    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement, cameraStates, setCameraState } = useGeometryStore();
+    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement, cameraStates, setCameraState, measurements } = useGeometryStore();
 
     // Viewport State - Initialize from Store
     // Ensure we use the correct mode key, default to 2d if undefined
@@ -1172,6 +1172,133 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             })()}
                         </g>
                     )}
+
+
+                    {/* Distance Measurement - Triángulo Característico */}
+                    {measurements.filter(m => m.visualLine && m.visible !== false).map(measurement => {
+                        const { p1, p2 } = measurement.visualLine!;
+
+                        // Horizontal projection (d') - using x and y coordinates
+                        const x1_h = p1.x * SCALE;
+                        const y1_h = p1.y * SCALE;
+                        const x2_h = p2.x * SCALE;
+                        const y2_h = p2.y * SCALE;
+
+                        // Vertical projection (d'') - using x and z coordinates
+                        const x1_v = p1.x * SCALE;
+                        const y1_v = -p1.z * SCALE;
+                        const x2_v = p2.x * SCALE;
+                        const y2_v = -p2.z * SCALE;
+
+                        // Calculate d' distance (horizontal projection length)
+                        const dPrimeLength = Math.sqrt(Math.pow(x2_h - x1_h, 2) + Math.pow(y2_h - y1_h, 2));
+                        const dPrime = dPrimeLength / SCALE;
+
+                        // Calculate d'' distance
+                        const dDoublePrime = Math.sqrt(Math.pow(x2_v - x1_v, 2) + Math.pow(y2_v - y1_v, 2)) / SCALE;
+
+                        // Difference in heights (Δz = cota2 - cota1)
+                        const deltaZ = Math.abs(p2.z - p1.z) * SCALE;
+
+                        // Construct characteristic triangle at end of d' line
+                        // Triangle vertices: 
+                        // A = start of d' (x2_h, y2_h) - we build from endpoint
+                        // B = A projected down/up by Δz (vertical leg)
+                        // C = end of d' (x1_h, y1_h) which connects to B as hypotenuse D
+
+                        // Direction vector of d' line (normalized)
+                        const dxH = x2_h - x1_h;
+                        const dyH = y2_h - y1_h;
+
+                        // Perpendicular direction (rotated 90°) - pointing "down" in the drawing
+                        const perpX = dyH;
+                        const perpY = -dxH;
+                        const perpLen = Math.sqrt(perpX * perpX + perpY * perpY);
+                        const normPerpX = perpLen > 0 ? perpX / perpLen : 0;
+                        const normPerpY = perpLen > 0 ? perpY / perpLen : 1;
+
+                        // Triangle points (attached to endpoint of d')
+                        const triA = { x: x2_h, y: y2_h }; // End of d'
+                        const triB = { x: x2_h + normPerpX * deltaZ, y: y2_h + normPerpY * deltaZ }; // Vertical offset
+                        // D goes from triB back to start of d'
+                        const triC = { x: x1_h, y: y1_h }; // Start of d'
+
+                        // Midpoints for labels
+                        const midH = { x: (x1_h + x2_h) / 2, y: (y1_h + y2_h) / 2 };
+                        const midV = { x: (x1_v + x2_v) / 2, y: (y1_v + y2_v) / 2 };
+                        const midDeltaZ = { x: (triA.x + triB.x) / 2, y: (triA.y + triB.y) / 2 };
+                        const midD = { x: (triB.x + triC.x) / 2, y: (triB.y + triC.y) / 2 };
+
+                        return (
+                            <g key={`dist-${measurement.id}`} className="distance-measurement">
+                                {/* d' - Horizontal projection line (base of triangle) */}
+                                <line
+                                    x1={x1_h} y1={y1_h} x2={x2_h} y2={y2_h}
+                                    stroke="#f59e0b" strokeWidth="2.5"
+                                />
+                                {/* d' label */}
+                                <text
+                                    x={midH.x + 8} y={midH.y - 8}
+                                    fontSize="11" fontWeight="bold" fill="#f59e0b"
+                                    className="select-none"
+                                >
+                                    d' = {dPrime.toFixed(2)}
+                                </text>
+
+                                {/* d'' - Vertical projection line */}
+                                <line
+                                    x1={x1_v} y1={y1_v} x2={x2_v} y2={y2_v}
+                                    stroke="#8b5cf6" strokeWidth="2.5"
+                                />
+                                {/* d'' label */}
+                                <text
+                                    x={midV.x + 8} y={midV.y - 8}
+                                    fontSize="11" fontWeight="bold" fill="#8b5cf6"
+                                    className="select-none"
+                                >
+                                    d'' = {dDoublePrime.toFixed(2)}
+                                </text>
+
+                                {/* === TRIÁNGULO CARACTERÍSTICO === */}
+                                {/* Vertical leg (Δz - difference in heights) */}
+                                <line
+                                    x1={triA.x} y1={triA.y} x2={triB.x} y2={triB.y}
+                                    stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 2"
+                                />
+                                {/* Δz label */}
+                                <text
+                                    x={midDeltaZ.x + 10} y={midDeltaZ.y}
+                                    fontSize="10" fontWeight="bold" fill="#3b82f6"
+                                    className="select-none"
+                                >
+                                    Δz = {(deltaZ / SCALE).toFixed(2)}
+                                </text>
+
+                                {/* D - Hypotenuse (true distance) */}
+                                <line
+                                    x1={triB.x} y1={triB.y} x2={triC.x} y2={triC.y}
+                                    stroke="#10b981" strokeWidth="3"
+                                />
+                                {/* D label */}
+                                <text
+                                    x={midD.x - 5} y={midD.y - 10}
+                                    fontSize="12" fontWeight="bold" fill="#10b981"
+                                    className="select-none"
+                                >
+                                    D = {measurement.value.toFixed(2)}
+                                </text>
+
+                                {/* Right angle marker at corner A-B */}
+                                <path
+                                    d={`M ${triA.x + normPerpX * 8} ${triA.y + normPerpY * 8} 
+                                        L ${triA.x + normPerpX * 8 - (dxH / dPrimeLength) * 8} ${triA.y + normPerpY * 8 - (dyH / dPrimeLength) * 8}
+                                        L ${triA.x - (dxH / dPrimeLength) * 8} ${triA.y - (dyH / dPrimeLength) * 8}`}
+                                    fill="none" stroke="#3b82f6" strokeWidth="1"
+                                />
+                            </g>
+                        );
+                    })}
+
 
                     {/* Merged Text Labels Layer (rendered on top) */}
                     <g className="merged-text-layer">

@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { LineElement, PlaneElement, PointElement } from '../../types';
+import { getNextName } from '../../utils/namingUtils';
 
 export default function ParallelismTool() {
     const { activeTool, elements, addElement, setActiveTool, selectForDistance, selectedForDistance } = useGeometryStore();
@@ -29,6 +30,12 @@ export default function ParallelismTool() {
             switch (activeTool) {
                 case 'parallel-line-line':
                     createParallelLineToLine();
+                    break;
+                case 'parallel-line-plane':
+                    createLineParallelToPlane();
+                    break;
+                case 'plane-parallel-line':
+                    createPlaneParallelToLine();
                     break;
                 case 'perp-line-plane':
                     createPerpLineToPlane();
@@ -91,7 +98,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'line',
-            name: `r∥${refLine.name}`,
+            name: getNextName(elements, `r∥${refLine.name}`), // e.g. "r∥recta 1 1" if needed, or just "r∥"
             point: pointCoords,
             p2: p2,
             direction: direction,
@@ -100,6 +107,120 @@ export default function ParallelismTool() {
         } as any);
 
         console.log(`Created parallel line to ${refLine.name}`);
+    };
+
+    const createLineParallelToPlane = () => {
+        const [id1, id2] = selectedForDistance;
+        const el1 = elements.find(e => e.id === id1);
+        const el2 = elements.find(e => e.id === id2);
+
+        let plane: PlaneElement | undefined;
+        let point: PointElement | undefined;
+
+        if (el1?.type === 'plane' && el2?.type === 'point') {
+            plane = el1 as PlaneElement;
+            point = el2 as PointElement;
+        } else if (el1?.type === 'point' && el2?.type === 'plane') {
+            point = el1 as PointElement;
+            plane = el2 as PlaneElement;
+        } else {
+            alert('Selecciona un plano y un punto.');
+            return;
+        }
+
+        const pointCoords = point.coords;
+        const n = plane.normal;
+
+        // Calculate direction for a Horizontal Line (z=const) parallel to the plane.
+        // Direction d must satisfy: d · n = 0 AND d · (0,0,1) = 0 (horizontal)
+        // d = n x (0,0,1) => (n.y, -n.x, 0)
+
+        // If plane is horizontal (normal is parallel to z axis), any horizontal line works.
+        // n.x=0, n.y=0. Cross product is 0. 
+        // In that case, we can choose (1,0,0).
+
+        let direction = {
+            x: n.y,
+            y: -n.x,
+            z: 0
+        };
+
+        // Check if direction is zero vector (plane is horizontal)
+        if (Math.abs(direction.x) < 0.001 && Math.abs(direction.y) < 0.001) {
+            direction = { x: 1, y: 0, z: 0 };
+        }
+
+        const p2 = {
+            x: pointCoords.x + direction.x * 10,
+            y: pointCoords.y + direction.y * 10,
+            z: pointCoords.z + direction.z * 10
+        };
+
+        addElement({
+            type: 'line',
+            name: getNextName(elements, `h∥${plane.name}`),
+            point: pointCoords,
+            p2: p2,
+            direction: direction,
+            color: '#00FF00',
+            visible: true
+        } as any);
+
+        console.log(`Created horizontal line parallel to ${plane.name}`);
+    };
+
+    const createPlaneParallelToLine = () => {
+        const [id1, id2] = selectedForDistance;
+        const el1 = elements.find(e => e.id === id1);
+        const el2 = elements.find(e => e.id === id2);
+
+        let line: LineElement | undefined;
+        let point: PointElement | undefined;
+
+        if (el1?.type === 'line' && el2?.type === 'point') {
+            line = el1 as LineElement;
+            point = el2 as PointElement;
+        } else if (el1?.type === 'point' && el2?.type === 'line') {
+            point = el1 as PointElement;
+            line = el2 as LineElement;
+        } else {
+            alert('Selecciona una recta y un punto.');
+            return;
+        }
+
+        const pointCoords = point.coords;
+        const dir = line.direction;
+
+        // Constraint: We create a "Vertical Plane" (Projecting on PH) parallel to the line.
+        // Normal vector n should be perpendicular to line direction d AND perpendicular to Z(0,0,1).
+        // n = d x (0,0,1) = (dir.y, -dir.x, 0)
+
+        // If line is vertical (dir.x=0, dir.y=0), n is (0,0,0) which is invalid.
+        // If line is vertical, any vertical plane containing it is parallel? No, a vertical line is parallel to any vertical plane.
+        // In that case, we can choose a Frontal Plane (normal 0,1,0).
+
+        let normal = {
+            x: dir.y,
+            y: -dir.x,
+            z: 0
+        };
+
+        if (Math.abs(normal.x) < 0.001 && Math.abs(normal.y) < 0.001) {
+            normal = { x: 0, y: 1, z: 0 };
+        }
+
+        const constant = -(normal.x * pointCoords.x + normal.y * pointCoords.y + normal.z * pointCoords.z);
+
+        addElement({
+            type: 'plane',
+            name: getNextName(elements, `α∥${line.name}`),
+            normal: normal,
+            constant: constant,
+            color: '#00FF00',
+            visible: true
+        } as any);
+
+        console.log(`Created vertical plane parallel to ${line.name}`);
     };
 
     const createPerpLineToPlane = () => {
@@ -132,7 +253,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'line',
-            name: `r⊥${plane.name}`,
+            name: getNextName(elements, `r⊥${plane.name}`),
             point: pointCoords,
             p2: p2,
             direction: direction,
@@ -168,7 +289,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'plane',
-            name: `α⊥${line.name}`,
+            name: getNextName(elements, `α⊥${line.name}`),
             normal: normal,
             constant: constant,
             color: '#FF00FF', // Magenta for perpendicular
@@ -225,7 +346,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'line',
-            name: `r⊥${refLine.name}`,
+            name: getNextName(elements, `r⊥${refLine.name}`),
             point: P,
             p2: F,
             direction: direction,
@@ -262,7 +383,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'plane',
-            name: `α∥${plane.name}`,
+            name: getNextName(elements, `α∥${plane.name}`),
             normal: normal,
             constant: constant,
             color: '#00FF00',
@@ -297,7 +418,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'plane',
-            name: `α⊥(${planes[0].name},${planes[1].name})`,
+            name: getNextName(elements, `α⊥`),
             normal: n3,
             constant: constant,
             color: '#FF00FF',
@@ -336,7 +457,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'line',
-            name: `r∥(${planes[0].name},${planes[1].name})`,
+            name: getNextName(elements, `r∥`),
             point: P,
             p2: p2,
             direction: dir,
@@ -372,7 +493,7 @@ export default function ParallelismTool() {
 
         addElement({
             type: 'plane',
-            name: `α∥(${lines[0].name},${lines[1].name})`,
+            name: getNextName(elements, `α∥`),
             normal: normal,
             constant: constant,
             color: '#00FF00',

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useGeometryStore } from '../store/geometryStore';
+import { getNextName } from '../utils/namingUtils';
 
 export default function LineCreator() {
     const { elements, addElement } = useGeometryStore();
@@ -44,9 +45,11 @@ export default function LineCreator() {
             direction.z /= length;
         }
 
+        const defaultName = getNextName(elements, 'recta');
+
         const lineElement: Omit<import('../types').LineElement, 'id' | 'visible'> = {
             type: 'line',
-            name: lineName || `L${Date.now()}`,
+            name: lineName || defaultName,
             color: '#ef4444',
             point: p1.coords,
             direction,

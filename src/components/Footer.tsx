@@ -63,7 +63,7 @@ export default function Footer() {
                     <div>
                         <h3 className="font-semibold mb-3 text-blue-400">Información</h3>
                         <p className="text-white/60 text-xs leading-relaxed">
-                            Este sitio web utiliza Google AdSense para mostrar anuncios.
+                            Este sitio web está a la espera de utilizar Google AdSense para mostrar anuncios.
                             Al utilizar este sitio, aceptas el uso de cookies y nuestra
                             política de privacidad.
                         </p>

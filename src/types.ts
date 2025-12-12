@@ -55,3 +55,23 @@ export interface SketchElement {
     text?: string;
     rotation?: number; // in radians
 }
+
+// Academy Types
+export interface AcademyExercise {
+    id: string;
+    title: string;
+    level: 'Fácil' | 'Medio' | 'Difícil';
+    statement: string;
+    setup: Partial<GeometryElement>[];
+    solutionHint?: string;
+}
+
+export interface AcademyTopic {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    theoryContent: string;
+    exercises: AcademyExercise[];
+}
+

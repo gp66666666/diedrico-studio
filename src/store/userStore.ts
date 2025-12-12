@@ -58,10 +58,19 @@ export const useUserStore = create<UserState>((set, get) => ({
                         is_premium: false,
                         role: 'user'
                     };
-                    // Ideally this is done via Postgres Triggers, but client-side fallback:
-                    // await supabase.from('profiles').insert(newProfile);
                     set({ profile: newProfile as UserProfile, isPremium: false });
                 }
+            } else {
+                // GUEST MODE: Load from LocalStorage
+                const guestProfile: UserProfile = {
+                    id: 'guest',
+                    email: 'guest@local',
+                    is_premium: false,
+                    role: 'user',
+                    completed_topics: JSON.parse(localStorage.getItem('guest_completed_topics') || '[]'),
+                    completed_exercises: JSON.parse(localStorage.getItem('guest_completed_exercises') || '[]')
+                };
+                set({ profile: guestProfile, isPremium: false });
             }
         } catch (error) {
             console.error('Session check failed', error);
@@ -82,12 +91,23 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     signOut: async () => {
         await supabase.auth.signOut();
-        set({ user: null, profile: null });
+        // Clear user but keep guest profile or reset it? 
+        // Better to reload guest profile or just null (which triggers reload on next session check)
+        // We'll set a fresh guest profile
+        const guestProfile: UserProfile = {
+            id: 'guest',
+            email: 'guest@local',
+            is_premium: false,
+            role: 'user',
+            completed_topics: JSON.parse(localStorage.getItem('guest_completed_topics') || '[]'),
+            completed_exercises: JSON.parse(localStorage.getItem('guest_completed_exercises') || '[]')
+        };
+        set({ user: null, profile: guestProfile });
     },
 
     markExerciseComplete: async (id: string) => {
         const { user, profile } = get();
-        if (!user || !profile) return;
+        if (!profile) return; // Allow null user (guest)
 
         // Optimistic update
         const currentCompleted = profile.completed_exercises || [];
@@ -99,23 +119,28 @@ export const useUserStore = create<UserState>((set, get) => ({
             profile: { ...profile, completed_exercises: newCompleted }
         });
 
-        // Persist to DB
-        try {
-            await supabase
-                .from('profiles')
-                .update({ completed_exercises: newCompleted })
-                .eq('id', user.id);
-        } catch (error) {
-            console.error('Failed to save progress', error);
-            // Revert on critical failure? Nah, keep optimistic for now.
+        // Persist
+        if (user) {
+            // DB
+            try {
+                await supabase
+                    .from('profiles')
+                    .update({ completed_exercises: newCompleted })
+                    .eq('id', user.id);
+            } catch (error) {
+                console.error('Failed to save progress', error);
+            }
+        } else {
+            // LocalStorage
+            localStorage.setItem('guest_completed_exercises', JSON.stringify(newCompleted));
         }
     },
 
     markTopicComplete: async (id: string, completed: boolean) => {
         const { user, profile } = get();
-        if (!user || !profile) return;
+        if (!profile) return; // Allow null user (guest)
 
-        const currentCompleted = profile.completed_topics || []; // Now typed correctly
+        const currentCompleted = profile.completed_topics || [];
         let newCompleted = [...currentCompleted];
 
         if (completed) {
@@ -127,14 +152,20 @@ export const useUserStore = create<UserState>((set, get) => ({
         // Optimistic update
         set({ profile: { ...profile, completed_topics: newCompleted } });
 
-        // Update DB
-        try {
-            await supabase
-                .from('profiles')
-                .update({ completed_topics: newCompleted })
-                .eq('id', user.id);
-        } catch (error) {
-            console.error('Error updating topic progress:', error);
+        // Persist
+        if (user) {
+            // DB
+            try {
+                await supabase
+                    .from('profiles')
+                    .update({ completed_topics: newCompleted })
+                    .eq('id', user.id);
+            } catch (error) {
+                console.error('Error updating topic progress:', error);
+            }
+        } else {
+            // LocalStorage
+            localStorage.setItem('guest_completed_topics', JSON.stringify(newCompleted));
         }
     }
 }));

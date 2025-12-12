@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { LogIn, LogOut, Crown, User as UserIcon, ChevronUp, ChevronDown, Info, Mail, Shield, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
+import PremiumModal from './PremiumModal';
 
 export default function UserMenu() {
     const { user, profile, isLoading, checkSession, signInWithGoogle, signOut } = useUserStore();
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showPremiumModal, setShowPremiumModal] = useState(false);
 
     useEffect(() => {
         checkSession();
@@ -76,6 +78,14 @@ export default function UserMenu() {
                             </div>
                         </div>
 
+                        <button
+                            onClick={() => setShowPremiumModal(true)}
+                            className="flex items-center justify-center gap-1.5 w-full p-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:shadow-md transition-all text-xs font-bold"
+                        >
+                            <Crown size={14} />
+                            <span>Hacerse Premium</span>
+                        </button>
+
                         <a
                             href="https://ko-fi.com/eloigperezzds"
                             target="_blank"
@@ -86,6 +96,8 @@ export default function UserMenu() {
                         </a>
                     </div>
                 )}
+
+                <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
             </div>
         );
     }

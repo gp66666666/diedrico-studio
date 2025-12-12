@@ -51,7 +51,7 @@ export default function PrivacyPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">3. Google AdSense y Cookies</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            Este sitio web utiliza Google AdSense para mostrar anuncios. Google utiliza cookies
+                            Este sitio web utilizará Google AdSense para mostrar anuncios. Google utilizará cookies
                             para mostrar anuncios basados en tus visitas anteriores a este u otros sitios web.
                         </p>
                         <p className="text-white/80 leading-relaxed mb-3">
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
                         <p className="text-white/80 leading-relaxed">
                             Este sitio no está dirigido a menores de 13 años. No recopilamos intencionadamente
                             información de menores de 13 años. Si descubres que un menor ha proporcionado
-                            información personal, contáctanos inmediatamente.
+                            información personal, contáctanos.
                         </p>
                     </section>
 

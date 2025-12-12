@@ -290,6 +290,18 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                             ∥ Plano Paralelo a Plano
                         </button>
                         <button
+                            className={getButtonClass('parallel-line-plane')}
+                            onClick={() => setActiveTool(activeTool === 'parallel-line-plane' ? 'none' : 'parallel-line-plane')}
+                        >
+                            ∥ Recta Paralela a Plano
+                        </button>
+                        <button
+                            className={getButtonClass('plane-parallel-line')}
+                            onClick={() => setActiveTool(activeTool === 'plane-parallel-line' ? 'none' : 'plane-parallel-line')}
+                        >
+                            ∥ Plano Paralelo a Recta
+                        </button>
+                        <button
                             className={getButtonClass('perp-line-plane')}
                             onClick={() => setActiveTool(activeTool === 'perp-line-plane' ? 'none' : 'perp-line-plane')}
                         >
