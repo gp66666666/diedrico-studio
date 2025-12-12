@@ -850,13 +850,113 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         ]
     },
 
-    // 4. ABATIMIENTOS (Intro)
+    // 4. INTERSECCIONES
     {
-        id: 'theory-4-abatimientos',
-        title: '4. Abatimientos',
+        id: 'theory-4-intersections',
+        title: '4. Intersecciones',
+        description: 'Intersecciones entre rectas y planos, y entre dos planos (Mordedura). Visibilidad.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 5. PARALELISMO Y PERPENDICULARIDAD
+    {
+        id: 'theory-5-parallelism',
+        title: '5. Paralelismo y Perpendicularidad',
+        description: 'Condiciones para que rectas y planos sean paralelos o perpendiculares entre sí.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 6. DISTANCIAS
+    {
+        id: 'theory-6-distances',
+        title: '6. Distancias',
+        description: 'Distancia entre dos puntos, punto a plano, punto a recta, y entre rectas que se cruzan.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 7. ÁNGULOS
+    {
+        id: 'theory-7-angles',
+        title: '7. Ángulos',
+        description: 'Ángulos entre recta y plano, entre dos planos, y con los planos de proyección.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 8. ABATIMIENTOS
+    {
+        id: 'theory-8-abatimientos',
+        title: '8. Abatimientos',
         description: 'Técnica para ver la Verdadera Magnitud de figuras planas situándolas sobre el plano de proyección.',
         category: 'Teoría',
-        theoryContent: '<div class="text-gray-300"><p>Contenido detallado próximamente...</p></div>',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 9. GIROS
+    {
+        id: 'theory-9-rotations',
+        title: '9. Giros',
+        description: 'Rotación de elementos alrededor de un eje (vertical o de punta) para ponerlos en posición favorable.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 10. CAMBIOS DE PLANO
+    {
+        id: 'theory-10-change-plane',
+        title: '10. Cambios de Plano',
+        description: 'Método alternativo simplificar problemas geométricas cambiando los planos de proyección.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 11. POLIEDROS REGULARES
+    {
+        id: 'theory-11-polyhedra',
+        title: '11. Poliedros Regulares',
+        description: 'Representación y propiedades del Tetraedro, Hexaedro (Cubo), Octaedro, Dodecaedro e Icosaedro.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 12. SUPERFICIES CURVAS
+    {
+        id: 'theory-12-surfaces',
+        title: '12. Superficies Curvas',
+        description: 'Cilindros, Conos y Esferas. Representación y puntos en su superficie.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 13. SECCIONES PLANAS
+    {
+        id: 'theory-13-sections',
+        title: '13. Secciones Planas',
+        description: 'Cortes producidos por planos en poliedros y superficies curvas. Verdadera magnitud de la sección.',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
+        exercises: []
+    },
+
+    // 14. DESARROLLOS
+    {
+        id: 'theory-14-developments',
+        title: '14. Desarrollo de Superficies',
+        description: 'Despliegue de superficies poliédricas y curvas sobre un plano (transformada).',
+        category: 'Teoría',
+        theoryContent: '<div class="bg-blue-50 p-8 rounded-xl border border-blue-100 text-center"><p class="text-blue-800 text-lg font-medium">🚀 Contenido en desarrollo...</p><p class="text-slate-500 mt-2">Próximamente disponible con visualizaciones 3D.</p></div>',
         exercises: []
     }
 ];
