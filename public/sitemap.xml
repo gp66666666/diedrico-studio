@@ -6,7 +6,7 @@
     
     <!-- Página principal -->
     <url>
-        <loc>https://https://diedrico-studio.vercel.app//</loc>
+        <loc>https://diedrico-studio.vercel.app/</loc>
         <lastmod>2025-12-04</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
@@ -14,7 +14,7 @@
     
     <!-- Quiénes Somos -->
     <url>
-        <loc>https://https://diedrico-studio.vercel.app//about</loc>
+        <loc>https://diedrico-studio.vercel.app/about</loc>
         <lastmod>2025-12-04</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
@@ -22,7 +22,7 @@
     
     <!-- Contacto -->
     <url>
-        <loc>https://https://diedrico-studio.vercel.app//contact</loc>
+        <loc>https://diedrico-studio.vercel.app/contact</loc>
         <lastmod>2025-12-04</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
@@ -30,7 +30,7 @@
     
     <!-- Política de Privacidad -->
     <url>
-        <loc>https://https://diedrico-studio.vercel.app//privacy</loc>
+        <loc>https://diedrico-studio.vercel.app/privacy</loc>
         <lastmod>2025-12-04</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
@@ -38,7 +38,7 @@
     
     <!-- Términos de Uso -->
     <url>
-        <loc>https://https://diedrico-studio.vercel.app//terms</loc>
+        <loc>https://diedrico-studio.vercel.app/terms</loc>
         <lastmod>2025-12-04</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>

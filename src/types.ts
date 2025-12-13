@@ -71,7 +71,7 @@ export interface AcademyTopic {
     title: string;
     description: string;
     category: string;
-    theoryContent: string;
+    theoryContent: string | React.ReactNode;
     exercises: AcademyExercise[];
 }
 

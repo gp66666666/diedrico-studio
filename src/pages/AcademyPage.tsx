@@ -133,12 +133,18 @@ export default function AcademyPage() {
                         </div>
 
                         {/* Theory Block - Clickable for Zoom */}
-                        <div
-                            id="theory-content"
-                            className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-slate-100 prose prose-slate max-w-none mb-8 print:bg-white print:text-black print:border-none print:shadow-none print:prose-black print:p-0 cursor-zoom-in font-serif"
-                            onClick={handleTheoryClick}
-                            dangerouslySetInnerHTML={{ __html: selectedTopic.theoryContent }}
-                        />
+                        {typeof selectedTopic.theoryContent === 'string' ? (
+                            <div
+                                id="theory-content"
+                                className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-slate-100 prose prose-slate max-w-none mb-8 print:bg-white print:text-black print:border-none print:shadow-none print:prose-black print:p-0 cursor-zoom-in font-serif"
+                                onClick={handleTheoryClick}
+                                dangerouslySetInnerHTML={{ __html: selectedTopic.theoryContent }}
+                            />
+                        ) : (
+                            <div className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-slate-100 prose prose-slate max-w-none mb-8 print:bg-white print:text-black print:border-none print:shadow-none print:prose-black print:p-0 font-serif">
+                                {selectedTopic.theoryContent}
+                            </div>
+                        )}
 
                         {/* Mark Topic as Completed */}
                         <div className="flex items-center gap-4 mb-12 p-6 bg-white border border-slate-200 rounded-xl shadow-sm print:hidden">

@@ -1,0 +1,286 @@
+    // 5. PARALELISMO Y PERPENDICULARIDAD (COMPLETO & METÓDICO)
+    {
+        id: 'theory-5-parallelism',
+        title: '5. Paralelismo y Perpendicularidad',
+        description: 'Métodos paso a paso para resolver problemas de paralelismo y perpendicularidad entre rectas y planos.',
+        category: 'Teoría',
+        theoryContent: `
+            <div class="space-y-12 text-slate-700 break-inside-avoid-page">
+                <!-- Introduction -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl">
+                    <h3 class="text-xl font-bold text-blue-900 mb-2">Metodología de Resolución</h3>
+                    <p class="text-blue-800">
+                        En geometría descriptiva, no basta con "ver" la solución. Hay que construirla paso a paso.
+                        A continuación, desglosamos cada caso fundamental con su <strong>protocolo exacto de resolución</strong>.
+                    </p>
+                </div>
+
+                <!-- SECTION 1: PARALELISM -->
+                <section>
+                    <h3 class="text-3xl font-bold text-slate-900 mb-8 flex items-center gap-3 border-b pb-4">
+                        <span class="bg-emerald-100 text-emerald-600 p-2 rounded-lg text-2xl">||</span>
+                        1. Paralelismo
+                    </h3>
+
+                    <!-- CASE 1.1: Line || Plane -->
+                    <div class="mb-12 break-inside-avoid">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="bg-slate-200 text-slate-700 font-bold px-3 py-1 rounded-full text-sm">CASO 1.1</span>
+                            <h4 class="text-2xl font-bold text-slate-800">Trazar Recta paralela a Recta</h4>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Steps -->
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                                <h5 class="font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Enunciado</h5>
+                                <p class="mb-6 text-lg">
+                                    Dada una recta <strong>r</strong> y un punto <strong>P</strong> exterior, trazar una recta <strong>s</strong> paralela a <strong>r</strong> que pase por <strong>P</strong>.
+                                </p>
+
+                                <h5 class="font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Protocolo paso a paso</h5>
+                                <ol class="relative border-l border-emerald-200 ml-3 space-y-6">
+                                    <li class="mb-2 ml-6">
+                                        <span class="absolute flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full -left-4 ring-4 ring-white">
+                                            <span class="text-emerald-600 font-bold">1</span>
+                                        </span>
+                                        <h6 class="font-bold text-slate-800">Identificar las proyecciones</h6>
+                                        <p class="text-sm text-slate-600">Tenemos r' y r''. Tenemos P' y P''.</p>
+                                    </li>
+                                    <li class="mb-2 ml-6">
+                                        <span class="absolute flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full -left-4 ring-4 ring-white">
+                                            <span class="text-emerald-600 font-bold">2</span>
+                                        </span>
+                                        <h6 class="font-bold text-slate-800">Paralelismo Directo</h6>
+                                        <p class="text-sm text-slate-600">
+                                            La condición de paralelismo entre rectas es directa: sus proyecciones deben ser paralelas.
+                                        </p>
+                                    </li>
+                                    <li class="ml-6">
+                                        <span class="absolute flex items-center justify-center w-8 h-8 bg-emerald-500 rounded-full -left-4 ring-4 ring-white animate-pulse">
+                                            <span class="text-white font-bold">3</span>
+                                        </span>
+                                        <h6 class="font-bold text-slate-800">Ejecución</h6>
+                                        <p class="text-sm text-slate-600">
+                                            Por <strong>P'</strong>, traza <strong>s' || r'</strong>.<br>
+                                            Por <strong>P''</strong>, traza <strong>s'' || r''</strong>.
+                                        </p>
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <!-- Animated Visual -->
+                            <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col items-center justify-center">
+                                <div class="bg-white p-2 rounded-xl shadow-lg cursor-zoom-in w-full max-w-md">
+                                    <style>
+                                        @keyframes drawLine {
+                                            to { stroke-dashoffset: 0; }
+                                        }
+                                        .step-1 { stroke-dasharray: 1000; stroke-dashoffset: 0; opacity: 0.3; }
+                                        .step-result { 
+                                            stroke-dasharray: 300; 
+                                            stroke-dashoffset: 300; 
+                                            animation: drawLine 2s ease-out forwards; 
+                                            animation-delay: 0.5s;
+                                        }
+                                    </style>
+                                    <svg viewBox="0 0 300 200" class="w-full">
+                                        <!-- LT -->
+                                        <line x1="10" y1="100" x2="290" y2="100" stroke="#000" stroke-width="2" />
+                                        
+                                        <!-- Given Line r -->
+                                        <line x1="30" y1="80" x2="100" y2="20" stroke="#94a3b8" stroke-width="2" class="step-1" /> <text x="105" y="25" fill="#94a3b8" font-size="10">r''</text>
+                                        <line x1="30" y1="120" x2="100" y2="180" stroke="#94a3b8" stroke-width="2" class="step-1" /> <text x="105" y="185" fill="#94a3b8" font-size="10">r'</text>
+
+                                        <!-- Point P -->
+                                        <circle cx="180" cy="50" r="3" fill="#3b82f6" /> <text x="190" y="50" fill="#3b82f6" font-size="10" font-weight="bold">P''</text>
+                                        <circle cx="180" cy="150" r="3" fill="#3b82f6" /> <text x="190" y="150" fill="#3b82f6" font-size="10" font-weight="bold">P'</text>
+
+                                        <!-- Solution s (Animated) -->
+                                        <line x1="150" y1="75.7" x2="220" y2="15.7" stroke="#10b981" stroke-width="3" class="step-result" /> 
+                                        <text x="225" y="20" fill="#10b981" font-size="12" font-weight="bold" style="opacity:0; animation: fadeIn 0.5s forwards 2.5s">s''</text>
+                                        
+                                        <line x1="150" y1="124.3" x2="220" y2="184.3" stroke="#10b981" stroke-width="3" class="step-result" />
+                                        <text x="225" y="190" fill="#10b981" font-size="12" font-weight="bold" style="opacity:0; animation: fadeIn 0.5s forwards 2.5s">s'</text>
+                                    </svg>
+                                </div>
+                                <p class="text-center text-xs text-slate-500 mt-3 font-mono">Simulación: s se dibuja paralela a r</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CASE 1.2: Line || Plane (Complex) -->
+                    <div class="mb-12 break-inside-avoid">
+                         <div class="flex items-center gap-4 mb-4">
+                            <span class="bg-slate-200 text-slate-700 font-bold px-3 py-1 rounded-full text-sm">CASO 1.2</span>
+                            <h4 class="text-2xl font-bold text-slate-800">Trazar Recta paralela a Plano</h4>
+                        </div>
+
+                         <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 mb-6">
+                            <h5 class="font-bold text-amber-900 mb-2">⚠ Concepto Clave</h5>
+                            <p class="text-amber-800">
+                                Una recta es paralela a un plano si es paralela a <strong>CUALQUIER</strong> recta contenida en ese plano.
+                                <br>
+                                <em>Estrategia:</em> Elegiremos una recta cualquiera del plano (la más fácil posible) y haremos la paralela a ella.
+                            </p>
+                        </div>
+
+                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                             <!-- Steps -->
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                                <h5 class="font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Protocolo paso a paso</h5>
+                                <ol class="relative border-l border-emerald-200 ml-3 space-y-6">
+                                    <li class="mb-2 ml-6">
+                                        <span class="absolute flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full -left-4 ring-4 ring-white">
+                                            <span class="text-emerald-600 font-bold">1</span>
+                                        </span>
+                                        <h6 class="font-bold text-slate-800">Dibujar auxiliar en el plano</h6>
+                                        <p class="text-sm text-slate-600">
+                                            Dibuja una recta <strong>x</strong> contenida en el plano <strong>α</strong>. 
+                                            <br>
+                                            <span class="text-xs bg-slate-100 p-1 rounded">Tip: Haz una frontal u horizontal para que sea más fácil.</span>
+                                        </p>
+                                    </li>
+                                    <li class="ml-6">
+                                        <span class="absolute flex items-center justify-center w-8 h-8 bg-emerald-500 rounded-full -left-4 ring-4 ring-white animate-pulse">
+                                            <span class="text-white font-bold">2</span>
+                                        </span>
+                                        <h6 class="font-bold text-slate-800">Trazar la paralela</h6>
+                                        <p class="text-sm text-slate-600">
+                                            Por el punto <strong>P</strong>, traza las proyecciones de <strong>r</strong> paralelas a las de <strong>x</strong>.
+                                            <br>
+                                            <strong>r' || x'</strong> y <strong>r'' || x''</strong>.
+                                        </p>
+                                    </li>
+                                </ol>
+                            </div>
+                            <!-- Visual -->
+                             <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col items-center justify-center">
+                                <div class="bg-white p-2 rounded-xl shadow-lg cursor-zoom-in w-full max-w-md">
+                                    <svg viewBox="0 0 300 200" class="w-full">
+                                        <defs>
+                                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                              <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+                                            </marker>
+                                        </defs>
+
+                                        <!-- LT -->
+                                        <line x1="10" y1="100" x2="290" y2="100" stroke="#000" stroke-width="1.5" />
+                                        
+                                        <!-- Plane Alpha -->
+                                        <line x1="50" y1="100" x2="10" y2="20" stroke="#94a3b8" stroke-width="2" /> <text x="15" y="25" fill="#64748b" font-weight="bold">α₂</text>
+                                        <line x1="50" y1="100" x2="120" y2="180" stroke="#94a3b8" stroke-width="2" /> <text x="110" y="190" fill="#64748b" font-weight="bold">α₁</text>
+
+                                        <!-- Point P -->
+                                        <circle cx="200" cy="40" r="3" fill="#3b82f6" /> <text x="210" y="40" fill="#3b82f6" font-size="10" font-weight="bold">P''</text>
+                                        <circle cx="200" cy="140" r="3" fill="#3b82f6" /> <text x="210" y="140" fill="#3b82f6" font-size="10" font-weight="bold">P'</text>
+                                        
+                                        <!-- Visual Aux Line X (Yellow) -->
+                                        <line x1="30" y1="40" x2="80" y2="90" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5,2" /> 
+                                        <line x1="60" y1="110" x2="110" y2="170" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5,2" />
+                                        <text x="35" y="50" fill="#d97706" font-size="10">x''</text>
+                                        <text x="65" y="120" fill="#d97706" font-size="10">x'</text>
+
+                                        <!-- Step 2: Solution r (Green) -->
+                                        <line x1="170" y1="10" x2="230" y2="70" stroke="#10b981" stroke-width="3" style="stroke-dasharray: 200; stroke-dashoffset: 200; animation: drawLine 1.5s ease-out forwards 2s" />
+                                        <text x="235" y="65" fill="#10b981" font-weight="bold">r''</text>
+
+                                        <line x1="170" y1="104" x2="220" y2="164" stroke="#10b981" stroke-width="3" style="stroke-dasharray: 200; stroke-dashoffset: 200; animation: drawLine 1.5s ease-out forwards 2s" />
+                                        <text x="225" y="170" fill="#10b981" font-weight="bold">r'</text>
+                                    </svg>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: PERPENDICULARITY -->
+                <section class="mt-16">
+                    <h3 class="text-3xl font-bold text-slate-900 mb-8 flex items-center gap-3 border-b border-indigo-100 pb-4">
+                        <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg text-2xl">⊥</span>
+                        2. Perpendicularidad
+                    </h3>
+
+                    <div class="bg-indigo-50 border-l-4 border-indigo-600 p-6 rounded-r-xl mb-12">
+                        <h4 class="text-xl font-bold text-indigo-900">Teorema Fundamental</h4>
+                        <p class="text-indigo-800 text-lg">
+                            "Un recta es perpendicular a un plano si sus proyecciones son <strong>perpendiculares a las trazas</strong> del plano."
+                        </p>
+                        <ul class="mt-4 space-y-2 text-indigo-700 font-mono text-sm">
+                            <li>r' ⊥ α₁ (Traza Horizontal)</li>
+                            <li>r'' ⊥ α₂ (Traza Vertical)</li>
+                        </ul>
+                    </div>
+
+                    <!-- CASE 2.1: Line Perpendicular to Plane -->
+                    <div class="mb-12 break-inside-avoid">
+                         <div class="flex items-center gap-4 mb-4">
+                            <span class="bg-slate-200 text-slate-700 font-bold px-3 py-1 rounded-full text-sm">CASO 2.1</span>
+                            <h4 class="text-2xl font-bold text-slate-800">Recta Perpendicular a Plano por un Punto</h4>
+                        </div>
+                        
+                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                             <!-- Steps -->
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                                <h5 class="font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Protocolo paso a paso</h5>
+                                <ol class="relative border-l border-indigo-200 ml-3 space-y-6">
+                                    <li class="mb-2 ml-6">
+                                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-4 ring-white">
+                                            <span class="text-indigo-600 font-bold">1</span>
+                                        </span>
+                                        <h6 class="font-bold text-slate-800">Proyección Horizontal</h6>
+                                        <p class="text-sm text-slate-600">
+                                            Desde <strong>P'</strong>, dibuja una recta perpendicular a la traza <strong>α₁</strong>. Esta será <strong>r'</strong>.
+                                        </p>
+                                    </li>
+                                    <li class="ml-6">
+                                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-4 ring-white">
+                                            <span class="text-indigo-600 font-bold">2</span>
+                                        </span>
+                                        <h6 class="font-bold text-slate-800">Proyección Vertical</h6>
+                                        <p class="text-sm text-slate-600">
+                                            Desde <strong>P''</strong>, dibuja una recta perpendicular a la traza <strong>α₂</strong>. Esta será <strong>r''</strong>.
+                                        </p>
+                                    </li>
+                                </ol>
+                            </div>
+
+                             <!-- Animated Visual -->
+                            <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col items-center justify-center">
+                                <div class="bg-white p-2 rounded-xl shadow-lg cursor-zoom-in w-full max-w-md">
+                                    <svg viewBox="0 0 300 200" class="w-full">
+                                        <!-- LT -->
+                                        <line x1="10" y1="100" x2="290" y2="100" stroke="#000" stroke-width="2" />
+                                        
+                                        <!-- Plane Alpha -->
+                                        <line x1="100" y1="100" x2="40" y2="20" stroke="#3b82f6" stroke-width="2" /> <text x="45" y="30" fill="#3b82f6" font-weight="bold">α₂</text>
+                                        <line x1="100" y1="100" x2="200" y2="180" stroke="#3b82f6" stroke-width="2" /> <text x="190" y="190" fill="#3b82f6" font-weight="bold">α₁</text>
+
+                                        <!-- Point P -->
+                                        <circle cx="150" cy="50" r="3" fill="#64748b" /> <text x="160" y="50" fill="#64748b" font-weight="bold">P''</text>
+                                        <circle cx="150" cy="150" r="3" fill="#64748b" /> <text x="160" y="150" fill="#64748b" font-weight="bold">P'</text>
+                                        
+                                        <!-- Solution r (Animated) -->
+                                        <!-- Perpendicular to Alpha2 (slope approx -1.3) -> r'' slope approx 0.7 -->
+                                        <line x1="120" y1="30" x2="180" y2="70" stroke="#ef4444" stroke-width="3" class="step-result" style="animation-delay: 1s"/>
+                                        <!-- Square symbol -->
+                                        <path d="M70 60 L75 64 L71 69" stroke="#94a3b8" fill="none" opacity="0.5"/> 
+
+                                        <!-- Perpendicular to Alpha1 (slope approx 0.8) -> r' slope approx -1.2 -->
+                                        <line x1="180" y1="110" x2="120" y2="190" stroke="#ef4444" stroke-width="3" class="step-result" style="animation-delay: 2.5s"/>
+                                        
+                                        <text x="185" y="65" fill="#ef4444" font-weight="bold" style="opacity:0; animation: fadeIn 0.5s forwards 2s">r''</text>
+                                        <text x="110" y="195" fill="#ef4444" font-weight="bold" style="opacity:0; animation: fadeIn 0.5s forwards 3.5s">r'</text>
+                                    </svg>
+                                </div>
+                                <p class="text-center text-xs text-slate-500 mt-3 font-mono">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                                    La recta roja aparece perpendicular a las trazas azules.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        `,
+        exercises: []
+    },

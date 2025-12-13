@@ -1,0 +1,469 @@
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
+                                <line x1="40" y1="30" x2="160" y2="30" stroke="#3b82f6" stroke-width="2" /> <text x="165" y="35" font-size="10" fill="#3b82f6">r'' // LT</text>
+                                <line x1="40" y1="70" x2="160" y2="70" stroke="#10b981" stroke-width="2" /> <text x="165" y="75" font-size="10" fill="#10b981">r' // LT</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Vertical -->
+                    <div class="bg-white border-l-4 border-emerald-500 p-4 rounded shadow-sm break-inside-avoid">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold text-slate-900">5. R. Vertical</h4>
+                            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-100">⊥ a PH</span>
+                        </div>
+                        <p class="text-sm text-slate-600 my-2">Perpendicular al PH. Proyección H es un punto.</p>
+                        <div class="bg-slate-50 rounded h-32 flex items-center justify-center cursor-zoom-in border border-slate-100">
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                <line x1="100" y1="20" x2="100" y2="80" stroke="#3b82f6" stroke-width="2" /> <text x="105" y="25" font-size="10" fill="#3b82f6">r'' (⊥ LT)</text>
+                                <circle cx="100" cy="80" r="3" fill="#10b981"/> <text x="105" y="85" font-size="10" fill="#10b981">r' (Punto)</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- De Punta -->
+                    <div class="bg-white border-l-4 border-emerald-500 p-4 rounded shadow-sm break-inside-avoid">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold text-slate-900">6. R. de Punta</h4>
+                            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-100">⊥ a PV</span>
+                        </div>
+                        <p class="text-sm text-slate-600 my-2">Perpendicular al PV. Proyección V es un punto.</p>
+                        <div class="bg-slate-50 rounded h-32 flex items-center justify-center cursor-zoom-in border border-slate-100">
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                <line x1="100" y1="20" x2="100" y2="80" stroke="#10b981" stroke-width="2" /> <text x="105" y="85" font-size="10" fill="#10b981">r' (⊥ LT)</text>
+                                <circle cx="100" cy="20" r="3" fill="#3b82f6"/> <text x="105" y="25" font-size="10" fill="#3b82f6">r'' (Punto)</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                     <!-- De Perfil -->
+                     <div class="bg-white border-l-4 border-blue-500 p-4 rounded shadow-sm break-inside-avoid col-span-1 lg:col-span-2">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold text-slate-900">7. Recta de Perfil</h4>
+                            <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100">Necesita 3ª Vista</span>
+                        </div>
+                        <p class="text-sm text-slate-600 my-2">Proyecciones perpendiculares a LT. Vemos una sola linea vertical.</p>
+                        <div class="bg-slate-50 rounded h-32 flex items-center justify-center cursor-zoom-in border border-slate-100">
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                <line x1="100" y1="10" x2="100" y2="90" stroke="purple" stroke-width="2" stroke-dasharray="5,2" /> 
+                                <text x="105" y="20" font-size="10" fill="#3b82f6">r''</text>
+                                <text x="105" y="90" font-size="10" fill="#10b981">r'</text>
+                                <text x="130" y="50" font-size="10" fill="gray">Coinciden en una linea</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabla Resumen -->
+                <div class="mt-8 bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-6 rounded-2xl border border-blue-500/30">
+                    <h4 class="font-bold text-white text-lg mb-4">Tabla Resumen de Tipos de Rectas</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-800">
+                                <tr>
+                                    <th class="p-2 text-left">Tipo</th>
+                                    <th class="p-2 text-center">r''</th>
+                                    <th class="p-2 text-center">r'</th>
+                                    <th class="p-2 text-left">Trazas</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs">
+                                <tr class="border-b border-gray-700"><td class="p-2 text-purple-400">Oblicua</td><td class="p-2 text-center">Oblicua</td><td class="p-2 text-center">Oblicua</td><td class="p-2">Vr y Hr</td></tr>
+                                <tr class="border-b border-gray-700 bg-gray-800/30"><td class="p-2 text-yellow-400">Horizontal</td><td class="p-2 text-center">// LT</td><td class="p-2 text-center">Oblicua</td><td class="p-2">Solo Vr</td></tr>
+                                <tr class="border-b border-gray-700"><td class="p-2 text-yellow-400">Frontal</td><td class="p-2 text-center">Oblicua</td><td class="p-2 text-center">// LT</td><td class="p-2">Solo Hr</td></tr>
+                                <tr class="border-b border-gray-700 bg-gray-800/30"><td class="p-2 text-red-400">Paralela LT</td><td class="p-2 text-center">// LT</td><td class="p-2 text-center">// LT</td><td class="p-2">Ninguna</td></tr>
+                                <tr class="border-b border-gray-700"><td class="p-2 text-pink-400">Vertical</td><td class="p-2 text-center">Perpendicular</td><td class="p-2 text-center">Punto</td><td class="p-2">Solo Hr</td></tr>
+                                <tr class="border-b border-gray-700 bg-gray-800/30"><td class="p-2 text-orange-400">De Perfil</td><td class="p-2 text-center">Perpendicular</td><td class="p-2 text-center">Perpendicular</td><td class="p-2">Vr y Hr en LT</td></tr>
+                                <tr><td class="p-2 text-red-400">Corta LT</td><td class="p-2 text-center">Pasa por LT</td><td class="p-2 text-center">Pasa por LT</td><td class="p-2">Vr=Hr en LT</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `,
+        exercises: [
+            {
+                id: 'ex-line-trace',
+                title: 'Hallar Trazas',
+                level: 'Medio',
+                statement: 'Dada una recta definida por A(20,10,30) y B(60,40,10), encuentra sus trazas Horizontal (H) y Vertical (V).',
+                setup: [
+                    { type: 'point', name: 'A', coords: { x: 20, y: 10, z: 30 }, color: '#3b82f6' },
+                    { type: 'point', name: 'B', coords: { x: 60, y: 40, z: 10 }, color: '#3b82f6' }
+                ],
+                solutionHint: 'Prolonga r\' hasta cortar LT -> Sube V. Prolonga r\'\' hasta cortar LT -> Baja H.'
+            }
+        ]
+    },
+
+    // 3. EL PLANO (COMPLETO)
+    {
+        id: 'theory-3-plane',
+        title: '3. El Plano',
+        description: 'Determinación, trazas, rectas notables y clasificación exhaustiva de planos.',
+        category: 'Teoría',
+        theoryContent: `
+             <div class="space-y-8 text-slate-700 break-inside-avoid-page">
+                <h3 class="text-2xl font-bold text-slate-900 mb-4 font-serif">1. Determinación del Plano</h3>
+                <p>Un plano no es solo "trazas". Se define geométricamente por:</p>
+                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 shadow-sm">
+                    <ul class="list-disc pl-5 space-y-2 text-slate-700">
+                        <li><strong>3 Puntos</strong> no alineados.</li>
+                        <li><strong>2 Rectas</strong> que se cortan.</li>
+                        <li><strong>2 Rectas</strong> paralelas.</li>
+                        <li><strong>1 Recta</strong> y <strong>1 Punto</strong> exterior.</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-2xl font-bold text-slate-900 mb-4 font-serif">2. Trazas del Plano</h3>
+                <p>Las trazas (<strong>α₁</strong>, <strong>α₂</strong>) son las rectas de intersección del plano con el PH y el PV.</p>
+                
+                 <h3 class="text-2xl font-bold text-slate-900 mt-8 mb-4 font-serif">3. Clasificación Completa</h3>
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Oblicuo -->
+                    <div class="bg-white border-l-4 border-purple-500 p-4 rounded shadow-sm break-inside-avoid">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold text-slate-900">1. Plano Oblicuo (Cualquiera)</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded border border-slate-200">Más común</span>
+                        </div>
+                        <div class="bg-slate-50 rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in border border-slate-100">
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
+                                <line x1="60" y1="10" x2="90" y2="50" stroke="#f97316" stroke-width="2" /> <text x="65" y="20" font-size="10" fill="#f97316">α₂</text>
+                                <line x1="90" y1="50" x2="130" y2="90" stroke="#f97316" stroke-width="2" /> <text x="120" y="80" font-size="10" fill="#f97316">α₁</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Proyectantes -->
+                    <div class="bg-white border-l-4 border-emerald-500 p-4 rounded shadow-sm break-inside-avoid">
+                         <div class="flex justify-between">
+                            <h4 class="font-bold text-slate-900">2. Proyectantes</h4>
+                            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-100">⊥ a un plano</span>
+                        </div>
+                        <p class="text-sm text-slate-500 my-1">Una traza es perpendicular a LT.</p>
+                        <div class="bg-slate-50 rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in gap-4 border border-slate-100">
+                             <!-- Proj Horiz -->
+                            <svg width="90" height="80" viewBox="0 0 100 80">
+                                <line x1="0" y1="40" x2="100" y2="40" stroke="black" />
+                                 <!-- LT Marks -->
+                                <line x1="10" y1="45" x2="20" y2="45" stroke="black" stroke-width="2" />
+                                <line x1="80" y1="45" x2="90" y2="45" stroke="black" stroke-width="2" />
+
+                                <line x1="50" y1="10" x2="50" y2="40" stroke="#f97316" stroke-width="2" />
+                                <line x1="50" y1="40" x2="20" y2="70" stroke="#f97316" stroke-width="2" />
+                                <text x="10" y="20" font-size="8" fill="#475569">Proyectante H.</text>
+                            </svg>
+                            <!-- Proj Vert -->
+                            <svg width="90" height="80" viewBox="0 0 100 80">
+                                <line x1="0" y1="40" x2="100" y2="40" stroke="black" />
+                                 <!-- LT Marks -->
+                                <line x1="10" y1="45" x2="20" y2="45" stroke="black" stroke-width="2" />
+                                <line x1="80" y1="45" x2="90" y2="45" stroke="black" stroke-width="2" />
+
+                                <line x1="20" y1="10" x2="50" y2="40" stroke="#f97316" stroke-width="2" />
+                                <line x1="50" y1="40" x2="50" y2="70" stroke="#f97316" stroke-width="2" />
+                                <text x="10" y="20" font-size="8" fill="#475569">Proyectante V.</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Paralelo a LT -->
+                    <div class="bg-white border-l-4 border-blue-500 p-4 rounded shadow-sm break-inside-avoid">
+                        <h4 class="font-bold text-slate-900">3. Paralelo a LT</h4>
+                        <p class="text-sm text-slate-500 my-1">Ambas trazas son paralelas a LT.</p>
+                        <div class="bg-slate-50 rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in border border-slate-100">
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
+                                <line x1="20" y1="20" x2="180" y2="20" stroke="#f97316" stroke-width="2" /> <text x="185" y="25" font-size="10" fill="#f97316">α₂</text>
+                                <line x1="20" y1="80" x2="180" y2="80" stroke="#f97316" stroke-width="2" /> <text x="185" y="85" font-size="10" fill="#f97316">α₁</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- De Perfil -->
+                    <div class="bg-white border-l-4 border-orange-500 p-4 rounded shadow-sm break-inside-avoid">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold text-slate-900">4. De Perfil</h4>
+                            <span class="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded border border-orange-100">Necesita 3ª Vista</span>
+                        </div>
+                        <p class="text-sm text-slate-500 my-1">Ambas trazas son perpendiculares a LT (en la misma línea).</p>
+                        <div class="bg-slate-50 rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in border border-slate-100">
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
+                                <line x1="100" y1="10" x2="100" y2="90" stroke="#f97316" stroke-width="2" />
+                                <text x="105" y="20" font-size="10" fill="#f97316">α₂</text>
+                                <text x="105" y="80" font-size="10" fill="#f97316">α₁</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Pasa por LT -->
+                    <div class="bg-white border-l-4 border-red-500 p-4 rounded shadow-sm break-inside-avoid md:col-span-2 lg:col-span-1">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold text-slate-900">5. Pasa por la Línea de Tierra</h4>
+                            <span class="text-xs bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">Especial</span>
+                        </div>
+                        <p class="text-sm text-slate-500 my-1">Sus trazas coinciden con la LT. Se define por un punto P de perfil.</p>
+                        <div class="bg-slate-50 rounded h-32 mt-2 flex items-center justify-center cursor-zoom-in border border-slate-100">
+                            <svg width="200" height="100" viewBox="0 0 200 100">
+                                <line x1="10" y1="50" x2="190" y2="50" stroke="black" stroke-width="2" />
+                                 <!-- LT Marks -->
+                                <line x1="20" y1="55" x2="35" y2="55" stroke="black" stroke-width="2" />
+                                <line x1="165" y1="55" x2="180" y2="55" stroke="black" stroke-width="2" />
+
+                                <circle cx="100" cy="50" r="3" fill="#f97316" />
+                                <text x="100" y="40" font-size="10" fill="#f97316">α₁ = α₂ = LT</text>
+                                <circle cx="140" cy="30" r="2" fill="#3b82f6" /> <text x="145" y="30" font-size="8" fill="#3b82f6">P''</text>
+                                <circle cx="140" cy="70" r="2" fill="#10b981" /> <text x="145" y="70" font-size="8" fill="#10b981">P'</text>
+                            </svg>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        `,
+        exercises: [
+            {
+                id: 'ex-plane-types',
+                title: 'Tipos de Planos',
+                level: 'Difícil',
+                statement: 'Representa un Plano Paralelo a la LT que pase por A(20, 30, 40) y B(60, 30, 40).',
+                setup: [
+                    { type: 'point', name: 'A', coords: { x: 20, y: 30, z: 40 }, visible: true, color: 'blue' },
+                    { type: 'point', name: 'B', coords: { x: 60, y: 30, z: 40 }, visible: true, color: 'blue' }
+                ],
+                solutionHint: 'Al tener misma cota y alejamiento, es un plano paralelo a LT. Dibuja las trazas paralelas a LT.'
+            }
+        ]
+    },
+
+    // 4. INTERSECCIONES
+    {
+        id: 'theory-4-intersections',
+        title: '4. Intersecciones',
+        description: 'Intersecciones entre rectas y planos, y entre dos planos (Mordedura). Visibilidad.',
+        category: 'Teoría',
+        theoryContent: `
+            <div class="space-y-10 text-slate-700">
+                <!-- INTRODUCCION -->
+                <section class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                    <h3 class="text-3xl font-bold text-slate-900 mb-4">Intersecciones en Diédrico</h3>
+                    <p class="text-lg leading-relaxed mb-4">
+                        La intersección es uno de los problemas fundamentales de la geometría descriptiva. 
+                        Consiste en hallar los <strong class="text-blue-700">puntos o rectas</strong> comunes a dos elementos geométricos.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div class="bg-white p-5 rounded-xl border border-blue-200 shadow-sm">
+                            <h4 class="font-bold text-slate-800 text-lg mb-2">Recta - Plano</h4>
+                            <p class="text-slate-600">El resultado es un <strong class="text-blue-600">Punto (I)</strong>.</p>
+                            <p class="text-sm text-slate-500 mt-2">Excepción: Si la recta está contenida en el plano.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-blue-200 shadow-sm">
+                            <h4 class="font-bold text-slate-800 text-lg mb-2">Plano - Plano</h4>
+                            <p class="text-slate-600">El resultado es una <strong class="text-emerald-600">Recta (i)</strong>.</p>
+                            <p class="text-sm text-slate-500 mt-2">Excepción: Planos paralelos (Intersección impropia/en el infinito).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- INTERSECCION RECTA - PLANO -->
+                <section>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">
+                        1. Intersección Recta - Plano
+                    </h3>
+                    <p class="mb-4 text-lg">
+                        Para hallar el punto <strong>I</strong> donde una recta <strong>r</strong> atraviesa un plano <strong>α</strong>, utilizamos el 
+                        <strong class="text-slate-900 bg-yellow-100 px-2 rounded">Método del Plano Auxiliar</strong>.
+                    </p>
+                    
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-lg mb-8">
+                        <h4 class="font-bold text-slate-800 mb-4">Pasos del Método General:</h4>
+                        <ol class="list-decimal pl-6 space-y-4 text-slate-700">
+                            <li>
+                                <strong>Contener la recta r</strong> en un plano auxiliar <strong>β</strong> 
+                                (lo más sencillo es usar un plano <em>proyectante</em>).
+                            </li>
+                            <li>
+                                Hallar la <strong>recta de intersección (i)</strong> entre el plano dado <strong>α</strong> y el auxiliar <strong>β</strong>.
+                            </li>
+                            <li>
+                                El punto donde esta recta <strong>i</strong> corta a la recta original <strong>r</strong> es el punto buscado <strong>I</strong>.
+                            </li>
+                        </ol>
+                    </div>
+
+                    <!-- Visualización SVG Recta - Plano -->
+                    <div class="bg-slate-100 p-6 rounded-2xl border border-slate-200 flex flex-col items-center">
+                        <h4 class="font-bold text-slate-500 text-sm tracking-widest uppercase mb-4">ESQUEMA VISUAL DEL PROCESO</h4>
+                        <div class="bg-white p-4 rounded-xl shadow-sm w-full max-w-lg cursor-zoom-in hover:shadow-md transition-shadow">
+                             <svg width="100%" height="300" viewBox="0 0 400 300">
+                                <defs>
+                                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                        <path d="M0,0 L0,6 L9,3 z" fill="#64748b" />
+                                    </marker>
+                                </defs>
+                                
+                                <!-- Plano Alpha (Dado) -->
+                                <path d="M50 250 L350 250" stroke="#2563eb" stroke-width="2" />
+                                <text x="360" y="255" fill="#2563eb" font-weight="bold">α₁ (Traza H)</text>
+                                <path d="M100 250 L200 50" stroke="#2563eb" stroke-width="2" />
+                                <text x="210" y="60" fill="#2563eb" font-weight="bold">α₂ (Traza V)</text>
+
+                                <!-- Recta r (Dada) -->
+                                <line x1="150" y1="280" x2="250" y2="80" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5" />
+                                <text x="260" y="90" fill="#64748b" font-weight="bold">r</text>
+
+                                <!-- Plano Auxiliar Beta (Proyectante Horizontal conteniendo a r) -->
+                                <path d="M150 280 L250 80" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2" />
+                                <text x="140" y="290" fill="#10b981" font-weight="bold">β₁</text>
+                                <line x1="250" y1="250" x2="250" y2="50" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2" />
+                                <text x="255" y="60" fill="#10b981" font-weight="bold">β₂</text>
+
+                                <!-- Punto de Intersección I -->
+                                <circle cx="215" cy="150" r="4" fill="#ef4444" />
+                                <text x="225" y="155" fill="#ef4444" font-weight="bold" font-size="16">I</text>
+
+                                <!-- Nota -->
+                                <text x="20" y="290" font-size="12" fill="#94a3b8">Utilizando plano proyectante auxiliar</text>
+                            </svg>
+                        </div>
+                        <p class="text-center text-sm text-slate-500 mt-4 italic">
+                            Esquema simplificado: El plano auxiliar facilita encontrar el punto común.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- INTERSECCION PLANO - PLANO -->
+                <section>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">
+                        2. Intersección Plano - Plano
+                    </h3>
+                    <p class="mb-4 text-lg">
+                        La intersección de dos planos <strong>α</strong> y <strong>β</strong> es una <strong>recta i</strong>.
+                        Para definir una recta necesitamos dos puntos. Esos dos puntos son las intersecciones de las trazas homónimas.
+                    </p>
+
+                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 mb-6">
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3">
+                                <span class="bg-indigo-200 text-indigo-800 font-bold px-2 py-0.5 rounded text-sm mt-1">V</span>
+                                <div>
+                                    <strong class="text-indigo-900">Punto V (Traza Vertical):</strong>
+                                    <p class="text-indigo-800/80">Donde se cortan las trazas verticales (α₂ y β₂). Este punto tiene alejamiento 0 (está en el PV).</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="bg-indigo-200 text-indigo-800 font-bold px-2 py-0.5 rounded text-sm mt-1">H</span>
+                                <div>
+                                    <strong class="text-indigo-900">Punto H (Traza Horizontal):</strong>
+                                    <p class="text-indigo-800/80">Donde se cortan las trazas horizontales (α₁ y β₁). Este punto tiene cota 0 (está en el PH).</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <p class="text-slate-700 mb-6">
+                        Uniendo <strong>V</strong> y <strong>H</strong> obtenemos la recta intersección <strong>i</strong>.
+                    </p>
+                    
+                    <!-- SVG Plano-Plano -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex justify-center cursor-zoom-in">
+                        <svg width="100%" height="350" viewBox="0 0 350 350">
+                            <!-- LT -->
+                            <line x1="20" y1="175" x2="330" y2="175" stroke="#000" stroke-width="2" />
+                            <text x="335" y="180" font-weight="bold" fill="#000">LT</text>
+
+                            <!-- Plano Alpha (Azul) -->
+                            <line x1="100" y1="175" x2="50" y2="50" stroke="#3b82f6" stroke-width="2" />
+                            <text x="55" y="60" fill="#3b82f6" font-weight="bold">α₂</text>
+                            <line x1="100" y1="175" x2="160" y2="300" stroke="#3b82f6" stroke-width="2" />
+                            <text x="150" y="310" fill="#3b82f6" font-weight="bold">α₁</text>
+
+                            <!-- Plano Beta (Verde) -->
+                            <line x1="250" y1="175" x2="180" y2="50" stroke="#10b981" stroke-width="2" />
+                            <text x="185" y="60" fill="#10b981" font-weight="bold">β₂</text>
+                            <line x1="250" y1="175" x2="200" y2="300" stroke="#10b981" stroke-width="2" />
+                            <text x="210" y="310" fill="#10b981" font-weight="bold">β₁</text>
+
+                            <!-- Intersecciones de Trazas -->
+                            <!-- V'' (Corte de trazas verticales) -->
+                            <!-- Alpha2: (100,175) to (50,50) -> y = 2.5x - 75 (aprox dir) -->
+                            <!-- Beta2: (250,175) to (180,50) -->
+                            <!-- Visual intersection aprox at (130, 110) just illustrative -->
+                            <circle cx="130" cy="110" r="4" fill="#f59e0b" />
+                            <text x="140" y="115" fill="#f59e0b" font-weight="bold">v''</text>
+                            <line x1="130" y1="110" x2="130" y2="175" stroke="#94a3b8" stroke-dasharray="4,4" />
+                            <text x="125" y="190" fill="#f59e0b" font-size="12">v'</text>
+
+                            <!-- H' (Corte de trazas horizontales) -->
+                            <!-- Alpha1: (100,175) to (160,300) -->
+                            <!-- Beta1: (250,175) to (200,300) -->
+                            <!-- Interesction aprox at (180, 240) -->
+                            <circle cx="180" cy="240" r="4" fill="#f59e0b" />
+                            <text x="190" y="245" fill="#f59e0b" font-weight="bold">h'</text>
+                            <line x1="180" y1="240" x2="180" y2="175" stroke="#94a3b8" stroke-dasharray="4,4" />
+                            <text x="175" y="165" fill="#f59e0b" font-size="12">h''</text>
+
+                            <!-- Recta intersección i (Roja) -->
+                            <!-- i'' une v'' con h'' -->
+                            <line x1="130" y1="110" x2="180" y2="175" stroke="#ef4444" stroke-width="3" />
+                            <text x="150" y="135" fill="#ef4444" font-weight="bold">i''</text>
+
+                            <!-- i' une v' con h' -->
+                            <line x1="130" y1="175" x2="180" y2="240" stroke="#ef4444" stroke-width="3" />
+                            <text x="150" y="220" fill="#ef4444" font-weight="bold">i'</text>
+
+                        </svg>
+                    </div>
+                </section>
+                
+                <!-- CASOS PARTICULARES -->
+                 <section class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Casos Particulares Comunes</h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold shrink-0">1</div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Intersección con Planos Proyectantes</h4>
+                                <p class="text-slate-600 text-sm">
+                                    Es el caso más fácil. Si uno de los planos es proyectante (perpendicular a un plano de proyección), 
+                                    la proyección de la recta intersección <strong>coincide</strong> con la traza oblicua del plano proyectante.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                             <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold shrink-0">2</div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Recta Paralela a una Traza</h4>
+                                <p class="text-slate-600 text-sm">
+                                    Si una traza de un plano es paralela a la LT, la recta intersección será paralela a esa traza 
+                                    (o al menos su proyección).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                 </section>
+            </div>
+        `,
+        exercises: []
+    },
+
