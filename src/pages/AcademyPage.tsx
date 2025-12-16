@@ -1,58 +1,73 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { useGeometryStore } from '../store/geometryStore';
 import { ACADEMY_CONTENT } from '../data/academyContent';
 import type { AcademyTopic, AcademyExercise } from '../types';
-import { BookOpen, Lock, Play, ChevronRight, CheckCircle2, ArrowLeft, Printer } from 'lucide-react';
+import { Sun, Moon, ArrowLeft, BookOpen, CheckCircle2, Printer, Play } from 'lucide-react';
 import PremiumModal from '../components/Auth/PremiumModal';
 
 export default function AcademyPage() {
-    const { isPremium, profile, markTopicComplete } = useUserStore();
-    const { addElement, clearAll, setActiveExercise } = useGeometryStore();
-    const navigate = useNavigate();
+    const user = useUserStore();
+    const geom = useGeometryStore();
+    const nav = useNavigate();
 
-    // Premium Modal State
+    const { isPremium, markTopicComplete, profile } = user;
+
     const [showPremiumModal, setShowPremiumModal] = useState(false);
-
-    // Lightbox State for zooming images/diagrams
     const [lightboxContent, setLightboxContent] = useState<string | null>(null);
-
     const [selectedTopic, setSelectedTopic] = useState<AcademyTopic | null>(ACADEMY_CONTENT[0]);
 
-    // Handle clicks inside theory content to detect images/svgs
+    const isDark = geom.theme === 'dark';
+    const headerBorder = isDark ? 'border-white/10' : 'border-gray-200/50';
+    const buttonClass = isDark ? 'hover:bg-white/10 active:bg-white/20' : 'hover:bg-white/60 hover:shadow-sm active:bg-white/80';
+
     const handleTheoryClick = (e: React.MouseEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
         const clickable = target.closest('svg') || target.closest('img');
 
         if (clickable) {
-            // Clone the node to render in modal
-            // For SVGs, we might need to adjust width/height for full screen
-            const content = clickable.outerHTML.replace(/width=".*?"/, 'width="100%"').replace(/height=".*?"/, 'height="100%"');
+            const content = clickable.outerHTML
+                .replace(/width=".*?"/, 'width="100%"')
+                .replace(/height=".*?"/, 'height="100%"');
             setLightboxContent(content);
         }
     };
 
-    // Educational content is now available to all users
-    // Premium gate removed for testing
+    useEffect(() => {
+        if (!isPremium) {
+            setShowPremiumModal(true);
+        }
+    }, [isPremium]);
 
+    if (!isPremium) {
+        return (
+            <>
+                {showPremiumModal && (
+                    <PremiumModal
+                        isOpen={true}
+                        onClose={() => nav('/')}
+                    />
+                )}
+            </>
+        );
+    }
 
-    // PDF Download - Using browser print with PDF styling
+    // PDF Download
     const handleDownloadPDF = () => {
         window.print();
     };
 
-
-
+    // Load Exercise
     const loadExercise = (exercise: AcademyExercise) => {
         console.log('[loadExercise] Starting with exercise:', exercise);
         console.log('[loadExercise] Setup data:', exercise.setup);
 
         if (confirm('Esto borrará tu espacio de trabajo actual para cargar el ejercicio. ¿Continuar?')) {
-            clearAll();
+            geom.clearAll();
             console.log('[loadExercise] Cleared all elements');
 
-            setActiveExercise({
+            geom.setActiveExercise({
                 id: exercise.id,
                 title: exercise.title,
                 statement: exercise.statement,
@@ -63,7 +78,7 @@ export default function AcademyPage() {
             exercise.setup.forEach((el, index) => {
                 console.log(`[loadExercise] Adding element ${index}:`, el);
                 try {
-                    addElement({ ...el } as any);
+                    geom.addElement({ ...el } as any);
                     console.log(`[loadExercise] Added element ${index} successfully`);
                 } catch (error) {
                     console.error(`[loadExercise] Error adding element ${index}:`, error);
@@ -71,7 +86,7 @@ export default function AcademyPage() {
             });
 
             console.log('[loadExercise] Navigating to /');
-            navigate('/');
+            nav('/');
         }
     };
 
@@ -80,7 +95,7 @@ export default function AcademyPage() {
             {/* Sidebar Topics */}
             <div className="w-full md:w-80 border-r border-slate-200 bg-white p-6 flex flex-col print:hidden shadow-sm z-10">
                 <div className="flex items-center gap-3 mb-8">
-                    <button onClick={() => navigate('/')} className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors">
+                    <button onClick={() => nav('/')} className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors">
                         <ArrowLeft size={20} />
                     </button>
                     <h1 className="text-xl font-bold flex items-center gap-2 text-slate-800">
@@ -116,6 +131,19 @@ export default function AcademyPage() {
             <div className="flex-1 bg-slate-50 flex flex-col overflow-hidden print:overflow-visible print:block print:bg-white print:h-auto">
                 {selectedTopic && (
                     <div className="h-full overflow-y-auto p-4 md:p-12 max-w-5xl mx-auto w-full custom-scrollbar print:custom-none print:p-0 print:overflow-visible print:h-auto print:block">
+                        {/* Header con botón de tema */}
+                        <div className={`flex items-center justify-between mb-6 border-b ${headerBorder} p-4 print:hidden`}>
+                            <h2 className="text-2xl font-bold">Academia</h2>
+                            <button
+                                onClick={geom.toggleTheme}
+                                className={`p-2 rounded-lg transition-colors ${buttonClass}`}
+                                title={isDark ? 'Cambiar a claro' : 'Cambiar a oscuro'}
+                                aria-label="Cambiar tema"
+                            >
+                                {isDark ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-gray-600" />}
+                            </button>
+                        </div>
+
                         <div className="mb-8 flex flex-col md:flex-row justify-between items-start gap-4 print:block">
                             <div className="print:w-full print:mb-4">
                                 <span className="text-blue-600 font-bold tracking-wider text-sm uppercase print:text-black bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Tema Teórico</span>
@@ -132,7 +160,7 @@ export default function AcademyPage() {
                             </button>
                         </div>
 
-                        {/* Theory Block - Clickable for Zoom */}
+                        {/* Theory Block */}
                         {typeof selectedTopic.theoryContent === 'string' ? (
                             <div
                                 id="theory-content"
@@ -187,12 +215,15 @@ export default function AcademyPage() {
                                     className="max-w-6xl max-h-[90vh] w-full bg-white rounded-xl p-2 md:p-4 overflow-hidden flex items-center justify-center border border-slate-200 shadow-2xl relative"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <div className="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>img]:object-contain [&>img]:max-h-[85vh] bg-white rounded-lg" dangerouslySetInnerHTML={{ __html: lightboxContent }} />
+                                    <div
+                                        className="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>img]:object-contain [&>img]:max-h-[85vh] bg-white rounded-lg"
+                                        dangerouslySetInnerHTML={{ __html: lightboxContent }}
+                                    />
                                     <button
                                         onClick={() => setLightboxContent(null)}
                                         className="absolute top-4 right-4 bg-white/90 hover:bg-white p-2 rounded-full text-slate-800 transition-all shadow-md border border-slate-200"
                                     >
-                                        <ArrowLeft size={24} /> {/* Using Arrow as Close/Back */}
+                                        <ArrowLeft size={24} />
                                     </button>
                                 </div>
                             </div>
@@ -211,14 +242,20 @@ export default function AcademyPage() {
                                 {selectedTopic.exercises.map(ex => {
                                     const isCompleted = profile?.completed_exercises?.includes(ex.id);
                                     return (
-                                        <div key={ex.id} className={`bg-white border transition-all p-6 rounded-xl flex flex-col hover:shadow-md ${isCompleted ? 'border-green-200 bg-green-50' : 'border-slate-200 hover:border-blue-300'
-                                            }`}>
+                                        <div
+                                            key={ex.id}
+                                            className={`bg-white border transition-all p-6 rounded-xl flex flex-col hover:shadow-md ${isCompleted ? 'border-green-200 bg-green-50' : 'border-slate-200 hover:border-blue-300'}`}
+                                        >
                                             <div className="flex justify-between items-start mb-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`px-2 py-1 rounded text-xs font-bold border ${ex.level === 'Fácil' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                        ex.level === 'Medio' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                                            'bg-red-50 text-red-700 border-red-200'
-                                                        }`}>
+                                                    <span
+                                                        className={`px-2 py-1 rounded text-xs font-bold border ${ex.level === 'Fácil'
+                                                            ? 'bg-green-50 text-green-700 border-green-200'
+                                                            : ex.level === 'Medio'
+                                                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                                                : 'bg-red-50 text-red-700 border-red-200'
+                                                            }`}
+                                                    >
                                                         {ex.level}
                                                     </span>
                                                     {isCompleted && (
@@ -230,7 +267,7 @@ export default function AcademyPage() {
                                                 <button
                                                     onClick={() => loadExercise(ex)}
                                                     className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 text-white"
-                                                    title={isCompleted ? "Repetir Ejercicio" : "Resolver en 3D"}
+                                                    title={isCompleted ? 'Repetir Ejercicio' : 'Resolver en 3D'}
                                                 >
                                                     <Play size={20} className="ml-1" />
                                                 </button>

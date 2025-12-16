@@ -71,7 +71,7 @@ export interface AcademyTopic {
     title: string;
     description: string;
     category: string;
-    theoryContent: string | React.ReactNode;
+    theory: string; // ✅ añadida para que coincida con AcademyPage.tsx
+    theoryContent?: string | React.ReactNode; // mantenida como opcional para compatibilidad
     exercises: AcademyExercise[];
 }
-

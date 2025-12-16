@@ -86,10 +86,9 @@ export default function MainApp() {
                                     <Scene />
                                     {/* Instructions overlay (only for 3D) */}
                                     <div className={`absolute top-16 left-4 md:top-4 md:left-4 backdrop-blur-md p-3 rounded-xl border max-w-xs pointer-events-none transition-colors ${overlayBg}`}>
-                                        <h3 className={`font-bold text-sm mb-1 ${textMain}`}>🎓 Diédrico Studio</h3>
-                                        <p className={`text-xs ${textSub}`}>
-                                            Ejes: <span className="text-red-400">X</span>, <span className="text-green-400">Y</span>, <span className="text-blue-400">Z</span>
-                                        </p>
+                                        <h3 className={`font-bold text-sm mb-1 ${textMain}`}>📐 Diédrico Studio</h3>
+
+
                                     </div>
                                 </>
                             ) : (
