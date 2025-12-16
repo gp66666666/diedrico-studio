@@ -1,4 +1,3 @@
-
 import { AcademyTopic } from '../types';
 import { StepByStepVisualizer } from '../components/Academy/StepByStepVisualizer';
 import React from 'react';
@@ -10,6 +9,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         title: '1. Introducción: El Punto',
         description: 'Fundamentos, planos de proyección, coordenadas (X, Y, Z) y alfabeto del punto visual.',
         category: 'Teoría',
+        theory: `Fundamentos, planos de proyección, coordenadas (X, Y, Z) y alfabeto del punto visual.`,
         theoryContent: `
             <div class="space-y-10 text-slate-700">
                 <!-- INTRODUCCION -->
@@ -112,6 +112,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         title: '2. La Recta',
         description: 'Definición, obtención de trazas, y clasificación exhaustiva de los 7 tipos de rectas.',
         category: 'Teoría',
+        theory: `Definición, obtención de trazas, y clasificación exhaustiva de los 7 tipos de rectas.`,
         theoryContent: `
              <div class="space-y-8 text-slate-700 break-inside-avoid-page">
                 <h3 class="text-2xl font-bold text-slate-900 mb-4 font-serif">1. Definición de la Recta</h3>
@@ -245,6 +246,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         title: '3. El Plano',
         description: 'Determinación, trazas, rectas notables y clasificación exhaustiva de planos.',
         category: 'Teoría',
+        theory: `Determinación, trazas, rectas notables y clasificación exhaustiva de planos.`,
         theoryContent: `
              <div class="space-y-8 text-slate-700 break-inside-avoid-page">
                 <h3 class="text-2xl font-bold text-slate-900 mb-4 font-serif">1. Determinación del Plano</h3>
@@ -376,6 +378,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         title: '4. Intersecciones',
         description: 'Métodos para hallar puntos y rectas comunes. Intersección Recta-Plano, Plano-Plano y casos complejos.',
         category: 'Teoría',
+        theory: `Métodos para hallar puntos y rectas comunes. Intersección Recta-Plano, Plano-Plano y casos complejos.`,
         theoryContent: (
             <div className="space-y-12 text-slate-700">
                 <div className="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-500">
@@ -489,7 +492,6 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                 />
 
                 {/* 2. Intersección Plano - Plano */}
-                {/* 2. Intersección Plano - Plano */}
                 <StepByStepVisualizer
                     title="2. Intersección Plano - Plano"
                     steps={[
@@ -519,25 +521,12 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                                     <line x1="220" y1="125" x2="180" y2="20" stroke="#10b981" strokeWidth="2" opacity="0.3" />
 
                                     {/* Intersection Top (Visual) */}
-                                    {/* A2 and B2 intersection. 
-                                        A2: (80,125) to (40,20). Slope: (20-125)/(40-80) = 105/40 = 2.625
-                                        B2: (220,125) to (180,20). Slope: (20-125)/(180-220) = 105/40 = 2.625. Parallel?
-                                        Wait, they both go Left-Up? Yes. They might not intersect on canvas.
-                                        I need opposite slopes for nice intersection.
-                                        Let's change B2 to go Right-Up. (220,125) to (260, 20).
-                                    */}
-                                    {/* Adjusted B2 for visual clarity */}
                                     <line x1="220" y1="125" x2="260" y2="20" stroke="#10b981" strokeWidth="2" opacity="0.3" />
-                                    {/* Intersection: A2 (Left-Up) and B2 (Right-Up). They intersect above LT.
-                                        Midpoint x approx 150. y approx ?
-                                        Let's just put the V point somewhere plausible.
-                                    */}
                                     <circle cx="150" cy="50" r="4" fill="#f97316" /> <text x="160" y="50" fill="#f97316">V</text>
 
                                     {/* Intersection Bottom */}
                                     <line x1="80" y1="125" x2="180" y2="270" stroke="#3b82f6" strokeWidth="2" opacity="0.3" />
                                     <line x1="220" y1="125" x2="140" y2="270" stroke="#10b981" strokeWidth="2" opacity="0.3" />
-                                    {/* Intersection H: A1 (Right-Down) and B1 (Left-Down). Intersect below. */}
                                     <circle cx="140" cy="210" r="4" fill="#f97316" /> <text x="150" y="210" fill="#f97316">H</text>
                                 </svg>
                             )
@@ -553,12 +542,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                                     <circle cx="140" cy="210" r="4" fill="#f97316" opacity="0.5" />
 
                                     {/* Line i'' (Vertical Projection) connecting V'' and H'' */}
-                                    {/* V''=(150,50). H''=(140,125) on LT. */}
                                     <line x1="150" y1="50" x2="140" y2="125" stroke="#f97316" strokeWidth="2" strokeDasharray="5,5" />
                                     <text x="155" y="70" fill="#f97316" fontWeight="bold">i''</text>
 
                                     {/* Line i' (Horizontal Projection) connecting V' and H' */}
-                                    {/* V'=(150,125) on LT. H'=(140,210). */}
                                     <line x1="150" y1="125" x2="140" y2="210" stroke="#f97316" strokeWidth="2" strokeDasharray="5,5" />
                                     <text x="145" y="190" fill="#f97316" fontWeight="bold">i'</text>
                                 </svg>
@@ -567,7 +554,6 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                     ]}
                 />
 
-                {/* 3. CASO COMPLEJO: 3 PLANOS */}
                 {/* 3. CASO COMPLEJO: 3 PLANOS */}
                 <StepByStepVisualizer
                     title="3. Intersección de 3 Planos (A, B, C)"
@@ -604,11 +590,6 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                                     <line x1="250" y1="125" x2="220" y2="220" stroke="#10b981" strokeWidth="2" opacity="0.3" />
 
                                     {/* Intersections of A and B */}
-                                    {/* V = A2 x B2. A2(50,125)->(20,20). B2(250,125)->(280,20). Intersect high up?
-                                        Actually they diverge upwards. Distances increase.
-                                        Need to adjust slopes for convergence.
-                                        Let's assume generic result: Line i.
-                                    */}
                                     <line x1="120" y1="20" x2="180" y2="230" stroke="#f97316" strokeWidth="2" /> <text x="185" y="190" fill="#f97316">i = A ∩ B</text>
                                     <circle cx="135" cy="70" r="3" fill="#f97316" /> <text x="140" y="70" fill="#f97316">V</text>
                                     <circle cx="165" cy="180" r="3" fill="#f97316" /> <text x="170" y="180" fill="#f97316">H</text>
@@ -649,6 +630,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         title: '5. Paralelismo y Perpendicularidad',
         description: 'Métodos interactivos paso a paso para resolver problemas de paralelismo y perpendicularidad.',
         category: 'Teoría',
+        theory: `Métodos interactivos paso a paso para resolver problemas de paralelismo y perpendicularidad.`,
         theoryContent: (
             <div className="space-y-12 text-slate-700">
                 <div className="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-500">
@@ -933,24 +915,14 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                                     <circle cx="150" cy="175" r="3" fill="black" /> <text x="160" y="175" fill="black">P'</text>
 
                                     {/* Recta s (Frontal) */}
-                                    {/* s'' perpendicular a r'' pasando por P'' */}
-                                    {/* r'' slope: -50/200 = -0.25. Perp slope: 4. */}
-                                    {/* y - 75 = 4(x - 150). Too steep. 
-                                        Let's redraw r to be steeper so s is visible.
-                                        r'': (100,20) to (140,100). m = 80/40 = 2.
-                                        s'' perp m = -0.5.
-                                    */}
                                     <line x1="120" y1="20" x2="140" y2="80" stroke="#ef4444" strokeWidth="2" /> {/* r'' */}
                                     <line x1="100" y1="200" x2="200" y2="150" stroke="#ef4444" strokeWidth="2" /> {/* r' */}
 
-                                    {/* P (150, 60) and (150, 180) */}
                                     <circle cx="160" cy="60" r="3" fill="black" />
                                     <circle cx="160" cy="180" r="3" fill="black" />
 
-                                    {/* s'' perp to r''. r'' slope 3. s'' slope -0.33 */}
                                     <line x1="100" y1="80" x2="220" y2="40" stroke="#10b981" strokeWidth="2" /> <text x="225" y="40" fill="#10b981">s'' (⊥ r'')</text>
 
-                                    {/* s' parallel to LT (Frontal) */}
                                     <line x1="100" y1="180" x2="220" y2="180" stroke="#10b981" strokeWidth="2" /> <text x="225" y="180" fill="#10b981">s' (// LT)</text>
                                 </svg>
                             )
@@ -990,7 +962,6 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                                         <line x1="50" y1="60" x2="150" y2="60" stroke="purple" strokeWidth="1" strokeDasharray="3,3" /> <text x="155" y="60" fill="purple">h'' (// LT)</text>
 
                                         {/* h' perpendicular to r' through P' */}
-                                        {/* r' slope roughly +0.6. perp slope -1.6 */}
                                         <line x1="140" y1="130" x2="80" y2="230" stroke="purple" strokeWidth="1" strokeDasharray="3,3" /> <text x="85" y="235" fill="purple">h' (⊥ r')</text>
 
                                         <circle cx="100" cy="60" r="3" fill="#ef4444" />
@@ -1005,17 +976,13 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                                     <svg width="100%" height="250" viewBox="0 0 300 250">
                                         <line x1="20" y1="125" x2="280" y2="125" className="stroke-black dark:stroke-white" strokeWidth="2" />
                                         {/* v point where h' cuts LT then up to h'' */}
-                                        {/* Visual approx: h' cuts LT(125) at approx x=143 */}
                                         <line x1="143" y1="125" x2="143" y2="60" stroke="purple" strokeWidth="1" strokeDasharray="2,2" />
                                         <circle cx="143" cy="60" r="3" fill="#f97316" /> <text x="135" y="55" fill="#f97316" fontSize="10">v</text>
 
                                         {/* Alpha2 perp to r'' passing through v */}
-                                        {/* r'' slope -0.6. perp slope +1.6 */}
                                         <line x1="120" y1="96" x2="160" y2="30" stroke="#f97316" strokeWidth="2" /> <text x="165" y="35" fill="#f97316" fontWeight="bold">Alpha2 (⊥ r'')</text>
 
                                         {/* Cuts LT at 139 approx */}
-                                        {/* Alpha1 perp to r' from cut point */}
-                                        {/* r' slope +0.6. perp slope -1.6 */}
                                         <line x1="139" y1="125" x2="100" y2="190" stroke="#f97316" strokeWidth="2" /> <text x="90" y="195" fill="#f97316" fontWeight="bold">Alpha1 (⊥ r')</text>
                                     </svg>
                                 )
@@ -1101,16 +1068,10 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                                     <circle cx="150" cy="180" r="3" fill="black" /> <text x="155" y="180" fill="gray" fontSize="10">P'</text>
 
                                     {/* h (Horizontal) passing through P */}
-                                    {/* h'' parallel to LT through P'' */}
                                     <line x1="50" y1="60" x2="250" y2="60" stroke="#10b981" strokeWidth="2" /> <text x="260" y="65" fill="#10b981">h'' (//LT)</text>
 
-                                    {/* h' perpendicular to r' through P' */}
-                                    {/* r' slope is (160-200)/(250-50) = -40/200 = -0.2 */}
-                                    {/* h' slope = 5 */}
-                                    {/* P'=(150,180). y-180 = 5(x-150). if x=140, y=130. if x=160, y=230. */}
                                     <line x1="140" y1="130" x2="160" y2="230" stroke="#10b981" strokeWidth="2" /> <text x="165" y="220" fill="#10b981">h' (⊥ r')</text>
 
-                                    {/* 90 deg visual symbol */}
                                     <path d="M 148 180 L 152 172" stroke="gray" strokeWidth="1" />
                                 </svg>
                             )
@@ -1132,14 +1093,85 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
     },
 
     // 6. DISTANCIAS
-    { id: 'theory-6-distances', title: '6. Distancias', description: 'Distancia entre elementos.', category: 'Teoría', theoryContent: 'Contenido 6', exercises: [] },
-    { id: 'theory-7-angles', title: '7. Ángulos', description: 'Ángulos.', category: 'Teoría', theoryContent: 'Contenido 7', exercises: [] },
-    { id: 'theory-8-abatements', title: '8. Abatimientos', description: 'Abatimientos.', category: 'Teoría', theoryContent: 'Contenido 8', exercises: [] },
-    { id: 'theory-9-rotations', title: '9. Giros', description: 'Giros.', category: 'Teoría', theoryContent: 'Contenido 9', exercises: [] },
-    { id: 'theory-10-change-plane', title: '10. Cambios de Plano', description: 'Cambios.', category: 'Teoría', theoryContent: 'Contenido 10', exercises: [] },
-    { id: 'theory-11-polyhedra', title: '11. Poliedros', description: 'Poliedros.', category: 'Teoría', theoryContent: 'Contenido 11', exercises: [] },
-    { id: 'theory-12-surfaces', title: '12. Superficies', description: 'Superficies.', category: 'Teoría', theoryContent: 'Contenido 12', exercises: [] },
-    { id: 'theory-13-sections', title: '13. Secciones', description: 'Secciones.', category: 'Teoría', theoryContent: 'Contenido 13', exercises: [] },
-    { id: 'theory-14-developments', title: '14. Desarrollos', description: 'Desarrollos.', category: 'Teoría', theoryContent: 'Contenido 14', exercises: [] }
+    {
+        id: 'theory-6-distances',
+        title: '6. Distancias',
+        description: 'Distancia entre elementos.',
+        category: 'Teoría',
+        theory: `Distancia entre elementos.`,
+        theoryContent: 'Contenido 6',
+        exercises: []
+    },
+    {
+        id: 'theory-7-angles',
+        title: '7. Ángulos',
+        description: 'Ángulos.',
+        category: 'Teoría',
+        theory: `Ángulos.`,
+        theoryContent: 'Contenido 7',
+        exercises: []
+    },
+    {
+        id: 'theory-8-abatements',
+        title: '8. Abatimientos',
+        description: 'Abatimientos.',
+        category: 'Teoría',
+        theory: `Abatimientos.`,
+        theoryContent: 'Contenido 8',
+        exercises: []
+    },
+    {
+        id: 'theory-9-rotations',
+        title: '9. Giros',
+        description: 'Giros.',
+        category: 'Teoría',
+        theory: `Giros.`,
+        theoryContent: 'Contenido 9',
+        exercises: []
+    },
+    {
+        id: 'theory-10-change-plane',
+        title: '10. Cambios de Plano',
+        description: 'Cambios.',
+        category: 'Teoría',
+        theory: `Cambios de plano.`,
+        theoryContent: 'Contenido 10',
+        exercises: []
+    },
+    {
+        id: 'theory-11-polyhedra',
+        title: '11. Poliedros',
+        description: 'Poliedros.',
+        category: 'Teoría',
+        theory: `Poliedros.`,
+        theoryContent: 'Contenido 11',
+        exercises: []
+    },
+    {
+        id: 'theory-12-surfaces',
+        title: '12. Superficies',
+        description: 'Superficies.',
+        category: 'Teoría',
+        theory: `Superficies.`,
+        theoryContent: 'Contenido 12',
+        exercises: []
+    },
+    {
+        id: 'theory-13-sections',
+        title: '13. Secciones',
+        description: 'Secciones.',
+        category: 'Teoría',
+        theory: `Secciones.`,
+        theoryContent: 'Contenido 13',
+        exercises: []
+    },
+    {
+        id: 'theory-14-developments',
+        title: '14. Desarrollos',
+        description: 'Desarrollos.',
+        category: 'Teoría',
+        theory: `Desarrollos.`,
+        theoryContent: 'Contenido 14',
+        exercises: []
+    }
 ];
-
