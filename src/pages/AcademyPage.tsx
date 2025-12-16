@@ -90,6 +90,16 @@ export default function AcademyPage() {
         }
     };
 
+    // Obtener el contenido teórico (usa theoryContent si existe, sino theory)
+    const getTheoryContent = (topic: AcademyTopic) => {
+        // Primero intenta con theoryContent (que puede ser string o ReactNode)
+        if (topic.theoryContent) {
+            return topic.theoryContent;
+        }
+        // Si no, usa theory (que siempre es string según tu tipo)
+        return topic.theory;
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col md:flex-row print:bg-white print:text-black">
             {/* Sidebar Topics */}
@@ -161,18 +171,26 @@ export default function AcademyPage() {
                         </div>
 
                         {/* Theory Block */}
-                        {typeof selectedTopic.theoryContent === 'string' ? (
-                            <div
-                                id="theory-content"
-                                className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-slate-100 prose prose-slate max-w-none mb-8 print:bg-white print:text-black print:border-none print:shadow-none print:prose-black print:p-0 cursor-zoom-in font-serif"
-                                onClick={handleTheoryClick}
-                                dangerouslySetInnerHTML={{ __html: selectedTopic.theoryContent }}
-                            />
-                        ) : (
-                            <div className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-slate-100 prose prose-slate max-w-none mb-8 print:bg-white print:text-black print:border-none print:shadow-none print:prose-black print:p-0 font-serif">
-                                {selectedTopic.theoryContent}
-                            </div>
-                        )}
+                        {(() => {
+                            const theoryContent = getTheoryContent(selectedTopic);
+
+                            if (typeof theoryContent === 'string') {
+                                return (
+                                    <div
+                                        id="theory-content"
+                                        className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-slate-100 prose prose-slate max-w-none mb-8 print:bg-white print:text-black print:border-none print:shadow-none print:prose-black print:p-0 cursor-zoom-in font-serif"
+                                        onClick={handleTheoryClick}
+                                        dangerouslySetInnerHTML={{ __html: theoryContent }}
+                                    />
+                                );
+                            } else {
+                                return (
+                                    <div className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-slate-100 prose prose-slate max-w-none mb-8 print:bg-white print:text-black print:border-none print:shadow-none print:prose-black print:p-0 font-serif">
+                                        {theoryContent}
+                                    </div>
+                                );
+                            }
+                        })()}
 
                         {/* Mark Topic as Completed */}
                         <div className="flex items-center gap-4 mb-12 p-6 bg-white border border-slate-200 rounded-xl shadow-sm print:hidden">
@@ -250,10 +268,10 @@ export default function AcademyPage() {
                                                 <div className="flex items-center gap-2">
                                                     <span
                                                         className={`px-2 py-1 rounded text-xs font-bold border ${ex.level === 'Fácil'
-                                                            ? 'bg-green-50 text-green-700 border-green-200'
-                                                            : ex.level === 'Medio'
-                                                                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                                                : 'bg-red-50 text-red-700 border-red-200'
+                                                                ? 'bg-green-50 text-green-700 border-green-200'
+                                                                : ex.level === 'Medio'
+                                                                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                                                    : 'bg-red-50 text-red-700 border-red-200'
                                                             }`}
                                                     >
                                                         {ex.level}
