@@ -1,6 +1,6 @@
 /* 
- * Academy Dark Theme Overrides - VERSIÓN INFALIBLE
- * Funciona siempre, para todo contenido nuevo
+ * Academy Dark Theme Overrides - VERSIÓN ESPECÍFICA
+ * Solo afecta al contenido de la Academia, no al resto de la aplicación
  */
 
 /* ========== 1. NÚCLEO PRINCIPAL ========== */
@@ -34,16 +34,14 @@
 }
 
 /* ========== 3. REGLAS DE SEGURIDAD ========== */
-/* Si alguien se olvida de poner .academy-content */
-.dark .space-y-10 .text-slate-900,
-.dark .space-y-8 .text-slate-900,
-.dark .space-y-6 .text-slate-900 {
+/* Solo para contenido de la Academia */
+.dark .academy-page .text-slate-900,
+.dark .academy-page .text-slate-800 {
     color: #FFD700 !important;
 }
 
-/* ========== 4. REGLA NUCLEAR - FUNCIONA SIEMPRE ========== */
-/* Esto selecciona CUALQUIER elemento en modo oscuro que tenga text-slate-900 */
-.dark [class*="slate-900"] {
+/* REGLA NUCLEAR RESTRINGIDA - Solo afecta dentro de academy-content */
+.dark .academy-content [class*="slate-900"] {
     color: #FFD700 !important;
     /* AMARILLO ORO */
 }
@@ -111,25 +109,29 @@
 }
 
 /* ========== 9. REGLA FINAL DE SEGURIDAD ========== */
-/* Para cualquier contenido futuro que se añada */
+/* Para cualquier contenido futuro que se añada a la Academia */
 .dark .academy-content *,
-.dark [class*="academy"] * {
+.dark .academy-page * {
     color: inherit !important;
 }
 
-/* ========== 10. ESPECIAL PARA CHAT IA ========== */
-/* Excluir el chat de IA de estas reglas */
+/* ========== 10. ESPECIAL PARA CHAT IA Y SIDEBAR ========== */
+/* Excluir el chat de IA y la barra lateral de estas reglas */
 .dark .fixed,
 .dark [class*="z-50"],
 .dark [class*="z-999"],
-.dark [class*="chat"] {
+.dark [class*="chat"],
+.dark [class*="sidebar"],
+.dark [class*="Sidebar"] {
     color: initial !important;
 }
 
 .dark .fixed *,
 .dark [class*="z-50"] *,
 .dark [class*="z-999"] *,
-.dark [class*="chat"] * {
+.dark [class*="chat"] *,
+.dark [class*="sidebar"] *,
+.dark [class*="Sidebar"] * {
     color: initial !important;
 }
 

@@ -4,7 +4,9 @@ import {
     Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import '../sidebar-theme-protection.css';
 import { useGeometryStore } from '../store/geometryStore';
+import { useThemeSync } from '../hooks/useThemeSync';
 import type { GeometryElement, PointElement, LineElement, PlaneElement } from '../types';
 import AdvancedToolsPanel from './AdvancedToolsPanel';
 import { calculatePlaneFromTwoLines } from '../utils/mathUtils';
@@ -60,6 +62,9 @@ export default function Sidebar() {
     } = useGeometryStore();
 
     const isDark = theme === 'dark';
+
+    // Sincronizar el tema con el DOM
+    useThemeSync();
 
     const [activeTab, setActiveTab] = useState<'add' | 'list' | 'tools'>('add');
     const navigate = useNavigate();
@@ -546,7 +551,7 @@ export default function Sidebar() {
     const buttonClass = isDark ? 'hover:bg-white/10 active:bg-white/20' : 'hover:bg-white/60 hover:shadow-sm active:bg-white/80';
 
     return (
-        <div className={`h-full w-80 max-w-[85vw] flex flex-col border-r pb-14 relative backdrop-blur-2xl transition-colors duration-300 ${headerBorder} ${isDark ? 'bg-gray-900/60 text-white border-white/20 shadow-2xl shadow-black/20' : 'bg-white/60 text-gray-900 border-white/60 shadow-xl'}`}>
+        <div className={`sidebar ${isDark ? 'sidebar-dark' : 'sidebar-light'} h-full w-80 max-w-[85vw] flex flex-col border-r pb-14 relative backdrop-blur-2xl transition-colors duration-300 ${headerBorder} ${isDark ? 'bg-gray-900/60 text-white border-white/20 shadow-2xl shadow-black/20' : 'bg-white/60 text-gray-900 border-white/60 shadow-xl'}`}>
             {/* Header */}
             <div className={`p-4 border-b ${headerBorder}`}>
                 <div className="flex items-center justify-between">

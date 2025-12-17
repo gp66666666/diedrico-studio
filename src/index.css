@@ -3,6 +3,40 @@
 @tailwind utilities;
 
 /* ===========================================
+   ESTILOS DE PROTECCIÓN PARA LA BARRA LATERAL
+   =========================================== */
+
+/* Estilos iniciales para evitar parpadeos */
+.dark div[class*="sidebar"],
+.dark [class*="sidebar"] {
+    color: white !important;
+}
+
+.dark div[class*="sidebar"] *,
+.dark [class*="sidebar"] * {
+    color: white !important;
+}
+
+/* Iconos específicos del Sidebar - Forzar colores */
+.dark .sidebar-dark .text-purple-500,
+.dark [class*="sidebar"] .text-purple-500 {
+    color: #a855f7 !important;
+    fill: #a855f7 !important;
+}
+
+.dark .sidebar-dark .text-blue-400,
+.dark [class*="sidebar"] .text-blue-400 {
+    color: #60a5fa !important;
+    fill: #60a5fa !important;
+}
+
+.dark .sidebar-dark .text-yellow-400,
+.dark [class*="sidebar"] .text-yellow-400 {
+    color: #facc15 !important;
+    fill: #facc15 !important;
+}
+
+/* ===========================================
    FIX PARA TEMA OSCURO DE ACADEMIA - VERSIÓN CORREGIDA
    =========================================== */
 

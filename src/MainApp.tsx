@@ -8,6 +8,7 @@ import { useGeometryStore } from './store/geometryStore';
 import { useUserStore } from './store/userStore';
 import { FEATURES } from './config/features';
 import { AIChatPanel } from './features/ai-assistant';
+import { useThemeSync, useThemeInitializer } from './hooks/useThemeSync';
 // AdBanner import removed
 
 export default function MainApp() {
@@ -15,6 +16,10 @@ export default function MainApp() {
     const { theme, viewMode, setViewMode } = useGeometryStore();
     const { isPremium } = useUserStore();
     const isDark = theme === 'dark';
+    
+    // Inicializar y sincronizar el tema
+    useThemeInitializer();
+    useThemeSync();
 
     // Theme Classes
     const bgClass = isDark ? 'bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50';

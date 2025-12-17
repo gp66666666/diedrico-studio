@@ -5,8 +5,11 @@ import ContactPage from './pages/ContactPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AcademyPage from './pages/AcademyPage';
+import { useThemeInitializer } from './hooks/useThemeSync';
 
 function App() {
+    // Inicializar el tema al cargar la aplicación
+    useThemeInitializer();
     return (
         <BrowserRouter>
             <Routes>

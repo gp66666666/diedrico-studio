@@ -6,6 +6,7 @@ import { ACADEMY_CONTENT } from '../data/academyContent';
 import type { AcademyTopic, AcademyExercise } from '../types';
 import { Sun, Moon, ArrowLeft, BookOpen, CheckCircle2, Printer, Play, ChevronUp } from 'lucide-react';
 import PremiumModal from '../components/Auth/PremiumModal';
+import { useThemeSync } from '../hooks/useThemeSync';
 
 export default function AcademyPage() {
     const user = useUserStore();
@@ -23,36 +24,12 @@ export default function AcademyPage() {
 
     const isDark = geom.theme === 'dark';
 
-    // ========== ARREGLO DEL TEMA OSCURO ==========
-    useEffect(() => {
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-            document.body.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-            localStorage.setItem('darkMode', 'true');
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.body.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-            localStorage.setItem('darkMode', 'false');
-        }
-    }, [isDark, geom.theme]);
+    // Sincronizar tema usando el hook centralizado
+    useThemeSync();
 
     const handleToggleTheme = () => {
-        const newTheme = isDark ? 'light' : 'dark';
         geom.toggleTheme();
-        localStorage.setItem('theme', newTheme);
-        localStorage.setItem('darkMode', newTheme === 'dark' ? 'true' : 'false');
-        if (newTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-            document.body.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.body.classList.remove('dark');
-        }
-        console.log('Tema cambiado a:', newTheme);
     };
-    // ========== FIN ARREGLO ==========
 
     const bgPrimary = isDark ? 'bg-slate-900' : 'bg-slate-50';
     const bgSecondary = isDark ? 'bg-slate-800/90' : 'bg-white';
@@ -189,7 +166,7 @@ export default function AcademyPage() {
     };
 
     return (
-        <div className={`min-h-screen ${bgPrimary} ${textPrimary} flex flex-col md:flex-row print:bg-white print:text-black transition-colors duration-300`}>
+        <div className={`academy-page min-h-screen ${bgPrimary} ${textPrimary} flex flex-col md:flex-row print:bg-white print:text-black transition-colors duration-300`}>
             {/* Sidebar */}
             <div className={`w-full md:w-80 border-r ${borderPrimary} ${bgSidebar} p-6 flex flex-col print:hidden shadow-sm z-10 transition-colors duration-300 backdrop-blur-sm`}>
                 <div className="flex items-center gap-3 mb-8">
@@ -514,4 +491,4 @@ export default function AcademyPage() {
             </div>
         </div>
     );
-}
+} 
