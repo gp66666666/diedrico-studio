@@ -11,7 +11,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         category: 'Teoría',
         theory: `Fundamentos, planos de proyección, coordenadas (X, Y, Z) y alfabeto del punto visual.`,
         theoryContent: `
-            <div class="space-y-10 text-slate-700">
+    <div class="academy-content space-y-10 text-slate-700">
                 <!-- INTRODUCCION -->
                 <section class="bg-blue-50 p-8 rounded-2xl border border-blue-100">
                     <h3 class="text-3xl font-bold text-blue-900 mb-4 font-serif">¿Qué es el Sistema Diédrico?</h3>

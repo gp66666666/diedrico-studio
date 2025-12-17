@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { useGeometryStore } from '../store/geometryStore';
 import { ACADEMY_CONTENT } from '../data/academyContent';
 import type { AcademyTopic, AcademyExercise } from '../types';
-import { Sun, Moon, ArrowLeft, BookOpen, CheckCircle2, Printer, Play } from 'lucide-react';
+import { Sun, Moon, ArrowLeft, BookOpen, CheckCircle2, Printer, Play, ChevronUp } from 'lucide-react';
 import PremiumModal from '../components/Auth/PremiumModal';
 
 export default function AcademyPage() {
@@ -17,10 +17,43 @@ export default function AcademyPage() {
     const [showPremiumModal, setShowPremiumModal] = useState(false);
     const [lightboxContent, setLightboxContent] = useState<string | null>(null);
     const [selectedTopic, setSelectedTopic] = useState<AcademyTopic | null>(ACADEMY_CONTENT[0]);
+    const [showScrollToTop, setShowScrollToTop] = useState(false);
+
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const isDark = geom.theme === 'dark';
 
-    // Sistema de colores optimizado para mejor contraste y estética
+    // ========== ARREGLO DEL TEMA OSCURO ==========
+    useEffect(() => {
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.body.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            localStorage.setItem('darkMode', 'false');
+        }
+    }, [isDark, geom.theme]);
+
+    const handleToggleTheme = () => {
+        const newTheme = isDark ? 'light' : 'dark';
+        geom.toggleTheme();
+        localStorage.setItem('theme', newTheme);
+        localStorage.setItem('darkMode', newTheme === 'dark' ? 'true' : 'false');
+        if (newTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.body.classList.remove('dark');
+        }
+        console.log('Tema cambiado a:', newTheme);
+    };
+    // ========== FIN ARREGLO ==========
+
     const bgPrimary = isDark ? 'bg-slate-900' : 'bg-slate-50';
     const bgSecondary = isDark ? 'bg-slate-800/90' : 'bg-white';
     const bgSidebar = isDark ? 'bg-slate-800/95' : 'bg-white';
@@ -36,7 +69,6 @@ export default function AcademyPage() {
     const borderSecondary = isDark ? 'border-slate-600/50' : 'border-slate-100';
     const borderHover = isDark ? 'border-slate-500' : 'border-slate-300';
 
-    // Colores temáticos con mejor balance
     const blueBg = isDark ? 'bg-blue-900/20' : 'bg-blue-50/80';
     const blueBorder = isDark ? 'border-blue-700/40' : 'border-blue-100';
     const blueText = isDark ? 'text-blue-300' : 'text-blue-700';
@@ -55,14 +87,38 @@ export default function AcademyPage() {
     const redText = isDark ? 'text-red-300' : 'text-red-700';
 
     const buttonHover = isDark ? 'hover:bg-slate-700/60 active:bg-slate-700' : 'hover:bg-slate-100/80 hover:shadow-sm active:bg-slate-200';
-
-    // Header específico
     const headerBorder = isDark ? 'border-slate-700/50' : 'border-slate-200/50';
+
+    const handleTopicClick = (topic: AcademyTopic) => {
+        setSelectedTopic(topic);
+        setTimeout(() => {
+            if (window.innerWidth < 768) {
+                contentRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 50);
+    };
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollToTop(window.scrollY > 300);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleTheoryClick = (e: React.MouseEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
         const clickable = target.closest('svg') || target.closest('img');
-
         if (clickable) {
             const content = clickable.outerHTML
                 .replace(/width=".*?"/, 'width="100%"')
@@ -90,12 +146,10 @@ export default function AcademyPage() {
         );
     }
 
-    // PDF Download
     const handleDownloadPDF = () => {
         window.print();
     };
 
-    // Load Exercise
     const loadExercise = (exercise: AcademyExercise) => {
         console.log('[loadExercise] Starting with exercise:', exercise);
         console.log('[loadExercise] Setup data:', exercise.setup);
@@ -127,19 +181,16 @@ export default function AcademyPage() {
         }
     };
 
-    // Obtener el contenido teórico (usa theoryContent si existe, sino theory)
     const getTheoryContent = (topic: AcademyTopic) => {
-        // Primero intenta con theoryContent (que puede ser string o ReactNode)
         if (topic.theoryContent) {
             return topic.theoryContent;
         }
-        // Si no, usa theory (que siempre es string según tu tipo)
         return topic.theory;
     };
 
     return (
         <div className={`min-h-screen ${bgPrimary} ${textPrimary} flex flex-col md:flex-row print:bg-white print:text-black transition-colors duration-300`}>
-            {/* Sidebar Topics - Mejorado */}
+            {/* Sidebar */}
             <div className={`w-full md:w-80 border-r ${borderPrimary} ${bgSidebar} p-6 flex flex-col print:hidden shadow-sm z-10 transition-colors duration-300 backdrop-blur-sm`}>
                 <div className="flex items-center gap-3 mb-8">
                     <button
@@ -162,7 +213,7 @@ export default function AcademyPage() {
                         return (
                             <button
                                 key={topic.id}
-                                onClick={() => setSelectedTopic(topic)}
+                                onClick={() => handleTopicClick(topic)}
                                 className={`w-full text-left p-4 rounded-xl border transition-all duration-200 relative group ${isSelected
                                     ? `${isDark ? 'bg-blue-900/30 border-blue-600/50 text-blue-100 shadow-md' : 'bg-blue-50 border-blue-200 text-blue-800 shadow-sm'}`
                                     : `${bgCard} border ${borderSecondary} hover:border ${borderHover} ${textSecondary} hover:${bgHover} hover:shadow-sm`
@@ -189,8 +240,11 @@ export default function AcademyPage() {
                 </div>
             </div>
 
-            {/* Main Content - Rediseñado */}
-            <div className={`flex-1 ${bgPrimary} flex flex-col overflow-hidden print:overflow-visible print:block print:bg-white print:h-auto transition-colors duration-300`}>
+            {/* Main Content */}
+            <div
+                ref={contentRef}
+                className={`flex-1 ${bgPrimary} flex flex-col overflow-hidden print:overflow-visible print:block print:bg-white print:h-auto transition-colors duration-300`}
+            >
                 {selectedTopic && (
                     <div className="h-full overflow-y-auto p-4 md:p-8 lg:p-12 max-w-5xl mx-auto w-full custom-scrollbar print:custom-none print:p-0 print:overflow-visible print:h-auto print:block">
                         {/* Header elegante */}
@@ -200,7 +254,7 @@ export default function AcademyPage() {
                                 <p className={`text-sm mt-1 ${textSubtle}`}>Aprende geometría descriptiva paso a paso</p>
                             </div>
                             <button
-                                onClick={geom.toggleTheme}
+                                onClick={handleToggleTheme}
                                 className={`p-2.5 rounded-xl transition-all ${buttonHover} border ${borderSecondary}`}
                                 title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                                 aria-label="Cambiar tema"
@@ -241,10 +295,9 @@ export default function AcademyPage() {
                             </button>
                         </div>
 
-                        {/* Theory Block - Mejorado */}
+                        {/* Theory Block */}
                         {(() => {
                             const theoryContent = getTheoryContent(selectedTopic);
-
                             if (typeof theoryContent === 'string') {
                                 return (
                                     <div
@@ -269,7 +322,7 @@ export default function AcademyPage() {
                             }
                         })()}
 
-                        {/* Marcar como completado - Rediseñado */}
+                        {/* Marcar como completado */}
                         <div className={`flex flex-col sm:flex-row items-center justify-between gap-6 mb-12 p-6 ${bgCard} border ${borderPrimary} rounded-2xl shadow-sm print:hidden transition-all duration-300 backdrop-blur-sm`}>
                             <div className="flex-1">
                                 <h4 className={`font-semibold mb-2 ${textPrimary}`}>
@@ -331,7 +384,7 @@ export default function AcademyPage() {
                             </div>
                         )}
 
-                        {/* Exercises Section - Mejorada */}
+                        {/* Exercises Section */}
                         <div className={`border-t ${borderPrimary} pt-10 mt-8 print:hidden transition-colors duration-300`}>
                             <div className="flex items-center justify-between mb-8">
                                 <div>
@@ -350,8 +403,6 @@ export default function AcademyPage() {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {selectedTopic.exercises.map(ex => {
                                     const isCompleted = profile?.completed_exercises?.includes(ex.id);
-
-                                    // Sistema de niveles mejorado
                                     const getLevelClasses = (level: string) => {
                                         if (level === 'Fácil') {
                                             return {
@@ -376,9 +427,7 @@ export default function AcademyPage() {
                                             };
                                         }
                                     };
-
                                     const level = getLevelClasses(ex.level);
-
                                     return (
                                         <div
                                             key={ex.id}
@@ -412,7 +461,6 @@ export default function AcademyPage() {
                                             <p className={`${textSecondary} text-sm flex-1 mb-5 leading-relaxed`}>
                                                 {ex.statement}
                                             </p>
-
                                             {ex.solutionHint && (
                                                 <div className={`mt-auto pt-4 border-t ${borderSecondary}`}>
                                                     <div className={`${isDark ? 'bg-blue-900/20' : 'bg-blue-50/80'} p-3.5 rounded-xl border ${isDark ? 'border-blue-800/40' : 'border-blue-100'}`}>
@@ -427,8 +475,6 @@ export default function AcademyPage() {
                                     );
                                 })}
                             </div>
-
-                            {/* Mensaje cuando no hay ejercicios */}
                             {selectedTopic.exercises.length === 0 && (
                                 <div className={`text-center py-12 ${textMuted} border ${borderPrimary} rounded-2xl ${bgCard}`}>
                                     <div className="text-4xl mb-3">📚</div>
@@ -436,6 +482,32 @@ export default function AcademyPage() {
                                     <p className="text-sm mt-2">Sigue practicando con los temas disponibles</p>
                                 </div>
                             )}
+                        </div>
+
+                        {/* Botón Volver Arriba */}
+                        {showScrollToTop && (
+                            <button
+                                onClick={scrollToTop}
+                                className={`fixed bottom-6 right-6 z-40 p-3 rounded-full shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 ${isDark
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    }`}
+                                aria-label="Volver arriba"
+                                title="Volver al inicio"
+                            >
+                                <ChevronUp size={24} />
+                            </button>
+                        )}
+
+                        {/* Botón adicional al final */}
+                        <div className="mt-12 pt-8 border-t ${borderPrimary} print:hidden">
+                            <button
+                                onClick={scrollToTop}
+                                className={`w-full py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all ${buttonHover} border ${borderPrimary}`}
+                            >
+                                <ChevronUp size={20} />
+                                <span className="font-medium">Volver al inicio del tema</span>
+                            </button>
                         </div>
                     </div>
                 )}

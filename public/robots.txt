@@ -3,10 +3,6 @@
 
 User-agent: *
 Allow: /
-Allow: /about
-Allow: /contact
-Allow: /privacy
-Allow: /terms
 
 # Bloquear archivos de configuración y desarrollo
 Disallow: /node_modules/
@@ -21,5 +17,5 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
-# Sitemap
-Sitemap: https://https://diedrico-studio.vercel.app//sitemap.xml
+# Sitemap correcto
+Sitemap: https://diedrico-studio.vercel.app/sitemap.xml

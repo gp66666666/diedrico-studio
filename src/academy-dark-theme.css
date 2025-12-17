@@ -1,511 +1,156 @@
 /* 
- * Academy Dark Theme Overrides - VERSIÓN COMPLETA MEJORADA
- * Contraste optimizado + todas las reglas originales
+ * Academy Dark Theme Overrides - VERSIÓN INFALIBLE
+ * Funciona siempre, para todo contenido nuevo
  */
 
-/* ========== CONTENEDOR PRINCIPAL ========== */
-.dark .academy-content {
-    color-scheme: dark;
-}
-
-/* ========== TEXTOS PRINCIPALES - MEJOR CONTRASTE ========== */
-.dark .academy-content p,
-.dark .academy-content li,
-.dark .academy-content td,
-.dark .academy-content th {
-    color: #e2e8f0 !important;
-    /* text-slate-200 - MÁS CLARO */
-    line-height: 1.8 !important;
-}
-
-.dark .academy-content .text-slate-700,
-.dark .academy-content .text-slate-600 {
-    color: #cbd5e1 !important;
-    /* text-slate-300 */
-}
-
+/* ========== 1. NÚCLEO PRINCIPAL ========== */
 .dark .academy-content .text-slate-900,
 .dark .academy-content .text-slate-800 {
-    color: #f1f5f9 !important;
-    /* text-slate-100 - MUCHO MÁS CLARO */
+    color: #FFD700 !important;
+    /* AMARILLO ORO */
 }
 
-.dark .academy-content .text-blue-900,
-.dark .academy-content .text-blue-800,
-.dark .academy-content .text-blue-700 {
-    color: #60a5fa !important;
-    /* text-blue-400 - MÁS BRILLANTE */
-}
-
-.dark .academy-content .text-blue-600 {
-    color: #3b82f6 !important;
-    /* text-blue-500 - AÚN MÁS BRILLANTE */
-}
-
-.dark .academy-content .text-emerald-700,
-.dark .academy-content .text-emerald-600 {
-    color: #34d399 !important;
-    /* text-emerald-400 - MÁS BRILLANTE */
-}
-
-.dark .academy-content .text-amber-600 {
-    color: #fbbf24 !important;
-    /* text-amber-300 */
-}
-
-.dark .academy-content .text-red-700 {
-    color: #f87171 !important;
-    /* text-red-400 */
-}
-
-.dark .academy-content .text-purple-700 {
-    color: #a78bfa !important;
-    /* text-purple-300 */
-}
-
-.dark .academy-content .text-indigo-700 {
-    color: #818cf8 !important;
-    /* text-indigo-400 */
-}
-
-.dark .academy-content .text-gray-600 {
-    color: #94a3b8 !important;
-    /* text-slate-400 */
-}
-
-/* ========== TÍTULOS - MÁXIMO CONTRASTE ========== */
-.dark .academy-content h1 {
-    color: #ffffff !important;
-    /* BLANCO PURO */
-    font-weight: 800 !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
+.dark .academy-content h1,
 .dark .academy-content h2,
 .dark .academy-content h3,
 .dark .academy-content h4,
 .dark .academy-content h5,
 .dark .academy-content h6 {
-    color: #f8fafc !important;
-    /* text-slate-50 */
-    font-weight: 700 !important;
+    color: #FFD700 !important;
+    /* AMARILLO ORO */
 }
 
-/* ========== TEXTOS DE ÉNFASIS ========== */
 .dark .academy-content strong,
 .dark .academy-content b {
-    color: #60a5fa !important;
-    /* text-blue-400 */
-    font-weight: 700 !important;
+    color: #FFA500 !important;
+    /* NARANJA */
 }
 
-.dark .academy-content em {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    font-style: italic !important;
+/* ========== 2. PARA TEXTOS ESPECÍFICOS DENTRO ========== */
+.dark .academy-content .text-slate-900 strong,
+.dark .academy-content .text-slate-900 b {
+    color: #FF8C00 !important;
+    /* NARANJA MÁS FUERTE */
 }
 
-/* ========== FONDOS - MÁS OSCUROS ========== */
+/* ========== 3. REGLAS DE SEGURIDAD ========== */
+/* Si alguien se olvida de poner .academy-content */
+.dark .space-y-10 .text-slate-900,
+.dark .space-y-8 .text-slate-900,
+.dark .space-y-6 .text-slate-900 {
+    color: #FFD700 !important;
+}
+
+/* ========== 4. REGLA NUCLEAR - FUNCIONA SIEMPRE ========== */
+/* Esto selecciona CUALQUIER elemento en modo oscuro que tenga text-slate-900 */
+.dark [class*="slate-900"] {
+    color: #FFD700 !important;
+    /* AMARILLO ORO */
+}
+
+/* ========== 5. FONDOS BÁSICOS ========== */
 .dark .academy-content .bg-white {
     background-color: rgba(15, 23, 42, 0.95) !important;
-    /* bg-slate-900/95 */
-    backdrop-filter: blur(8px);
+}
+
+.dark .academy-content .bg-slate-50,
+.dark .academy-content .bg-gray-50 {
+    background-color: rgba(15, 23, 42, 0.7) !important;
 }
 
 .dark .academy-content .bg-blue-50 {
     background-color: rgba(30, 58, 138, 0.4) !important;
-    /* bg-blue-900/40 */
 }
 
 .dark .academy-content .bg-emerald-50 {
     background-color: rgba(6, 78, 59, 0.4) !important;
-    /* bg-emerald-900/40 */
 }
 
-.dark .academy-content .bg-indigo-50 {
-    background-color: rgba(49, 46, 129, 0.4) !important;
-    /* bg-indigo-900/40 */
+/* ========== 6. TEXTOS BÁSICOS ========== */
+.dark .academy-content p,
+.dark .academy-content li,
+.dark .academy-content td {
+    color: #e2e8f0 !important;
 }
 
-.dark .academy-content .bg-slate-50 {
-    background-color: rgba(15, 23, 42, 0.7) !important;
-    /* bg-slate-900/70 */
+.dark .academy-content .text-slate-700,
+.dark .academy-content .text-slate-600,
+.dark .academy-content .text-gray-700,
+.dark .academy-content .text-gray-600 {
+    color: #cbd5e1 !important;
 }
 
-.dark .academy-content .bg-slate-100 {
-    background-color: rgba(30, 41, 59, 0.8) !important;
-    /* bg-slate-800/80 */
-}
-
-.dark .academy-content .bg-yellow-50 {
-    background-color: rgba(113, 63, 18, 0.4) !important;
-    /* bg-yellow-900/40 */
-}
-
-.dark .academy-content .bg-orange-50 {
-    background-color: rgba(124, 45, 18, 0.4) !important;
-    /* bg-orange-900/40 */
-}
-
-.dark .academy-content .bg-red-50 {
-    background-color: rgba(127, 29, 29, 0.4) !important;
-    /* bg-red-900/40 */
-}
-
-.dark .academy-content .bg-purple-50 {
-    background-color: rgba(76, 29, 149, 0.4) !important;
-    /* bg-purple-900/40 */
-}
-
-.dark .academy-content .bg-amber-50 {
-    background-color: rgba(120, 53, 15, 0.4) !important;
-    /* bg-amber-900/40 */
-}
-
-/* ========== BORDES - MÁS VISIBLES ========== */
-.dark .academy-content .border-blue-100,
-.dark .academy-content .border-blue-200 {
-    border-color: rgba(59, 130, 246, 0.5) !important;
-    /* border-blue-500/50 */
-}
-
-.dark .academy-content .border-emerald-100,
-.dark .academy-content .border-emerald-200 {
-    border-color: rgba(52, 211, 153, 0.5) !important;
-    /* border-emerald-500/50 */
+/* ========== 7. BORDES ========== */
+.dark .academy-content .border-slate-200,
+.dark .academy-content .border-gray-200 {
+    border-color: rgba(148, 163, 184, 0.5) !important;
 }
 
 .dark .academy-content .border-slate-100,
-.dark .academy-content .border-slate-200,
-.dark .academy-content .border-slate-400 {
-    border-color: rgba(148, 163, 184, 0.5) !important;
-    /* border-slate-400/50 */
+.dark .academy-content .border-gray-100 {
+    border-color: rgba(148, 163, 184, 0.3) !important;
 }
 
-.dark .academy-content .border-indigo-100 {
-    border-color: rgba(99, 102, 241, 0.5) !important;
-    /* border-indigo-500/50 */
+/* ========== 8. OTRAS CLASES COMUNES ========== */
+.dark .academy-content .text-blue-900,
+.dark .academy-content .text-blue-800 {
+    color: #60a5fa !important;
 }
 
-.dark .academy-content .border-yellow-100,
-.dark .academy-content .border-yellow-200 {
-    border-color: rgba(234, 179, 8, 0.5) !important;
-    /* border-yellow-500/50 */
-}
-
-.dark .academy-content .border-red-100,
-.dark .academy-content .border-red-200 {
-    border-color: rgba(239, 68, 68, 0.5) !important;
-    /* border-red-500/50 */
-}
-
-.dark .academy-content .border-orange-100,
-.dark .academy-content .border-orange-200 {
-    border-color: rgba(249, 115, 22, 0.5) !important;
-    /* border-orange-500/50 */
-}
-
-.dark .academy-content .border-purple-100,
-.dark .academy-content .border-purple-200 {
-    border-color: rgba(168, 85, 247, 0.5) !important;
-    /* border-purple-500/50 */
-}
-
-.dark .academy-content .border-amber-100,
-.dark .academy-content .border-amber-200 {
-    border-color: rgba(245, 158, 11, 0.5) !important;
-    /* border-amber-500/50 */
-}
-
-/* ========== BORDES IZQUIERDOS ========== */
-.dark .academy-content .border-l-4.border-blue-500 {
-    border-color: #3b82f6 !important;
-    /* border-blue-500 */
-}
-
-.dark .academy-content .border-l-4.border-emerald-500 {
-    border-color: #10b981 !important;
-    /* border-emerald-500 */
-}
-
-.dark .academy-content .border-l-4.border-yellow-500 {
-    border-color: #fbbf24 !important;
-    /* border-yellow-400 */
-}
-
-.dark .academy-content .border-l-4.border-red-500 {
-    border-color: #f87171 !important;
-    /* border-red-400 */
-}
-
-.dark .academy-content .border-l-4.border-purple-500 {
-    border-color: #a78bfa !important;
-    /* border-purple-400 */
-}
-
-.dark .academy-content .border-l-4.border-orange-500 {
-    border-color: #fb923c !important;
-    /* border-orange-400 */
-}
-
-.dark .academy-content .border-l-4.border-slate-400 {
-    border-color: #94a3b8 !important;
-    /* border-slate-400 */
-}
-
-/* ========== SVG Y ELEMENTOS GRÁFICOS ========== */
-.dark .academy-content svg line.stroke-black {
-    stroke: #e2e8f0 !important;
-    /* stroke-slate-200 */
-}
-
-.dark .academy-content .stroke-black {
-    stroke: #e2e8f0 !important;
-    /* stroke-slate-200 */
-}
-
-.dark .academy-content circle,
-.dark .academy-content rect,
-.dark .academy-content path {
-    stroke: #e2e8f0 !important;
-    /* stroke-slate-200 */
-}
-
-/* ========== BADGES Y ETIQUETAS ========== */
-.dark .academy-content .bg-slate-100.text-slate-600 {
-    background-color: rgba(71, 85, 105, 0.6) !important;
-    /* bg-slate-700/60 */
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    border-color: rgba(100, 116, 139, 0.4) !important;
-}
-
-.dark .academy-content .bg-emerald-50.text-emerald-700 {
-    background-color: rgba(6, 78, 59, 0.4) !important;
+.dark .academy-content .text-emerald-900,
+.dark .academy-content .text-emerald-800 {
     color: #34d399 !important;
-    /* text-emerald-400 */
-    border-color: rgba(52, 211, 153, 0.4) !important;
 }
 
-.dark .academy-content .bg-yellow-50.text-yellow-700 {
-    background-color: rgba(113, 63, 18, 0.4) !important;
+.dark .academy-content .text-amber-600 {
     color: #fbbf24 !important;
-    /* text-amber-300 */
-    border-color: rgba(234, 179, 8, 0.4) !important;
 }
 
-.dark .academy-content .bg-red-50.text-red-700 {
-    background-color: rgba(127, 29, 29, 0.4) !important;
+.dark .academy-content .text-red-700 {
     color: #f87171 !important;
-    /* text-red-400 */
-    border-color: rgba(239, 68, 68, 0.4) !important;
 }
 
-.dark .academy-content .bg-blue-50.text-blue-700 {
-    background-color: rgba(30, 58, 138, 0.4) !important;
-    color: #60a5fa !important;
-    /* text-blue-400 */
-    border-color: rgba(59, 130, 246, 0.4) !important;
+/* ========== 9. REGLA FINAL DE SEGURIDAD ========== */
+/* Para cualquier contenido futuro que se añada */
+.dark .academy-content *,
+.dark [class*="academy"] * {
+    color: inherit !important;
 }
 
-.dark .academy-content .bg-orange-50.text-orange-700 {
-    background-color: rgba(124, 45, 18, 0.4) !important;
-    color: #fb923c !important;
-    /* text-orange-400 */
-    border-color: rgba(249, 115, 22, 0.4) !important;
+/* ========== 10. ESPECIAL PARA CHAT IA ========== */
+/* Excluir el chat de IA de estas reglas */
+.dark .fixed,
+.dark [class*="z-50"],
+.dark [class*="z-999"],
+.dark [class*="chat"] {
+    color: initial !important;
 }
 
-/* ========== SHADOWS ========== */
-.dark .academy-content .shadow-sm {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4) !important;
+.dark .fixed *,
+.dark [class*="z-50"] *,
+.dark [class*="z-999"] *,
+.dark [class*="chat"] * {
+    color: initial !important;
 }
 
-/* ========== TABLAS ========== */
-.dark .academy-content table {
-    border-color: rgba(100, 116, 139, 0.4) !important;
+/* ===========================================
+   REGLA NUCLEAR ABSOLUTA - SOBREESCRIBE TODO
+   =========================================== */
+
+/* ESTO SOBREESCRIBE TODAS LAS REGLAS DEL UNIVERSO */
+.dark h3.text-2xl.font-bold.text-slate-900.mb-6.border-b.border-slate-200.pb-2.font-serif {
+    color: #FFD700 !important;
+    font-weight: 800 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-.dark .academy-content th {
-    background-color: rgba(30, 41, 59, 0.8) !important;
-    color: #f1f5f9 !important;
-    /* text-slate-100 */
-    font-weight: 600 !important;
+/* Y para el strong dentro */
+.dark .mb-6.text-lg strong.text-slate-900 {
+    color: #FFA500 !important;
+    font-weight: 800 !important;
 }
 
-.dark .academy-content td {
-    border-color: rgba(100, 116, 139, 0.3) !important;
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-}
-
-/* ========== ENLACES ========== */
-.dark .academy-content a {
-    color: #60a5fa !important;
-    /* text-blue-400 */
-    text-decoration: underline !important;
-    text-underline-offset: 2px !important;
-}
-
-.dark .academy-content a:hover {
-    color: #3b82f6 !important;
-    /* text-blue-500 */
-}
-
-/* ========== CÓDIGO Y PRE ========== */
-.dark .academy-content code {
-    background-color: rgba(0, 0, 0, 0.4) !important;
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    padding: 0.2rem 0.4rem !important;
-    border-radius: 0.25rem !important;
-    font-family: 'Monaco', 'Menlo', monospace !important;
-}
-
-.dark .academy-content pre {
-    background-color: rgba(15, 23, 42, 0.9) !important;
-    border-color: rgba(100, 116, 139, 0.4) !important;
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    padding: 1rem !important;
-    border-radius: 0.5rem !important;
-    overflow-x: auto !important;
-}
-
-/* ========== BLOQUES DE CÓDIGO ESPECÍFICOS ========== */
-.dark .academy-content .space-y-8.text-slate-700 {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-}
-
-.dark .academy-content .space-y-10.text-slate-700 {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-}
-
-/* ========== TEXTO EN ELEMENTOS ESPECIALES ========== */
-.dark .academy-content .text-xs.text-slate-500 {
-    color: #94a3b8 !important;
-    /* text-slate-400 */
-}
-
-.dark .academy-content .text-sm.text-slate-500 {
-    color: #94a3b8 !important;
-    /* text-slate-400 */
-}
-
-.dark .academy-content .text-lg.text-slate-600 {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-}
-
-/* ========== OVERRIDES ESPECIALES PARA CONTENIDO RICO ========== */
-.dark .academy-content div,
-.dark .academy-content section,
-.dark .academy-content article {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-}
-
-.dark .academy-content ul,
-.dark .academy-content ol {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-}
-
-.dark .academy-content li {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    margin-bottom: 0.5rem !important;
-}
-
-/* ========== MEJORAS ESPECÍFICAS PARA TU CONTENIDO ========== */
-.dark .academy-content .bg-blue-50.p-8.rounded-2xl {
-    background-color: rgba(30, 58, 138, 0.3) !important;
-    border-color: rgba(59, 130, 246, 0.3) !important;
-}
-
-.dark .academy-content .text-3xl.font-bold.text-blue-900 {
-    color: #ffffff !important;
-    /* BLANCO PURO */
-    font-size: 2rem !important;
-    line-height: 1.2 !important;
-}
-
-.dark .academy-content .text-lg.leading-relaxed {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    font-size: 1.125rem !important;
-    line-height: 1.8 !important;
-}
-
-.dark .academy-content .text-sm.text-slate-600 {
-    color: #cbd5e1 !important;
-    /* text-slate-300 */
-}
-
-.dark .academy-content .bg-white.p-5.rounded-xl {
-    background-color: rgba(30, 41, 59, 0.8) !important;
-    border-color: rgba(59, 130, 246, 0.3) !important;
-}
-
-/* ========== ESPECIAL PARA "PLANOS DE PROYECCIÓN" ========== */
-.dark .academy-content .text-2xl.font-bold.text-slate-900 {
-    color: #ffffff !important;
-    /* BLANCO PURO */
-    font-size: 1.75rem !important;
-    margin-bottom: 1.5rem !important;
-    padding-bottom: 0.75rem !important;
-    border-bottom: 2px solid rgba(59, 130, 246, 0.5) !important;
-}
-
-.dark .academy-content .mb-6.text-lg {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    font-size: 1.125rem !important;
-    margin-bottom: 2rem !important;
-}
-
-/* ========== FIX PARA PROSE ========== */
-.dark .academy-content .prose :where(p):not(:where([class~="not-prose"] *)) {
-    color: #e2e8f0 !important;
-    /* text-slate-200 */
-    font-size: 1.125rem !important;
-    line-height: 1.8 !important;
-    margin-bottom: 1.5rem !important;
-}
-
-.dark .academy-content .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"] *)) {
-    color: #ffffff !important;
-    /* BLANCO PURO */
-    font-weight: 700 !important;
-    margin-top: 2.5rem !important;
-    margin-bottom: 1.5rem !important;
-}
-
-.dark .academy-content .prose :where(strong):not(:where([class~="not-prose"] *)) {
-    color: #60a5fa !important;
-    /* text-blue-400 */
-    font-weight: 700 !important;
-}
-
-/* ========== MEJORA DE CONTRASTE GENERAL ========== */
-.dark .academy-content * {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* ========== ESPACIADO MEJORADO ========== */
-.dark .academy-content p {
-    margin-bottom: 1.5rem !important;
-}
-
-.dark .academy-content h1,
-.dark .academy-content h2,
-.dark .academy-content h3 {
-    margin-top: 3rem !important;
-    margin-bottom: 2rem !important;
-}
-
-/* ========== FONDOS TRANSPARENTES ========== */
-.dark .academy-content :not(.bg-white):not(.bg-blue-50):not(.bg-slate-50):not(.bg-slate-100):not(.bg-emerald-50):not(.bg-indigo-50) {
-    background-color: transparent !important;
+/* NUCLEAR: selecciona POR TEXTO (si todo falla) */
+.dark h3:contains("Los Planos de Proyección") {
+    color: #FFD700 !important;
 }

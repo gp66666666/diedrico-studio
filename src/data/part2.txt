@@ -115,10 +115,10 @@
                 <p>Un plano no es solo "trazas". Se define geométricamente por:</p>
                 <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 shadow-sm">
                     <ul class="list-disc pl-5 space-y-2 text-slate-700">
-                        <li><strong>3 Puntos</strong> no alineados.</li>
-                        <li><strong>2 Rectas</strong> que se cortan.</li>
-                        <li><strong>2 Rectas</strong> paralelas.</li>
-                        <li><strong>1 Recta</strong> y <strong>1 Punto</strong> exterior.</li>
+                        3 Puntos no alineados.
+                        2 Rectas que se cortan.
+                        2 Rectas paralelas.
+                        1 Recta y 1 Punto exterior.
                     </ul>
                 </div>
 
@@ -263,7 +263,7 @@
         description: 'Intersecciones entre rectas y planos, y entre dos planos (Mordedura). Visibilidad.',
         category: 'Teoría',
         theoryContent: `
-            <div class="space-y-10 text-slate-700">
+      <div class="academy-content space-y-10 text-slate-700">
                 <!-- INTRODUCCION -->
                 <section class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
                     <h3 class="text-3xl font-bold text-slate-900 mb-4">Intersecciones en Diédrico</h3>
