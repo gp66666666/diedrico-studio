@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Save, Loader } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
 
 interface SaveProjectModalProps {
@@ -39,7 +40,7 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
         }
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full">
                 {/* Header */}
@@ -121,6 +122,7 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

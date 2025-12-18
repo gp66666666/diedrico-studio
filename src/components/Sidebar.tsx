@@ -87,7 +87,7 @@ export default function Sidebar() {
         }
     }, [activeTool]);
 
-    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane'>('point');
+    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane' | 'solid'>('point');
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
     const [showPremiumModal, setShowPremiumModal] = useState(false);

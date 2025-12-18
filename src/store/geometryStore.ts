@@ -107,6 +107,13 @@ interface GeometryState {
     };
     setCaballeraStep: (step: GeometryState['caballeraState']['step']) => void;
     updateCaballeraPreview: (coords: Partial<GeometryState['caballeraState']['previewCoords']>) => void;
+
+    // Cloud Save/Load (Premium)
+    saveProject: (title: string, description?: string) => Promise<string>;
+    loadProject: (projectId: string) => Promise<void>;
+    getUserProjects: () => Promise<any[]>;
+    deleteProject: (projectId: string) => Promise<void>;
+    renameProject: (projectId: string, title: string, description?: string) => Promise<void>;
 }
 
 export const useGeometryStore = create<GeometryState>((set, get) => ({

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, FolderOpen, Loader, Trash2, Calendar, Edit2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
 
 interface LoadProjectModalProps {
@@ -63,7 +64,7 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[600px] flex flex-col">
                 {/* Header */}
@@ -173,6 +174,7 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

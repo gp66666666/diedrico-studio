@@ -68,10 +68,9 @@ function SolidObject({ element }: { element: any }) {
             </lineSegments>
 
             {/* Outline - Hidden Edges (Dashed) */}
-            <lineSegments>
+            <lineSegments onUpdate={(self) => (self as THREE.LineSegments).computeLineDistances()}>
                 <edgesGeometry
                     args={[new THREE.BoxGeometry(s.x, s.z, s.y)]}
-                    onUpdate={(self) => self.computeLineDistances()}
                 />
                 <lineDashedMaterial
                     color={color}

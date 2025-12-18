@@ -98,7 +98,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                     {activeTab === 'intro' && (
                         <div className="space-y-6">
                             <div className="text-center space-y-4 py-8">
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                                <h1 className={`text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent block ${isDark ? 'drop-shadow-[0_0_10px_rgba(96,165,250,0.3)]' : ''}`}>
                                     Diédrico Studio v2
                                 </h1>
                                 <p className={`text-lg max-w-xl mx-auto ${isDark ? 'text-slate-300' : 'opacity-80'}`}>
@@ -108,7 +108,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
 
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className={`p-4 rounded-lg border ${headerClass} space-y-2`}>
-                                    <h3 className="font-bold text-blue-400 flex items-center gap-2">
+                                    <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
                                         <MousePointer2 size={18} /> Navegación
                                     </h3>
                                     <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
@@ -118,7 +118,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                     </p>
                                 </div>
                                 <div className={`p-4 rounded-lg border ${headerClass} space-y-2`}>
-                                    <h3 className="font-bold text-green-400 flex items-center gap-2">
+                                    <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-blue-400' : 'text-green-600'}`}>
                                         <Box size={18} /> Modos
                                     </h3>
                                     <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
@@ -136,8 +136,8 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                             <div className="grid gap-3">
                                 {sketchTools.map((tool, idx) => (
                                     <div key={idx} className={`p-3 rounded-lg border ${headerClass} ${itemClass}`}>
-                                        <div className="font-bold text-blue-400">{tool.name}</div>
-                                        <div className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-80'}`}>{tool.desc}</div>
+                                        <div className={`font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{tool.name}</div>
+                                        <div className={`text-sm ${isDark ? 'text-slate-300' : 'opacity-80'}`}>{tool.desc}</div>
                                     </div>
                                 ))}
                             </div>
@@ -161,8 +161,8 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                     <div className="grid gap-3 pl-2">
                                         {section.items.map((item, i) => (
                                             <div key={i} className={`p-3 rounded-lg border ${headerClass} ${itemClass}`}>
-                                                <div className="font-bold text-purple-400">{item.name}</div>
-                                                <div className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-80'}`}>{item.desc}</div>
+                                                <div className={`font-bold ${isDark ? 'text-blue-400' : 'text-purple-600'}`}>{item.name}</div>
+                                                <div className={`text-sm ${isDark ? 'text-slate-300' : 'opacity-80'}`}>{item.desc}</div>
                                             </div>
                                         ))}
                                     </div>

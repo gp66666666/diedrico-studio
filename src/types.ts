@@ -7,6 +7,18 @@ export interface Vector3 {
 // Alias for compatibility
 export type Vec3 = Vector3;
 
+export interface CloudProject {
+    id: string;
+    title: string;
+    description: string;
+    created_at: string;
+    updated_at: string;
+    data: {
+        elements: GeometryElement[];
+        sketchElements: SketchElement[];
+    };
+}
+
 export interface BaseElement {
     id: string;
     type: 'point' | 'line' | 'plane' | 'solid';

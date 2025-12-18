@@ -7,13 +7,13 @@
    =========================================== */
 
 /* Estilos iniciales para evitar parpadeos */
-.dark div[class*="sidebar"]:not([class*="modal"]),
-.dark [class*="sidebar"]:not([class*="modal"]) {
+.dark div[class*="sidebar"],
+.dark [class*="sidebar"] {
   color: white !important;
 }
 
-.dark div[class*="sidebar"]:not([class*="modal"]) *:not([class*="modal"], [class*="modal"] *),
-.dark [class*="sidebar"]:not([class*="modal"]) *:not([class*="modal"], [class*="modal"] *) {
+.dark div[class*="sidebar"] *,
+.dark [class*="sidebar"] * {
   color: white !important;
 }
 

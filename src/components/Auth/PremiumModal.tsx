@@ -1,4 +1,5 @@
-import { X, Crown, Check } from 'lucide-react';
+import { X, Crown } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 interface PremiumModalProps {
     isOpen: boolean;
@@ -8,7 +9,7 @@ interface PremiumModalProps {
 export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
                 {/* Header */}
@@ -47,6 +48,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
