@@ -13,12 +13,12 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
 
     if (!isOpen) return null;
 
-    const bgClass = isDark ? 'bg-gray-900 text-gray-100 border-gray-700' : 'bg-white text-gray-800 border-gray-200';
+    const bgClass = isDark ? 'bg-gray-900 text-slate-100 border-gray-700' : 'bg-white text-gray-800 border-gray-200';
     const headerClass = isDark ? 'border-gray-700' : 'border-gray-200';
     const itemClass = isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50';
     const tabClass = (active: boolean) => `px-4 py-2 font-medium transition-colors ${active
         ? 'text-blue-500 border-b-2 border-blue-500'
-        : `opacity-70 hover:opacity-100 ${isDark ? 'hover:text-gray-200' : 'hover:text-gray-900'}`
+        : `${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`
         }`;
 
     const sketchTools = [
@@ -68,14 +68,14 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md p-4 transition-all duration-300">
-            <div className={`w-full max-w-3xl h-[80vh] flex flex-col rounded-2xl shadow-2xl border ${bgClass} ring-1 ring-white/10`}>
+            <div className={`w-full max-w-3xl h-[80vh] flex flex-col rounded-2xl shadow-2xl border ${bgClass} ring-1 ring-white/10 help-guide-modal`}>
                 {/* Header */}
                 <div className={`flex items-center justify-between p-4 border-b ${headerClass}`}>
-                    <h2 className="text-xl font-bold flex items-center gap-2">
+                    <h2 className={`text-xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                         <Book size={24} className="text-blue-500" />
                         Manual de Usuario
                     </h2>
-                    <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-500/20 transition-colors">
+                    <button onClick={onClose} className={`p-2 rounded-lg hover:bg-gray-500/20 transition-colors ${isDark ? 'text-white' : 'text-gray-600'}`}>
                         <X size={20} />
                     </button>
                 </div>
@@ -101,7 +101,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                                     Diédrico Studio v2
                                 </h1>
-                                <p className="text-lg opacity-80 max-w-xl mx-auto">
+                                <p className={`text-lg max-w-xl mx-auto ${isDark ? 'text-slate-300' : 'opacity-80'}`}>
                                     Tu suite profesional para Geometría Descriptiva y Dibujo Técnico. Combine la potencia del 3D con la precisión del 2D.
                                 </p>
                             </div>
@@ -111,7 +111,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                     <h3 className="font-bold text-blue-400 flex items-center gap-2">
                                         <MousePointer2 size={18} /> Navegación
                                     </h3>
-                                    <p className="text-sm opacity-70">
+                                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
                                         • <b>Click Izquierdo:</b> Seleccionar.<br />
                                         • <b>Click Derecho + Arrastrar:</b> Orbitar (3D) o Desplazar (2D).<br />
                                         • <b>Rueda:</b> Zoom.
@@ -121,7 +121,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                     <h3 className="font-bold text-green-400 flex items-center gap-2">
                                         <Box size={18} /> Modos
                                     </h3>
-                                    <p className="text-sm opacity-70">
+                                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
                                         • <b>Boceto:</b> Dibuja libremente en 2D.<br />
                                         • <b>Diédrico:</b> Construye en el espacio 3D con proyección automática.
                                     </p>
@@ -132,12 +132,12 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
 
                     {activeTab === 'sketch' && (
                         <div className="space-y-4">
-                            <h3 className="text-lg font-bold mb-4">Herramientas de Boceto</h3>
+                            <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Herramientas de Boceto</h3>
                             <div className="grid gap-3">
                                 {sketchTools.map((tool, idx) => (
                                     <div key={idx} className={`p-3 rounded-lg border ${headerClass} ${itemClass}`}>
                                         <div className="font-bold text-blue-400">{tool.name}</div>
-                                        <div className="text-sm opacity-80">{tool.desc}</div>
+                                        <div className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-80'}`}>{tool.desc}</div>
                                     </div>
                                 ))}
                             </div>
@@ -146,13 +146,13 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
 
                     {activeTab === 'diedrico' && (
                         <div className="space-y-8">
-                            <p className="opacity-80 italic border-l-4 border-blue-500 pl-4 py-1">
+                            <p className={`italic border-l-4 border-blue-500 pl-4 py-1 ${isDark ? 'text-gray-300' : 'opacity-80'}`}>
                                 En el modo Diédrico, usa el panel "Herramientas Avanzadas" para realizar operaciones complejas sin necesidad de dibujar trazo a trazo.
                             </p>
 
                             {diedricoTools.map((section, idx) => (
                                 <div key={idx} className="space-y-3">
-                                    <h3 className="text-lg font-bold flex items-center gap-2 border-b pb-2 border-gray-700/50">
+                                    <h3 className={`text-lg font-bold flex items-center gap-2 border-b pb-2 ${isDark ? 'text-white border-gray-700/50' : 'text-gray-800 border-gray-200'}`}>
                                         {idx === 0 && <Box size={18} />}
                                         {idx === 1 && <RotateCw size={18} />}
                                         {idx === 2 && <Ruler size={18} />}
@@ -162,7 +162,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                         {section.items.map((item, i) => (
                                             <div key={i} className={`p-3 rounded-lg border ${headerClass} ${itemClass}`}>
                                                 <div className="font-bold text-purple-400">{item.name}</div>
-                                                <div className="text-sm opacity-80">{item.desc}</div>
+                                                <div className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-80'}`}>{item.desc}</div>
                                             </div>
                                         ))}
                                     </div>

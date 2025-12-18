@@ -57,12 +57,12 @@
 }
 
 /* Reglas de máxima prioridad para evitar parpadeos */
-.dark div[class*="sidebar"],
-.dark [class*="sidebar"] {
+.dark div[class*="sidebar"]:not([class*="modal"]),
+.dark [class*="sidebar"]:not([class*="modal"]) {
     color: white !important;
 }
 
-.dark div[class*="sidebar"] * {
+.dark div[class*="sidebar"]:not([class*="modal"]) *:not([class*="modal"], [class*="modal"] *) {
     color: white !important;
 }
 

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Box, FileText, PenTool, Menu, X } from 'lucide-react';
+import { Box, FileText, PenTool, Menu, X, Layers } from 'lucide-react';
 import Scene from './components/Scene';
 import Sidebar from './components/Sidebar';
 import DiedricoView from './components/DiedricoView';
+import CaballeraView from './features/caballera/components/CaballeraView';
 import SEO from './components/SEO';
 import { useGeometryStore } from './store/geometryStore';
 import { useUserStore } from './store/userStore';
@@ -16,7 +17,7 @@ export default function MainApp() {
     const { theme, viewMode, setViewMode } = useGeometryStore();
     const { isPremium } = useUserStore();
     const isDark = theme === 'dark';
-    
+
     // Inicializar y sincronizar el tema
     useThemeInitializer();
     useThemeSync();
@@ -45,12 +46,14 @@ export default function MainApp() {
                     </button>
 
                     {/* Sidebar Wrapper */}
-                    <div className={`
-                    fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 shadow-2xl md:shadow-none
-                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                `}>
-                        <Sidebar />
-                    </div>
+                    {viewMode !== 'caballera' && (
+                        <div className={`
+                            fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 shadow-2xl md:shadow-none
+                            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                        `}>
+                            <Sidebar />
+                        </div>
+                    )}
 
                     {/* Mobile Overlay */}
                     {isSidebarOpen && (
@@ -82,6 +85,14 @@ export default function MainApp() {
                             >
                                 <PenTool size={16} /> Boceto
                             </button>
+                            {isPremium && (
+                                <button
+                                    onClick={() => setViewMode('caballera')}
+                                    className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === 'caballera' ? 'bg-indigo-600 text-white shadow-lg' : tabInactive}`}
+                                >
+                                    <Layers size={16} /> Caballera
+                                </button>
+                            )}
                         </div>
 
                         {/* View Content */}
@@ -96,6 +107,8 @@ export default function MainApp() {
 
                                     </div>
                                 </>
+                            ) : viewMode === 'caballera' ? (
+                                <CaballeraView />
                             ) : (
                                 <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />
                             )}
@@ -103,7 +116,7 @@ export default function MainApp() {
                     </div>
 
                     {/* AI Assistant Panel - Premium Only */}
-                    {FEATURES.AI_ASSISTANT && isPremium && <AIChatPanel isSidebarOpen={isSidebarOpen} />}
+                    {FEATURES.AI_ASSISTANT && isPremium && viewMode !== 'caballera' && <AIChatPanel isSidebarOpen={isSidebarOpen} />}
 
                     {/* Watermark */}
                     <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>

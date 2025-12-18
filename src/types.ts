@@ -9,7 +9,7 @@ export type Vec3 = Vector3;
 
 export interface BaseElement {
     id: string;
-    type: 'point' | 'line' | 'plane';
+    type: 'point' | 'line' | 'plane' | 'solid';
     name: string;
     color: string;
     visible: boolean;
@@ -35,7 +35,14 @@ export interface PlaneElement extends BaseElement {
     constant: number;
 }
 
-export type GeometryElement = PointElement | LineElement | PlaneElement;
+export interface SolidElement extends BaseElement {
+    type: 'solid';
+    position: Vector3;
+    size: Vector3;
+    opacity?: number;
+}
+
+export type GeometryElement = PointElement | LineElement | PlaneElement | SolidElement;
 
 // Sketch Types
 export type SketchTool =

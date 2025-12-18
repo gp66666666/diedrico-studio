@@ -7,33 +7,33 @@
    =========================================== */
 
 /* Estilos iniciales para evitar parpadeos */
-.dark div[class*="sidebar"],
-.dark [class*="sidebar"] {
-    color: white !important;
+.dark div[class*="sidebar"]:not([class*="modal"]),
+.dark [class*="sidebar"]:not([class*="modal"]) {
+  color: white !important;
 }
 
-.dark div[class*="sidebar"] *,
-.dark [class*="sidebar"] * {
-    color: white !important;
+.dark div[class*="sidebar"]:not([class*="modal"]) *:not([class*="modal"], [class*="modal"] *),
+.dark [class*="sidebar"]:not([class*="modal"]) *:not([class*="modal"], [class*="modal"] *) {
+  color: white !important;
 }
 
 /* Iconos específicos del Sidebar - Forzar colores */
 .dark .sidebar-dark .text-purple-500,
 .dark [class*="sidebar"] .text-purple-500 {
-    color: #a855f7 !important;
-    fill: #a855f7 !important;
+  color: #a855f7 !important;
+  fill: #a855f7 !important;
 }
 
 .dark .sidebar-dark .text-blue-400,
 .dark [class*="sidebar"] .text-blue-400 {
-    color: #60a5fa !important;
-    fill: #60a5fa !important;
+  color: #60a5fa !important;
+  fill: #60a5fa !important;
 }
 
 .dark .sidebar-dark .text-yellow-400,
 .dark [class*="sidebar"] .text-yellow-400 {
-    color: #facc15 !important;
-    fill: #facc15 !important;
+  color: #facc15 !important;
+  fill: #facc15 !important;
 }
 
 /* ===========================================
@@ -183,6 +183,41 @@ svg .merged-label {
 
   .animate-fade-in {
     animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  /* Manual / Help Guide Dark Mode Fix */
+  .dark .help-guide-modal {
+    color: white !important;
+  }
+
+  .dark .help-guide-modal *:not(h1, h2, h3, .text-blue-500, .text-blue-400, .text-green-400, .text-purple-400, [class*="bg-gradient"]) {
+    color: white !important;
+  }
+
+  /* Fix for Diédrico Studio v2 Header to ensure it uses the gradient or a bright color */
+  .dark .help-guide-modal h1 {
+    background-image: linear-gradient(to right, #60a5fa, #a855f7) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+  }
+
+  .dark .help-guide-modal .opacity-70,
+  .dark .help-guide-modal .opacity-80,
+  .dark .help-guide-modal .text-gray-300,
+  .dark .help-guide-modal .text-gray-400 {
+    color: #cbd5e1 !important;
+    /* slate-300 */
+    opacity: 1 !important;
+  }
+
+  /* Specific fix for Titles (Navegación, Modos, etc) and Subtitles to be Blue/Cyan in dark mode */
+  .dark .help-guide-modal h3,
+  .dark .help-guide-modal .text-blue-400,
+  .dark .help-guide-modal .text-green-400,
+  .dark .help-guide-modal .text-purple-400 {
+    color: #60a5fa !important;
+    /* blue-400 */
   }
 }
 

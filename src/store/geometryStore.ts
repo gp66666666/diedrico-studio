@@ -31,8 +31,8 @@ interface GeometryState {
     toggleTheme: () => void;
 
     // View Mode
-    viewMode: '3d' | '2d' | 'sketch';
-    setViewMode: (mode: '3d' | '2d' | 'sketch') => void;
+    viewMode: '3d' | '2d' | 'caballera' | 'sketch';
+    setViewMode: (mode: '3d' | '2d' | 'caballera' | 'sketch') => void;
 
     // Intersections
     showIntersections: boolean;
@@ -65,9 +65,10 @@ interface GeometryState {
     cameraStates: {
         '3d': { position: [number, number, number], target: [number, number, number] };
         '2d': { offset: { x: number, y: number }, zoom: number };
+        'caballera': { offset: { x: number, y: number }, zoom: number };
         'sketch': { offset: { x: number, y: number }, zoom: number };
     };
-    setCameraState: (mode: '3d' | '2d' | 'sketch', state: any) => void;
+    setCameraState: (mode: '3d' | '2d' | 'caballera' | 'sketch', state: any) => void;
     activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
@@ -99,12 +100,13 @@ interface GeometryState {
     toggleMeasurementVisibility: (id: string) => void;
     clearAllMeasurements: () => void;
 
-    // Cloud Save/Load (Premium)
-    saveProject: (title: string, description?: string) => Promise<string>;
-    loadProject: (projectId: string) => Promise<void>;
-    getUserProjects: () => Promise<any[]>;
-    deleteProject: (projectId: string) => Promise<void>;
-    renameProject: (projectId: string, title: string, description?: string) => Promise<void>;
+    // Caballero / Axonometric Construction
+    caballeraState: {
+        step: 'idle' | 'waiting-alzado' | 'waiting-planta';
+        previewCoords: { x: number; y: number; z: number };
+    };
+    setCaballeraStep: (step: GeometryState['caballeraState']['step']) => void;
+    updateCaballeraPreview: (coords: Partial<GeometryState['caballeraState']['previewCoords']>) => void;
 }
 
 export const useGeometryStore = create<GeometryState>((set, get) => ({
@@ -113,14 +115,30 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
     // Camera Persistence
     cameraStates: {
-        '3d': { position: [12, 10, 12], target: [0, 0, 0] },
+        '3d': { position: [-30, 25, 30], target: [0, 0, 0] },
         '2d': { offset: { x: 400, y: 300 }, zoom: 1 },
+        'caballera': { offset: { x: 400, y: 300 }, zoom: 1 },
         'sketch': { offset: { x: 400, y: 300 }, zoom: 1 }
     },
     setCameraState: (mode, state) => set((prev) => ({
         cameraStates: {
             ...prev.cameraStates,
             [mode]: { ...prev.cameraStates[mode], ...state }
+        }
+    })),
+
+    // Caballero / Axonometric Construction
+    caballeraState: {
+        step: 'idle',
+        previewCoords: { x: 0, y: 0, z: 0 }
+    },
+    setCaballeraStep: (step) => set((state) => ({
+        caballeraState: { ...state.caballeraState, step }
+    })),
+    updateCaballeraPreview: (coords) => set((state) => ({
+        caballeraState: {
+            ...state.caballeraState,
+            previewCoords: { ...state.caballeraState.previewCoords, ...coords }
         }
     })),
 
