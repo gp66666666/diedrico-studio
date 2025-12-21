@@ -10,6 +10,7 @@ import { useUserStore } from './store/userStore';
 import { FEATURES } from './config/features';
 import { AIChatPanel } from './features/ai-assistant';
 import { useThemeSync, useThemeInitializer } from './hooks/useThemeSync';
+import SolidsTool from './components/tools/SolidsTool';
 // AdBanner import removed
 
 export default function MainApp() {
@@ -113,6 +114,8 @@ export default function MainApp() {
                                 <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />
                             )}
                         </div>
+                        {/* Global Tools that render UI overlays */}
+                        <SolidsTool />
                     </div>
 
                     {/* AI Assistant Panel - Premium Only */}

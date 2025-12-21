@@ -23,6 +23,8 @@ import TrueMagnitudeTool from './tools/TrueMagnitudeTool';
 import ParallelismTool from './tools/ParallelismTool';
 import DistanceTool from './tools/DistanceTool';
 import RotationTool from './tools/RotationTool';
+import CambioPlanoTool from './tools/CambioPlanoTool';
+import PlaneCreatorTool from './tools/PlaneCreatorTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 
@@ -69,7 +71,7 @@ export default function Sidebar() {
     const [activeTab, setActiveTab] = useState<'add' | 'list' | 'tools'>('add');
     const navigate = useNavigate();
 
-    // Auto-switch to list on mobile when tool is active
+    // Auto-switch to list when tool is active (requires selection)
     useEffect(() => {
         const needsSelection = activeTool.startsWith('distance-') ||
             activeTool.startsWith('angle-') ||
@@ -80,9 +82,12 @@ export default function Sidebar() {
             activeTool.startsWith('intersection-') ||
             activeTool.startsWith('rotation-') ||
             activeTool.startsWith('true-length') ||
+            activeTool.startsWith('abatir-') ||
+            activeTool.startsWith('desabatir-p') ||
+            activeTool === 'plane-3-points' ||
             activeTool.startsWith('advanced-');
 
-        if (needsSelection && activeTool !== 'none' && window.innerWidth < 768) {
+        if (needsSelection && activeTool !== 'none') {
             setActiveTab('list');
         }
     }, [activeTool]);
@@ -1246,7 +1251,9 @@ export default function Sidebar() {
             <AdvancedIntersectionTool />
             <RotationTool />
             <AbatimientoTool />
+            <PlaneCreatorTool />
             <TrueMagnitudeTool />
+            <CambioPlanoTool />
             {/* Modals */}
             <ExerciseOverlay />
             <HelpGuide isOpen={showHelp} onClose={toggleHelp} isDark={isDark} />

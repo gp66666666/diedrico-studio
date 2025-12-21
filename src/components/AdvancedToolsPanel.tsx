@@ -126,18 +126,13 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         >
                             ➡️ Abatir sobre PV
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('abatir-traza')}
+                            onClick={() => setActiveTool(activeTool === 'abatir-traza' ? 'none' : 'abatir-traza')}
+                        >
                             🔄 Abatir sobre Traza
                         </button>
-                        <button
-                            className={getButtonClass('desabatir')}
-                            onClick={() => setActiveTool(activeTool === 'desabatir' ? 'none' : 'desabatir')}
-                        >
-                            ↩️ Desabatir
-                        </button>
-                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Ver verdaderas magnitudes
-                        </div>
+
                     </div>
                 )}
             </div>
@@ -176,6 +171,7 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         >
                             ⊞ Plano ∩ Plano
                         </button>
+
 
                         <div className="mt-3 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Avanzados (3 Elementos)</div>
                         <button
@@ -403,18 +399,19 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
 
                 {expandedSections.cambiosPlano && (
                     <div className={contentClass}>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('cambio-plano-v')}
+                            onClick={() => setActiveTool(activeTool === 'cambio-plano-v' ? 'none' : 'cambio-plano-v')}
+                        >
                             📐 Cambiar Plano Vertical
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('cambio-plano-h')}
+                            onClick={() => setActiveTool(activeTool === 'cambio-plano-h' ? 'none' : 'cambio-plano-h')}
+                        >
                             📏 Cambiar Plano Horizontal
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
-                            🔄 Doble Cambio de Plano
-                        </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
-                            📋 Gestionar Sistemas
-                        </button>
+
                     </div>
                 )}
             </div>
@@ -434,23 +431,39 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
 
                 {expandedSections.solidos && (
                     <div className={contentClass}>
+
                         {/* Poliedros */}
                         <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase`}>
                             Poliedros
                         </div>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('poliedro-tetraedro')}
+                            onClick={() => setActiveTool(activeTool === 'poliedro-tetraedro' ? 'none' : 'poliedro-tetraedro')}
+                        >
                             🔺 Tetraedro
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('poliedro-cubo')}
+                            onClick={() => setActiveTool(activeTool === 'poliedro-cubo' ? 'none' : 'poliedro-cubo')}
+                        >
                             🟦 Cubo/Hexaedro
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('poliedro-octaedro')}
+                            onClick={() => setActiveTool(activeTool === 'poliedro-octaedro' ? 'none' : 'poliedro-octaedro')}
+                        >
                             🔶 Octaedro
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('poliedro-dodecaedro')}
+                            onClick={() => setActiveTool(activeTool === 'poliedro-dodecaedro' ? 'none' : 'poliedro-dodecaedro')}
+                        >
                             ⬟ Dodecaedro
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('poliedro-icosaedro')}
+                            onClick={() => setActiveTool(activeTool === 'poliedro-icosaedro' ? 'none' : 'poliedro-icosaedro')}
+                        >
                             🔷 Icosaedro
                         </button>
 
@@ -458,10 +471,16 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>
                             Prismáticos
                         </div>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('solid-prisma')}
+                            onClick={() => setActiveTool(activeTool === 'solid-prisma' ? 'none' : 'solid-prisma')}
+                        >
                             ▭ Prisma
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('solid-piramide')}
+                            onClick={() => setActiveTool(activeTool === 'solid-piramide' ? 'none' : 'solid-piramide')}
+                        >
                             🔺 Pirámide
                         </button>
 
@@ -469,29 +488,39 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>
                             Revolución
                         </div>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('revolucion-cilindro')}
+                            onClick={() => setActiveTool(activeTool === 'revolucion-cilindro' ? 'none' : 'revolucion-cilindro')}
+                        >
                             🥫 Cilindro
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('revolucion-cono')}
+                            onClick={() => setActiveTool(activeTool === 'revolucion-cono' ? 'none' : 'revolucion-cono')}
+                        >
                             🍦 Cono
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button
+                            className={getButtonClass('revolucion-esfera')}
+                            onClick={() => setActiveTool(activeTool === 'revolucion-esfera' ? 'none' : 'revolucion-esfera')}
+                        >
                             ⚫ Esfera
                         </button>
 
                         {/* Operaciones */}
                         <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>
-                            Operaciones
+                            Operaciones (Próximamente)
                         </div>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button className={`${getButtonClass('solid-section')} opacity-50 cursor-not-allowed`} disabled>
                             ✂️ Sección Plana
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button className={`${getButtonClass('solid-intersection')} opacity-50 cursor-not-allowed`} disabled>
                             🔗 Intersecciones
                         </button>
-                        <button className={`${getButtonClass('')} opacity-50 cursor-not-allowed`} disabled>
+                        <button className={`${getButtonClass('solid-development')} opacity-50 cursor-not-allowed`} disabled>
                             📄 Desarrollos
                         </button>
+
                     </div>
                 )}
             </div>

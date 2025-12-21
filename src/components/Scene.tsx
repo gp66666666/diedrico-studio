@@ -4,6 +4,7 @@ import { useGeometryStore } from '../store/geometryStore';
 import PointObject from './3D/PointObject';
 import LineObject from './3D/LineObject';
 import PlaneObject from './3D/PlaneObject';
+import SolidObject from './3D/SolidObject';
 import IntersectionsRenderer from './3D/IntersectionsRenderer';
 import SystemPlanes from './3D/SystemPlanes';
 import { useEffect, useRef, Suspense } from 'react';
@@ -99,6 +100,8 @@ export default function Scene() {
                                 return <LineObject key={element.id} element={element} />;
                             case 'plane':
                                 return <PlaneObject key={element.id} element={element} />;
+                            case 'solid':
+                                return <SolidObject key={element.id} element={element} />;
                             default:
                                 return null;
                         }

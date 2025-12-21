@@ -9,6 +9,7 @@ import type { GeometryElement, LineElement, PlaneElement, SketchElement, PointEl
 import Point2D from './2D/Point2D';
 import Line2D from './2D/Line2D';
 import Plane2D from './2D/Plane2D';
+import Solid2D from './2D/Solid2D';
 import HelpGuide from './HelpGuide';
 import SketchToolbar from './SketchToolbar';
 
@@ -167,8 +168,73 @@ const LTAxis = memo(({ show, axisColor, isDark, scale }: { show: boolean, axisCo
     );
 });
 
+const AuxSystem = memo(({ system, axisColor, isDark, elements }: { system: import('../types').ProjectionSystem, axisColor: string, isDark: boolean, elements: any[] }) => {
+    const { point, direction, type, label } = system;
+
+    // Convert store coords (units) to view coords (pixels)
+    const pX = point.x * SCALE;
+    const pY = point.y * SCALE;
+
+    // Draw LT line
+    const x1 = pX - direction.x * 2000;
+    const y1 = pY - direction.y * 2000;
+    const x2 = pX + direction.x * 2000;
+    const y2 = pY + direction.y * 2000;
+
+    // Perpendicular vector for projection rays
+    const perp = { x: -direction.y, y: direction.x };
+
+    return (
+        <g className="aux-system">
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={axisColor} strokeWidth="1.5" strokeDasharray="5,3" opacity="0.6" />
+            <text x={pX + direction.x * 50 + perp.x * 20} y={pY + direction.y * 50 + perp.y * 20} className={`text-xs font-bold ${isDark ? 'fill-blue-400' : 'fill-blue-600'}`}>{label}</text>
+
+            {/* Project existing points onto this new system */}
+            {elements.map(el => {
+                if (el.type !== 'point' || !el.visible) return null;
+                const pt = el as import('../types').PointElement;
+
+                // For a change of PV (horizontal system): New projection is at distance Z from LT'
+                // For a change of PH (vertical system): New projection is at distance Y from LT''
+                const dist = type === 'horizontal' ? pt.coords.z : pt.coords.y;
+                const distPx = dist * SCALE;
+
+                // Original projection shared with the change (X coordinate in traditional method, 
+                // but here it's about the "shared" projection)
+                // If it's a change of PV, we project from the horizontal projection (x, y)
+                // If it's a change of PH, we project from the vertical projection (x, -z)
+                const basePx = type === 'horizontal' ? pt.coords.x * SCALE : pt.coords.x * SCALE;
+                const baseY = type === 'horizontal' ? pt.coords.y * SCALE : -pt.coords.z * SCALE;
+
+                // Project base position onto the new LT line
+                // Vector from system.point to Base
+                const vBase = { x: basePx - pX, y: baseY - pY };
+                const dot = vBase.x * direction.x + vBase.y * direction.y;
+                const intersectX = pX + direction.x * dot;
+                const intersectY = pY + direction.y * dot;
+
+                // New projection is at 'distPx' from the intersection along the perpendicular
+                // We need to ensure we go the "right" way. 
+                // Traditionally, if Z > 0, we go to the "other side" of LT.
+                const newX = intersectX + perp.x * distPx;
+                const newY = intersectY + perp.y * distPx;
+
+                return (
+                    <g key={`${el.id}-${system.id}`}>
+                        {/* Projection Ray */}
+                        <line x1={basePx} y1={baseY} x2={newX} y2={newY} stroke={isDark ? '#4b5563' : '#9ca3af'} strokeWidth="1" strokeDasharray="2,2" />
+                        {/* Auxiliary Point */}
+                        <circle cx={newX} cy={newY} r="3" fill="#3b82f6" />
+                        <text x={newX + 5} y={newY - 5} className="text-[10px] fill-blue-500 font-bold">{pt.name}{type === 'horizontal' ? '₁\'' : '₂\'\''}</text>
+                    </g>
+                );
+            })}
+        </g>
+    );
+});
+
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
-    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement, cameraStates, setCameraState, measurements } = useGeometryStore();
+    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement, cameraStates, setCameraState, measurements, auxSystems } = useGeometryStore();
 
     // Viewport State - Initialize from Store
     // Ensure we use the correct mode key, default to 2d if undefined
@@ -557,6 +623,11 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     setDrawingStep(0); setP1(null); setP2(null);
                 }
             }
+            return;
+        }
+
+        if (activeDistanceTool === 'cambio-plano-h' || activeDistanceTool === 'cambio-plano-v') {
+            // Logic moved to CambioPlanoTool.tsx using list selection
             return;
         }
 
@@ -1134,12 +1205,24 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             case 'point': return <Point2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'line': return <Line2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'plane': return <Plane2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
+                            case 'solid': return <Solid2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             default: return null;
                         }
                     })}
 
                     {/* Intersections (Always Visible) */}
                     <Intersections2D elements={elements} showIntersections={showIntersections} />
+
+                    {/* Auxiliary Systems (Cambios de Plano) */}
+                    {auxSystems.map(system => (
+                        <AuxSystem
+                            key={system.id}
+                            system={system as any}
+                            axisColor={axisColor}
+                            isDark={isDark}
+                            elements={elements}
+                        />
+                    ))}
 
                     {/* Distance Visualization */}
                     {distanceResult && distanceResult.auxiliaryPoints && distanceResult.auxiliaryPoints.length === 2 && (

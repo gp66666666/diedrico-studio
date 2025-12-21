@@ -19,6 +19,14 @@ export interface CloudProject {
     };
 }
 
+export interface ProjectionSystem {
+    id: string;
+    type: 'horizontal' | 'vertical';
+    point: Vector3; // A point on the ground line (usually where the user clicked first)
+    direction: Vector3; // Direction vector of the new ground line
+    label: string;
+}
+
 export interface BaseElement {
     id: string;
     type: 'point' | 'line' | 'plane' | 'solid';
@@ -49,9 +57,12 @@ export interface PlaneElement extends BaseElement {
 
 export interface SolidElement extends BaseElement {
     type: 'solid';
+    subtype: 'tetrahedron' | 'cube' | 'octahedron' | 'dodecahedron' | 'icosahedron' | 'prism' | 'pyramid' | 'cylinder' | 'cone' | 'sphere';
     position: Vector3;
-    size: Vector3;
+    size: Vector3; // For most, x=radius/sidelength, y=height
+    rotation?: Vector3;
     opacity?: number;
+    color: string;
 }
 
 export type GeometryElement = PointElement | LineElement | PlaneElement | SolidElement;

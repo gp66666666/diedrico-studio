@@ -69,7 +69,7 @@ interface GeometryState {
         'sketch': { offset: { x: number, y: number }, zoom: number };
     };
     setCameraState: (mode: '3d' | '2d' | 'caballera' | 'sketch', state: any) => void;
-    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines';
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'abatir-traza' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines' | 'cambio-plano-h' | 'cambio-plano-v' | 'desabatir-p-ph' | 'desabatir-p-pv' | 'plane-3-points' | 'poliedro-tetraedro' | 'poliedro-cubo' | 'poliedro-octaedro' | 'poliedro-dodecaedro' | 'poliedro-icosaedro' | 'solid-prisma' | 'solid-piramide' | 'revolucion-cilindro' | 'revolucion-cono' | 'revolucion-esfera' | 'solid-section' | 'solid-intersection' | 'solid-development';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
     distanceResult: {
@@ -79,6 +79,7 @@ interface GeometryState {
     } | null;
     selectForDistance: (id: string) => void;
     clearDistanceTool: () => void;
+    clearDistanceSelection: () => void;
 
     // Measurements (with Visual Lines for D, d', d'')
     measurements: Array<{
@@ -114,6 +115,11 @@ interface GeometryState {
     getUserProjects: () => Promise<any[]>;
     deleteProject: (projectId: string) => Promise<void>;
     renameProject: (projectId: string, title: string, description?: string) => Promise<void>;
+
+    // Auxiliary Projection Systems (Cambios de Plano)
+    auxSystems: import('../types').ProjectionSystem[];
+    addAuxSystem: (system: Omit<import('../types').ProjectionSystem, 'id'>) => void;
+    removeAuxSystem: (id: string) => void;
 }
 
 export const useGeometryStore = create<GeometryState>((set, get) => ({
@@ -315,6 +321,8 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         else if (activeTool === 'true-length') maxSelection = 1;
         else if (activeTool?.startsWith('intersection')) maxSelection = 2;
         else if (activeTool?.startsWith('advanced-intersection')) maxSelection = 3;
+        else if (activeTool?.startsWith('poliedro-') || activeTool?.startsWith('solid-') || activeTool?.startsWith('revolucion-')) maxSelection = 1;
+        else if (activeTool !== 'none') maxSelection = 1; // Default for other tools
 
         console.log(`[Store] selectForDistance: id=${id}, activeTool=${activeTool}, maxSelection=${maxSelection}`);
 
@@ -352,6 +360,9 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     },
     clearDistanceTool: () => {
         set({ activeTool: 'none', selectedForDistance: [], distanceResult: null });
+    },
+    clearDistanceSelection: () => {
+        set({ selectedForDistance: [], distanceResult: null });
     },
 
     // Measurements (True Magnitude)
@@ -440,4 +451,13 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
         if (error) throw error;
     },
+
+    // Auxiliary Systems
+    auxSystems: [],
+    addAuxSystem: (system) => set((state) => ({
+        auxSystems: [...state.auxSystems, { ...system, id: Math.random().toString(36).substr(2, 9) }]
+    })),
+    removeAuxSystem: (id) => set((state) => ({
+        auxSystems: state.auxSystems.filter(s => s.id !== id)
+    })),
 }));
