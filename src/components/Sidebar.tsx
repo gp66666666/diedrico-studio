@@ -133,6 +133,15 @@ export default function Sidebar() {
     const [simpleValueStr, setSimpleValueStr] = useState('0');
     const [planeInterceptsStr, setPlaneInterceptsStr] = useState({ x: '0', y: '0', z: '0' });
 
+    // Plane 2 Lines specific state
+    const [plane2LinesType, setPlane2LinesType] = useState<'select' | 'custom'>('select');
+    const [selectedLine1Id, setSelectedLine1Id] = useState<string>('');
+    const [selectedLine2Id, setSelectedLine2Id] = useState<string>('');
+    const [customLine1Point, setCustomLine1Point] = useState({ x: '0', y: '0', z: '0' });
+    const [customLine1Dir, setCustomLine1Dir] = useState({ x: '1', y: '0', z: '0' });
+    const [customLine2Point, setCustomLine2Point] = useState({ x: '0', y: '0', z: '0' });
+    const [customLine2Dir, setCustomLine2Dir] = useState({ x: '0', y: '1', z: '0' });
+
     // Helper to parse string coords to numbers
     const parseCoords = (coords: { x: string, y: string, z: string }) => ({
         x: coords.x.trim() === '' ? Infinity : (parseFloat(coords.x) || 0),
@@ -276,12 +285,33 @@ export default function Sidebar() {
                     constant = 1;
                 }
             } else if (planeMode === '2lines') {
-                // This requires selecting 2 lines from the scene, which is complex in this UI.
-                // For now, we'll skip or implement if we have line selection state.
-                // The previous code had a snippet for this.
-                // We'll leave it as a placeholder or remove if not fully implemented.
-                alert("Modo 2 Rectas no implementado completamente en este formulario.");
-                return;
+                let l1, l2;
+
+                if (plane2LinesType === 'select') {
+                    const line1 = elements.find(e => e.id === selectedLine1Id) as LineElement;
+                    const line2 = elements.find(e => e.id === selectedLine2Id) as LineElement;
+                    if (!line1 || !line2) {
+                        alert("Selecciona dos rectas válidas");
+                        return;
+                    }
+                    if (line1.id === line2.id) {
+                        alert("Selecciona dos rectas diferentes");
+                        return;
+                    }
+                    l1 = { point: line1.point, direction: line1.direction };
+                    l2 = { point: line2.point, direction: line2.direction };
+                } else {
+                    l1 = { point: parseCoords(customLine1Point), direction: parseCoords(customLine1Dir) };
+                    l2 = { point: parseCoords(customLine2Point), direction: parseCoords(customLine2Dir) };
+                }
+
+                const result = calculatePlaneFromTwoLines(l1, l2);
+                if (!result) {
+                    alert("Las rectas no forman un plano válido (son cruzadas o coincidentes)");
+                    return;
+                }
+                normal = result.normal;
+                constant = result.constant;
             }
         } else {
             // Special plane types
@@ -397,6 +427,14 @@ export default function Sidebar() {
         setPlaneEqStr({ a: '0', b: '0', c: '1', d: '0' });
         setSimpleValueStr('0');
         setPlaneInterceptsStr({ x: '0', y: '0', z: '0' });
+
+        setPlane2LinesType('select');
+        setSelectedLine1Id('');
+        setSelectedLine2Id('');
+        setCustomLine1Point({ x: '0', y: '0', z: '0' });
+        setCustomLine1Dir({ x: '1', y: '0', z: '0' });
+        setCustomLine2Point({ x: '0', y: '0', z: '0' });
+        setCustomLine2Dir({ x: '0', y: '1', z: '0' });
     };
 
     const handleExportCurrentView = () => {
@@ -848,8 +886,8 @@ export default function Sidebar() {
                                 {lineType === 'generic' ? (
                                     <>
                                         <div className="flex gap-2">
-                                            <button onClick={() => setLineMode('2points')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === '2points' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>2 Puntos</button>
-                                            <button onClick={() => setLineMode('pointDir')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === 'pointDir' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Punto + Dir</button>
+                                            <button onClick={() => setLineMode('2points')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === '2points' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>2 Puntos</button>
+                                            <button onClick={() => setLineMode('pointDir')} className={`flex-1 py-1.5 text-xs rounded border ${lineMode === 'pointDir' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Punto + Dir</button>
                                         </div>
 
                                         <div>
@@ -956,14 +994,14 @@ export default function Sidebar() {
                                 {planeType === 'generic' ? (
                                     <>
                                         <div className="grid grid-cols-3 gap-2">
-                                            <button onClick={() => setPlaneMode('simple')} className={`py-1.5 text-xs rounded border ${planeMode === 'simple' ? 'bg-green-50 border-green-300 text-green-700 font-bold' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>⚡ Simple</button>
-                                            <button onClick={() => setPlaneMode('3points')} className={`py-1.5 text-xs rounded border ${planeMode === '3points' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>3 Puntos</button>
-                                            <button onClick={() => setPlaneMode('normal')} className={`py-1.5 text-xs rounded border ${planeMode === 'normal' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Normal</button>
+                                            <button onClick={() => setPlaneMode('simple')} className={`py-1.5 text-xs rounded border ${planeMode === 'simple' ? (isDark ? 'bg-green-600 border-green-500 text-white font-bold' : 'bg-green-50 border-green-300 text-green-700 font-bold') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>⚡ Simple</button>
+                                            <button onClick={() => setPlaneMode('3points')} className={`py-1.5 text-xs rounded border ${planeMode === '3points' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>3 Puntos</button>
+                                            <button onClick={() => setPlaneMode('normal')} className={`py-1.5 text-xs rounded border ${planeMode === 'normal' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Normal</button>
                                         </div>
                                         <div className="grid grid-cols-3 gap-2 mt-2">
-                                            <button onClick={() => setPlaneMode('equation')} className={`py-1.5 text-xs rounded border ${planeMode === 'equation' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Ecuación</button>
-                                            <button onClick={() => setPlaneMode('intercepts')} className={`py-1.5 text-xs rounded border ${planeMode === 'intercepts' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>Trazas</button>
-                                            <button onClick={() => setPlaneMode('2lines')} className={`py-1.5 text-xs rounded border ${planeMode === '2lines' ? 'bg-blue-50 border-blue-300 text-blue-700' : `${isDark ? 'border-white/20 text-gray-300' : 'border-gray-300 text-gray-600'}`}`}>2 Rectas</button>
+                                            <button onClick={() => setPlaneMode('equation')} className={`py-1.5 text-xs rounded border ${planeMode === 'equation' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Ecuación</button>
+                                            <button onClick={() => setPlaneMode('intercepts')} className={`py-1.5 text-xs rounded border ${planeMode === 'intercepts' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Trazas</button>
+                                            <button onClick={() => setPlaneMode('2lines')} className={`py-1.5 text-xs rounded border ${planeMode === '2lines' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>2 Rectas</button>
                                         </div>
 
                                         <div className="mt-3">
@@ -1065,6 +1103,88 @@ export default function Sidebar() {
                                                             <input type="number" value={planeInterceptsStr.z} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
                                                         </div>
                                                     </div>
+                                                </div>
+                                            )}
+
+                                            {planeMode === '2lines' && (
+                                                <div className="space-y-3">
+                                                    <div className="flex gap-2 mb-2">
+                                                        <button onClick={() => setPlane2LinesType('select')} className={`flex-1 py-1.5 text-xs rounded border ${plane2LinesType === 'select' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Seleccionar</button>
+                                                        <button onClick={() => setPlane2LinesType('custom')} className={`flex-1 py-1.5 text-xs rounded border ${plane2LinesType === 'custom' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Definir</button>
+                                                    </div>
+
+                                                    {plane2LinesType === 'select' ? (
+                                                        <div className="space-y-2">
+                                                            <div>
+                                                                <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Recta 1</label>
+                                                                <select
+                                                                    value={selectedLine1Id}
+                                                                    onChange={(e) => setSelectedLine1Id(e.target.value)}
+                                                                    className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`}
+                                                                >
+                                                                    <option value="">Selecciona una recta...</option>
+                                                                    {elements.filter(e => e.type === 'line').map(e => (
+                                                                        <option key={e.id} value={e.id}>{e.name}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Recta 2</label>
+                                                                <select
+                                                                    value={selectedLine2Id}
+                                                                    onChange={(e) => setSelectedLine2Id(e.target.value)}
+                                                                    className={`w-full px-3 py-2 border rounded text-sm ${inputClass}`}
+                                                                >
+                                                                    <option value="">Selecciona una recta...</option>
+                                                                    {elements.filter(e => e.type === 'line').map(e => (
+                                                                        <option key={e.id} value={e.id}>{e.name}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-3">
+                                                            <div className="p-2 border rounded border-gray-200 dark:border-gray-700">
+                                                                <div className="text-xs font-bold mb-2">Recta 1</div>
+                                                                <div className="mb-2">
+                                                                    <span className="text-[10px] text-gray-500">Punto</span>
+                                                                    <div className="grid grid-cols-3 gap-1">
+                                                                        <input type="number" placeholder="X" value={customLine1Point.x} onChange={(e) => setCustomLine1Point({ ...customLine1Point, x: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Y" value={customLine1Point.y} onChange={(e) => setCustomLine1Point({ ...customLine1Point, y: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Z" value={customLine1Point.z} onChange={(e) => setCustomLine1Point({ ...customLine1Point, z: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="text-[10px] text-gray-500">Director</span>
+                                                                    <div className="grid grid-cols-3 gap-1">
+                                                                        <input type="number" placeholder="X" value={customLine1Dir.x} onChange={(e) => setCustomLine1Dir({ ...customLine1Dir, x: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Y" value={customLine1Dir.y} onChange={(e) => setCustomLine1Dir({ ...customLine1Dir, y: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Z" value={customLine1Dir.z} onChange={(e) => setCustomLine1Dir({ ...customLine1Dir, z: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="p-2 border rounded border-gray-200 dark:border-gray-700">
+                                                                <div className="text-xs font-bold mb-2">Recta 2</div>
+                                                                <div className="mb-2">
+                                                                    <span className="text-[10px] text-gray-500">Punto</span>
+                                                                    <div className="grid grid-cols-3 gap-1">
+                                                                        <input type="number" placeholder="X" value={customLine2Point.x} onChange={(e) => setCustomLine2Point({ ...customLine2Point, x: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Y" value={customLine2Point.y} onChange={(e) => setCustomLine2Point({ ...customLine2Point, y: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Z" value={customLine2Point.z} onChange={(e) => setCustomLine2Point({ ...customLine2Point, z: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="text-[10px] text-gray-500">Director</span>
+                                                                    <div className="grid grid-cols-3 gap-1">
+                                                                        <input type="number" placeholder="X" value={customLine2Dir.x} onChange={(e) => setCustomLine2Dir({ ...customLine2Dir, x: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Y" value={customLine2Dir.y} onChange={(e) => setCustomLine2Dir({ ...customLine2Dir, y: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                        <input type="number" placeholder="Z" value={customLine2Dir.z} onChange={(e) => setCustomLine2Dir({ ...customLine2Dir, z: e.target.value })} className={`px-1 py-1 border rounded text-xs ${inputClass}`} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
