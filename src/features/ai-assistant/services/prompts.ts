@@ -53,41 +53,24 @@ Tu misión no es solo responder, es COMPRENDER la geometría espacial y ejecutar
 🌟 TU ESTILO DE RESPUESTA AL USUARIO (TEXTO FINAL):
 Sé profesional, técnico pero claro. "He generado los elementos...". NO muestres el JSON al usuario, eso es para el sistema.`;
 
-export const EXERCISE_GENERATOR_PROMPT = `Eres el MOTOR DE GEOMETRÍA ANALÍTICA 3D. 
-Tu tarea es GENERAR y RESOLVER MATEMÁTICAMENTE ejercicios de Sistema Diédrico.
+export const EXERCISE_GENERATOR_PROMPT = `Eres un experto en Dibujo Técnico y Sistema Diédrico.
+Tu tarea es GENERAR enunciados de ejercicios técnicos basados en la petición del usuario.
 
-REGLAS DE ORO PARA LA GENERACIÓN:
-- **PRECISIÓN MATEMÁTICA ABSOLUTA**: Usa álgebra lineal y geometría analítica 3D (vectores, productos escalares, cruz, etc.) para hallar coordenadas EXACTAS.
-- **NO EXPLIQUES TEORÍA**: El usuario quiere el resultado dibujado. Sé extremadamente breve en "solution_explanation".
-- **PASOS COMPLETOS**: Debes incluir CADA PASO de la resolución como un comando JSON. Si la solución es un punto de intersección, CALCÚLALO y ponlo en "steps".
-- **FORMATO DE COORDENADAS**: Representa todo con coordenadas explícitas utilizando los comandos permitidos.
-- **NO IMITES DIBUJO A MANO**: No te limites a lo que se puede hacer con regla y compás. Si necesitas rotar un punto, calcula la nueva matriz de rotación y devuelve el punto final.
+REGLAS DE GENERACIÓN:
+- **CREATIVIDAD TÉCNICA**: Genera un enunciado claro, preciso y profesional.
+- **DIBUJO DIÉDRICO**: El enunciado debe ser sobre puntos, rectas, planos, intersecciones, distancias, etc. en sistema diédrico.
+- **SOLO EL ENUNCIADO**: No intentes resolver el ejercicio ni dar coordenadas. Solo el texto del enunciado.
+- **JSON ESTRICTO**: Devuelve siempre un objeto JSON.
 
-FORMATO DE SALIDA (ESTRICTAMENTE JSON):
+FORMATO DE SALIDA:
 {
-  "statement": "Enunciado del ejercicio",
-  "solution_explanation": "Resumen técnico brevísimo (1-2 líneas).",
-  "steps": [
-    { "name": "add_point", "arguments": { "name": "A", "x": 10, "y": 20, "z": 30, "label": "1" }, "isResult": false },
-    ...
-  ]
+  "statement": "Texto completo del enunciado del ejercicio..."
 }
 
-COMANDOS DISPONIBLES EN 'steps':
-- \`add_point\`: \`{ "name": "A", "x": 10, "y": 20, "z": 30, "label": "1" } \`
-- \`add_point_result\`: \`{ "name": "I", "x": 35, "y": 15, "z": 20, "label": "Sol", "color": "#ff0000" } \`
-- \`add_line_by_coords\`: \`{ "name": "r", "p1_x": 10, "p1_y": 20, "p1_z": 30, "p2_x": 60, "p2_y": 10, "p2_z": 10, "label": "r" } \`
-- \`add_plane_by_traces\`: \`{ "name": "P", "x_intercept": 40, "y_intercept": 50, "z_intercept": 50 } \`
-- \`draw_arc\`: \`{ "center_x": 10, "center_y": 20, "center_z": 30, "radius": 40, "plane": "PH" | "PV", "start_angle": 0, "end_angle": 1.57, "label": "arc" } \`
+Ejemplo:
+User: "Uno de intersección de plano con recta"
+AI: { "statement": "Dada la recta r que pasa por A(20, 30, 40) y B(50, 10, 10), halla su punto de intersección con el plano P definido por sus trazas..." }`;
 
-REGLA CRÍTICA: Tú eres el que hace TODO el cálculo. Si pides una intersección, devuelve el punto resultante YA CALCULADO con \`add_point_result\`. No omitas pasos intermedios relevantes para la visualización (trazas, rectas auxiliares, etc.).
-
-Ejemplo de flujo interno:
-1. Recibes: "Intersección recta r y plano P".
-2. Calculas vector director de r y normal de P.
-3. Resuelves el sistema para hallar el parámetro 't'.
-4. Calculas las coordenadas (x, y, z) del punto de corte.
-5. Generas el JSON con la recta, el plano y el punto calculado con sus coordenadas exactas.`;
 
 export const FUNCTION_DEFINITIONS = [
     ...AI_ADVANCED_TOOLS_DEFINITIONS,

@@ -2122,22 +2122,8 @@
                     const steps = data.steps || [];
 
                     if (statement) {
-                        // Remove previous AI sheets if any? No, let user decide or clearAll manually.
-
-                        // 1. Create Exercise Sheet
+                        // Create only the Exercise Sheet (Statement)
                         addSheet(statement, true);
-
-                        // 2. Create Solution Sheet (if we have steps)
-                        if (steps && steps.length > 0) {
-                            const solutionExplanation = data.solution_explanation || null;
-                            addSheet(statement, false, steps, solutionExplanation);
-                            const lastSheet = sheets[sheets.length - 1];
-                            lastSheet.title = "SOLUCIÓN: " + (lastSheet.title || "Ejercicio");
-                            // Force immediate re-render of solution sheet with title
-                            renderSheet(lastSheet);
-                            renderSidebar();
-                        }
-
                         document.getElementById('aiPrompt').value = '';
                     } else if (data.error) {
                         alert('Error de la IA: ' + data.error);
