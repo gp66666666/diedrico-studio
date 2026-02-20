@@ -13,7 +13,7 @@ export class GroqService {
         this.apiKey = apiKey;
     }
 
-    async solveExercise(userPrompt: string): Promise<AIResponse> {
+    async solveExercise(userPrompt: string, systemPromptOverride?: string): Promise<AIResponse> {
         await rateLimiter.checkLimit();
         colorManager.reset();
 
@@ -28,7 +28,8 @@ export class GroqService {
             }).join('\n')
             : "Lienzo vacío.";
 
-        const fullSystemPrompt = SYSTEM_PROMPT +
+        const baseSystemPrompt = systemPromptOverride || SYSTEM_PROMPT;
+        const fullSystemPrompt = baseSystemPrompt +
             "\n\nCONTEXTO ACTUAL (LO QUE YA EXISTE):\n" + contextDescription +
             "\n\nDEFINICIONES DE FUNCIONES DISPONIBLES (ÚSALAS):\n" + JSON.stringify(FUNCTION_DEFINITIONS);
 
@@ -204,11 +205,14 @@ export class GroqService {
 
     // Helper to clean text ONLY if steps were successfully found
     public cleanResponseText(text: string, stepsFound: boolean): string {
-        if (!stepsFound) {
-            // If no steps found, KEEP the JSON block so the user can see the error/raw output
+        const hasCodeBlocks = /```(?:json|JSON)?\s*([\s\S]*?)\s*```/g.test(text);
+
+        if (!stepsFound && hasCodeBlocks) {
+            // If no steps found BUT code blocks were present, it's a format error
             return text + "\n\n⚠️ **Alerta:** No se detectaron pasos ejecutables. Si ves código arriba, hubo un error de formato.";
         }
-        // Otherwise, clean it up
+
+        // Otherwise, clean it up (remove code blocks if any, or just return text if none)
         return text.replace(/```(?:json|JSON)?\s*([\s\S]*?)\s*```/g, '').trim();
     }
 

@@ -16,6 +16,8 @@ Tu misión no es solo responder, es COMPRENDER la geometría espacial y ejecutar
 4.  **VERDADERA MAGNITUD (VM)**:
     *   Para medir distancias reales, ABATE el plano o GIRA la recta hasta ponerla horizontal/frontal.
     *   *ACCIÓN*: Si te piden "distancia real", calcula la distancia euclídea pero EXPLICA que es la VM.
+5.  **ÁNGULOS**: El ángulo de una recta con los planos de proyección se halla mediante su abatimiento sobre ellos. El ángulo entre dos planos es el ángulo entre sus rectas de máxima pendiente.
+6.  **PERTENENCIA**: Un punto pertenece a una recta si sus proyecciones están en las de la recta. Una recta pertenece a un plano si sus trazas están en las del plano.
 
 🛠️ TU PROTOCOLO DE EJECUCIÓN (MEGA-IMPORTANTE):
 1.  **INPUT**: "Dibuja una recta r por A(1,2,3) y B(4,5,6)"
@@ -51,6 +53,42 @@ Tu misión no es solo responder, es COMPRENDER la geometría espacial y ejecutar
 🌟 TU ESTILO DE RESPUESTA AL USUARIO (TEXTO FINAL):
 Sé profesional, técnico pero claro. "He generado los elementos...". NO muestres el JSON al usuario, eso es para el sistema.`;
 
+export const EXERCISE_GENERATOR_PROMPT = `Eres el MOTOR DE GEOMETRÍA ANALÍTICA 3D. 
+Tu tarea es GENERAR y RESOLVER MATEMÁTICAMENTE ejercicios de Sistema Diédrico.
+
+REGLAS DE ORO PARA LA GENERACIÓN:
+- **PRECISIÓN MATEMÁTICA ABSOLUTA**: Usa álgebra lineal y geometría analítica 3D (vectores, productos escalares, cruz, etc.) para hallar coordenadas EXACTAS.
+- **NO EXPLIQUES TEORÍA**: El usuario quiere el resultado dibujado. Sé extremadamente breve en "solution_explanation".
+- **PASOS COMPLETOS**: Debes incluir CADA PASO de la resolución como un comando JSON. Si la solución es un punto de intersección, CALCÚLALO y ponlo en "steps".
+- **FORMATO DE COORDENADAS**: Representa todo con coordenadas explícitas utilizando los comandos permitidos.
+- **NO IMITES DIBUJO A MANO**: No te limites a lo que se puede hacer con regla y compás. Si necesitas rotar un punto, calcula la nueva matriz de rotación y devuelve el punto final.
+
+FORMATO DE SALIDA (ESTRICTAMENTE JSON):
+{
+  "statement": "Enunciado del ejercicio",
+  "solution_explanation": "Resumen técnico brevísimo (1-2 líneas).",
+  "steps": [
+    { "name": "add_point", "arguments": { "name": "A", "x": 10, "y": 20, "z": 30, "label": "1" }, "isResult": false },
+    ...
+  ]
+}
+
+COMANDOS DISPONIBLES EN 'steps':
+- \`add_point\`: \`{ "name": "A", "x": 10, "y": 20, "z": 30, "label": "1" } \`
+- \`add_point_result\`: \`{ "name": "I", "x": 35, "y": 15, "z": 20, "label": "Sol", "color": "#ff0000" } \`
+- \`add_line_by_coords\`: \`{ "name": "r", "p1_x": 10, "p1_y": 20, "p1_z": 30, "p2_x": 60, "p2_y": 10, "p2_z": 10, "label": "r" } \`
+- \`add_plane_by_traces\`: \`{ "name": "P", "x_intercept": 40, "y_intercept": 50, "z_intercept": 50 } \`
+- \`draw_arc\`: \`{ "center_x": 10, "center_y": 20, "center_z": 30, "radius": 40, "plane": "PH" | "PV", "start_angle": 0, "end_angle": 1.57, "label": "arc" } \`
+
+REGLA CRÍTICA: Tú eres el que hace TODO el cálculo. Si pides una intersección, devuelve el punto resultante YA CALCULADO con \`add_point_result\`. No omitas pasos intermedios relevantes para la visualización (trazas, rectas auxiliares, etc.).
+
+Ejemplo de flujo interno:
+1. Recibes: "Intersección recta r y plano P".
+2. Calculas vector director de r y normal de P.
+3. Resuelves el sistema para hallar el parámetro 't'.
+4. Calculas las coordenadas (x, y, z) del punto de corte.
+5. Generas el JSON con la recta, el plano y el punto calculado con sus coordenadas exactas.`;
+
 export const FUNCTION_DEFINITIONS = [
     ...AI_ADVANCED_TOOLS_DEFINITIONS,
     {
@@ -82,6 +120,10 @@ export const FUNCTION_DEFINITIONS = [
                 step_description: {
                     type: "string",
                     description: "Explicación breve de por qué se crea este punto"
+                },
+                label: {
+                    type: "string",
+                    description: "Etiqueta numérica o texto corto (ej: '1', '2') para indicar el orden"
                 }
             },
             required: ["name", "x", "y", "z", "color", "step_description"]
@@ -286,6 +328,24 @@ export const FUNCTION_DEFINITIONS = [
                 }
             },
             required: ["expression", "step_description"]
+        }
+    },
+    {
+        name: "draw_arc",
+        description: "Dibuja un arco de compás (útil para mostrar procedimientos de giro o transporte de distancias)",
+        parameters: {
+            type: "object",
+            properties: {
+                center_x: { type: "number", description: "X del centro del arco" },
+                center_y: { type: "number", description: "Y del centro (cota en Planta)" },
+                center_z: { type: "number", description: "Z del centro (altura en Alzado)" },
+                radius: { type: "number", description: "Radio del arco en mm" },
+                start_angle: { type: "number", description: "Ángulo inicial en radianes" },
+                end_angle: { type: "number", description: "Ángulo final en radianes" },
+                label: { type: "string", description: "Etiqueta opcional (ej: '1')" },
+                step_description: { type: "string", description: "Descripción del paso" }
+            },
+            required: ["center_x", "center_y", "center_z", "radius", "start_angle", "end_angle", "step_description"]
         }
     }
 ];

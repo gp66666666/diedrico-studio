@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diédrico – Documento de Ejercicios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #232733;
+            --border: #2e3346;
+            --text: #e4e6ed;
+            --text-dim: #8b90a5;
+            --accent: #6c8cff;
+            --accent-glow: rgba(108, 140, 255, .15);
+            --red: #ff6b6b;
+            --green: #51cf66;
+            --orange: #ffa94d;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 380px;
+            min-width: 380px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0
+        }
+
+        .sidebar-header h1 {
+            font-size: 16px;
+            font-weight: 700
+        }
+
+        .sidebar-header p {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 3px
+        }
+
+        /* Sheet list in sidebar */
+        .sheet-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px
+        }
+
+        .sheet-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: border-color .2s;
+            overflow: hidden;
+        }
+
+        .sheet-item.active {
+            border-color: var(--accent)
+        }
+
+        .sheet-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            gap: 8px;
+        }
+
+        .sheet-num {
+            background: var(--accent-glow);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .sheet-title-text {
+            font-size: 12px;
+            font-weight: 500;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .sheet-status {
+            font-size: 10px;
+            color: var(--text-dim)
+        }
+
+        .sheet-del {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .sheet-del:hover {
+            color: var(--red)
+        }
+
+        /* Add sheet button */
+        .add-sheet-btn {
+            margin: 0 10px 10px;
+            padding: 10px;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            background: none;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all .2s;
+            width: calc(100% - 20px);
+        }
+
+        .add-sheet-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow)
+        }
+
+        /* Global config */
+        .global-config {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0
+        }
+
+        .global-config h2 {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-dim);
+            margin-bottom: 8px
+        }
+
+        .cfg-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px
+        }
+
+        .cfg-row label {
+            font-size: 12px
+        }
+
+        .cfg-row input {
+            width: 60px;
+            text-align: center;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            outline: none
+        }
+
+        .cfg-row input:focus {
+            border-color: var(--accent)
+        }
+
+        .orient-toggle {
+            display: flex;
+            gap: 2px;
+            padding: 3px;
+            background: var(--bg);
+            border-radius: 6px
+        }
+
+        .orient-btn {
+            padding: 4px 10px;
+            border: none;
+            background: none;
+            color: var(--text-dim);
+            font-size: 11px;
+            font-family: inherit;
+            border-radius: 4px;
+            cursor: pointer
+        }
+
+        .orient-btn.active {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .cfg-row-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            user-select: none;
+        }
+
+        .cfg-row-toggle input {
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .view3d-canvas {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 140px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .portrait .view3d-canvas {
+            width: 120px;
+            height: 120px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: var(--surface2);
+            border-radius: 2px;
+            outline: none;
+            accent-color: var(--accent);
+        }
+
+        .fmt-select,
+        .fmt-input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .format-btn {
+            display: block;
+            width: calc(100% - 20px);
+            margin: 10px;
+            padding: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all .2s;
+            text-align: center;
+        }
+
+        .format-btn:hover {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+        }
+
+        /* Bottom actions */
+        .sidebar-actions {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: #5a7cf0
+        }
+
+        .btn-pdf {
+            background: #e03131;
+            color: #fff;
+            font-weight: 600
+        }
+
+        .btn-pdf:hover {
+            background: #c92a2a
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border)
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        /* ===== MAIN AREA ===== */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        /* Sheet editor (top) */
+        .sheet-editor {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            flex-shrink: 0;
+        }
+
+        .editor-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px
+        }
+
+        .editor-header .sheet-num-big {
+            background: var(--accent-glow);
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        .editor-header h3 {
+            font-size: 14px;
+            font-weight: 600
+        }
+
+        textarea.exercise-input {
+            width: 100%;
+            min-height: 90px;
+            max-height: 160px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+        }
+
+        textarea.exercise-input:focus {
+            border-color: var(--accent)
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center
+        }
+
+        .status-ok {
+            font-size: 11px;
+            color: var(--green)
+        }
+
+        .status-warn {
+            font-size: 11px;
+            color: var(--text-dim)
+        }
+
+        .example-link {
+            font-size: 11px;
+            color: var(--accent);
+            cursor: pointer;
+            text-decoration: underline
+        }
+
+        /* Preview scroll area */
+        .preview-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+            background: #1a1a1a;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .page-wrapper {
+            position: relative;
+            flex-shrink: 0
+        }
+
+        .page-label {
+            position: absolute;
+            top: -22px;
+            left: 0;
+            font-size: 11px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .a4-shadow {
+            background: #fff;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, .5);
+            border-radius: 3px;
+        }
+
+        .a4-shadow canvas {
+            display: block
+        }
+
+        /* Scrollbar */
+        .sheet-list::-webkit-scrollbar,
+        .preview-scroll::-webkit-scrollbar {
+            width: 6px
+        }
+
+        .sheet-list::-webkit-scrollbar-track,
+        .preview-scroll::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        .sheet-list::-webkit-scrollbar-thumb,
+        .preview-scroll::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+
+        /* Batch import button */
+        .batch-btn {
+            margin: 0 10px 6px;
+            padding: 8px;
+            border: 1px solid rgba(108, 140, 255, .3);
+            border-radius: 8px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            width: calc(100% - 20px);
+        }
+
+        .batch-btn:hover {
+            background: rgba(108, 140, 255, .25);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            width: 620px;
+            max-width: 95vw;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal h2 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal p {
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .modal textarea {
+            flex: 1;
+            min-height: 300px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+        }
+
+        .modal textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* AI Generator */
+        .ai-generator {
+            padding: 12px 15px;
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(59, 130, 246, 0.1));
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ai-generator-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #a78bfa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-input-container {
+            display: flex;
+            gap: 6px;
+        }
+
+        .ai-prompt-input {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .ai-prompt-input:focus {
+            border-color: #7c3aed;
+        }
+
+        .ai-gen-btn {
+            background: linear-gradient(to right, #7c3aed, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .ai-gen-btn:hover {
+            opacity: 0.9;
+        }
+
+        .ai-gen-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ai-loader {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .ai-generator.loading .ai-loader {
+            display: block;
+        }
+
+        .ai-generator.loading .ai-gen-btn-text {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- ===== SIDEBAR ===== -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>📐 Diédrico – Documento</h1>
+                <p>Múltiples ejercicios · Exportar a PDF</p>
+            </div>
+
+            <div class="ai-generator" id="aiGenerator">
+                <div class="ai-generator-title">
+                    <span>✨ GENERADOR DE EJERCICIOS (IA)</span>
+                </div>
+                <div class="ai-input-container">
+                    <input type="text" id="aiPrompt" class="ai-prompt-input"
+                        placeholder="Ej: Intersección recta y plano..."
+                        onkeydown="if(event.key === 'Enter') requestAIGeneration()">
+                    <button class="ai-gen-btn" id="aiGenBtn" onclick="requestAIGeneration()">
+                        <span class="ai-loader"></span>
+                        <span class="ai-gen-btn-text">Generar</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sheet-list" id="sheetList"></div>
+            <button class="batch-btn" onclick="openBatchModal()">📋 Importar varios ejercicios</button>
+            <button class="add-sheet-btn" onclick="addSheet()">＋ Nueva hoja vacía</button>
+            <button class="format-btn" onclick="openFormatModal()">🎨 Personalizar lámina</button>
+
+            <div class="global-config">
+                <h2>Configuración global</h2>
+                <div class="cfg-row">
+                    <label>Posición LT (%)</label>
+                    <input type="number" id="gLtPos" value="50" min="10" max="90" step="5" oninput="renderAll()">
+                </div>
+                <div class="cfg-row">
+                    <label>Orientación</label>
+                    <div class="orient-toggle">
+                        <button class="orient-btn" data-o="landscape" onclick="setOrient('landscape')">H</button>
+                        <button class="orient-btn active" data-o="portrait" onclick="setOrient('portrait')">V</button>
+                    </div>
+                </div>
+                <div class="cfg-row-toggle">
+                    <input type="checkbox" id="gridVisible" checked onclick="toggleGrid()">
+                    <label for="gridVisible">Mostrar cuadrícula</label>
+                </div>
+                <div class="cfg-row">
+                    <label style="font-size:10px; color:var(--text-dim)">Opacidad fondo</label>
+                    <input type="range" id="gridOpacity" min="1" max="50" value="15"
+                        oninput="renderAll(); saveProject()">
+                </div>
+            </div>
+
+            <div class="sidebar-actions">
+                <button class="btn btn-ghost" onclick="clearAll()" style="flex:0">🗑</button>
+                <button class="btn btn-pdf" style="flex:1" onclick="exportPDF()">📄 Exportar PDF</button>
+            </div>
+        </div>
+
+        <!-- ===== MAIN ===== -->
+        <div class="main">
+            <!-- Active sheet editor -->
+            <div class="sheet-editor" id="sheetEditor">
+                <div class="editor-header">
+                    <span class="sheet-num-big" id="editorNum">Hoja 1</span>
+                    <h3>Enunciado</h3>
+                </div>
+                <textarea class="exercise-input" id="exerciseInput"
+                    placeholder="Pega aquí el enunciado del ejercicio...&#10;Ej: Las rectas R [A (5, 10, 60), B (39, 23, 0)] y S [A, C (-64, 90, 0)] determinan el plano P."
+                    oninput="onInputChange()"></textarea>
+                <div class="editor-actions">
+                    <button class="btn btn-primary" onclick="analyzeActive()">🔍 Analizar</button>
+                    <div style="display:flex; align-items:center; gap:6px; margin-left:auto">
+                        <label style="font-size:11px; color:var(--text-dim)">Escala:</label>
+                        <input type="number" id="manualScale" value="1.0" min="0.1" max="10" step="0.1"
+                            style="width:50px" oninput="onManualScale()">
+                        <button class="btn btn-ghost" style="padding:4px 8px; font-size:10px"
+                            onclick="runAutoScale()">Auto</button>
+                    </div>
+                    <span class="example-link" onclick="loadExample()">Cargar ejemplo</span>
+                    <span id="editorStatus" class="status-warn"></span>
+                </div>
+            </div>
+
+            <!-- Scrollable preview of all sheets -->
+            <div class="preview-scroll" id="previewScroll"></div>
+        </div>
+    </div>
+
+    <!-- Batch import modal -->
+    <!-- Format personalization modal -->
+    <div class="modal-overlay" id="formatModal">
+        <div class="modal">
+            <h2>🎨 Personalizar Formato</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3 style="font-size:12px; margin-bottom:10px; color:var(--accent)">Posiciones</h3>
+                    <div class="cfg-row">
+                        <label>Num. Hoja</label>
+                        <select id="fmtPagePos" class="fmt-select" onchange="updateFormat()">
+                            <option value="top-right">Arriba Derecha</option>
+                            <option value="top-left">Arriba Izquierda</option>
+                            <option value="bottom-right">Abajo Derecha</option>
+                            <option value="bottom-left">Abajo Izquierda</option>
+                        </select>
+                    </div>
+                    <div class="cfg-row">
+                        <label>Enunciado</label>
+                        <select id="fmtTextPos" class="fmt-select" onchange="updateFormat()">
+                            <option value="top">Arriba</option>
+                            <option value="bottom">Abajo</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:12px; margin-bottom:10px; color:var(--accent)">Fuentes (pt)</h3>
+                    <div class="cfg-row">
+                        <label>Enunciado</label>
+                        <input type="number" id="fmtFontSizeText" step="0.5" class="fmt-input" oninput="updateFormat()">
+                    </div>
+                    <div class="cfg-row">
+                        <label>Etiquetas</label>
+                        <input type="number" id="fmtFontSizeLabels" step="0.5" class="fmt-input"
+                            oninput="updateFormat()">
+                    </div>
+                </div>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--border); margin:10px 0">
+            <div>
+                <h3 style="font-size:12px; margin-bottom:10px; color:var(--accent)">Visibilidad</h3>
+                <div style="display:flex; flex-wrap:wrap; gap:15px">
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowLegend" checked
+                            onchange="updateFormat()"> Leyenda (PV/PH)</label>
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowTitle" checked
+                            onchange="updateFormat()"> Título ejercicio</label>
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowScale" checked
+                            onchange="updateFormat()"> Info escala</label>
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShow3D" checked
+                            onchange="updateFormat()"> Mini-vista 3D</label>
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowPageNum" checked
+                            onchange="updateFormat()"> Num. Hoja</label>
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowGuides" checked
+                            onchange="updateFormat()"> Mostrar Guías de Ayuda</label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeFormatModal()">Cerrar y Aplicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch import modal -->
+    <div class="modal-overlay" id="batchModal">
+        <div class="modal">
+            <h2>📋 Importar ejercicios en bloque</h2>
+            <p>Pega aquí todos los ejercicios juntos. El programa los separará automáticamente por
+                <strong>"EJERCICIO"</strong> y creará una hoja por cada uno.
+            </p>
+            <textarea id="batchInput"
+                placeholder="EJERCICIO n° 101&#10;Dada la recta R...&#10;&#10;EJERCICIO n° 102&#10;Dada la recta S..."></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeBatchModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="importBatch()">✔ Importar y generar hojas</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== GLOBALS ====================
+        const DPI = 96, MM = DPI / 25.4;
+        let sheets = []; // [{id, text, title, points, lines, planes, scale, canvas, orient}]
+        let activeId = null;
+        let nextId = 1;
+        let orient = 'portrait'; // Global default orientation
+        let format = {
+            pagePos: 'top-right',
+            textPos: 'top',
+            fontSizeText: 9.5,
+            fontSizeLabels: 10,
+            showLegend: true,
+            showTitle: true,
+            showScale: true,
+            show3D: true,
+            showGuides: true,
+            showPageNum: true
+        };
+
+        function getLtPos() { return parseFloat(document.getElementById('gLtPos').value) || 50; }
+
+        // ==================== SHEET MANAGEMENT ====================
+        function addSheet(text = '', autoAnalyze = false, steps = null, explanation = null) {
+            const id = nextId++;
+            const sheet = { id, text, title: '', points: [], lines: [], planes: [], scale: 1, manualScale: true, orient: 'portrait', guides: [], steps: steps || [], solutionExplanation: explanation };
+            sheets.push(sheet);
+            if (activeId === null) activeId = id;
+            renderSidebar();
+            createPageCanvas(sheet);
+            if (autoAnalyze && text) { setActive(id); analyzeSheet(sheet); }
+            else if (steps) { setActive(id); renderSheet(sheet); }
+            else setActive(id);
+            saveProject();
+            // Scroll preview to bottom
+            setTimeout(() => {
+                const ps = document.getElementById('previewScroll');
+                ps.scrollTop = ps.scrollHeight;
+            }, 50);
+        }
+
+        function removeSheet(id, e) {
+            if (e) e.stopPropagation();
+            sheets = sheets.filter(s => s.id !== id);
+            if (activeId === id) activeId = sheets.length ? sheets[0].id : null;
+            renderSidebar();
+            rebuildAllCanvases();
+            saveProject();
+        }
+
+        function setActive(id) {
+            activeId = id;
+            document.querySelectorAll('.sheet-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.id) === id));
+            const sheet = sheets.find(s => s.id === id);
+            if (sheet) {
+                document.getElementById('exerciseInput').value = sheet.text;
+                document.getElementById('editorNum').textContent = `Hoja ${sheets.indexOf(sheet) + 1}`;
+                document.getElementById('manualScale').value = sheet.scale;
+
+                document.getElementById('editorStatus').textContent = sheet.points.length ? `✔ ${sheet.points.length} pto(s), ${sheet.lines.length} recta(s)` : '';
+                document.getElementById('editorStatus').className = sheet.points.length ? 'status-ok' : 'status-warn';
+
+                // Sync orientation buttons
+                document.querySelectorAll('.orient-btn').forEach(b => b.classList.toggle('active', b.dataset.o === sheet.orient));
+
+                // Scroll preview to this page
+                const el = document.getElementById('page-' + id);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            renderSidebar();
+        }
+
+        function renumberPages() {
+            sheets.forEach((s, i) => {
+                const lbl = document.getElementById('label-' + s.id);
+                if (lbl) lbl.textContent = `Hoja ${i + 1}`;
+            });
+            renderSidebar();
+        }
+
+        function clearAll() {
+            if (!confirm('¿Eliminar todas las hojas?')) return;
+            sheets = [];
+            document.getElementById('previewScroll').innerHTML = '';
+            nextId = 1;
+            activeId = null;
+            addSheet();
+        }
+
+        // ==================== SIDEBAR RENDER ====================
+        function renderSidebar() {
+            const list = document.getElementById('sheetList');
+            list.innerHTML = sheets.map((s, i) => {
+                const num = i + 1;
+                const title = s.title || (s.text.trim().split('\n')[0].slice(0, 40) || 'Sin título');
+                const status = s.points.length ? `${s.points.length} pto · ${s.lines.length} recta` : 'Sin datos';
+                return `<div class="sheet-item${s.id === activeId ? ' active' : ''}" onclick="setActive(${s.id})">
+            <div class="sheet-item-header">
+                <span class="sheet-num">Hoja ${num}</span>
+                <span class="sheet-title-text">${escHtml(title)}</span>
+                <span class="sheet-status">${status}</span>
+                <button class="sheet-del" onclick="event.stopPropagation();removeSheet(${s.id})">✕</button>
+            </div>
+        </div>`;
+            }).join('');
+        }
+
+        function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        // ==================== CANVAS CREATION ====================
+        function createPageCanvas(sheet) {
+            const isPort = sheet.orient === 'portrait';
+            const a4 = { w: 210, h: 297 };
+            const cw = Math.round((isPort ? a4.w : a4.h) * MM);
+            const ch = Math.round((isPort ? a4.h : a4.w) * MM);
+            // Display scale to fit nicely (max ~700px wide)
+            const maxW = 700;
+            const ds = Math.min(maxW / cw, 1);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'page-wrapper' + (isPort ? '' : ' landscape');
+            wrapper.id = 'page-' + sheet.id;
+
+            const label = document.createElement('div');
+            label.className = 'page-label';
+            label.id = 'label-' + sheet.id;
+            label.textContent = `Hoja ${sheets.indexOf(sheet) + 1} (${isPort ? 'Vertical' : 'Horizontal'})`;
+
+            const shadow = document.createElement('div');
+            shadow.className = 'a4-shadow';
+            shadow.style.width = (cw * ds) + 'px';
+            shadow.style.height = (ch * ds) + 'px';
+
+            const cv = document.createElement('canvas');
+            cv.width = cw; cv.height = ch;
+            cv.style.width = (cw * ds) + 'px';
+            cv.style.height = (ch * ds) + 'px';
+            cv.id = 'cv-' + sheet.id;
+            cv.onclick = () => setActive(sheet.id);
+
+            shadow.appendChild(cv);
+            wrapper.appendChild(label);
+            wrapper.appendChild(shadow);
+
+            // 3D Canvas
+            const cv3 = document.createElement('canvas');
+            cv3.className = 'view3d-canvas';
+            cv3.width = 300; cv3.height = 300;
+            cv3.id = 'cv3d-' + sheet.id;
+            wrapper.appendChild(cv3);
+
+            document.getElementById('previewScroll').appendChild(wrapper);
+
+            sheet.canvas = cv;
+            sheet.canvas3d = cv3;
+            renderSheet(sheet);
+        }
+
+        function rebuildAllCanvases() {
+            document.getElementById('previewScroll').innerHTML = '';
+            sheets.forEach(s => createPageCanvas(s));
+            renumberPages();
+        }
+
+        // ==================== ORIENTATION ====================
+        function syncCanvasOrientation(sheet) {
+            const oldWrapper = document.getElementById('page-' + sheet.id);
+            if (!oldWrapper) return;
+
+            const isPort = sheet.orient === 'portrait';
+            const currentIsPort = !oldWrapper.classList.contains('landscape');
+            if (isPort === currentIsPort) return; // No change needed
+
+            const nextWrapper = oldWrapper.nextSibling;
+            oldWrapper.remove();
+            createPageCanvas(sheet); // Re-creates and appends
+            const newWrapper = document.getElementById('page-' + sheet.id);
+            if (nextWrapper) {
+                document.getElementById('previewScroll').insertBefore(newWrapper, nextWrapper);
+            }
+        }
+
+        function setOrient(o) {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet) return;
+            sheet.orient = o;
+            document.querySelectorAll('.orient-btn').forEach(b => b.classList.toggle('active', b.dataset.o === o));
+            syncCanvasOrientation(sheet);
+            renderSheet(sheet);
+            saveProject();
+        }
+
+        // ==================== PARSING ====================
+        function parseC(v) {
+            if (v == null) return null;
+            const s = String(v).trim().toLowerCase();
+            // Handle variables x, y, z as null (unknown)
+            if (!s || s === '?' || s === '*' || /^[xyz]$/.test(s)) return null;
+            const n = parseFloat(s);
+            return isNaN(n) ? null : n;
+        }
+
+        function parseExercise(text) {
+            text = text.replace(/[–—]/g, '-').replace(/\s+/g, ' ');
+
+            const points = [];
+            const planeCoords = [];
+
+            // 1. Detect structures: NAME (x, y, z)
+            const coordRx = /([A-Zα-ωΑ-Ω])(?:\s*[₁₂₃₄₅₆₇₈₉₀\d])*\s*\(\s*([^)]+)\)/gi;
+            let m;
+            while ((m = coordRx.exec(text)) !== null) {
+                const name = m[1];
+                const coordsStr = m[2];
+                const coords = coordsStr.split(',').map(s => s.trim());
+                if (coords.length < 3) continue;
+
+                const x = parseC(coords[0]);
+                const y = parseC(coords[1]);
+                const z = parseC(coords[2]);
+
+                // Context search: is "plano" or "punto" nearby?
+                const contextPrefix = text.slice(Math.max(0, m.index - 15), m.index).toLowerCase();
+                const isPlane = /plano/i.test(contextPrefix) || /^[PQRSt]$/.test(name);
+                const isPoint = /punto/i.test(contextPrefix) || /^[ABCDEFGHLMN]$/.test(name);
+
+                if (isPlane && x !== null) {
+                    planeCoords.push({ name, x, y, z, type: 'coord' });
+                } else if (x !== null || y !== null || z !== null) {
+                    points.push({ name, x, alej: y, cota: z });
+                }
+            }
+
+            // 2. Lines
+            const lines = [];
+            // Format 1: R [A, B]
+            const lRx1 = /([A-Z])\s*\[([^\]]+)\]/g;
+            while ((m = lRx1.exec(text)) !== null) {
+                const lName = m[1], content = m[2];
+                const pNames = [];
+                const pr = /\b([A-Z])\b/g; let pm;
+                while ((pm = pr.exec(content)) !== null) if (!pNames.includes(pm[1])) pNames.push(pm[1]);
+                if (pNames.length >= 2) lines.push({ name: lName.toLowerCase(), p1: pNames[0], p2: pNames[1] });
+            }
+            // Format 2: recta R ... puntos A y B / que une A y B / determinada por A y B
+            const lRx2 = /(?:recta|segmento)\s+([A-Z])?\s*[^.]*(?:puntos|une|determina(?:da)?|pasa por)\s*([A-Z])\s*[^.]{0,100}?\s*(?:y|con)\s+([A-Z])/gi;
+            while ((m = lRx2.exec(text)) !== null) {
+                const lName = (m[1] || 's').toLowerCase();
+                const p1 = m[2], p2 = m[3];
+                if (!lines.find(l => l.name === lName && l.p1 === p1 && l.p2 === p2)) {
+                    lines.push({ name: lName, p1, p2 });
+                }
+            }
+            // Format 3: recta/segmento AB
+            const lRx3 = /(?:recta|segmento)\s+([A-Z])([A-Z])\b/gi;
+            while ((m = lRx3.exec(text)) !== null) {
+                const p1 = m[1], p2 = m[2];
+                const lName = (p1 + p2).toLowerCase();
+                if (!lines.find(l => l.p1 === p1 && l.p2 === p2)) {
+                    lines.push({ name: lName, p1, p2 });
+                }
+            }
+
+            // 3. Mentioned Planes
+            const planes = [...planeCoords];
+            const plRx = /plano\s+([A-Zα-ωΑ-Ω])/gi;
+            while ((m = plRx.exec(text)) !== null) {
+                if (!planes.find(p => p.name === m[1])) {
+                    planes.push({ name: m[1], type: 'mentioned' });
+                }
+            }
+
+            // Smart title detection: only if first line is short and followed by more text, or starts with "Ejercicio"
+            const parsingLines = text.trim().split('\n').map(l => l.trim()).filter(l => l !== '');
+            let title = '';
+            if (parsingLines.length >= 2) {
+                const first = parsingLines[0];
+                const isExplicit = /ejercicio/i.test(first);
+                // Heuristic: first line is short (<100) and followed by significantly more content
+                if (isExplicit || (first.length < 100 && first.length * 2 < text.trim().length)) {
+                    title = first;
+                }
+            }
+
+            // 4. Orientation & Guides
+            let orient = 'portrait';
+            if (/\ba4\s+horizontal\b|observaciones\s*:\s*(?:a4\s+)?horizontal\b/i.test(text)) orient = 'landscape';
+
+            const guides = [];
+            // Robust Guide Detection: handles "altura de 84", "84 mm de altura", "z igual a 15", etc.
+            const keywords = 'cota|alejamiento|z|y|altura|profundidad|desviación|nivel';
+            const guideRx = new RegExp(`(?:(?:${keywords})\\s*(?:de|igual\\s+a|es|:\\s*)?\\s*[=><]{0,2}\\s*(-?\\d+(?:\\.\\d+)?)(?:\\s*mm)?|(-?\\d+(?:\\.\\d+)?)(?:\\s*mm)?\\s+de\\s+(?:${keywords}))`, 'gi');
+
+            while ((m = guideRx.exec(text)) !== null) {
+                const fullMatch = m[0].toLowerCase();
+                const isCota = fullMatch.includes('cota') || fullMatch.includes('z') || fullMatch.includes('altura');
+                const type = isCota ? 'cota' : 'alej';
+                const value = parseFloat(m[1] || m[3]);
+                if (!guides.find(g => g.type === type && g.val === value)) guides.push({ type, val: value });
+            }
+
+            // Robust Natural Language Point Detection: handles more text between name and coords
+            const nlPointRx = /punto\s+([A-Z])(?:[^.]{0,60})\s+(?:cota|altura)\s*(?:de|igual\s+a|es|:\s*)?\s*(-?\d+)\s+(?:[^.]{0,60})\s+(?:alejamiento|profundidad)\s*(?:de|igual\s+a|es|:\s*)?\s*(-?\d+)/gi;
+            while ((m = nlPointRx.exec(text)) !== null) {
+                const name = m[1], cota = parseFloat(m[2]), alej = parseFloat(m[3]);
+                if (!points.find(p => p.name === name)) {
+                    points.push({ name, x: 0, alej, cota });
+                }
+            }
+
+            return { points, lines, planes, title, orient, guides };
+        }
+
+        function autoScaleFor(sheet) {
+            if (!sheet.points.length && !sheet.planes.filter(p => p.type === 'coord').length) { sheet.scale = 1; return; }
+            const isPort = sheet.orient === 'portrait';
+            const a4 = isPort ? { w: 210, h: 297 } : { w: 297, h: 210 };
+            const mg = 20, pad = 15;
+            const halfW = a4.w / 2 - mg - pad;
+            const pct = getLtPos() / 100;
+            const above = (a4.h - 2 * mg) * pct - pad;
+            const below = (a4.h - 2 * mg) * (1 - pct) - pad;
+
+            const xs = [
+                ...sheet.points.map(p => Math.abs(p.x)),
+                ...sheet.planes.filter(p => p.type === 'coord').map(p => Math.abs(p.x))
+            ].filter(v => !isNaN(v));
+
+            const cs = [
+                ...sheet.points.map(p => p.cota).filter(v => v !== null).map(Math.abs),
+                ...sheet.planes.filter(p => p.type === 'coord').map(p => p.z).filter(v => v !== null).map(Math.abs)
+            ];
+
+            const as = [
+                ...sheet.points.map(p => p.alej).filter(v => v !== null).map(Math.abs),
+                ...sheet.planes.filter(p => p.type === 'coord').map(p => p.y).filter(v => v !== null).map(Math.abs)
+            ];
+
+            const scales = [];
+            if (xs.length && Math.max(...xs) > 0) scales.push(halfW / Math.max(...xs));
+            if (cs.length && Math.max(...cs) > 0) scales.push(above / Math.max(...cs));
+            if (as.length && Math.max(...as) > 0) scales.push(below / Math.max(...as));
+            const sc = scales.length ? Math.min(...scales) : 1;
+            sheet.scale = Math.max(0.3, Math.min(Math.round(sc * 10) / 10, 5));
+        }
+
+        function toggleGrid() {
+            renderAll();
+            saveProject();
+        }
+
+        function onManualScale() {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet) return;
+            sheet.scale = parseFloat(document.getElementById('manualScale').value) || 1;
+            sheet.manualScale = true;
+            renderSheet(sheet);
+            saveProject();
+        }
+
+        function runAutoScale() {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet) return;
+            sheet.manualScale = false;
+            autoScaleFor(sheet);
+            document.getElementById('manualScale').value = sheet.scale;
+            renderSheet(sheet);
+            saveProject();
+        }
+
+        // ==================== ANALYZE ====================
+        function analyzeSheet(sheet) {
+            const parsed = parseExercise(sheet.text);
+            sheet.points = parsed.points;
+            sheet.lines = parsed.lines;
+            sheet.planes = parsed.planes;
+            sheet.title = parsed.title;
+            sheet.orient = parsed.orient;
+            sheet.guides = parsed.guides;
+
+            syncCanvasOrientation(sheet);
+            if (!sheet.manualScale) autoScaleFor(sheet);
+            renderSheet(sheet);
+            if (sheet.canvas3d) render3D(sheet);
+            renderSidebar();
+            saveProject();
+        }
+
+        function analyzeActive() {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet) return;
+            sheet.text = document.getElementById('exerciseInput').value;
+            analyzeSheet(sheet);
+            const st = document.getElementById('editorStatus');
+            if (sheet.points.length) {
+                st.textContent = `✔ ${sheet.points.length} pto(s), ${sheet.lines.length} recta(s)`;
+                st.className = 'status-ok';
+            } else {
+                st.textContent = '⚠ Sin datos reconocibles';
+                st.className = 'status-warn';
+            }
+        }
+
+        function onInputChange() {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (sheet) {
+                sheet.text = document.getElementById('exerciseInput').value;
+                saveProject();
+            }
+        }
+
+        function renderAll() { sheets.forEach(s => renderSheet(s)); }
+
+        function loadExample() {
+            const txt = `EJERCICIO n° 111\nLas rectas R [A (5, 10, 60), B (39, 23, 0)] y S [A, C (-64, 90, 0)] determinan el plano P. Transformarlo en plano de canto con eje de giro que pase por L (-44, 26, z). El plano de canto transformarlo en horizontal con eje de giro que pase por M (-71, y, 41).`;
+            document.getElementById('exerciseInput').value = txt;
+            const sheet = sheets.find(s => s.id === activeId);
+            if (sheet) { sheet.text = txt; analyzeSheet(sheet); }
+            const st = document.getElementById('editorStatus');
+            st.textContent = `✔ ${sheets.find(s => s.id === activeId)?.points.length || 0} pto(s)`;
+            st.className = 'status-ok';
+        }
+
+        // ==================== DRAWING ====================
+        function clipLineToRect(x1, y1, x2, y2, rx, ry, rw, rh) {
+            const L = 1, R = 2, B = 4, T = 8;
+            function code(x, y) { let c = 0; if (x < rx) c |= L; else if (x > rx + rw) c |= R; if (y < ry) c |= T; else if (y > ry + rh) c |= B; return c; }
+            let c1 = code(x1, y1), c2 = code(x2, y2);
+            for (let i = 0; i < 12; i++) {
+                if (!(c1 | c2)) return [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+                if (c1 & c2) return null;
+                const c = c1 || c2; let x, y; const dx = x2 - x1, dy = y2 - y1;
+                if (c & B) { x = x1 + dx * (ry + rh - y1) / dy; y = ry + rh; }
+                else if (c & T) { x = x1 + dx * (ry - y1) / dy; y = ry; }
+                else if (c & R) { y = y1 + dy * (rx + rw - x1) / dx; x = rx + rw; }
+                else { y = y1 + dy * (rx - x1) / dx; x = rx; }
+                if (c === c1) { x1 = x; y1 = y; c1 = code(x1, y1); } else { x2 = x; y2 = y; c2 = code(x2, y2); }
+            }
+            return null;
+        }
+        function extendAndClip(x1, y1, x2, y2, rx, ry, rw, rh) {
+            const dx = x2 - x1, dy = y2 - y1, big = (rw + rh) * 10, len = Math.sqrt(dx * dx + dy * dy);
+            if (len < 0.001) return null;
+            const ux = dx / len, uy = dy / len;
+            return clipLineToRect(x1 - ux * big, y1 - uy * big, x1 + ux * big, y1 + uy * big, rx, ry, rw, rh);
+        }
+        function drawSegClipped(ctx, x1, y1, x2, y2, rx, ry, rw, rh, color, lw, dash) {
+            const seg = clipLineToRect(x1, y1, x2, y2, rx, ry, rw, rh);
+            if (!seg) return;
+            ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash(dash || []);
+            ctx.beginPath(); ctx.moveTo(seg[0].x, seg[0].y); ctx.lineTo(seg[1].x, seg[1].y); ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function renderSheet(sheet) {
+            const cv = sheet.canvas;
+            if (!cv) return;
+            const ctx = cv.getContext('2d');
+            const w = cv.width, h = cv.height;
+            const isPort = sheet.orient === 'portrait';
+            const a4 = { w: 210, h: 297 };
+            const sc = sheet.scale * MM; // 1:1 or manual scale
+            const mg = 15 * MM;
+            const ltY = h * (getLtPos() / 100);
+            const ox = w / 2;
+            const fs = format.fontSizeLabels * MM / 4, sfs = 8 * MM / 4;
+            const rx = mg, ry = mg, rw = w - 2 * mg, rh = h - 2 * mg;
+
+            function drawLabel(txt, x, y, col, size, halign, valign) {
+                ctx.font = `${size}px 'Inter',sans-serif`;
+                ctx.textAlign = halign; ctx.textBaseline = valign;
+                // Halo for contrast
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+                ctx.strokeText(txt, x, y);
+                ctx.fillStyle = col; ctx.fillText(txt, x, y);
+            }
+
+            // Background + border
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+
+            // Grid (Centered on origin, subtle)
+            const showGridEl = document.getElementById('gridVisible');
+            const showGrid = showGridEl ? showGridEl.checked : true;
+            const gridOpacityEl = document.getElementById('gridOpacity');
+            const gridOpacityVal = ((gridOpacityEl ? gridOpacityEl.value : 15) / 100);
+
+            if (showGrid) {
+                ctx.strokeStyle = `rgba(108, 140, 255, ${gridOpacityVal})`;
+                ctx.lineWidth = 0.5;
+                for (let lx = (ox % MM); lx < w; lx += MM) { ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, h); ctx.stroke(); }
+                for (let ly = (ltY % MM); ly < h; ly += MM) { ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(w, ly); ctx.stroke(); }
+            }
+
+            // Guide lines (auxiliary hints for cota/alejamiento)
+            if (format.showGuides && sheet.guides && sheet.guides.length) {
+                ctx.setLineDash([5, 5]); ctx.lineWidth = 0.8; ctx.strokeStyle = 'rgba(108, 140, 255, 0.2)';
+                sheet.guides.forEach(g => {
+                    const gy = ltY - (g.type === 'cota' ? g.val * sc : -g.val * sc);
+                    if (gy > mg && gy < h - mg) {
+                        ctx.beginPath(); ctx.moveTo(mg, gy); ctx.lineTo(w - mg, gy); ctx.stroke();
+                        ctx.fillStyle = 'rgba(108, 140, 255, 0.5)'; ctx.font = `italic ${7 * MM / 4}px Inter`;
+                        ctx.textAlign = 'right'; ctx.fillText(`${g.type} ${g.val}`, w - mg - 2, gy - 2);
+                    }
+                });
+                ctx.setLineDash([]);
+            }
+
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(mg, mg, rw, rh);
+
+            // Page number (subtle badge)
+            const pageNum = sheets.indexOf(sheet) + 1;
+            const pnumW = 18 * MM, pnumH = 7 * MM;
+            let pnx = w - mg - pnumW, pny = mg;
+            if (format.pagePos === 'top-left') { pnx = mg; }
+            else if (format.pagePos === 'bottom-right') { pny = h - mg - pnumH; }
+            else if (format.pagePos === 'bottom-left') { pnx = mg; pny = h - mg - pnumH; }
+
+            if (format.showPageNum) {
+                ctx.fillStyle = '#f8f9fa';
+                ctx.fillRect(pnx, pny, pnumW, pnumH);
+                ctx.strokeStyle = '#ccc'; ctx.lineWidth = 0.5;
+                ctx.strokeRect(pnx, pny, pnumW, pnumH);
+                ctx.fillStyle = '#666'; ctx.font = `bold ${9 * MM / 4}px 'Inter',sans-serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(`Hoja ${pageNum}`, pnx + pnumW / 2, pny + pnumH / 2);
+            }
+
+            // Title
+            if (format.showTitle) {
+                let titleText = sheet.title;
+                if (titleText) {
+                    const isSol = titleText.toUpperCase().includes('SOLUCIÓN');
+                    ctx.fillStyle = isSol ? '#ff0000' : '#000';
+                    ctx.font = `bold ${(isSol ? 14 : 12) * MM / 4}px 'Inter',sans-serif`;
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                    let tx = mg + 6, ty = mg + 5;
+                    if (format.showPageNum && format.pagePos === 'top-left') tx += pnumW + 5;
+                    ctx.fillText(titleText, tx, ty);
+                }
+            }
+
+            // (Previous redundant grid logic removed)
+
+            // LT
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 1.4;
+            ctx.beginPath(); ctx.moveTo(mg, ltY); ctx.lineTo(w - mg, ltY); ctx.stroke();
+            // Terminal markings (small parallel lines below LT)
+            ctx.lineWidth = 1; const tLen = 4 * MM, tDist = 2 * MM;
+            ctx.beginPath(); ctx.moveTo(mg, ltY + tDist); ctx.lineTo(mg + tLen, ltY + tDist); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(w - mg, ltY + tDist); ctx.lineTo(w - mg - tLen, ltY + tDist); ctx.stroke();
+
+            ctx.fillStyle = '#000'; ctx.font = `bold ${11 * MM / 4}px 'Inter',sans-serif`;
+            ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+            ctx.fillText('LT', mg + 3, ltY - 4);
+
+            // Origin
+            ctx.strokeStyle = '#555'; ctx.lineWidth = 0.8;
+            ctx.beginPath(); ctx.moveTo(ox, ltY - 6); ctx.lineTo(ox, ltY + 6); ctx.stroke();
+            ctx.fillStyle = '#555'; ctx.font = `${sfs}px 'Inter',sans-serif`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            ctx.fillText('O', ox, ltY + 8);
+
+            // PV/PH labels (shifted to avoid page number)
+            if (format.showLegend) {
+                ctx.fillStyle = '#bbb'; ctx.font = `${sfs}px 'Inter',sans-serif`;
+                ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+                let pvy = mg + 3;
+                if (format.showPageNum && format.pagePos === 'top-right') pvy += pnumH + 2;
+                ctx.fillText('PV (Alzado)', w - mg - 3, pvy);
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('PH (Planta)', w - mg - 3, h - mg - 3);
+            }
+
+            // ===== LINES (infinite, PAU dashed when crossing LT) =====
+            sheet.lines.forEach(ln => {
+                const p1 = sheet.points.find(p => p.name === ln.p1);
+                const p2 = sheet.points.find(p => p.name === ln.p2);
+                if (!p1 || !p2) return;
+                const color = '#d9730d', lw = 1.2;
+
+                // Alzado r'
+                if (p1.cota !== null && p2.cota !== null) {
+                    const ax1 = ox + p1.x * sc, ay1 = ltY - p1.cota * sc;
+                    const ax2 = ox + p2.x * sc, ay2 = ltY - p2.cota * sc;
+                    const full = extendAndClip(ax1, ay1, ax2, ay2, rx, ry, rw, rh);
+                    if (full) {
+                        const mid = { x: (full[0].x + full[1].x) / 2, y: (full[0].y + full[1].y) / 2 };
+                        const dx = full[1].x - full[0].x, dy = full[1].y - full[0].y;
+                        let crossX = null;
+                        if (Math.abs(dy) > 0.001) { const t = (ltY - full[0].y) / dy; if (t > 0 && t < 1) crossX = full[0].x + t * dx; }
+                        if (crossX === null) {
+                            const above = (full[0].y + full[1].y) / 2 <= ltY;
+                            drawSegClipped(ctx, full[0].x, full[0].y, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, above ? [] : [6, 4]);
+                        } else {
+                            drawSegClipped(ctx, full[0].x, full[0].y, crossX, ltY, rx, ry, rw, rh, color, lw, full[0].y <= ltY ? [] : [6, 4]);
+                            drawSegClipped(ctx, crossX, ltY, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, full[1].y <= ltY ? [] : [6, 4]);
+                        }
+                        ctx.fillStyle = color;
+                        drawLabel(ln.name + "'", mid.x + 10, mid.y - 10, color, fs, 'left', 'bottom');
+                    }
+                }
+
+                // Planta r
+                if (p1.alej !== null && p2.alej !== null) {
+                    const px1 = ox + p1.x * sc, py1 = ltY + p1.alej * sc;
+                    const px2 = ox + p2.x * sc, py2 = ltY + p2.alej * sc;
+                    const full = extendAndClip(px1, py1, px2, py2, rx, ry, rw, rh);
+                    if (full) {
+                        const mid = { x: (full[0].x + full[1].x) / 2, y: (full[0].y + full[1].y) / 2 };
+                        const dx = full[1].x - full[0].x, dy = full[1].y - full[0].y;
+                        let crossX = null;
+                        if (Math.abs(dy) > 0.001) { const t = (ltY - full[0].y) / dy; if (t > 0 && t < 1) crossX = full[0].x + t * dx; }
+                        if (crossX === null) {
+                            const below = (full[0].y + full[1].y) / 2 >= ltY;
+                            drawSegClipped(ctx, full[0].x, full[0].y, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, below ? [] : [6, 4]);
+                        } else {
+                            drawSegClipped(ctx, full[0].x, full[0].y, crossX, ltY, rx, ry, rw, rh, color, lw, full[0].y >= ltY ? [] : [6, 4]);
+                            drawSegClipped(ctx, crossX, ltY, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, full[1].y >= ltY ? [] : [6, 4]);
+                        }
+                        ctx.fillStyle = color;
+                        drawLabel(ln.name, mid.x + 10, mid.y + 10, color, fs, 'left', 'top');
+                    }
+                }
+            });
+
+            // ===== POINTS =====
+            const cr = 4;
+            sheet.points.forEach(pt => {
+                const xK = pt.x !== null, cK = pt.cota !== null, aK = pt.alej !== null;
+                const px = xK ? ox + pt.x * sc : null;
+                const pyA = cK ? ltY - pt.cota * sc : null;
+                const pyP = aK ? ltY + pt.alej * sc : null;
+
+                // Draw Horizontal Loci (if x is unknown but cota/alej is known)
+                if (format.showGuides && !xK) {
+                    ctx.setLineDash([8, 6]); ctx.lineWidth = 0.6; ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+                    if (cK) {
+                        ctx.beginPath(); ctx.moveTo(mg, pyA); ctx.lineTo(w - mg, pyA); ctx.stroke();
+                        ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.font = `italic ${sfs}px Inter`; ctx.textAlign = 'right';
+                        ctx.fillText(`Lugar geométrico ${pt.name}' (z=${pt.cota})`, w - mg - 5, pyA - 3);
+                    }
+                    if (aK) {
+                        ctx.beginPath(); ctx.moveTo(mg, pyP); ctx.lineTo(w - mg, pyP); ctx.stroke();
+                        ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.font = `italic ${sfs}px Inter`; ctx.textAlign = 'right';
+                        ctx.fillText(`Lugar geométrico ${pt.name} (y=${pt.alej})`, w - mg - 5, pyP + 12);
+                    }
+                    ctx.setLineDash([]);
+                }
+
+                // Draw Vertical Loci / Ticks (if x is known)
+                if (xK) {
+                    // Tick on LT
+                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(px, ltY - 4); ctx.lineTo(px, ltY + 4); ctx.stroke();
+
+                    // If one projection is unknown, draw vertical infinite line in that half-plane
+                    if (format.showGuides) {
+                        ctx.setLineDash([8, 6]); ctx.lineWidth = 0.6; ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+                        if (!cK) {
+                            ctx.beginPath(); ctx.moveTo(px, mg); ctx.lineTo(px, ltY); ctx.stroke();
+                            ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.font = `italic ${sfs}px Inter`; ctx.textAlign = 'left';
+                            ctx.fillText(`Lugar geométrico ${pt.name}' (x=${pt.x})`, px + 5, mg + 12);
+                        }
+                        if (!aK) {
+                            ctx.beginPath(); ctx.moveTo(px, ltY); ctx.lineTo(px, h - mg); ctx.stroke();
+                            ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.font = `italic ${sfs}px Inter`; ctx.textAlign = 'left';
+                            ctx.fillText(`Lugar geométrico ${pt.name} (x=${pt.x})`, px + 5, h - mg - 5);
+                        }
+                        ctx.setLineDash([]);
+                    }
+
+                    // Draw projection-to-projection connection if both known
+                    if (cK && aK) {
+                        ctx.strokeStyle = '#ccc'; ctx.lineWidth = 0.4; ctx.setLineDash([3, 3]);
+                        ctx.beginPath(); ctx.moveTo(px, pyA); ctx.lineTo(px, pyP); ctx.stroke(); ctx.setLineDash([]);
+                    }
+
+                    // Alzado (name')
+                    if (cK) {
+                        ctx.strokeStyle = '#2b6cb0'; ctx.lineWidth = 1.2;
+                        ctx.beginPath(); ctx.moveTo(px - cr, pyA - cr); ctx.lineTo(px + cr, pyA + cr);
+                        ctx.moveTo(px + cr, pyA - cr); ctx.lineTo(px - cr, pyA + cr); ctx.stroke();
+                        drawLabel(pt.name + "'", px + 8, pyA, '#2b6cb0', fs, 'left', 'middle');
+                    }
+
+                    // Planta (name)
+                    if (aK) {
+                        ctx.strokeStyle = '#c92a2a'; ctx.lineWidth = 1.2;
+                        ctx.beginPath(); ctx.moveTo(px - cr, pyP - cr); ctx.lineTo(px + cr, pyP + cr);
+                        ctx.moveTo(px + cr, pyP - cr); ctx.lineTo(px - cr, pyP + cr); ctx.stroke();
+                        drawLabel(pt.name, px + 8, pyP, '#c92a2a', fs, 'left', 'middle');
+                    }
+                }
+            });
+
+            // ===== PLANES (using x, y, z coords) =====
+            sheet.planes.forEach(pl => {
+                if (pl.type !== 'coord') return;
+                const color = '#38a169'; // Greenish
+                const lw = 1.4;
+                const vx = ox + pl.x * sc, vy = ltY; // Vertex on LT
+
+                // Draw vertex cross
+                ctx.strokeStyle = color; ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(vx - cr, vy - cr); ctx.lineTo(vx + cr, vy + cr);
+                ctx.moveTo(vx + cr, vy - cr); ctx.lineTo(vx - cr, vy + cr);
+                ctx.stroke();
+
+                // Vertical trace p' (joins Vertex on LT to intercept Z on center axis)
+                if (pl.z !== null) {
+                    const zx = ox, zy = ltY - pl.z * sc;
+
+                    // Draw intercept cross
+                    ctx.beginPath();
+                    ctx.moveTo(zx - cr, zy - cr); ctx.lineTo(zx + cr, zy + cr);
+                    ctx.moveTo(zx + cr, zy - cr); ctx.lineTo(zx - cr, zy + cr);
+                    ctx.stroke();
+
+                    const full = extendAndClip(vx, vy, zx, zy, rx, ry, rw, rh);
+                    if (full) {
+                        const dx = full[1].x - full[0].x, dy = full[1].y - full[0].y;
+                        let crossX = null;
+                        if (Math.abs(dy) > 0.001) { const t = (ltY - full[0].y) / dy; if (t > 0 && t < 1) crossX = full[0].x + t * dx; }
+                        if (crossX === null) {
+                            const above = (full[0].y + full[1].y) / 2 <= ltY;
+                            drawSegClipped(ctx, full[0].x, full[0].y, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, above ? [] : [6, 4]);
+                        } else {
+                            drawSegClipped(ctx, full[0].x, full[0].y, crossX, ltY, rx, ry, rw, rh, color, lw, full[0].y <= ltY ? [] : [6, 4]);
+                            drawSegClipped(ctx, crossX, ltY, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, full[1].y <= ltY ? [] : [6, 4]);
+                        }
+                        ctx.fillStyle = color;
+                        drawLabel(pl.name + "'", zx - 5, zy - 5, color, fs * 1.1, 'right', 'bottom');
+                    }
+                }
+
+                // Horizontal trace p (joins Vertex on LT to intercept Y on center axis)
+                if (pl.y !== null) {
+                    const yx = ox, yy = ltY + pl.y * sc;
+
+                    // Draw intercept cross
+                    ctx.beginPath();
+                    ctx.moveTo(yx - cr, yy - cr); ctx.lineTo(yx + cr, yy + cr);
+                    ctx.moveTo(yx + cr, yy - cr); ctx.lineTo(yx - cr, yy + cr);
+                    ctx.stroke();
+
+                    const full = extendAndClip(vx, vy, yx, yy, rx, ry, rw, rh);
+                    if (full) {
+                        const dx = full[1].x - full[0].x, dy = full[1].y - full[0].y;
+                        let crossX = null;
+                        if (Math.abs(dy) > 0.001) { const t = (ltY - full[0].y) / dy; if (t > 0 && t < 1) crossX = full[0].x + t * dx; }
+                        if (crossX === null) {
+                            const below = (full[0].y + full[1].y) / 2 >= ltY;
+                            drawSegClipped(ctx, full[0].x, full[0].y, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, below ? [] : [6, 4]);
+                        } else {
+                            drawSegClipped(ctx, full[0].x, full[0].y, crossX, ltY, rx, ry, rw, rh, color, lw, full[0].y >= ltY ? [] : [6, 4]);
+                            drawSegClipped(ctx, crossX, ltY, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, full[1].y >= ltY ? [] : [6, 4]);
+                        }
+                        ctx.fillStyle = color;
+                        drawLabel(pl.name, yx - 5, yy + 5, color, fs * 1.1, 'right', 'top');
+                    }
+                }
+            });
+
+            // ===== AI GENERATED STEPS (Solution) =====
+            if (sheet.steps && sheet.steps.length) {
+                // Determine if this is a solution sheet
+                const isSol = sheet.title && sheet.title.toUpperCase().includes('SOLUCIÓN');
+
+                sheet.steps.forEach(step => {
+                    const isResult = step.isResult === true;
+                    const args = step.arguments;
+                    const color = isResult ? (args.color || '#ff0000') : '#aaa';
+                    const lw = isResult ? 3.5 : 1.0;
+                    const dash = isResult ? [] : [6, 4];
+                    const label = args.label ? `(${args.label})` : '';
+
+                    // Simplified drawing for steps (only basic items for now)
+                    if (step.name === 'add_point' || step.name === 'add_point_result' || step.name === 'intersection_line_plane' || step.name === 'intersection_planes') {
+                        // Support both 'x'/'y'/'z' and 'result_x'/'result_y'/'result_z'
+                        const px = ox + (args.x !== undefined ? args.x : args.result_x) * sc;
+                        const pyA = ltY - (args.z !== undefined ? args.z : args.result_z) * sc;
+                        const pyP = ltY + (args.y !== undefined ? args.y : args.result_y) * sc;
+                        const isResult = step.name === 'add_point_result' || step.isResult;
+                        const pointColor = args.color || (isResult ? '#e63946' : '#2d3436');
+                        const pointWidth = isResult ? lw * 1.5 : lw;
+
+                        ctx.strokeStyle = pointColor; ctx.lineWidth = pointWidth;
+                        // Alzado (A')
+                        ctx.beginPath(); ctx.moveTo(px - 3, pyA - 3); ctx.lineTo(px + 3, pyA + 3); ctx.moveTo(px + 3, pyA - 3); ctx.lineTo(px - 3, pyA + 3); ctx.stroke();
+                        // Planta (A)
+                        ctx.beginPath(); ctx.moveTo(px - 3, pyP - 3); ctx.lineTo(px + 3, pyP + 3); ctx.moveTo(px + 3, pyP - 3); ctx.lineTo(px - 3, pyP + 3); ctx.stroke();
+                        // Reference line
+                        ctx.setLineDash([2, 3]); ctx.lineWidth = lw * 0.3; ctx.beginPath(); ctx.moveTo(px, pyA); ctx.lineTo(px, pyP); ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        if (args.name) {
+                            const label = args.label ? ` (${args.label})` : "";
+                            drawLabel(args.name + "'" + label, px + 8, pyA, pointColor, fs, 'left', 'middle');
+                            drawLabel(args.name + label, px + 8, pyP, pointColor, fs, 'left', 'middle');
+                        }
+                    } else if (step.name === 'add_line_by_points' || step.name === 'add_line_by_coords') {
+                        let x1, y1, z1, x2, y2, z2;
+                        if (step.name === 'add_line_by_points') {
+                            const p1 = sheet.steps.find(s => (s.name === 'add_point' || s.name === 'add_point_result') && s.arguments.name === args.point1_name)?.arguments;
+                            const p2 = sheet.steps.find(s => (s.name === 'add_point' || s.name === 'add_point_result') && s.arguments.name === args.point2_name)?.arguments;
+                            if (p1 && p2) { x1 = p1.x; y1 = p1.y; z1 = p1.z; x2 = p2.x; y2 = p2.y; z2 = p2.z; }
+                        } else {
+                            x1 = args.p1_x; y1 = args.p1_y; z1 = args.p1_z; x2 = args.p2_x; y2 = args.p2_y; z2 = args.p2_z;
+                        }
+
+                        if (x1 !== undefined) {
+                            drawSegClipped(ctx, ox + x1 * sc, ltY - z1 * sc, ox + x2 * sc, ltY - z2 * sc, rx, ry, rw, rh, color, lw, dash);
+                            drawSegClipped(ctx, ox + x1 * sc, ltY + y1 * sc, ox + x2 * sc, ltY + y2 * sc, rx, ry, rw, rh, color, lw, dash);
+                        }
+                    } else if (step.name === 'add_plane_by_traces') {
+                        const vx = ox + args.x_intercept * sc, vy = ltY;
+                        const zx = ox, zy = ltY - args.z_intercept * sc;
+                        const yx = ox, yy = ltY + args.y_intercept * sc;
+                        drawSegClipped(ctx, vx, vy, zx, zy, rx, ry, rw, rh, color, lw, dash);
+                        drawSegClipped(ctx, vx, vy, yx, yy, rx, ry, rw, rh, color, lw, dash);
+                    } else if (step.name === 'rotate_point_around_axis' || step.name === 'rotate_point') {
+                        const rx_val = args.x !== undefined ? args.x : args.result_x;
+                        const ry_val = args.y !== undefined ? args.y : args.result_y;
+                        const rz_val = args.z !== undefined ? args.z : args.result_z;
+                        if (rx_val !== undefined) {
+                            const px = ox + rx_val * sc, pyA = ltY - rz_val * sc, pyP = ltY + ry_val * sc;
+                            ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash([]);
+                            ctx.beginPath(); ctx.arc(px, pyA, 2, 0, Math.PI * 2); ctx.stroke();
+                            drawLabel((args.name || "A_rot") + "'" + label, px + 8, pyA, color, fs, 'left', 'middle');
+                        }
+                    } else if (step.name === 'draw_arc' || step.name === 'compass_arc') {
+                        const isPH = args.plane === 'PH';
+                        const cx = ox + args.center_x * sc;
+                        const cy = isPH ? ltY + args.center_y * sc : ltY - args.center_z * sc;
+                        const r = args.radius * sc;
+                        const arcColor = args.color || (isPH ? '#c92a2a' : '#2b6cb0');
+
+                        ctx.strokeStyle = arcColor; ctx.lineWidth = lw * 0.5; ctx.setLineDash([4, 4]);
+                        // "Pinchado" center cross
+                        ctx.beginPath();
+                        ctx.moveTo(cx - 2, cy - 2); ctx.lineTo(cx + 2, cy + 2);
+                        ctx.moveTo(cx + 2, cy - 2); ctx.lineTo(cx - 2, cy + 2);
+                        ctx.stroke();
+
+                        // Arc
+                        ctx.beginPath();
+                        // Adjust angles if needed (Canvas angles are clockwise from positive X)
+                        // In technical drawing, angles might need mapping, but let's stick to standard for now
+                        ctx.arc(cx, cy, r, args.start_angle || 0, args.end_angle || Math.PI * 2);
+                        ctx.stroke();
+
+                        if (args.label) {
+                            const labelX = cx + (r + 5) * Math.cos((args.start_angle || 0 + args.end_angle || Math.PI * 2) / 2);
+                            const labelY = cy + (r + 5) * Math.sin((args.start_angle || 0 + args.end_angle || Math.PI * 2) / 2);
+                            drawLabel(args.label, labelX, labelY, arcColor, fs * 0.8, 'center', 'middle');
+                        }
+                    }
+                });
+            }
+
+            // Legend
+            ctx.font = `${sfs}px 'Inter',sans-serif`;
+            ctx.fillStyle = '#aaa'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+            // ===== ENUNCIADO TEXT BOX =====
+            const displayText = sheet.solutionExplanation || sheet.text;
+            if (displayText && displayText.trim()) {
+                const boxPad = 4 * MM / 4;
+                const textFontSize = format.fontSizeText * MM / 4;
+                const lineH = textFontSize * 1.45;
+                const boxX = mg + 1;
+                const boxW = (format.orient === 'portrait' ? 210 : 297) * MM / 4 - 2 * mg - 2;
+
+                ctx.font = `${textFontSize}px 'Inter',sans-serif`;
+
+                // Wrap text
+                const linesArr = wrapText(ctx, displayText, boxW - 2 * boxPad, textFontSize);
+
+                const boxH = linesArr.length * lineH + boxPad * 2;
+                let boxY = (format.textPos === 'top') ? mg + 1 : h - mg - boxH - 1;
+
+                // Simple background for text
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                ctx.fillRect(boxX, boxY, boxW, boxH);
+                ctx.strokeStyle = '#eee'; ctx.lineWidth = 0.5;
+                ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+                ctx.fillStyle = '#000'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                linesArr.forEach((line, i) => {
+                    ctx.fillText(line, boxX + boxPad, boxY + boxPad + i * lineH);
+                });
+            }
+
+            // Legend
+            if (format.showScale) {
+                ctx.font = `${sfs}px 'Inter',sans-serif`;
+                ctx.fillStyle = '#aaa'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                ctx.fillText(`1 ud = ${sheet.scale} mm`, mg + 5, h - mg - 3);
+            }
+            ctx.textAlign = 'right';
+            ctx.fillText("Azul = Alzado (')  │  Rojo = Planta  │  ─ ─ = desconocido", w - mg - 5, h - mg - 3);
+
+            // Trigger 3D render
+            if (sheet.canvas3d) render3D(sheet);
+        }
+
+        function render3D(sheet) {
+            const cv = sheet.canvas3d;
+            if (!cv) return;
+            const ctx = cv.getContext('2d');
+            const w = cv.width, h = cv.height;
+            const ox = w / 2, oy = h / 2 + 10;
+            const sc = sheet.scale * 1.3;
+
+            ctx.clearRect(0, 0, w, h);
+            if (!format.show3D) { cv.style.display = 'none'; return; }
+            cv.style.display = 'block';
+
+            function to3D(x, y, z) {
+                // Modified Dimetric for a "spatial model" look
+                // X increases left, Y increases bottom-right, Z increases up
+                const x0 = ox, y0 = oy;
+                const angleY = Math.PI / 6; // 30 deg
+                const angleX = Math.PI - Math.PI / 6; // 150 deg (leftwards)
+
+                return {
+                    x: x0 + (x * sc * Math.cos(angleX)) + (y * sc * Math.cos(angleY)),
+                    y: y0 - (z * sc) - (x * sc * Math.sin(angleX)) - (y * sc * Math.sin(angleY))
+                };
+            }
+
+            // Draw Planes (PHP and PVP)
+            const pSize = 70;
+            const v00 = to3D(0, 0, 0);
+            const vX0 = to3D(pSize, 0, 0);
+            const v0Y = to3D(0, pSize, 0);
+            const vXY = to3D(pSize, pSize, 0);
+            const vXZ = to3D(pSize, 0, pSize);
+            const v0Z = to3D(0, 0, pSize);
+            const vX_Z = to3D(pSize, 0, -pSize);
+            const v0_Z = to3D(0, 0, -pSize);
+            const v0_Y = to3D(0, -pSize, 0);
+            const vX_Y = to3D(pSize, -pSize, 0);
+
+            // PHP (Horizontal) - Posterior part
+            ctx.fillStyle = 'rgba(200, 200, 200, 0.4)';
+            ctx.beginPath(); ctx.moveTo(v00.x, v00.y); ctx.lineTo(vX0.x, vX0.y); ctx.lineTo(vX_Y.x, vX_Y.y); ctx.lineTo(v0_Y.x, v0_Y.y); ctx.fill();
+            // PHP - Anterior part
+            ctx.fillStyle = 'rgba(180, 180, 180, 0.6)';
+            ctx.beginPath(); ctx.moveTo(v00.x, v00.y); ctx.lineTo(vX0.x, vX0.y); ctx.lineTo(vXY.x, vXY.y); ctx.lineTo(v0Y.x, v0Y.y); ctx.fill();
+            ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1; ctx.stroke();
+
+            // PVP (Vertical) - Superior part
+            ctx.fillStyle = 'rgba(230, 230, 230, 0.5)';
+            ctx.beginPath(); ctx.moveTo(v00.x, v00.y); ctx.lineTo(vX0.x, vX0.y); ctx.lineTo(vXZ.x, vXZ.y); ctx.lineTo(v0Z.x, v0Z.y); ctx.fill();
+            ctx.stroke();
+            // PVP - Inferior part
+            ctx.fillStyle = 'rgba(210, 210, 210, 0.3)';
+            ctx.beginPath(); ctx.moveTo(v00.x, v00.y); ctx.lineTo(vX0.x, vX0.y); ctx.lineTo(vX_Z.x, vX_Z.y); ctx.lineTo(v0_Z.x, v0_Z.y); ctx.fill();
+
+            // Ground Line in 3D
+            ctx.strokeStyle = '#999'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(v00.x, v00.y); ctx.lineTo(vX0.x, vX0.y); ctx.stroke();
+
+            // Labels for planes
+            ctx.fillStyle = '#666'; ctx.font = 'bold 9px Inter'; ctx.textAlign = 'left';
+            ctx.fillText('P.H. (Post.)', v0_Y.x - 50, v0_Y.y); ctx.fillText('P.H. (Ante.)', vXY.x + 5, vXY.y);
+            ctx.fillText('P.V. (Super.)', v0Z.x - 5, v0Z.y - 5); ctx.fillText('P.V. (Infe.)', v0_Z.x - 5, v0_Z.y + 12);
+
+            // Points & Projections
+            sheet.points.forEach(p => {
+                const x = p.x, y = p.alej || 0, z = p.cota || 0;
+                const p3d = to3D(x, y, z);
+                const pPH = to3D(x, y, 0); // Projection on PHP
+                const pPV = to3D(x, 0, z); // Projection on PVP
+                const pLT = to3D(x, 0, 0); // Point on LT
+
+                // Projection lines (dashed)
+                ctx.setLineDash([3, 3]); ctx.lineWidth = 0.8;
+                // Vertical projection lines (Blue)
+                ctx.strokeStyle = 'rgba(43,108,176,0.6)';
+                ctx.beginPath(); ctx.moveTo(p3d.x, p3d.y); ctx.lineTo(pPV.x, pPV.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(pPH.x, pPH.y); ctx.lineTo(pLT.x, pLT.y); ctx.stroke();
+                // Horizontal projection lines (Red)
+                ctx.strokeStyle = 'rgba(201,42,42,0.6)';
+                ctx.beginPath(); ctx.moveTo(p3d.x, p3d.y); ctx.lineTo(pPH.x, pPH.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(pPV.x, pPV.y); ctx.lineTo(pLT.x, pLT.y); ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Projections markers & Labels
+                ctx.font = 'italic 10px Inter';
+                // Planta (p)
+                ctx.fillStyle = '#c92a2a'; ctx.beginPath(); ctx.arc(pPH.x, pPH.y, 2, 0, Math.PI * 2); ctx.fill();
+                ctx.fillText(p.name, pPH.x + 4, pPH.y + 10);
+                // Alzado (p')
+                ctx.fillStyle = '#2b6cb0'; ctx.beginPath(); ctx.arc(pPV.x, pPV.y, 2, 0, Math.PI * 2); ctx.fill();
+                ctx.fillText(p.name + "'", pPV.x + 4, pPV.y - 4);
+
+                // Real 3D Point
+                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(p3d.x, p3d.y, 3, 0, Math.PI * 2); ctx.fill();
+                ctx.font = 'bold 12px Inter';
+                ctx.fillText(p.name, p3d.x + 6, p3d.y - 6);
+            });
+
+            // Lines
+            sheet.lines.forEach(ln => {
+                const p1 = sheet.points.find(p => p.name === ln.p1);
+                const p2 = sheet.points.find(p => p.name === ln.p2);
+                if (p1 && p2) {
+                    const s1 = to3D(p1.x, p1.alej || 0, p1.cota || 0);
+                    const s2 = to3D(p2.x, p2.alej || 0, p2.cota || 0);
+                    ctx.strokeStyle = 'rgba(0,0,0,0.8)'; ctx.lineWidth = 2.5;
+                    ctx.beginPath(); ctx.moveTo(s1.x, s1.y); ctx.lineTo(s2.x, s2.y); ctx.stroke();
+                }
+            });
+
+            // Planes
+            sheet.planes.forEach(pl => {
+                if (pl.type === 'coord' && pl.x !== null) {
+                    const v = to3D(pl.x, 0, 0);
+                    const color = '#2f855a'; ctx.strokeStyle = color; ctx.lineWidth = 2;
+                    if (pl.z !== null) {
+                        const pz = to3D(0, 0, pl.z);
+                        ctx.beginPath(); ctx.moveTo(v.x, v.y); ctx.lineTo(pz.x, pz.y); ctx.stroke();
+                    }
+                    if (pl.y !== null) {
+                        const py = to3D(0, pl.y, 0);
+                        ctx.beginPath(); ctx.moveTo(v.x, v.y); ctx.lineTo(py.x, py.y); ctx.stroke();
+                    }
+                }
+            });
+        }
+
+        // ==================== PDF EXPORT ====================
+        async function exportPDF() {
+            if (!sheets.length) return;
+            const btn = document.querySelector('.btn-pdf');
+            btn.textContent = '⏳ Generando...';
+            btn.disabled = true;
+
+            try {
+                const { jsPDF } = window.jspdf;
+                let pdf = null;
+
+                for (let i = 0; i < sheets.length; i++) {
+                    const sheet = sheets[i];
+                    const isPort = sheet.orient === 'portrait';
+                    const a4 = { w: 210, h: 297 };
+                    const pw = isPort ? a4.w : a4.h;
+                    const ph = isPort ? a4.h : a4.w;
+
+                    if (!pdf) {
+                        pdf = new jsPDF({ orientation: isPort ? 'portrait' : 'landscape', unit: 'mm', format: 'a4' });
+                    } else {
+                        pdf.addPage('a4', isPort ? 'portrait' : 'landscape');
+                    }
+
+                    // Render at high resolution
+                    const printDPI = 200;
+                    const cw = Math.round(pw * printDPI / 25.4);
+                    const ch = Math.round(ph * printDPI / 25.4);
+                    const tempCv = document.createElement('canvas');
+                    tempCv.width = cw; tempCv.height = ch;
+                    const ctx = tempCv.getContext('2d');
+                    ctx.scale(printDPI / DPI, printDPI / DPI);
+
+                    // Temporarily swap canvas
+                    const origCv = sheet.canvas;
+                    // Use a mock canvas object that renderSheet expects
+                    sheet.canvas = { width: Math.round(pw * MM), height: Math.round(ph * MM), getContext: () => ctx };
+                    renderSheet(sheet);
+                    sheet.canvas = origCv;
+
+                    const imgData = tempCv.toDataURL('image/jpeg', 0.92);
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pw, ph);
+                }
+
+                pdf.save('diedrico-ejercicios.pdf');
+            } catch (e) {
+                alert('Error al generar PDF: ' + e.message);
+                console.error(e);
+            }
+
+            btn.textContent = '📄 Exportar PDF';
+            btn.disabled = false;
+        }
+
+        // ==================== BATCH IMPORT ====================
+        function openBatchModal() {
+            document.getElementById('batchModal').classList.add('open');
+            document.getElementById('batchInput').focus();
+        }
+        function closeBatchModal() {
+            document.getElementById('batchModal').classList.remove('open');
+        }
+        // Close modal on overlay click
+        document.getElementById('batchModal').addEventListener('click', function (e) {
+            if (e.target === this) closeBatchModal();
+        });
+
+        function importBatch() {
+            const raw = document.getElementById('batchInput').value.trim();
+            if (!raw) return;
+
+            // Split line-by-line: start a new block on any line containing 'EJERCICIO'
+            const allLines = raw.split(/\r?\n/);
+            const parts = [];
+            let current = [];
+            for (const line of allLines) {
+                if (/EJERCICIO/i.test(line) && current.length > 0) {
+                    parts.push(current.join('\n').trim());
+                    current = [line];
+                } else {
+                    current.push(line);
+                }
+            }
+            if (current.length > 0 && current.join('').trim()) parts.push(current.join('\n').trim());
+            if (!parts.length) {
+                alert('No se encontraron bloques que empiecen por "EJERCICIO".');
+                return;
+            }
+
+            // Clear existing sheets
+            sheets = [];
+            document.getElementById('previewScroll').innerHTML = '';
+            nextId = 1;
+            activeId = null;
+
+            // Create one sheet per exercise block
+            parts.forEach(text => addSheet(text, true));
+
+            closeBatchModal();
+            document.getElementById('batchInput').value = '';
+
+            // Activate first sheet
+            if (sheets.length) setActive(sheets[0].id);
+        }
+
+        // ==================== PERSISTENCE ====================
+        function saveProject() {
+            const data = {
+                sheets: sheets.map(s => ({ ...s, canvas: null, canvas3d: null })),
+                orient,
+                ltPos: getLtPos(),
+                gridVisible: document.getElementById('gridVisible').checked,
+                gridOpacity: document.getElementById('gridOpacity').value,
+                nextId,
+                format
+            };
+            localStorage.setItem('diedricoProject', JSON.stringify(data));
+        }
+
+        function loadProject() {
+            const raw = localStorage.getItem('diedricoProject');
+            if (!raw) { addSheet(); return; }
+            try {
+                const data = JSON.parse(raw);
+                orient = data.orient || 'portrait';
+                sheets = data.sheets || [];
+                format = { ...format, ...(data.format || {}) };
+                nextId = data.nextId || (sheets.length ? Math.max(...sheets.map(s => s.id)) + 1 : 1);
+
+                document.getElementById('gLtPos').value = data.ltPos || 50;
+                document.getElementById('gridVisible').checked = data.gridVisible !== false;
+                document.getElementById('gridOpacity').value = data.gridOpacity || 15;
+
+                // Sync format inputs
+                document.getElementById('fmtPagePos').value = format.pagePos;
+                document.getElementById('fmtTextPos').value = format.textPos;
+                document.getElementById('fmtFontSizeText').value = format.fontSizeText;
+                document.getElementById('fmtFontSizeLabels').value = format.fontSizeLabels;
+                document.getElementById('fmtShowLegend').checked = format.showLegend;
+                document.getElementById('fmtShowTitle').checked = format.showTitle;
+                document.getElementById('fmtShowScale').checked = format.showScale;
+                document.getElementById('fmtShow3D').checked = format.show3D !== false;
+                document.getElementById('fmtShowGuides').checked = format.showGuides !== false;
+                document.getElementById('fmtShowPageNum').checked = format.showPageNum !== false;
+
+                document.querySelectorAll('.orient-btn').forEach(b => b.classList.toggle('active', b.dataset.o === orient));
+
+                if (sheets.length) {
+                    rebuildAllCanvases();
+                    setActive(sheets[0].id);
+                } else {
+                    addSheet();
+                }
+            } catch (e) {
+                console.error("Failed to load project", e);
+                addSheet();
+            }
+        }
+
+        // ==================== FORMAT MODAL ====================
+        function openFormatModal() { document.getElementById('formatModal').classList.add('open'); }
+        function closeFormatModal() { document.getElementById('formatModal').classList.remove('open'); }
+        function updateFormat() {
+            format.pagePos = document.getElementById('fmtPagePos').value;
+            format.textPos = document.getElementById('fmtTextPos').value;
+            format.fontSizeText = parseFloat(document.getElementById('fmtFontSizeText').value) || 9.5;
+            format.fontSizeLabels = parseFloat(document.getElementById('fmtFontSizeLabels').value) || 10;
+            format.showLegend = document.getElementById('fmtShowLegend').checked;
+            format.showTitle = document.getElementById('fmtShowTitle').checked;
+            format.showScale = document.getElementById('fmtShowScale').checked;
+            format.show3D = document.getElementById('fmtShow3D').checked;
+            format.showGuides = document.getElementById('fmtShowGuides').checked;
+            format.showPageNum = document.getElementById('fmtShowPageNum').checked;
+            renderAll();
+            saveProject();
+        }
+
+        function clearAll() {
+            if (!confirm('¿Seguro que quieres borrar todas las hojas?')) return;
+            localStorage.removeItem('diedricoProject');
+            sheets = [];
+            nextId = 1;
+            activeId = null;
+            document.getElementById('previewScroll').innerHTML = '';
+            addSheet();
+        }
+
+        // Initialize
+        loadProject();
+        renderAll();
+
+        // AI Generation Bridge
+        function requestAIGeneration() {
+            const promptInput = document.getElementById('aiPrompt');
+            const prompt = promptInput.value.trim();
+            const genBtn = document.getElementById('aiGenBtn');
+            const panel = document.getElementById('aiGenerator');
+
+            if (!prompt || panel.classList.contains('loading')) return;
+
+            panel.classList.add('loading');
+            genBtn.disabled = true;
+
+            // Send message to parent (MainApp)
+            window.parent.postMessage({
+                type: 'GENERATE_EXERCISE',
+                prompt: prompt
+            }, '*');
+        }
+
+        function wrapText(ctx, text, maxWidth, fontSize) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            words.forEach(word => {
+                const testLine = currentLine ? currentLine + ' ' + word : word;
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                if (testWidth > maxWidth && currentLine !== '') {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            });
+            lines.push(currentLine);
+            return lines;
+        }
+
+        window.addEventListener('message', function (event) {
+            if (event.data?.type === 'EXERCISE_GENERATED') {
+                const rawContent = event.data.content;
+                const panel = document.getElementById('aiGenerator');
+                const genBtn = document.getElementById('aiGenBtn');
+
+                panel.classList.remove('loading');
+                genBtn.disabled = false;
+
+                try {
+                    // Pre-clean: find first { and last }
+                    let jsonText = rawContent;
+                    const first = jsonText.indexOf('{');
+                    const last = jsonText.lastIndexOf('}');
+                    if (first !== -1 && last !== -1) {
+                        jsonText = jsonText.substring(first, last + 1);
+                    }
+
+                    const data = JSON.parse(jsonText);
+                    const statement = data.statement;
+                    const steps = data.steps || [];
+
+                    if (statement) {
+                        // Remove previous AI sheets if any? No, let user decide or clearAll manually.
+
+                        // 1. Create Exercise Sheet
+                        addSheet(statement, true);
+
+                        // 2. Create Solution Sheet (if we have steps)
+                        if (steps && steps.length > 0) {
+                            const solutionExplanation = data.solution_explanation || null;
+                            addSheet(statement, false, steps, solutionExplanation);
+                            const lastSheet = sheets[sheets.length - 1];
+                            lastSheet.title = "SOLUCIÓN: " + (lastSheet.title || "Ejercicio");
+                            // Force immediate re-render of solution sheet with title
+                            renderSheet(lastSheet);
+                            renderSidebar();
+                        }
+
+                        document.getElementById('aiPrompt').value = '';
+                    } else if (data.error) {
+                        alert('Error de la IA: ' + data.error);
+                    }
+                } catch (e) {
+                    console.error("Error processing AI response:", e);
+                    // Fallback to old behavior if it's not JSON
+                    if (rawContent && !rawContent.startsWith('Error:')) {
+                        addSheet(rawContent, true);
+                        document.getElementById('aiPrompt').value = '';
+                    } else {
+                        alert('Hubo un error al generar el ejercicio: ' + rawContent);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

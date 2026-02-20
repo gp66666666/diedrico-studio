@@ -22,8 +22,8 @@ export class AIService {
         }
     }
 
-    async solveExercise(prompt: string): Promise<AIResponse> {
-        return this.service.solveExercise(prompt);
+    async solveExercise(prompt: string, systemPromptOverride?: string): Promise<AIResponse> {
+        return this.service.solveExercise(prompt, systemPromptOverride);
     }
 }
 

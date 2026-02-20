@@ -24,7 +24,7 @@ const SCALE = 40; // 40 pixels per unit
 const compassCursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>') 16 16, crosshair`;
 
 interface DiedricoViewProps {
-    mode?: '2d' | 'sketch';
+    mode?: '2d' | 'sketch' | 'laminas';
     isSidebarOpen?: boolean;
 }
 

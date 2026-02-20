@@ -11,6 +11,7 @@ interface AIStore extends AIConversation {
     executeNextStep: () => Promise<void>;
     reset: () => void;
     setCurrentStep: (stepNumber: number | null) => void;
+    generateExercise: (prompt: string) => Promise<string>;
 }
 
 export const useAIStore = create<AIStore>((set, get) => ({
@@ -133,5 +134,42 @@ export const useAIStore = create<AIStore>((set, get) => ({
             currentStep: null,
             error: null,
         });
+    },
+
+    generateExercise: async (prompt: string) => {
+        const { addMessage } = get();
+        try {
+            set({ isProcessing: true, error: null });
+
+            const { EXERCISE_GENERATOR_PROMPT } = await import('../services/prompts');
+            const response = await aiService.solveExercise(prompt, EXERCISE_GENERATOR_PROMPT);
+
+            set({ isProcessing: false });
+
+            // The response.explanation SHOULD be a JSON string now
+            try {
+                // More robust extraction: find the first { and the last }
+                const firstBrace = response.explanation.indexOf('{');
+                const lastBrace = response.explanation.lastIndexOf('}');
+
+                if (firstBrace === -1 || lastBrace === -1) {
+                    throw new Error("No JSON object found in response");
+                }
+
+                const jsonStr = response.explanation.substring(firstBrace, lastBrace + 1);
+                const parsed = JSON.parse(jsonStr);
+                return JSON.stringify(parsed);
+            } catch (e) {
+                console.error("Failed to parse AI exercise JSON:", e);
+                // Fallback for unexpected format
+                return JSON.stringify({
+                    statement: response.explanation,
+                    steps: []
+                });
+            }
+        } catch (error: any) {
+            set({ isProcessing: false, error: error.message });
+            return JSON.stringify({ error: error.message });
+        }
     },
 }));
