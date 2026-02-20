@@ -13,8 +13,8 @@ export default function SEO({
     title = 'Diédrico Studio - Herramienta Educativa de Sistema Diédrico',
     description = 'Aprende sistema diédrico de forma interactiva con visualización 3D en tiempo real. Herramientas de geometría descriptiva, proyecciones diédricas automáticas y asistente AI. Gratis y educativo.',
     keywords = 'sistema diédrico, geometría descriptiva, dibujo técnico, visualización 3D, educación, ingeniería, arquitectura, proyecciones diédricas, alzado, planta, perfil',
-    ogImage = 'https://https://diedrico-studio.vercel.app//og-image.png',
-    canonicalUrl = 'https://https://diedrico-studio.vercel.app//',
+    ogImage = 'https://diedrico-studio.vercel.app/og-image.png',
+    canonicalUrl = 'https://diedrico-studio.vercel.app/',
     type = 'website'
 }: SEOProps) {
     const structuredData = {

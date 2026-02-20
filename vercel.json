@@ -7,6 +7,10 @@
     {
       "src": "/robots.txt",
       "dest": "/robots.txt"
+    },
+    {
+      "src": "/[^.]+",
+      "dest": "/index.html"
     }
   ]
 }

@@ -128,6 +128,20 @@ export default function MainApp() {
                 </div>
 
                 {/* Ad Banner Removed for Policy Compliance */}
+
+                {/* Semantic Content for SEO (Visually hidden but accessible) */}
+                <section className="sr-only">
+                    <h1>Diédrico Studio – Sistema Diédrico Online</h1>
+                    <p>
+                        Diédrico Studio es una herramienta educativa online gratuita para aprender
+                        sistema diédrico, geometría descriptiva y dibujo técnico con visualización
+                        2D y 3D interactiva en tiempo real.
+                    </p>
+                    <h2>¿Para quién es?</h2>
+                    <p>
+                        Estudiantes de bachillerato, ingeniería, arquitectura y formación técnica.
+                    </p>
+                </section>
             </div>
         </>
     );

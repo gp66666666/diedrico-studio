@@ -99,43 +99,15 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                 )}
             </div>
 
-            {/* ABATIMIENTOS */}
-            <div>
-                <button
-                    onClick={() => toggleSection('abatimientos')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <GitBranch size={16} className="rotate-90" />
-                        Abatimientos
-                    </span>
-                    {expandedSections.abatimientos ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.abatimientos && (
-                    <div className={contentClass}>
-                        <button
-                            className={getButtonClass('abatir-ph')}
-                            onClick={() => setActiveTool(activeTool === 'abatir-ph' ? 'none' : 'abatir-ph')}
-                        >
-                            ⬇️ Abatir sobre PH
-                        </button>
-                        <button
-                            className={getButtonClass('abatir-pv')}
-                            onClick={() => setActiveTool(activeTool === 'abatir-pv' ? 'none' : 'abatir-pv')}
-                        >
-                            ➡️ Abatir sobre PV
-                        </button>
-                        <button
-                            className={getButtonClass('abatir-traza')}
-                            onClick={() => setActiveTool(activeTool === 'abatir-traza' ? 'none' : 'abatir-traza')}
-                        >
-                            🔄 Abatir sobre Traza
-                        </button>
-
-                    </div>
-                )}
-            </div>
+            {/* ABATIMIENTOS (DISABLED)
+             <div>
+                 <button
+@@ -136,5 +136,5 @@
+ 
+                     </div>
+                 )}
+-            </div>
++            </div> */}
 
             {/* INTERSECCIONES */}
             <div>
@@ -344,77 +316,25 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
             </div>
 
 
-            {/* GIROS */}
-            <div>
-                <button
-                    onClick={() => toggleSection('giros')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <RotateCw size={16} />
-                        Giros
-                    </span>
-                    {expandedSections.giros ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
+            {/* GIROS (DISABLED)
+             <div>
+                 <button
+@@ -382,5 +382,5 @@
+                         </div>
+                     </div>
+                 )}
+-            </div>
++            </div> */}
 
-                {expandedSections.giros && (
-                    <div className={contentClass}>
-                        <button
-                            className={getButtonClass('rotation-point-axis')}
-                            onClick={() => setActiveTool(activeTool === 'rotation-point-axis' ? 'none' : 'rotation-point-axis')}
-                        >
-                            🔄 Girar Punto sobre Eje
-                        </button>
-                        <button
-                            className={getButtonClass('rotation-parallel-lt')}
-                            onClick={() => setActiveTool(activeTool === 'rotation-parallel-lt' ? 'none' : 'rotation-parallel-lt')}
-                        >
-                            ↔️ Giro Paralelo a LT
-                        </button>
-                        <button
-                            className={getButtonClass('rotation-any')}
-                            onClick={() => setActiveTool(activeTool === 'rotation-any' ? 'none' : 'rotation-any')}
-                        >
-                            🌀 Giro Eje Cualquiera
-                        </button>
-                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Rota elementos alrededor de un eje
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* CAMBIOS DE PLANO */}
-            <div>
-                <button
-                    onClick={() => toggleSection('cambiosPlano')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <Maximize2 size={16} />
-                        Cambios de Plano
-                    </span>
-                    {expandedSections.cambiosPlano ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.cambiosPlano && (
-                    <div className={contentClass}>
-                        <button
-                            className={getButtonClass('cambio-plano-v')}
-                            onClick={() => setActiveTool(activeTool === 'cambio-plano-v' ? 'none' : 'cambio-plano-v')}
-                        >
-                            📐 Cambiar Plano Vertical
-                        </button>
-                        <button
-                            className={getButtonClass('cambio-plano-h')}
-                            onClick={() => setActiveTool(activeTool === 'cambio-plano-h' ? 'none' : 'cambio-plano-h')}
-                        >
-                            📏 Cambiar Plano Horizontal
-                        </button>
-
-                    </div>
-                )}
-            </div>
+            {/* CAMBIOS DE PLANO (DISABLED)
+             <div>
+                 <button
+@@ -414,5 +414,5 @@
+ 
+                     </div>
+                 )}
+-            </div>
++            </div> */}
 
             {/* SÓLIDOS */}
             <div>
