@@ -62,12 +62,14 @@ export default function MainApp() {
                 {/* Main App Area (grows to fill available space) */}
                 <div className="overflow-hidden flex min-h-0">
                     {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className={`md:hidden absolute top-4 left-4 z-50 p-2 rounded-lg backdrop-blur-md border transition-colors ${tabBg} ${textMain}`}
-                    >
-                        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-                    </button>
+                    {viewMode !== 'caballera' && viewMode !== 'laminas' && (
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className={`md:hidden absolute top-4 left-4 z-50 p-2 rounded-lg backdrop-blur-md border transition-colors ${tabBg} ${textMain}`}
+                        >
+                            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                        </button>
+                    )}
 
                     {/* Sidebar Wrapper */}
                     {viewMode !== 'caballera' && viewMode !== 'laminas' && (
