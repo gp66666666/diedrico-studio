@@ -1037,8 +1037,22 @@
             return isNaN(n) ? null : n;
         }
 
-        function parseExercise(text) {
-            text = text.replace(/[–—]/g, '-').replace(/\s+/g, ' ');
+        function parseExercise(rawText) {
+            // Smart title detection BEFORE collapsing newlines
+            let title = '';
+            let bodyText = rawText.trim();
+            const textLines = bodyText.split('\n');
+
+            if (textLines.length > 1) {
+                const firstLine = textLines[0].trim();
+                // Heuristic: A title should be short (< 120 chars) and single-line
+                if (firstLine.length > 0 && firstLine.length < 120) {
+                    title = firstLine;
+                    bodyText = textLines.slice(1).join('\n').trim();
+                }
+            }
+
+            let text = bodyText.replace(/[–—]/g, '-').replace(/\s+/g, ' ');
 
             const points = [];
             const planeCoords = [];
@@ -1107,17 +1121,7 @@
                 }
             }
 
-            // Smart title detection: only if first line is short and followed by more text, or starts with "Ejercicio"
-            const parsingLines = text.trim().split('\n').map(l => l.trim()).filter(l => l !== '');
-            let title = '';
-            if (parsingLines.length >= 2) {
-                const first = parsingLines[0];
-                const isExplicit = /ejercicio/i.test(first);
-                // Heuristic: first line is short (<100) and followed by significantly more content
-                if (isExplicit || (first.length < 100 && first.length * 2 < text.trim().length)) {
-                    title = first;
-                }
-            }
+            // Title is already extracted at the top of the function
 
             // 4. Orientation & Guides
             let orient = 'portrait';
@@ -1145,7 +1149,7 @@
                 }
             }
 
-            return { points, lines, planes, title, orient, guides };
+            return { points, lines, planes, title, bodyText, orient, guides };
         }
 
         function autoScaleFor(sheet) {
@@ -1212,6 +1216,7 @@
             sheet.lines = parsed.lines;
             sheet.planes = parsed.planes;
             sheet.title = parsed.title;
+            sheet.bodyText = parsed.bodyText;
             sheet.orient = parsed.orient;
             sheet.guides = parsed.guides;
 
@@ -1701,7 +1706,7 @@
             ctx.font = `${sfs}px 'Inter',sans-serif`;
             ctx.fillStyle = '#aaa'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
             // ===== ENUNCIADO TEXT BOX =====
-            const displayText = sheet.solutionExplanation || sheet.text;
+            const displayText = sheet.solutionExplanation || (sheet.title ? sheet.bodyText : sheet.text);
             if (displayText && displayText.trim()) {
                 const boxPad = 4 * MM / 4;
                 const textFontSize = format.fontSizeText * MM / 4;

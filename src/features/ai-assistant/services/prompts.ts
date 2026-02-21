@@ -59,17 +59,18 @@ Tu tarea es GENERAR enunciados de ejercicios técnicos basados en la petición d
 REGLAS DE GENERACIÓN:
 - **CREATIVIDAD TÉCNICA**: Genera un enunciado claro, preciso y profesional.
 - **DIBUJO DIÉDRICO**: El enunciado debe ser sobre puntos, rectas, planos, intersecciones, distancias, etc. en sistema diédrico.
+- **TÍTULO OPCIONAL**: El enunciado puede empezar con un título corto (ej. "Ejercicio 1: Intersección"), seguido de UN SALTO DE LÍNEA (\\n) y luego el cuerpo del enunciado.
 - **SOLO EL ENUNCIADO**: No intentes resolver el ejercicio ni dar coordenadas. Solo el texto del enunciado.
 - **JSON ESTRICTO**: Devuelve siempre un objeto JSON.
 
 FORMATO DE SALIDA:
 {
-  "statement": "Texto completo del enunciado del ejercicio..."
+  "statement": "Ejercicio 234\\nDada la recta r..."
 }
 
 Ejemplo:
 User: "Uno de intersección de plano con recta"
-AI: { "statement": "Dada la recta r que pasa por A(20, 30, 40) y B(50, 10, 10), halla su punto de intersección con el plano P definido por sus trazas..." }`;
+AI: { "statement": "Ejercicio de Intersección\\n\\nDada la recta r que pasa por A(20, 30, 40) y B(50, 10, 10), halla su punto de intersección con el plano P definido por sus trazas x=10, y=20, z=30..." }`;
 
 
 export const FUNCTION_DEFINITIONS = [
