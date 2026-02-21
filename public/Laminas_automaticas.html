@@ -263,6 +263,7 @@
 
         input[type="range"] {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
             height: 4px;
             background: var(--surface2);
@@ -663,6 +664,100 @@
 
         .ai-generator.loading .ai-gen-btn-text {
             display: none;
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 768px) {
+
+            body,
+            html {
+                height: auto;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            .app {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                overflow: visible;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+                overflow: visible;
+            }
+
+            .sheet-list {
+                max-height: 35vh;
+                overflow-y: auto;
+            }
+
+            .main {
+                height: auto;
+                flex: none;
+                overflow: visible;
+            }
+
+            .modal {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .a4-shadow {
+                width: 100% !important;
+                height: auto !important;
+                aspect-ratio: 210 / 297;
+            }
+
+            .page-wrapper.landscape .a4-shadow {
+                aspect-ratio: 297 / 210;
+            }
+
+            canvas[id^="cv-"] {
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            .view3d-canvas {
+                width: 100px !important;
+                height: 100px !important;
+                bottom: 5px;
+                right: 5px;
+            }
+
+            .page-wrapper {
+                margin: 10px 0;
+                width: 100%;
+            }
+
+            .preview-scroll {
+                padding: 10px;
+                gap: 15px;
+                overflow: visible;
+            }
+
+            .sheet-editor {
+                padding: 10px;
+            }
+
+            .editor-header {
+                flex-wrap: wrap;
+            }
+
+            .editor-actions {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 10px;
+                font-size: 14px;
+                justify-content: center;
+            }
         }
     </style>
 </head>
