@@ -153,8 +153,8 @@ export default function MainApp() {
                         <SolidsTool />
                     </div>
 
-                    {/* AI Assistant Panel - Premium Only */}
-                    {FEATURES.AI_ASSISTANT && isPremium && viewMode !== 'caballera' && viewMode !== 'laminas' && <AIChatPanel isSidebarOpen={isSidebarOpen} />}
+                    {/* AI Assistant Panel - Premium Only - TEMPORARILY HIDDEN */}
+                    {/* {FEATURES.AI_ASSISTANT && isPremium && viewMode !== 'caballera' && viewMode !== 'laminas' && <AIChatPanel isSidebarOpen={isSidebarOpen} />} */}
 
                     {/* Watermark */}
                     <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
