@@ -1166,9 +1166,18 @@
                 const z = parseC(coords[2]);
 
                 // Context search: is "plano" or "punto" nearby?
-                const contextPrefix = text.slice(Math.max(0, m.index - 15), m.index).toLowerCase();
-                const isPlane = /plano/i.test(contextPrefix) || /^[PQRSt]$/.test(name);
-                const isPoint = /punto/i.test(contextPrefix) || /^[ABCDEFGHLMN]$/.test(name);
+                const contextPrefix = text.slice(Math.max(0, m.index - 30), m.index).toLowerCase();
+                const isExplicitPoint = /(?:punto|puntos|pto).{0,25}$/i.test(contextPrefix);
+                const isExplicitPlane = /(?:plano|pl).{0,20}$/i.test(contextPrefix);
+
+                let isPlane = false;
+                if (isExplicitPoint) {
+                    isPlane = false;
+                } else if (isExplicitPlane) {
+                    isPlane = true;
+                } else {
+                    isPlane = /^[PQRSt]$/.test(name);
+                }
 
                 if (isPlane && x !== null) {
                     planeCoords.push({ name, x, y, z, type: 'coord' });
@@ -1807,7 +1816,7 @@
                 const textFontSize = format.fontSizeText * MM / 4;
                 const lineH = textFontSize * 1.45;
                 const boxX = mg + 1;
-                const boxW = (format.orient === 'portrait' ? 210 : 297) * MM / 4 - 2 * mg - 2;
+                const boxW = rw - 2;
 
                 ctx.font = `${textFontSize}px 'Inter',sans-serif`;
 
@@ -1964,6 +1973,30 @@
                     if (pl.y !== null) {
                         const py = to3D(0, pl.y, 0);
                         ctx.beginPath(); ctx.moveTo(v.x, v.y); ctx.lineTo(py.x, py.y); ctx.stroke();
+                    }
+                } else if (pl.type === 'projecting_horizontal') {
+                    // 3D representation of a vertical plane
+                    const p1 = sheet.points.find(p => p.name === pl.p1);
+                    const p2 = sheet.points.find(p => p.name === pl.p3);
+                    if (!p1 || !p2 || p1.x === null || p1.alej === null || p2.x === null || p2.alej === null) return;
+
+                    const color = '#2f855a'; ctx.strokeStyle = color; ctx.lineWidth = 2;
+                    const h1 = to3D(p1.x, p1.alej, 0);
+                    const h2 = to3D(p2.x, p2.alej, 0);
+
+                    // Horizontal trace on the ground plane (z=0)
+                    const dx = p2.x - p1.x, dy = p2.alej - p1.alej;
+                    if (Math.abs(dy) > 0.001) {
+                        const tLT = -p1.alej / dy; // when y=0
+                        const vx = p1.x + tLT * dx;
+
+                        // Vertical trace goes up from vx
+                        const vLT = to3D(vx, 0, 0);
+                        const vPZ = to3D(vx, 0, pSize); // some arbitrary height
+                        ctx.beginPath(); ctx.moveTo(vLT.x, vLT.y); ctx.lineTo(vPZ.x, vPZ.y); ctx.stroke();
+
+                        // Draw horizontal trace extending through the points
+                        ctx.beginPath(); ctx.moveTo(vLT.x, vLT.y); ctx.lineTo(h2.x, h2.y); ctx.stroke();
                     }
                 }
             });

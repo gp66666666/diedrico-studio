@@ -1369,11 +1369,11 @@ export default function Sidebar() {
             <ParallelismTool />
             <DistanceTool />
             <AdvancedIntersectionTool />
-            {/* <RotationTool />
-            <AbatimientoTool /> */}
+            <RotationTool />
+            <AbatimientoTool />
             <PlaneCreatorTool />
             <TrueMagnitudeTool />
-            {/* <CambioPlanoTool /> */}
+            <CambioPlanoTool />
             {/* Modals */}
             <ExerciseOverlay />
             <HelpGuide isOpen={showHelp} onClose={toggleHelp} isDark={isDark} />

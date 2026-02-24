@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Xata Tattoostudio | Valencia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #2d2d2d;
+            --accent: #ff6b35;
+            --accent-glow: #ff8c5a;
+            --light: #f5f5f5;
+            --muted: #888;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--primary);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(ellipse at 20% 80%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 40%),
+                radial-gradient(ellipse at 40% 40%, rgba(45, 45, 45, 0.5) 0%, transparent 60%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(2%, 2%) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(-1%, 1%) rotate(-1deg);
+            }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(26, 26, 26, 0.95), transparent);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+            }
+
+            50% {
+                text-shadow: 0 0 30px rgba(255, 107, 53, 0.8), 0 0 50px rgba(255, 107, 53, 0.4);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 400;
+            letter-spacing: 1px;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        main {
+            padding-top: 120px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5rem;
+            letter-spacing: 8px;
+            margin-bottom: 1rem;
+            animation: slideUp 1s ease-out;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+            animation: slideUp 1s ease-out 0.2s backwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Interactive Form Container */
+        .wizard-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+            border-radius: 2px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .step-indicator span.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            animation: cardSlide 0.5s ease-out;
+        }
+
+        @keyframes cardSlide {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+
+        .question-card .subtitle {
+            color: var(--muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .option-btn {
+            background: var(--secondary);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 1.2rem;
+            color: var(--light);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.2);
+        }
+
+        .option-btn.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .option-btn i {
+            font-size: 1.3rem;
+        }
+
+        /* Input Fields */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 1rem;
+            background: var(--secondary);
+            border: 2px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--light);
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--glass-border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent);
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload p {
+            color: var(--muted);
+        }
+
+        /* Navigation Buttons */
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--light);
+            border: 2px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--muted);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+            color: white;
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            animation: cardSlide 0.5s ease-out;
+        }
+
+        .summary-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item .label {
+            color: var(--muted);
+        }
+
+        .summary-item .value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-filters {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            padding: 3rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links a {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light);
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--primary);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal i {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal p {
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            nav {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .question-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animations for step transitions */
+        .step-exit {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+        }
+
+        .step-enter {
+            animation: slideIn 0.4s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <nav>
+        <div class="logo">LA XATA</div>
+        <ul class="nav-links">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#galeria">Galería</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <main id="inicio">
+        <section class="hero">
+            <h1>LA XATA <span>TATTOOSTUDIO</span></h1>
+            <p>Arte corporal en Valencia. Transformamos tus ideas en obras maestras únicas.</p>
+            <button class="btn btn-primary" onclick="scrollToWizard()" style="font-size: 1.1rem; padding: 1.2rem 3rem;">
+                <i class="fas fa-pen-fancy"></i> Diseña tu Tattoo
+            </button>
+        </section>
+
+        <div class="wizard-container" id="wizard">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 12.5%"></div>
+                </div>
+                <div class="step-indicator">
+                    <span class="active" data-step="1">Paso 1</span>
+                    <span data-step="2">Paso 2</span>
+                    <span data-step="3">Paso 3</span>
+                    <span data-step="4">Paso 4</span>
+                    <span data-step="5">Paso 5</span>
+                    <span data-step="6">Paso 6</span>
+                    <span data-step="7">Paso 7</span>
+                    <span data-step="8">Resumen</span>
+                </div>
+            </div>
+
+            <div class="question-card" id="questionCard">
+                <!-- Questions will be injected here -->
+            </div>
+        </div>
+
+        <section class="gallery-section" id="galeria">
+            <h2 style="text-align: center; font-family: 'Bebas Neue'; font-size: 3rem; margin-bottom: 2rem;">
+                NUESTRO TRABAJO
+            </h2>
+            <div class="gallery-filters">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="blackwork">Blackwork</button>
+                <button class="filter-btn" data-filter="realista">Realista</button>
+                <button class="filter-btn" data-filter="neotradicional">Neotradicional</button>
+                <button class="filter-btn" data-filter="lineal">Lineal</button>
+                <button class="filter-btn" data-filter="micro">Micropigmentación</button>
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery items will be injected -->
+            </div>
+        </section>
+
+        <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto;" id="servicios">
+            <h2 style="text-align: center; font-family: 'Bebas Neue'; font-size: 3rem; margin-bottom: 2rem;">
+                NUESTROS SERVICIOS
+            </h2>
+            <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div class="option-btn" style="flex-direction: column; text-align: center; padding: 2rem;">
+                    <i class="fas fa-pen-fancy" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3>Tatuajes</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">Desde pequeños diseños hasta
+                        piezas de manga completa</p>
+                </div>
+                <div class="option-btn" style="flex-direction: column; text-align: center; padding: 2rem;">
+                    <i class="fas fa-feather-alt" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3>Cover-ups</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">Transforma tatuajes
+                        anteriores en nuevas obras</p>
+                </div>
+                <div class="option-btn" style="flex-direction: column; text-align: center; padding: 2rem;">
+                    <i class="fas fa-eye" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3>Micropigmentación</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">Cejas, ojos y labios con
+                        técnica profesional</p>
+                </div>
+                <div class="option-btn" style="flex-direction: column; text-align: center; padding: 2rem;">
+                    <i class="fas fa-calendar-check" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3>Consultas</h3>
+                    <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">Diseño personalizado y
+                        presupuestos sin compromiso</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contacto">
+        <div class="logo" style="margin-bottom: 1rem;">LA XATA</div>
+        <p style="color: var(--muted); margin-bottom: 1rem;">Valencia, España</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        <p style="color: var(--muted); font-size: 0.85rem;">© 2024 La Xata Tattoostudio. Todos los derechos reservados.
+        </p>
+    </footer>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <i class="fas fa-check-circle"></i>
+            <h3>¡Solicitud Enviada!</h3>
+            <p>Gracias por confiar en La Xata Tattoostudio. Nos pondremos en contacto contigo en breve.</p>
+            <button class="btn btn-primary" onclick="closeModal()">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        // Wizard State
+        const wizardState = {
+            currentStep: 1,
+            totalSteps: 8,
+            data: {}
+        };
+
+        // Question definitions
+        const questions = [
+            {
+                step: 1,
+                title: "¿Qué tipo de tatuaje buscas?",
+                subtitle: "Cuéntanos qué tienes en mente",
+                type: "options",
+                key: "type",
+                options: [
+                    { icon: "fa-pen-fancy", label: "Tatuaje nuevo", value: "nuevo" },
+                    { icon: "fa-magic", label: "Cover-up (cubrir tatuaje)", value: "coverup" },
+                    { icon: "fa-feather-alt", label: "Reparación/Retoque", value: "reparacion" },
+                    { icon: "fa-eye", label: "Micropigmentación", value: "micropigmentacion" }
+                ]
+            },
+            {
+                step: 2,
+                title: "¿Dónde te gustaría hacerte el tatuaje?",
+                subtitle: "Selecciona la zona del cuerpo",
+                type: "options",
+                key: "zone",
+                options: [
+                    { icon: "fa-hand-sparkles", label: "Mano/Dedos", value: "mano" },
+                    { icon: "fa-user", label: "Brazo (antebrazo)", value: "antebrazo" },
+                    { icon: "fa-user", label: "Brazo (superior/completo)", value: "brazo" },
+                    { icon: "fa-tshirt", label: "Pecho", value: "pecho" },
+                    { icon: "fa-columns", label: "Espalda", value: "espalda" },
+                    { icon: "fa-leaf", label: "Pierna", value: "pierna" },
+                    { icon: "fa-ghost", label: "Otra zona", value: "otra" }
+                ]
+            },
+            {
+                step: 3,
+                title: "¿Qué tamaño approximate prefieres?",
+                subtitle: "El tamaño influye en el detalle y precio",
+                type: "options",
+                key: "size",
+                options: [
+                    { icon: "fa-dot-circle", label: "Pequeño (< 5cm)", value: "pequeno" },
+                    { icon: "fa-circle", label: "Mediano (5-10cm)", value: "mediano" },
+                    { icon: "fa-compact-disc", label: "Grande (10-20cm)", value: "grande" },
+                    { icon: "fa-expand", label: "Muy grande (> 20cm)", value: "muy_grande" }
+                ]
+            },
+            {
+                step: 4,
+                title: "¿Qué estilo te atrae más?",
+                subtitle: "Elige el estilo que más te gusta",
+                type: "options",
+                key: "style",
+                options: [
+                    { icon: "fa-square-full", label: "Blackwork", value: "blackwork" },
+                    { icon: "fa-portrait", label: "Realista", value: "realista" },
+                    { icon: "fa-palette", label: "Neotradicional", value: "neotradicional" },
+                    { icon: "fa-pen-nib", label: "Lineal/Minimalista", value: "lineal" },
+                    { icon: "fa-gem", label: "Dotwork", value: "dotwork" },
+                    { icon: "fa-infinity", label: "Acuarela", value: "acuarela" },
+                    { icon: "fa-skull", label: "Old School", value: "oldschool" },
+                    { icon: "fa-shapes", label: "Geométrico", value: "geometrico" }
+                ]
+            },
+            {
+                step: 5,
+                title: "Describe tu idea",
+                subtitle: "Cuéntanos qué quieres tatuarte",
+                type: "textarea",
+                key: "description",
+                placeholder: "Describe tu idea: temática, elementos, colores, significados..."
+            },
+            {
+                step: 6,
+                title: "¿Tienes referencia visual?",
+                subtitle: "Sube una imagen si la tienes (opcional)",
+                type: "file",
+                key: "reference"
+            },
+            {
+                step: 7,
+                title: "Tus datos de contacto",
+                subtitle: "Para poder contactar contigo",
+                type: "form",
+                fields: [
+                    { key: "name", label: "Nombre", type: "text", placeholder: "Tu nombre" },
+                    { key: "email", label: "Email", type: "email", placeholder: "tu@email.com" },
+                    { key: "phone", label: "Teléfono", type: "tel", placeholder: "Tu teléfono" },
+                    { key: "instagram", label: "Instagram", type: "text", placeholder: "@tuinstagram (opcional)" }
+                ]
+            },
+            {
+                step: 8,
+                title: "Resumen de tu solicitud",
+                subtitle: "Revisa que todo esté correcto",
+                type: "summary"
+            }
+        ];
+
+        // Gallery images (placeholder data)
+        const galleryImages = [
+            { src: "https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=400", category: "blackwork", title: "Blackwork Mandala" },
+            { src: "https://images.unsplash.com/photo-1590246814883-57c511e2c3a0?w=400", category: "realista", title: "Retrato Realista" },
+            { src: "https://images.unsplash.com/photo-1562962230-16e4623d36e6?w=400", category: "neotradicional", title: "Neotradicional Flor" },
+            { src: "https://images.unsplash.com/photo-1560707303-4e9803566d66?w=400", category: "lineal", title: "Lineal Geométrico" },
+            { src: "https://images.unsplash.com/photo-1475403614135-5f1aa0eb5015?w=400", category: "blackwork", title: "Blackwork abstracto" },
+            { src: "https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?w=400", category: "realista", title: "Animal Realista" },
+            { src: "https://images.unsplash.com/photo-1542362567-b07e54358753?w=400", category: "neotradicional", title: "Neotradicional Clásico" },
+            { src: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=400", category: "lineal", title: "Lineal Botánico" },
+            { src: "https://images.unsplash.com/photo-1569231516501-d67f539bc5c0?w=400", category: "micro", title: "Micropigmentación Cejas" },
+            { src: "https://images.unsplash.com/photo-1581803118522-7b72a50f7e9f?w=400", category: "blackwork", title: "Blackwork Tribal" },
+            { src: "https://images.unsplash.com/photo-1612459284270-27f3bbbed32e?w=400", category: "realista", title: "Retrato Anime" },
+            { src: "https://images.unsplash.com/photo-1535581652167-3d6b98c36cd0?w=400", category: "neotradicional", title: "Neotradicional Dagger" }
+        ];
+
+        // Initialize wizard
+        function initWizard() {
+            renderQuestion();
+            initGallery();
+        }
+
+        // Render current question
+        function renderQuestion() {
+            const card = document.getElementById('questionCard');
+            const q = questions[wizardState.currentStep - 1];
+
+            let html = `<h2>${q.title}</h2><p class="subtitle">${q.subtitle}</p>`;
+
+            if (q.type === 'options') {
+                html += `<div class="options-grid">`;
+                q.options.forEach(opt => {
+                    const isSelected = wizardState.data[q.key] === opt.value;
+                    html += `
+                        <button class="option-btn ${isSelected ? 'selected' : ''}" 
+                                onclick="selectOption('${q.key}', '${opt.value}')">
+                            <i class="fas ${opt.icon}"></i>
+                            ${opt.label}
+                        </button>
+                    `;
+                });
+                html += `</div>`;
+            } else if (q.type === 'textarea') {
+                html += `
+                    <div class="input-group">
+                        <textarea 
+                            id="${q.key}" 
+                            placeholder="${q.placeholder}"
+                            onchange="updateData('${q.key}', this.value)"
+                        >${wizardState.data[q.key] || ''}</textarea>
+                    </div>
+                `;
+            } else if (q.type === 'file') {
+                html += `
+                    <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Haz clic para subir una imagen</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">JPG, PNG hasta 10MB</p>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleFileUpload(this)">
+                    <div id="filePreview" style="margin-top: 1rem; color: var(--accent);"></div>
+                `;
+            } else if (q.type === 'form') {
+                q.fields.forEach(field => {
+                    html += `
+                        <div class="input-group">
+                            <label>${field.label}</label>
+                            <input type="${field.type}" 
+                                   id="${field.key}" 
+                                   placeholder="${field.placeholder}"
+                                   value="${wizardState.data[field.key] || ''}"
+                                   onchange="updateData('${field.key}', this.value)">
+                        </div>
+                    `;
+                });
+            } else if (q.type === 'summary') {
+                html += renderSummary();
+            }
+
+            // Add navigation buttons
+            if (q.type !== 'summary') {
+                html += `
+                    <div class="wizard-nav">
+                        ${wizardState.currentStep > 1 ?
+                        `<button class="btn btn-secondary" onclick="prevStep()">
+                                <i class="fas fa-arrow-left"></i> Anterior
+                            </button>` :
+                        `<div></div>`
+                    }
+                        <button class="btn btn-primary" onclick="nextStep()" id="nextBtn">
+                            ${wizardState.currentStep === wizardState.totalSteps ? 'Enviar' : 'Siguiente'} 
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="wizard-nav">
+                        <button class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-left"></i> Editar
+                        </button>
+                        <button class="btn btn-primary" onclick="submitForm()">
+                            <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                        </button>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = html;
+            updateProgress();
+            updateStepIndicator();
+        }
+
+        // Render summary
+        function renderSummary() {
+            const d = wizardState.data;
+            const typeLabels = { nuevo: 'Tatuaje nuevo', coverup: 'Cover-up', reparacion: 'Reparación', micropigmentacion: 'Micropigmentación' };
+            const sizeLabels = { pequeno: 'Pequeño (< 5cm)', mediano: 'Mediano (5-10cm)', grande: 'Grande (10-20cm)', muy_grande: 'Muy grande (> 20cm)' };
+            const styleLabels = { blackwork: 'Blackwork', realista: 'Realista', neotradicional: 'Neotradicional', lineal: 'Lineal/Minimalista', dotwork: 'Dotwork', acuarela: 'Acuarela', oldschool: 'Old School', geometrico: 'Geométrico' };
+            const zoneLabels = { mano: 'Mano/Dedos', antebrazo: 'Antebrazo', brazo: 'Brazo superior', pecho: 'Pecho', espalda: 'Espalda', pierna: 'Pierna', otra: 'Otra zona' };
+
+            return `
+                <div class="summary-card">
+                    <h2><i class="fas fa-clipboard-check"></i> Tu Solicitud</h2>
+                    <div class="summary-item">
+                        <span class="label">Tipo</span>
+                        <span class="value">${typeLabels[d.type] || d.type}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Zona</span>
+                        <span class="value">${zoneLabels[d.zone] || d.zone}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Tamaño</span>
+                        <span class="value">${sizeLabels[d.size] || d.size}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Estilo</span>
+                        <span class="value">${styleLabels[d.style] || d.style}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Descripción</span>
+                        <span class="value" style="font-weight: 400;">${d.description || 'Sin descripción'}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Nombre</span>
+                        <span class="value">${d.name || '-'}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Email</span>
+                        <span class="value">${d.email || '-'}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Teléfono</span>
+                        <span class="value">${d.phone || '-'}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (wizardState.currentStep / wizardState.totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // Update step indicator
+        function updateStepIndicator() {
+            document.querySelectorAll('.step-indicator span').forEach((span, i) => {
+                span.classList.toggle('active', i + 1 <= wizardState.currentStep);
+            });
+        }
+
+        // Select option
+        function selectOption(key, value) {
+            wizardState.data[key] = value;
+            renderQuestion();
+        }
+
+        // Update data from inputs
+        function updateData(key, value) {
+            wizardState.data[key] = value;
+        }
+
+        // Handle file upload
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                wizardState.data.reference = input.files[0].name;
+                document.getElementById('filePreview').innerHTML =
+                    `<i class="fas fa-check"></i> Archivo seleccionado: ${input.files[0].name}`;
+            }
+        }
+
+        // Next step
+        function nextStep() {
+            // Validate required fields
+            const q = questions[wizardState.currentStep - 1];
+            if (q.type === 'options' && !wizardState.data[q.key]) {
+                alert('Por favor, selecciona una opción');
+                return;
+            }
+            if (q.type === 'form') {
+                const required = ['name', 'email', 'phone'];
+                for (let field of required) {
+                    if (!wizardState.data[field]) {
+                        alert('Por favor, completa todos los campos obligatorios');
+                        return;
+                    }
+                }
+            }
+
+            if (wizardState.currentStep < wizardState.totalSteps) {
+                wizardState.currentStep++;
+                renderQuestion();
+            }
+        }
+
+        // Previous step
+        function prevStep() {
+            if (wizardState.currentStep > 1) {
+                wizardState.currentStep--;
+                renderQuestion();
+            }
+        }
+
+        // Submit form
+        function submitForm() {
+            // Show success modal
+            document.getElementById('successModal').classList.add('active');
+
+            // Log data (in production, this would be sent to a server)
+            console.log('Form submitted:', wizardState.data);
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+            // Reset wizard
+            wizardState.currentStep = 1;
+            wizardState.data = {};
+            renderQuestion();
+            scrollToWizard();
+        }
+
+        // Scroll to wizard
+        function scrollToWizard() {
+            document.getElementById('wizard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize gallery
+        function initGallery() {
+            renderGallery('all');
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderGallery(btn.dataset.filter);
+                });
+            });
+        }
+
+        // Render gallery
+        function renderGallery(filter) {
+            const grid = document.getElementById('galleryGrid');
+            const filtered = filter === 'all'
+                ? galleryImages
+                : galleryImages.filter(img => img.category === filter);
+
+            grid.innerHTML = filtered.map(img => `
+                <div class="gallery-item">
+                    <img src="${img.src}" alt="${img.title}" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>${img.title}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initWizard);
+    </script>
+</body>
+
+</html>
