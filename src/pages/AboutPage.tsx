@@ -87,11 +87,11 @@ export default function AboutPage() {
                                     </a>
                                     <div>
                                         <a
-                                            href="mailto:eloigperezz@gmail.com"
+                                            href="mailto:diedrico.studio25@gmail.com"
                                             className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300"
                                         >
                                             <Mail size={20} />
-                                            eloigperezz@gmail.com
+                                            diedrico.studio25@gmail.com
                                         </a>
                                         <p className="text-xs text-white/50 mt-1 ml-7">
                                             Contacto, soporte y sugerencias

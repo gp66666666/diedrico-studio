@@ -31,7 +31,7 @@ export default function ContactPage() {
                 from_email: formData.email,
                 subject: formData.subject,
                 message: formData.message,
-                to_email: 'eloigperezz@gmail.com'
+                to_email: 'diedrico.studio25@gmail.com'
             };
 
             // Send email via EmailJS
@@ -45,7 +45,7 @@ export default function ContactPage() {
             setTimeout(() => setSubmitted(false), 5000);
         } catch (err) {
             console.error('Error sending email:', err);
-            setError('Hubo un error al enviar el mensaje. Por favor intenta de nuevo o escríbeme directamente a eloigperezz@gmail.com');
+            setError('Hubo un error al enviar el mensaje. Por favor intenta de nuevo o escríbeme directamente a diedrico.studio25@gmail.com');
         } finally {
             setSending(false);
         }
@@ -72,10 +72,10 @@ export default function ContactPage() {
                                     <div>
                                         <p className="font-medium">Email</p>
                                         <a
-                                            href="mailto:eloigperezz@gmail.com"
+                                            href="mailto:diedrico.studio25@gmail.com"
                                             className="text-blue-400 hover:text-blue-300"
                                         >
-                                            eloigperezz@gmail.com
+                                            diedrico.studio25@gmail.com
                                         </a>
                                     </div>
                                 </div>

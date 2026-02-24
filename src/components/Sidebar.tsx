@@ -608,6 +608,7 @@ export default function Sidebar() {
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
+                        {/* 
                         <button
                             onClick={() => navigate('/academy')}
                             className={`p-2 rounded-lg transition-colors ${buttonClass} group`}
@@ -615,6 +616,7 @@ export default function Sidebar() {
                         >
                             <BookOpen size={18} className="text-purple-500 group-hover:scale-110 transition-transform" />
                         </button>
+                        */}
                         <button onClick={toggleHelp} className={`p-2 rounded-lg transition-colors ${buttonClass}`} title="Ayuda">
                             <HelpCircle size={18} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
                         </button>

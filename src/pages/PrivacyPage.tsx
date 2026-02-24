@@ -149,7 +149,7 @@ export default function PrivacyPage() {
                             Si tienes preguntas sobre esta política de privacidad, contáctanos en:
                         </p>
                         <p className="text-blue-400 mt-2">
-                            Email: eloigperezz@gmail.com
+                            Email: diedrico.studio25@gmail.com
                         </p>
                         <p className="text-white/70 mt-2">
                             O visita nuestra

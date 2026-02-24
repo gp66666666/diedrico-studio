@@ -32,7 +32,7 @@ export default function SEO({
         "creator": {
             "@type": "Person",
             "name": "Eloi García",
-            "email": "eloigperezz@gmail.com",
+            "email": "diedrico.studio25@gmail.com",
             "url": "https://github.com/gp66666666"
         },
         "inLanguage": "es",
