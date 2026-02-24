@@ -132,12 +132,7 @@ export default function MainApp() {
                             {viewMode === '3d' ? (
                                 <>
                                     <Scene />
-                                    {/* Instructions overlay (only for 3D) */}
-                                    <div className={`absolute top-16 left-4 md:top-4 md:left-4 backdrop-blur-md p-3 rounded-xl border max-w-xs pointer-events-none transition-colors ${overlayBg}`}>
-                                        <h3 className={`font-bold text-sm mb-1 ${textMain}`}>📐 Diédrico Studio</h3>
-
-
-                                    </div>
+                                    {/* Instructions overlay removed for aesthetics and mobile usability */}
                                 </>
                             ) : viewMode === 'caballera' ? (
                                 <CaballeraView />
