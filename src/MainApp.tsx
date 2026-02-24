@@ -111,14 +111,14 @@ export default function MainApp() {
                             >
                                 <PenTool size={16} /> Boceto
                             </button>
-                            {isPremium && (
+                            {/* {isPremium && (
                                 <button
                                     onClick={() => setViewMode('caballera')}
                                     className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === 'caballera' ? 'bg-indigo-600 text-white shadow-lg' : tabInactive}`}
                                 >
                                     <Layers size={16} /> Caballera
                                 </button>
-                            )}
+                            )} */}
                             <button
                                 onClick={() => setViewMode('laminas')}
                                 className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === 'laminas' ? 'bg-emerald-600 text-white shadow-lg' : tabInactive}`}
