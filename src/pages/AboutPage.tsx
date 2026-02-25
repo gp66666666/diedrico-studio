@@ -128,7 +128,7 @@ export default function AboutPage() {
 
                         <section className="border-t border-white/20 pt-6">
                             <p className="text-sm text-white/60">
-                                Última actualización: Diciembre 2025
+                                Última actualización: Febrero 2026
                             </p>
                             <p className="text-sm text-white/60 mt-2">
                                 Este sitio web es un proyecto educativo. Los anuncios que aparecen

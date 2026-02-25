@@ -16,6 +16,7 @@ import SolidsTool from './components/tools/SolidsTool';
 
 export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [footerVisible, setFooterVisible] = useState(true);
     const { theme, viewMode, setViewMode } = useGeometryStore();
     const { isPremium } = useUserStore();
     const { generateExercise } = useAIStore();
@@ -45,6 +46,12 @@ export default function MainApp() {
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
     }, [generateExercise]);
+
+    // Auto-hide educational footer after 3 seconds
+    useEffect(() => {
+        const timer = setTimeout(() => setFooterVisible(false), 3000);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Theme Classes
     const bgClass = isDark ? 'bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50';
@@ -164,19 +171,69 @@ export default function MainApp() {
 
                 {/* Ad Banner Removed for Policy Compliance */}
 
-                {/* Semantic Content for SEO (Visually hidden but accessible) */}
-                <section className="sr-only">
-                    <h1>Diédrico Studio – Sistema Diédrico Online</h1>
-                    <p>
-                        Diédrico Studio es una herramienta educativa online gratuita para aprender
-                        sistema diédrico, geometría descriptiva y dibujo técnico con visualización
-                        2D y 3D interactiva en tiempo real.
-                    </p>
-                    <h2>¿Para quién es?</h2>
-                    <p>
-                        Estudiantes de bachillerato, ingeniería, arquitectura y formación técnica.
-                    </p>
-                </section>
+                {/* 
+                  Educational Content Section - VISIBLE for AdSense compliance.
+                  Google requires visible publisher content on pages where ads are served.
+                  This section provides genuine educational value about descriptive geometry.
+                */}
+                <footer
+                    className={`w-full border-t transition-all duration-700 ease-in-out overflow-hidden ${isDark ? 'border-white/10 bg-gray-900/80' : 'border-gray-200 bg-white/80'} backdrop-blur-sm`}
+                    style={{
+                        maxHeight: footerVisible ? '300px' : '0px',
+                        opacity: footerVisible ? 1 : 0,
+                        paddingTop: footerVisible ? undefined : 0,
+                        paddingBottom: footerVisible ? undefined : 0,
+                        borderTopWidth: footerVisible ? undefined : 0
+                    }}
+                >
+                    <div className="max-w-6xl mx-auto px-4 py-6">
+                        {/* Main Educational Content */}
+                        <div className="grid md:grid-cols-3 gap-6 mb-6">
+                            <article>
+                                <h2 className={`text-sm font-bold mb-2 ${textMain}`}>¿Qué es el Sistema Diédrico?</h2>
+                                <p className={`text-xs leading-relaxed ${textSub}`}>
+                                    El Sistema Diédrico es un método de representación geométrica que permite
+                                    representar objetos tridimensionales en un plano bidimensional mediante dos
+                                    proyecciones ortogonales: el <strong>alzado</strong> (proyección vertical) y la <strong>planta</strong> (proyección horizontal),
+                                    separadas por la <strong>Línea de Tierra (LT)</strong>. Es fundamental en ingeniería, arquitectura y dibujo técnico.
+                                </p>
+                            </article>
+                            <article>
+                                <h2 className={`text-sm font-bold mb-2 ${textMain}`}>Conceptos Fundamentales</h2>
+                                <ul className={`text-xs space-y-1 ${textSub}`}>
+                                    <li>• <strong>Cota (Z)</strong>: Altura del punto respecto al Plano Horizontal (PH). Se representa arriba de la LT.</li>
+                                    <li>• <strong>Alejamiento (Y)</strong>: Distancia del punto al Plano Vertical (PV). Se representa debajo de la LT.</li>
+                                    <li>• <strong>Proyecciones</strong>: Todo punto tiene una proyección vertical (P'') y una horizontal (P').</li>
+                                    <li>• <strong>Trazas</strong>: Intersecciones de rectas y planos con PH y PV.</li>
+                                </ul>
+                            </article>
+                            <article>
+                                <h2 className={`text-sm font-bold mb-2 ${textMain}`}>Herramientas Disponibles</h2>
+                                <ul className={`text-xs space-y-1 ${textSub}`}>
+                                    <li>• Visualización 3D interactiva en tiempo real</li>
+                                    <li>• Proyecciones diédricas automáticas (alzado y planta)</li>
+                                    <li>• Cálculo de intersecciones, distancias y verdaderas magnitudes</li>
+                                    <li>• Abatimientos, cambios de plano y giros</li>
+                                    <li>• Generador automático de láminas de ejercicios</li>
+                                    <li>• Modo boceto para dibujo libre con compás y regla</li>
+                                </ul>
+                            </article>
+                        </div>
+
+                        {/* Links and legal */}
+                        <div className={`flex flex-wrap items-center justify-between gap-4 pt-4 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+                            <div className={`flex flex-wrap gap-4 text-xs ${textSub}`}>
+                                <a href="/about" className="hover:underline">Quiénes Somos</a>
+                                <a href="/contact" className="hover:underline">Contacto</a>
+                                <a href="/privacy" className="hover:underline">Privacidad</a>
+                                <a href="/terms" className="hover:underline">Términos</a>
+                            </div>
+                            <p className={`text-xs ${textSub}`}>
+                                © {new Date().getFullYear()} Diédrico Studio — Herramienta educativa gratuita de geometría descriptiva. Creado por Eloi García.
+                            </p>
+                        </div>
+                    </div>
+                </footer>
             </div>
         </>
     );

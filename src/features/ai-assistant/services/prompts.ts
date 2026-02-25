@@ -19,6 +19,12 @@ Tu misión no es solo responder, es COMPRENDER la geometría espacial y ejecutar
 5.  **ÁNGULOS**: El ángulo de una recta con los planos de proyección se halla mediante su abatimiento sobre ellos. El ángulo entre dos planos es el ángulo entre sus rectas de máxima pendiente.
 6.  **PERTENENCIA**: Un punto pertenece a una recta si sus proyecciones están en las de la recta. Una recta pertenece a un plano si sus trazas están en las del plano.
 
+📐 CONVENCIÓN DE COORDENADAS (FUNDAMENTAL):
+*   **X** = Posición horizontal a lo largo de la Línea de Tierra (LT).
+*   **Y** = ALEJAMIENTO (profundidad/distancia al Plano Vertical). Y positivo = punto situado debajo de la LT en la vista 2D (proyección horizontal, planta).
+*   **Z** = COTA (altura). Z positivo = punto situado arriba de la LT en la vista 2D (proyección vertical, alzado).
+*   Ejemplo: Punto A(3, 2, 4) → X=3 (posición en LT), alejamiento=2 (debajo de LT), cota=4 (arriba de LT).
+
 🛠️ TU PROTOCOLO DE EJECUCIÓN (MEGA-IMPORTANTE):
 1.  **INPUT**: "Dibuja una recta r por A(1,2,3) y B(4,5,6)"
 2.  **PENSAMIENTO (Cadena de Razonamiento)**:
@@ -77,7 +83,7 @@ export const FUNCTION_DEFINITIONS = [
     ...AI_ADVANCED_TOOLS_DEFINITIONS,
     {
         name: "add_point",
-        description: "Añade un punto en el espacio 3D con coordenadas (x, y, z)",
+        description: "Añade un punto en el espacio 3D con coordenadas (x, y, z). CONVENCIÓN: X = posición horizontal a lo largo de la Línea de Tierra, Y = alejamiento (profundidad, positivo = debajo de LT en 2D), Z = cota (altura, positivo = arriba de LT en 2D)",
         parameters: {
             type: "object",
             properties: {
@@ -87,15 +93,15 @@ export const FUNCTION_DEFINITIONS = [
                 },
                 x: {
                     type: "number",
-                    description: "Coordenada X (alejamiento en Sistema Diédrico)"
+                    description: "Coordenada X (posición horizontal a lo largo de la Línea de Tierra)"
                 },
                 y: {
                     type: "number",
-                    description: "Coordenada Y (cota en Sistema Diédrico)"
+                    description: "Coordenada Y (alejamiento en Sistema Diédrico: distancia al PV. Positivo = debajo de LT en vista 2D)"
                 },
                 z: {
                     type: "number",
-                    description: "Coordenada Z (altura en Sistema Diédrico)"
+                    description: "Coordenada Z (cota en Sistema Diédrico: altura. Positivo = arriba de LT en vista 2D)"
                 },
                 color: {
                     type: "string",
@@ -221,15 +227,15 @@ export const FUNCTION_DEFINITIONS = [
                 },
                 x_intercept: {
                     type: "number",
-                    description: "Corte con eje X (alejamiento)"
+                    description: "Corte con eje X (posición horizontal en LT)"
                 },
                 y_intercept: {
                     type: "number",
-                    description: "Corte con eje Y (cota)"
+                    description: "Corte con eje Y (alejamiento)"
                 },
                 z_intercept: {
                     type: "number",
-                    description: "Corte con eje Z (altura)"
+                    description: "Corte con eje Z (cota/altura)"
                 },
                 color: {
                     type: "string",
@@ -320,9 +326,9 @@ export const FUNCTION_DEFINITIONS = [
         parameters: {
             type: "object",
             properties: {
-                center_x: { type: "number", description: "X del centro del arco" },
-                center_y: { type: "number", description: "Y del centro (cota en Planta)" },
-                center_z: { type: "number", description: "Z del centro (altura en Alzado)" },
+                center_x: { type: "number", description: "X del centro del arco (posición horizontal en LT)" },
+                center_y: { type: "number", description: "Y del centro (alejamiento en Planta)" },
+                center_z: { type: "number", description: "Z del centro (cota/altura en Alzado)" },
                 radius: { type: "number", description: "Radio del arco en mm" },
                 start_angle: { type: "number", description: "Ángulo inicial en radianes" },
                 end_angle: { type: "number", description: "Ángulo final en radianes" },

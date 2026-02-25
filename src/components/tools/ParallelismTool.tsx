@@ -285,7 +285,7 @@ export default function ParallelismTool() {
 
         const pointCoords = pointEl.coords;
         const normal = line.direction;
-        const constant = normal.x * pointCoords.x + normal.y * pointCoords.y + normal.z * pointCoords.z;
+        const constant = -(normal.x * pointCoords.x + normal.y * pointCoords.y + normal.z * pointCoords.z);
 
         addElement({
             type: 'plane',

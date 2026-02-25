@@ -320,6 +320,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         else if (activeTool === 'rotation-point-axis') maxSelection = 2;
         else if (activeTool === 'angle-line-line') maxSelection = 2;
         else if (activeTool === 'angle-line-plane') maxSelection = 2;
+        else if (activeTool === 'abatir-ph') maxSelection = 2; // Plano y luego Punto
         else if (activeTool === 'true-length') maxSelection = 1;
         else if (activeTool?.startsWith('intersection')) maxSelection = 2;
         else if (activeTool?.startsWith('advanced-intersection')) maxSelection = 3;

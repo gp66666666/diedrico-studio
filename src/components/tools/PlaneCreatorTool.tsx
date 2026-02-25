@@ -36,8 +36,8 @@ export default function PlaneCreatorTool() {
                     return;
                 }
 
-                // Plane constant: Ax + By + Cz = D
-                const constant = normal.x * p1.x + normal.y * p1.y + normal.z * p1.z;
+                // Plane constant: Ax + By + Cz + D = 0 → D = -(n·p1)
+                const constant = -(normal.x * p1.x + normal.y * p1.y + normal.z * p1.z);
 
                 addElement({
                     type: 'plane',

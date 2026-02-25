@@ -13,175 +13,173 @@ export default function AbatimientoTool() {
             return;
         }
 
-        // Abatir sobre Traza (Interactive)
-        if (activeTool === 'abatir-traza') {
+        if (activeTool === 'abatir-ph') {
             if (hasExecuted.current) return;
 
-            if (selectedForDistance.length === 1) {
-                const elId = selectedForDistance[0];
-                const el = elements.find(e => e.id === elId);
+            // Requerimos que se hayan seleccionado 2 elementos
+            if (selectedForDistance.length === 2) {
+                const el1 = elements.find(e => e.id === selectedForDistance[0]);
+                const el2 = elements.find(e => e.id === selectedForDistance[1]);
 
-                if (el && el.type === 'plane') {
+                // Identificar cuál es el plano y cuál es el punto
+                const planeEl = (el1?.type === 'plane' ? el1 : (el2?.type === 'plane' ? el2 : null)) as PlaneElement | null;
+                const pointEl = (el1?.type === 'point' ? el1 : (el2?.type === 'point' ? el2 : null)) as import('../../types').PointElement | null;
+
+                if (planeEl && pointEl) {
                     hasExecuted.current = true;
-                    const plane = el as PlaneElement;
-
-                    // Standard: Abatir over PH
-                    executeSpecificAbatimiento(plane, 'ph');
+                    executeUniversalAbatimiento(planeEl, pointEl);
+                    setActiveTool('none');
+                    clearDistanceTool();
+                } else {
+                    // Si seleccionan algo inválido, reseteamos la herramienta
+                    alert('Debes seleccionar un PLANO y un PUNTO para abatir.');
                     setActiveTool('none');
                     clearDistanceTool();
                 }
             }
-            return;
         }
-
     }, [activeTool, selectedForDistance, elements]);
 
-    const executeSpecificAbatimiento = (plane: PlaneElement, mode: 'ph' | 'pv') => {
+    const executeUniversalAbatimiento = (plane: PlaneElement, pt: import('../../types').PointElement) => {
         const A = plane.normal.x;
         const B = plane.normal.y;
         const C_plane = plane.normal.z;
         const D = plane.constant;
 
-        // Function to compute flattened point
-        const flattenPoint = (p: { x: number, y: number, z: number }) => {
-            if (mode === 'ph') {
-                const normSq = A * A + B * B;
-                if (normSq < 1e-6) return { x: p.x, y: p.y, z: 0 }; // Plane || PH
-
-                const len = Math.sqrt(normSq);
-                const dirHinge = { x: -B / len, y: A / len, z: 0 };
-                const perpDir = { x: A / len, y: B / len, z: 0 };
-
-                // Point on Hinge (Trace PH: Ax + By + D = 0, z=0)
-                const P0 = Math.abs(A) > Math.abs(B) ? { x: -D / A, y: 0, z: 0 } : { x: 0, y: -D / B, z: 0 };
-
-                const vec = { x: p.x - P0.x, y: p.y - P0.y, z: p.z - P0.z };
-                const dotHinge = vec.x * dirHinge.x + vec.y * dirHinge.y + vec.z * dirHinge.z;
-                const O = {
-                    x: P0.x + dotHinge * dirHinge.x,
-                    y: P0.y + dotHinge * dirHinge.y,
-                    z: P0.z + dotHinge * dirHinge.z
-                };
-
-                const OP = { x: p.x - O.x, y: p.y - O.y, z: p.z - O.z };
-                const R = Math.sqrt(OP.x ** 2 + OP.y ** 2 + OP.z ** 2);
-
-                const dotPerp = OP.x * perpDir.x + OP.y * perpDir.y;
-                const sign = dotPerp >= 0 ? 1 : -1;
-
-                return {
-                    x: O.x + sign * R * perpDir.x,
-                    y: O.y + sign * R * perpDir.y,
-                    z: 0
-                };
-            } else {
-                const normSq = A * A + C_plane * C_plane;
-                if (normSq < 1e-6) return { x: p.x, y: 0, z: p.z }; // Plane || PV
-
-                const len = Math.sqrt(normSq);
-                const dirHinge = { x: -C_plane / len, y: 0, z: A / len };
-                const perpDir = { x: A / len, y: 0, z: C_plane / len };
-
-                // Point on Hinge (Trace PV: Ax + Cz + D = 0, y=0)
-                const P0 = Math.abs(A) > Math.abs(C_plane) ? { x: -D / A, y: 0, z: 0 } : { x: 0, y: 0, z: -D / C_plane };
-
-                const vec = { x: p.x - P0.x, y: p.y - P0.y, z: p.z - P0.z };
-                const dotHinge = vec.x * dirHinge.x + vec.y * dirHinge.y + vec.z * dirHinge.z;
-                const O = {
-                    x: P0.x + dotHinge * dirHinge.x,
-                    y: P0.y + dotHinge * dirHinge.y,
-                    z: P0.z + dotHinge * dirHinge.z
-                };
-
-                const OP = { x: p.x - O.x, y: p.y - O.y, z: p.z - O.z };
-                const R = Math.sqrt(OP.x ** 2 + OP.y ** 2 + OP.z ** 2);
-
-                const dotPerp = OP.x * perpDir.x + OP.z * perpDir.z;
-                const sign = dotPerp >= 0 ? 1 : -1;
-
-                return {
-                    x: O.x + sign * R * perpDir.x,
-                    y: 0,
-                    z: O.z + sign * R * perpDir.z
-                };
-            }
-        };
-
         const lenN = Math.sqrt(A * A + B * B + C_plane * C_plane);
+        const distToPlane = Math.abs(A * pt.coords.x + B * pt.coords.y + C_plane * pt.coords.z + D) / lenN;
 
-        // 1. Flatten only points that belong to this plane
-        elements.forEach(el => {
-            if (el.type === 'point') {
-                const flatName = `(${el.name})`;
-                if (elements.some(e => e.name === flatName)) return;
+        if (distToPlane > 0.1) {
+            alert(`El punto ${pt.name} no pertenece al plano ${plane.name}. No se puede abatir.`);
+            return;
+        }
 
-                const pt = el as import('../../types').PointElement;
-                const distToPlane = Math.abs(A * pt.coords.x + B * pt.coords.y + C_plane * pt.coords.z + D) / lenN;
+        const flatName = `(${pt.name})`;
+        if (elements.some(e => e.name === flatName)) {
+            alert(`El punto ${pt.name} ya está abatido.`);
+            return; // Ya abatido
+        }
 
-                if (distToPlane < 0.1) {
-                    const flat = flattenPoint(pt.coords);
-                    if (flat) {
-                        addElement({
-                            type: 'point',
-                            name: flatName,
-                            coords: flat,
-                            color: plane.color,
-                            visible: true,
-                            isDependent: true
-                        } as any);
-                    }
-                }
-            }
-        });
+        // --- Algoritmo Universal de Abatimiento sobre PH (z=0) ---
+        let flatPoint = { x: pt.coords.x, y: pt.coords.y, z: 0 };
 
-        // 2. Flatten the OTHER trace to visualize the abated plane
-        if (Math.abs(A) > 1e-6 && (mode === 'ph' ? Math.abs(C_plane) > 1e-6 : Math.abs(B) > 1e-6)) {
-            const xL = -D / A;
-            const L = { x: xL, y: 0, z: 0 };
-            let P_trace;
-            if (mode === 'ph') {
-                const xP = xL - 10;
-                const zP = (-D - A * xP) / C_plane;
-                P_trace = { x: xP, y: 0, z: zP };
+        // Comprobar si es un plano horizontal (A=0, B=0)
+        const isHorizontal = Math.abs(A) < 1e-6 && Math.abs(B) < 1e-6;
+
+        if (isHorizontal) {
+            // El abatimiento es su propia proyección horizontal
+            flatPoint = { x: pt.coords.x, y: pt.coords.y, z: 0 };
+        } else {
+            // Recta charnela (Traza horizontal P): Ax + By + D = 0, en Z=0
+            // Proyección horizontal del punto P: (px, py)
+            const px = pt.coords.x;
+            const py = pt.coords.y;
+
+            // Distancia en 2D desde (px, py) a la recta Ax + By + D = 0
+            const num = Math.abs(A * px + B * py + D);
+            const den = Math.sqrt(A * A + B * B);
+
+            // Proyección del punto sobre la charnela en Z=0 (Centro de giro O)
+            // La dirección perpendicular a la traza en 2D es (A, B)
+            // Necesitamos saber si sumamos o restamos, por lo que usamos - (Ax+By+D)/(A^2+B^2)
+            const t = -(A * px + B * py + D) / (A * A + B * B);
+            const Ox = px + A * t;
+            const Oy = py + B * t;
+
+            // d es la distancia proyectada al eje (alejamiento relativo)
+            const d = Math.sqrt((px - Ox) ** 2 + (py - Oy) ** 2);
+            const pz = pt.coords.z;
+
+            // Radio de abatimiento (Verdadera magnitud en 3D)
+            const R = Math.sqrt(d * d + pz * pz);
+
+            // Vector unitario u desde O hacia Pxy (para saber a qué lado abatir)
+            let ux = 0, uy = 0;
+            if (d > 1e-6) {
+                ux = (px - Ox) / d;
+                uy = (py - Oy) / d;
             } else {
-                const xP = xL - 10;
-                const yP = (-D - A * xP) / B;
-                P_trace = { x: xP, y: yP, z: 0 };
+                // Caso en el que el punto está MISMAMENTE en la traza. (rara vez pero posible si z != 0 en planos peculiares, aunque d=0 suele implicar z=0 o plano de perfil/etc)
+                // Usamos la normal 2D para un lado arbitrario convencional.
+                ux = A / den;
+                uy = B / den;
             }
 
-            const flatP = flattenPoint(P_trace);
-            if (flatP) {
-                const traceName = mode === 'ph' ? `(v_${plane.name.toLowerCase()})` : `(h_${plane.name.toLowerCase()})`;
-                if (!elements.some(e => e.name === traceName)) {
+            // Convención: si z > 0 (por encima del PH), y estamos en el primer diedro, el abatimiento suele "estirarse" hacia afuera.
+            // Para mantener consistencia con dibujos técnicos donde todo se abre a la derecha/abajo:
+            // Multiplicamos por el vector perpendicular.
+            flatPoint.x = Ox + R * ux;
+            flatPoint.y = Oy + R * uy;
+        }
+
+        // Añadir el punto abatido
+        addElement({
+            type: 'point',
+            name: flatName,
+            coords: flatPoint,
+            color: plane.color,
+            visible: true,
+            isDependent: true
+        } as any);
+
+        // Visualizar Traza Inversa (Charnela secundaria abatida - Ej: traza vertical abatida)
+        // Esto es un plus visual, trazaremos la otra traza abatida para dar contexto del plano abatido entero.
+        if (!isHorizontal) {
+            const traceName = `(v_${plane.name.toLowerCase()})`;
+            if (!elements.some(e => e.name === traceName)) {
+                // Hallar el vértice V (corte de trazas con LT)
+                let Vx, Vy = 0, Vz = 0;
+                if (Math.abs(A) > 1e-6) {
+                    Vx = -D / A; // Intersección con el eje X (como LT)
+                } else {
+                    Vx = 0; // Planes paralelos a LT no cortan (V en infinito)
+                }
+
+                // Generar un punto arbitrario de la traza vertical para abatir
+                let PtV: { x: number, y: number, z: number } | null = null;
+                if (Math.abs(C_plane) > 1e-6) {
+                    // Plano corta al PV (Ax + Cz + D = 0 => y=0)
+                    const testX = (Math.abs(A) > 1e-6) ? Vx + 10 : 0; // Si es paralelo a LT (A=0), x=0 cualq
+                    const testZ = (-D - A * testX) / C_plane;
+                    PtV = { x: testX, y: 0, z: testZ };
+                }
+
+                if (PtV) {
+                    const tvX = PtV.x;
+                    const tvY = PtV.y;
+                    const tvZ = PtV.z;
+
+                    // Abatir este PtV con la misma lógica
+                    const t_tv = -(A * tvX + B * tvY + D) / (A * A + B * B);
+                    const OtvX = tvX + A * t_tv;
+                    const OtvY = tvY + B * t_tv;
+                    const d_tv = Math.sqrt((tvX - OtvX) ** 2 + (tvY - OtvY) ** 2);
+                    const R_tv = Math.sqrt(d_tv * d_tv + tvZ * tvZ);
+
+                    let utvX = 0, utvY = 0;
+                    if (d_tv > 1e-6) {
+                        utvX = (tvX - OtvX) / d_tv;
+                        utvY = (tvY - OtvY) / d_tv;
+                    } else {
+                        const den = Math.sqrt(A * A + B * B);
+                        utvX = A / den;
+                        utvY = B / den;
+                    }
+
+                    const flatPtV = { x: OtvX + R_tv * utvX, y: OtvY + R_tv * utvY, z: 0 };
+
                     addElement({
                         type: 'line',
                         name: traceName,
-                        point: L,
-                        direction: { x: flatP.x - L.x, y: flatP.y - L.y, z: flatP.z - L.z },
+                        point: { x: Vx, y: 0, z: 0 },
+                        direction: { x: flatPtV.x - Vx, y: flatPtV.y - 0, z: 0 },
                         color: plane.color,
                         visible: true,
                         isInfinite: true,
-                        isDependent: true
                     } as any);
                 }
             }
         }
-    };
-
-    const executeFlattenAll = () => {
-        const planes = elements.filter(el => el.type === 'plane') as PlaneElement[];
-
-        if (planes.length === 0) {
-            alert('No hay planos definidos para realizar abatimientos.');
-            setActiveTool('none');
-            return;
-        }
-
-        const mode = activeTool === 'abatir-ph' ? 'ph' : 'pv';
-        // Clear state immediately
-        setActiveTool('none');
-
-        planes.forEach(plane => executeSpecificAbatimiento(plane, mode));
     };
 
     return null;

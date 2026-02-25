@@ -288,7 +288,7 @@ const createPerpPlaneToLine = (params: any, elements: GeometryElement[], addElem
 
     const pointCoords = point.coords;
     const normal = line.direction;
-    const constant = normal.x * pointCoords.x + normal.y * pointCoords.y + normal.z * pointCoords.z;
+    const constant = -(normal.x * pointCoords.x + normal.y * pointCoords.y + normal.z * pointCoords.z);
 
     addElement({
         id: Math.random().toString(36).substr(2, 9),

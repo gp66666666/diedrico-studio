@@ -122,7 +122,7 @@ export default function Sidebar() {
     // Plane state
     const [planeName, setPlaneName] = useState('');
     const [planeType, setPlaneType] = useState<'generic' | 'horizontal' | 'frontal' | 'parallel_lt' | 'vertical' | 'canto' | 'through_lt' | 'profile'>('generic');
-    const [planeMode, setPlaneMode] = useState<'simple' | '3points' | 'normal' | 'equation' | 'intercepts' | '2lines'>('simple');
+    const [planeMode, setPlaneMode] = useState<'simple' | '3points' | 'normal' | 'equation' | 'intercepts' | '2lines'>('intercepts');
 
     // String states for Plane inputs
     const [planeP1Str, setPlaneP1Str] = useState({ x: '0', y: '0', z: '0' });
@@ -131,7 +131,8 @@ export default function Sidebar() {
     const [planeNormalStr, setPlaneNormalStr] = useState({ x: '0', y: '0', z: '1' });
     const [planeEqStr, setPlaneEqStr] = useState({ a: '0', b: '0', c: '1', d: '0' });
     const [simpleValueStr, setSimpleValueStr] = useState('0');
-    const [planeInterceptsStr, setPlaneInterceptsStr] = useState({ x: '0', y: '0', z: '0' });
+    const [planeInterceptsStr, setPlaneInterceptsStr] = useState({ x: '5', y: '5', z: '5' });
+    const [planeInterceptTypes, setPlaneInterceptTypes] = useState<{ x: 'value' | 'infinite', y: 'value' | 'infinite', z: 'value' | 'infinite' }>({ x: 'value', y: 'value', z: 'value' });
 
     // Plane 2 Lines specific state
     const [plane2LinesType, setPlane2LinesType] = useState<'select' | 'custom'>('select');
@@ -247,7 +248,7 @@ export default function Sidebar() {
                 // Based on previous code, it seemed to be just a value.
                 // Let's implement as Horizontal plane at Z = value
                 normal = { x: 0, y: 0, z: 1 };
-                constant = parseFloat(simpleValueStr) || 0;
+                constant = -(parseFloat(simpleValueStr) || 0);
             } else if (planeMode === '3points') {
                 const p1 = parseCoords(planeP1Str);
                 const p2 = parseCoords(planeP2Str);
@@ -261,29 +262,43 @@ export default function Sidebar() {
                     y: v1.z * v2.x - v1.x * v2.z,
                     z: v1.x * v2.y - v1.y * v2.x
                 };
-                constant = normal.x * p1.x + normal.y * p1.y + normal.z * p1.z;
+                constant = -(normal.x * p1.x + normal.y * p1.y + normal.z * p1.z);
             } else if (planeMode === 'normal') {
                 const p1 = parseCoords(planeP1Str);
                 normal = parseCoords(planeNormalStr);
-                constant = normal.x * p1.x + normal.y * p1.y + normal.z * p1.z;
+                constant = -(normal.x * p1.x + normal.y * p1.y + normal.z * p1.z);
             } else if (planeMode === 'equation') {
                 normal = {
                     x: parseFloat(planeEqStr.a) || 0,
                     y: parseFloat(planeEqStr.b) || 0,
                     z: parseFloat(planeEqStr.c) || 0
                 };
-                constant = -(parseFloat(planeEqStr.d) || 0); // Ax + By + Cz + D = 0 => Ax + By + Cz = -D
+                constant = parseFloat(planeEqStr.d) || 0; // Ax + By + Cz + D = 0 => constant = D
             } else if (planeMode === 'intercepts') {
-                const x = parseFloat(planeInterceptsStr.x);
-                const y = parseFloat(planeInterceptsStr.y);
-                const z = parseFloat(planeInterceptsStr.z);
+                const getVal = (type: 'value' | 'infinite', str: string) => type === 'infinite' ? Infinity : (parseFloat(str) || 0);
 
-                if (x && y && z) {
-                    // Plane equation: x/a + y/b + z/c = 1
-                    // x(1/a) + y(1/b) + z(1/c) = 1
-                    normal = { x: 1 / x, y: 1 / y, z: 1 / z };
-                    constant = 1;
+                const vx = getVal(planeInterceptTypes.x, planeInterceptsStr.x);
+                const vy = getVal(planeInterceptTypes.y, planeInterceptsStr.y);
+                const vz = getVal(planeInterceptTypes.z, planeInterceptsStr.z);
+
+                if (vx === 0 || vy === 0 || vz === 0) {
+                    alert('Las trazas no pueden cortar en el origen (0). Usa otro método para planos que pasen por la línea de tierra.');
+                    return;
                 }
+
+                if (vx === Infinity && vy === Infinity && vz === Infinity) {
+                    alert('El plano no puede tener todas sus trazas en el infinito.');
+                    return;
+                }
+
+                // Plane equation: x/a + y/b + z/c = 1
+                // In n·p + D = 0 form: x/a + y/b + z/c - 1 = 0, so D = -1
+                normal = {
+                    x: vx === Infinity ? 0 : 1 / vx,
+                    y: vy === Infinity ? 0 : 1 / vy,
+                    z: vz === Infinity ? 0 : 1 / vz
+                };
+                constant = -1;
             } else if (planeMode === '2lines') {
                 let l1, l2;
 
@@ -319,25 +334,25 @@ export default function Sidebar() {
 
             if (planeType === 'horizontal') {
                 normal = { x: 0, y: 0, z: 1 };
-                constant = p1.z;
+                constant = -p1.z;
             } else if (planeType === 'frontal') {
                 normal = { x: 0, y: 1, z: 0 };
-                constant = p1.y;
+                constant = -p1.y;
             } else if (planeType === 'parallel_lt') {
                 // Parallel to LT (X-axis), so Normal.x = 0
                 const n = parseCoords(planeNormalStr);
                 normal = { x: 0, y: n.y, z: n.z };
-                constant = normal.y * p1.y + normal.z * p1.z;
+                constant = -(normal.y * p1.y + normal.z * p1.z);
             } else if (planeType === 'vertical') {
                 // Projecting Horizontal (Vertical plane) -> Perpendicular to PH -> Normal.z = 0
                 const n = parseCoords(planeNormalStr);
                 normal = { x: n.x, y: n.y, z: 0 };
-                constant = normal.x * p1.x + normal.y * p1.y;
+                constant = -(normal.x * p1.x + normal.y * p1.y);
             } else if (planeType === 'canto') {
                 // Projecting Vertical (De Canto) -> Perpendicular to PV -> Normal.y = 0
                 const n = parseCoords(planeNormalStr);
                 normal = { x: n.x, y: 0, z: n.z };
-                constant = normal.x * p1.x + normal.z * p1.z;
+                constant = -(normal.x * p1.x + normal.z * p1.z);
             } else if (planeType === 'through_lt') {
                 // Passes through LT -> Constant = 0, and contains (0,0,0)
                 // Normal is perpendicular to the plane.
@@ -347,7 +362,7 @@ export default function Sidebar() {
             } else if (planeType === 'profile') {
                 // Profile plane -> Perpendicular to LT -> Normal = (1, 0, 0)
                 normal = { x: 1, y: 0, z: 0 };
-                constant = p1.x;
+                constant = -p1.x;
             }
         }
 
@@ -402,7 +417,7 @@ export default function Sidebar() {
                 a: p.normal.x.toString(),
                 b: p.normal.y.toString(),
                 c: p.normal.z.toString(),
-                d: (-p.constant).toString()
+                d: (p.constant).toString()
             });
         }
     };
@@ -426,7 +441,8 @@ export default function Sidebar() {
         setPlaneNormalStr({ x: '0', y: '0', z: '1' });
         setPlaneEqStr({ a: '0', b: '0', c: '1', d: '0' });
         setSimpleValueStr('0');
-        setPlaneInterceptsStr({ x: '0', y: '0', z: '0' });
+        setPlaneInterceptsStr({ x: '5', y: '5', z: '5' });
+        setPlaneInterceptTypes({ x: 'value', y: 'value', z: 'value' });
 
         setPlane2LinesType('select');
         setSelectedLine1Id('');
@@ -1091,19 +1107,30 @@ export default function Sidebar() {
                                             {planeMode === 'intercepts' && (
                                                 <div className="space-y-3">
                                                     <label className={`block text-xs font-medium ${labelClass}`}>Trazas (Cortes con Ejes)</label>
-                                                    <div className="grid grid-cols-3 gap-2">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[10px] text-gray-500 mb-1">X (Vértice)</span>
-                                                            <input type="number" value={planeInterceptsStr.x} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[10px] text-gray-500 mb-1">Y (Alejamiento)</span>
-                                                            <input type="number" value={planeInterceptsStr.y} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[10px] text-gray-500 mb-1">Z (Cota)</span>
-                                                            <input type="number" value={planeInterceptsStr.z} onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                        </div>
+                                                    <div className="space-y-2">
+                                                        {[{ axis: 'x', label: 'X (Vértice)' }, { axis: 'y', label: 'Y (Alejamiento)' }, { axis: 'z', label: 'Z (Cota)' }].map(({ axis, label }) => (
+                                                            <div key={axis} className="flex flex-col gap-1">
+                                                                <span className="text-[10px] text-gray-500">{label}</span>
+                                                                <div className="flex gap-2">
+                                                                    <select
+                                                                        value={planeInterceptTypes[axis as 'x' | 'y' | 'z']}
+                                                                        onChange={(e) => setPlaneInterceptTypes({ ...planeInterceptTypes, [axis as 'x' | 'y' | 'z']: e.target.value as 'value' | 'infinite' })}
+                                                                        className={`flex-1 px-2 py-2 border rounded text-sm ${inputClass}`}
+                                                                    >
+                                                                        <option value="value">Valor</option>
+                                                                        <option value="infinite">Infinito / No existe</option>
+                                                                    </select>
+                                                                    {planeInterceptTypes[axis as 'x' | 'y' | 'z'] === 'value' && (
+                                                                        <input
+                                                                            type="number"
+                                                                            value={planeInterceptsStr[axis as 'x' | 'y' | 'z']}
+                                                                            onChange={(e) => setPlaneInterceptsStr({ ...planeInterceptsStr, [axis as 'x' | 'y' | 'z']: e.target.value })}
+                                                                            className={`w-20 px-2 py-2 border rounded text-sm ${inputClass}`}
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </div>
                                             )}
