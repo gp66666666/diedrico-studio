@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, FileText, PenTool, Menu, X, Layers, Printer } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Box, FileText, PenTool, Menu, X, Layers, Printer, Info, HelpCircle } from 'lucide-react';
 import Scene from './components/Scene';
 import Sidebar from './components/Sidebar';
 import DiedricoView from './components/DiedricoView';
@@ -17,6 +18,7 @@ import SolidsTool from './components/tools/SolidsTool';
 export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [footerVisible, setFooterVisible] = useState(true);
+    const [countdown, setCountdown] = useState(5);
     const { theme, viewMode, setViewMode } = useGeometryStore();
     const { isPremium } = useUserStore();
     const { generateExercise } = useAIStore();
@@ -47,11 +49,15 @@ export default function MainApp() {
         return () => window.removeEventListener('message', handleMessage);
     }, [generateExercise]);
 
-    // Auto-hide educational footer after 3 seconds
+    // Auto-hide educational footer after countdown
     useEffect(() => {
-        const timer = setTimeout(() => setFooterVisible(false), 3000);
-        return () => clearTimeout(timer);
-    }, []);
+        if (countdown > 0 && footerVisible) {
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+            return () => clearTimeout(timer);
+        } else if (countdown === 0) {
+            setFooterVisible(false);
+        }
+    }, [countdown, footerVisible]);
 
     // Theme Classes
     const bgClass = isDark ? 'bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50';
@@ -173,64 +179,55 @@ export default function MainApp() {
 
                 {/* 
                   Educational Content Section - VISIBLE for AdSense compliance.
-                  Google requires visible publisher content on pages where ads are served.
-                  This section provides genuine educational value about descriptive geometry.
                 */}
                 <footer
-                    className={`w-full border-t transition-all duration-700 ease-in-out overflow-hidden ${isDark ? 'border-white/10 bg-gray-900/80' : 'border-gray-200 bg-white/80'} backdrop-blur-sm`}
+                    className={`fixed bottom-0 left-0 w-full border-t border-blue-500/20 transition-all duration-1000 ease-in-out overflow-hidden z-[100] backdrop-blur-xl educational-footer`}
                     style={{
-                        maxHeight: footerVisible ? '300px' : '0px',
+                        maxHeight: footerVisible ? '55px' : '0px',
                         opacity: footerVisible ? 1 : 0,
-                        paddingTop: footerVisible ? undefined : 0,
-                        paddingBottom: footerVisible ? undefined : 0,
-                        borderTopWidth: footerVisible ? undefined : 0
+                        transform: footerVisible ? 'translateY(0)' : 'translateY(100%)',
+                        pointerEvents: footerVisible ? 'auto' : 'none',
+                        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)'
                     }}
                 >
-                    <div className="max-w-6xl mx-auto px-4 py-6">
-                        {/* Main Educational Content */}
-                        <div className="grid md:grid-cols-3 gap-6 mb-6">
-                            <article>
-                                <h2 className={`text-sm font-bold mb-2 ${textMain}`}>¿Qué es el Sistema Diédrico?</h2>
-                                <p className={`text-xs leading-relaxed ${textSub}`}>
-                                    El Sistema Diédrico es un método de representación geométrica que permite
-                                    representar objetos tridimensionales en un plano bidimensional mediante dos
-                                    proyecciones ortogonales: el <strong>alzado</strong> (proyección vertical) y la <strong>planta</strong> (proyección horizontal),
-                                    separadas por la <strong>Línea de Tierra (LT)</strong>. Es fundamental en ingeniería, arquitectura y dibujo técnico.
-                                </p>
-                            </article>
-                            <article>
-                                <h2 className={`text-sm font-bold mb-2 ${textMain}`}>Conceptos Fundamentales</h2>
-                                <ul className={`text-xs space-y-1 ${textSub}`}>
-                                    <li>• <strong>Cota (Z)</strong>: Altura del punto respecto al Plano Horizontal (PH). Se representa arriba de la LT.</li>
-                                    <li>• <strong>Alejamiento (Y)</strong>: Distancia del punto al Plano Vertical (PV). Se representa debajo de la LT.</li>
-                                    <li>• <strong>Proyecciones</strong>: Todo punto tiene una proyección vertical (P'') y una horizontal (P').</li>
-                                    <li>• <strong>Trazas</strong>: Intersecciones de rectas y planos con PH y PV.</li>
-                                </ul>
-                            </article>
-                            <article>
-                                <h2 className={`text-sm font-bold mb-2 ${textMain}`}>Herramientas Disponibles</h2>
-                                <ul className={`text-xs space-y-1 ${textSub}`}>
-                                    <li>• Visualización 3D interactiva en tiempo real</li>
-                                    <li>• Proyecciones diédricas automáticas (alzado y planta)</li>
-                                    <li>• Cálculo de intersecciones, distancias y verdaderas magnitudes</li>
-                                    <li>• Abatimientos, cambios de plano y giros</li>
-                                    <li>• Generador automático de láminas de ejercicios</li>
-                                    <li>• Modo boceto para dibujo libre con compás y regla</li>
-                                </ul>
-                            </article>
+                    <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-6">
+                        <div className="flex items-center gap-3 overflow-hidden flex-1">
+                            <span className="shrink-0 px-2 py-0.5 rounded-full bg-blue-600 text-[9px] font-black uppercase tracking-tighter text-white">
+                                EDU
+                            </span>
+
+                            <p className="text-[10px] leading-tight truncate hidden md:block">
+                                <strong>Geometría Descriptiva:</strong> Estudio del Sistema Diédrico para representación 3D mediante planos de proyección (Alzado y Planta).
+                                Herramienta para cálculo de trazas e intersecciones reales.
+                            </p>
+                            <p className="text-[10px] leading-tight md:hidden">
+                                <strong>Geometría Descriptiva:</strong> Sistema Diédrico interactivo.
+                            </p>
                         </div>
 
-                        {/* Links and legal */}
-                        <div className={`flex flex-wrap items-center justify-between gap-4 pt-4 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
-                            <div className={`flex flex-wrap gap-4 text-xs ${textSub}`}>
-                                <a href="/about" className="hover:underline">Quiénes Somos</a>
-                                <a href="/contact" className="hover:underline">Contacto</a>
-                                <a href="/privacy" className="hover:underline">Privacidad</a>
-                                <a href="/terms" className="hover:underline">Términos</a>
+                        <div className="flex items-center gap-4 md:gap-6 shrink-0">
+                            <nav className="flex items-center gap-3 md:gap-4 text-[10px] font-bold">
+                                <Link to="/about" className="hover:text-blue-500 transition-colors">Sobre nosotros</Link>
+                                <Link to="/contact" className="hover:text-blue-500 transition-colors">Contacto</Link>
+                                <Link to="/privacy" className="hover:text-blue-500 transition-colors hidden sm:block">Privacidad</Link>
+                                <Link to="/terms" className="hover:text-blue-500 transition-colors hidden sm:block">Términos</Link>
+                            </nav>
+
+                            <div className="flex items-center gap-3 border-l border-white/10 pl-4">
+                                {countdown > 0 && (
+                                    <span className="text-[9px] font-mono opacity-50">
+                                        {countdown}s
+                                    </span>
+                                )}
+
+                                <button
+                                    onClick={() => setFooterVisible(false)}
+                                    className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                                    title="Cerrar"
+                                >
+                                    <X size={14} className={isDark ? 'text-white/40' : 'text-gray-400'} />
+                                </button>
                             </div>
-                            <p className={`text-xs ${textSub}`}>
-                                © {new Date().getFullYear()} Diédrico Studio — Herramienta educativa gratuita de geometría descriptiva. Creado por Eloi García.
-                            </p>
                         </div>
                     </div>
                 </footer>

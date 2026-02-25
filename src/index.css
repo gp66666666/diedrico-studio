@@ -233,6 +233,19 @@ html.dark .academy-content h3 {
   color: #FFFF00 !important;
 }
 
-html.dark .academy-content strong {
-  color: #FFA500 !important;
+/* educational-footer - FORCED COLORS */
+.educational-footer p,
+.educational-footer span,
+.educational-footer strong,
+.educational-footer a {
+  color: #1e293b !important;
+  /* Default light mode */
+}
+
+html.dark .educational-footer p,
+html.dark .educational-footer span,
+html.dark .educational-footer strong,
+html.dark .educational-footer a {
+  color: #f8fafc !important;
+  /* Forced white in dark mode */
 }
