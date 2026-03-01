@@ -62,7 +62,7 @@ export default function IntersectionTool() {
                     if (point) {
                         addElement({
                             type: 'point',
-                            name: `Intersección de ${el1.name} con ${el2.name}`,
+                            name: `P(${el1.name}, ${el2.name})`,
                             coords: point,
                             color: '#ff0000'
                         } as any);
@@ -96,7 +96,7 @@ export default function IntersectionTool() {
                     if (point) {
                         addElement({
                             type: 'point',
-                            name: `Intersección de ${line.name} con ${plane.name}`,
+                            name: `P(${line.name}, ${plane.name})`,
                             coords: point,
                             color: '#ff0000'
                         } as any);
@@ -133,7 +133,7 @@ export default function IntersectionTool() {
 
                         addElement({
                             type: 'line',
-                            name: `Intersección de ${el1.name} con ${el2.name}`,
+                            name: `i(${el1.name}, ${el2.name})`,
                             point: intersection.point,
                             p2: p2,
                             direction: intersection.direction,

@@ -18,7 +18,7 @@ export default function PointObject({ element }: Props) {
     const object3DRef = useRef<THREE.Group>(null);
 
     useFrame((_, delta) => {
-        const targetRot = isFlattened ? -Math.PI / 2 : 0;
+        const targetRot = isFlattened ? Math.PI / 2 : 0;
         const targetScale = isFlattened ? 0 : 1;
 
         if (groupHRef.current) {
@@ -48,14 +48,14 @@ export default function PointObject({ element }: Props) {
         >
             {/* --- 3D Element (Sphere) --- */}
             <group ref={object3DRef}>
-                <Sphere position={[coords.x, coords.y, coords.z]} args={[isSelected ? 0.3 : 0.2]}>
+                <Sphere position={[coords.x, coords.z, coords.y]} args={[isSelected ? 0.3 : 0.2]}>
                     <meshStandardMaterial
                         color={isSelected ? '#ffff00' : color}
                         emissive={isSelected ? '#ffff00' : '#000000'}
                         emissiveIntensity={isSelected ? 0.5 : 0}
                     />
                 </Sphere>
-                <Billboard position={[coords.x, coords.y + 0.5, coords.z]}>
+                <Billboard position={[coords.x, coords.z + 0.5, coords.y]}>
                     <Text
                         fontSize={isSelected ? 0.8 : 0.5}
                         color={isSelected ? '#ffff00' : 'white'}
@@ -70,7 +70,7 @@ export default function PointObject({ element }: Props) {
 
                 {/* Projection Lines (3D) - Dashed and subtle */}
                 <Line
-                    points={[[coords.x, coords.y, coords.z], [coords.x, 0, coords.z]]}
+                    points={[[coords.x, coords.z, coords.y], [coords.x, 0, coords.y]]}
                     color={color}
                     opacity={0.3}
                     transparent
@@ -79,7 +79,7 @@ export default function PointObject({ element }: Props) {
                     gapSize={1}
                 />
                 <Line
-                    points={[[coords.x, coords.y, coords.z], [coords.x, coords.y, 0]]}
+                    points={[[coords.x, coords.z, coords.y], [coords.x, coords.z, 0]]}
                     color={color}
                     opacity={0.3}
                     transparent
@@ -90,7 +90,7 @@ export default function PointObject({ element }: Props) {
             </group>
 
             {/* --- Vertical Projection (P'') - Static --- */}
-            <group position={[coords.x, 0, coords.z]}>
+            <group position={[coords.x, coords.z, 0]}>
                 <Sphere args={[0.08]}>
                     <meshBasicMaterial color={color} opacity={0.7} transparent />
                 </Sphere>
@@ -101,7 +101,7 @@ export default function PointObject({ element }: Props) {
                 </Billboard>
                 {/* Line to LT */}
                 <Line
-                    points={[[0, 0, 0], [0, 0, -coords.z]]} // Relative to group position
+                    points={[[0, 0, 0], [0, -coords.z, 0]]} // Relative to group position (now y is z)
                     color={color}
                     opacity={0.2}
                     transparent
@@ -111,7 +111,7 @@ export default function PointObject({ element }: Props) {
 
             {/* --- Horizontal Projection (P') - Rotates --- */}
             <group ref={groupHRef}>
-                <group position={[coords.x, coords.y, 0]}>
+                <group position={[coords.x, 0, coords.y]}>
                     <Sphere args={[0.08]}>
                         <meshBasicMaterial color={color} opacity={0.7} transparent />
                     </Sphere>
@@ -122,7 +122,7 @@ export default function PointObject({ element }: Props) {
                     </Billboard>
                     {/* Line to LT */}
                     <Line
-                        points={[[0, 0, 0], [0, -coords.y, 0]]} // Relative to group position
+                        points={[[0, 0, 0], [0, 0, -coords.y]]} // Relative to group position (now z is y)
                         color={color}
                         opacity={0.2}
                         transparent

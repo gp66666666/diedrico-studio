@@ -30,7 +30,7 @@ export default function IntersectionsRenderer() {
 
                     if (intersection) {
                         results.push(
-                            <group key={`int-${key++}`} position={[intersection.x, intersection.y, intersection.z]}>
+                            <group key={`int-${key++}`} position={[intersection.x, intersection.z, intersection.y]}>
                                 <Sphere args={[0.2]}>
                                     <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.5} />
                                 </Sphere>
@@ -52,13 +52,13 @@ export default function IntersectionsRenderer() {
                     if (intersection) {
                         const start = {
                             x: intersection.point.x - intersection.direction.x * 50,
-                            y: intersection.point.y - intersection.direction.y * 50,
-                            z: intersection.point.z - intersection.direction.z * 50,
+                            z: intersection.point.z - intersection.direction.z * 50, // This is Cota
+                            y: intersection.point.y - intersection.direction.y * 50, // This is Alejamiento
                         };
                         const end = {
                             x: intersection.point.x + intersection.direction.x * 50,
-                            y: intersection.point.y + intersection.direction.y * 50,
                             z: intersection.point.z + intersection.direction.z * 50,
+                            y: intersection.point.y + intersection.direction.y * 50,
                         };
 
                         results.push(
@@ -72,7 +72,7 @@ export default function IntersectionsRenderer() {
                                     dashSize={1}
                                     gapSize={0.5}
                                 />
-                                <Text position={[intersection.point.x, intersection.point.y + 1, intersection.point.z]} fontSize={0.3} color="#fbbf24">
+                                <Text position={[intersection.point.x, intersection.point.z + 1, intersection.point.y]} fontSize={0.3} color="#fbbf24">
                                     {p1.name}∩{p2.name}
                                 </Text>
                             </group>
@@ -89,7 +89,7 @@ export default function IntersectionsRenderer() {
 
                     if (intersection) {
                         results.push(
-                            <group key={`int-${key++}`} position={[intersection.x, intersection.y, intersection.z]}>
+                            <group key={`int-${key++}`} position={[intersection.x, intersection.z, intersection.y]}>
                                 <Sphere args={[0.2]}>
                                     <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.5} />
                                 </Sphere>

@@ -21,11 +21,13 @@ export default function AbatimientoArrow({ x, radius, color }: Props) {
 
         for (let i = 0; i <= segments; i++) {
             const theta = (i / segments) * (Math.PI / 2); // 0 a 90 grados
-            // Rotación alrededor del eje X, desde Y positivo hacia Z negativo
-            // y = r * cos(theta)
-            // z = -r * sin(theta)
-            // Si radius es negativo (punto detrás de la pared), el arco va hacia el otro lado
-            pts.push(new THREE.Vector3(x, radius * Math.cos(theta), -radius * Math.sin(theta)));
+            // In our new mapping: 
+            // - Diedrico Z (Cota) is THREE Y
+            // - Diedrico Y (Alejamiento) is THREE Z
+            // Abatimiento rotates from Floor (Z=radius, Y=0) to Wall (Z=0, Y=-radius)
+            // y = -radius * sin(theta)
+            // z = radius * cos(theta)
+            pts.push(new THREE.Vector3(x, -radius * Math.sin(theta), radius * Math.cos(theta)));
         }
         return pts;
     }, [x, radius]);
@@ -46,8 +48,8 @@ export default function AbatimientoArrow({ x, radius, color }: Props) {
             />
             {/* Punta de flecha al final del arco */}
             <mesh
-                position={[x, 0, -radius]}
-                rotation={[radius > 0 ? Math.PI / 2 : -Math.PI / 2, 0, 0]}
+                position={[x, -radius, 0]}
+                rotation={[0, 0, radius > 0 ? 0 : Math.PI]}
             >
                 <coneGeometry args={[0.08, 0.2, 8]} />
                 <meshBasicMaterial color={color} opacity={0.5} transparent />

@@ -19,7 +19,7 @@ export default function PlaneObject({ element }: Props) {
     const object3DRef = useRef<THREE.Group>(null);
 
     useFrame((state, delta) => {
-        const targetRot = isFlattened ? -Math.PI / 2 : 0;
+        const targetRot = isFlattened ? Math.PI / 2 : 0;
         const targetScale = isFlattened ? 0 : 1;
 
         if (groupHRef.current) {
@@ -40,8 +40,8 @@ export default function PlaneObject({ element }: Props) {
 
     // Calculate rotation to align plane with normal
     const quaternion = new THREE.Quaternion();
-    const defaultNormal = new THREE.Vector3(0, 0, 1);
-    const targetNormal = new THREE.Vector3(A, B, C).normalize();
+    const defaultNormal = new THREE.Vector3(0, 0, 1); // Default Plane normal is (0,0,1)
+    const targetNormal = new THREE.Vector3(A, C, B).normalize(); // Swapped Y (Alejamiento) and Z (Cota) to match THREE.js Y (Up) and Z (Depth)
     quaternion.setFromUnitVectors(defaultNormal, targetNormal);
 
     // Calculate position (closest point to origin)
@@ -134,8 +134,8 @@ export default function PlaneObject({ element }: Props) {
                         // z = (-D - Ax) / C
                         <Line
                             points={[
-                                [-traceLength, 0, (-D - A * -traceLength) / C],
-                                [traceLength, 0, (-D - A * traceLength) / C]
+                                [-traceLength, (-D - A * -traceLength) / C, 0],
+                                [traceLength, (-D - A * traceLength) / C, 0]
                             ]}
                             color={color}
                             lineWidth={1}
@@ -145,8 +145,8 @@ export default function PlaneObject({ element }: Props) {
                         // Vertical line (x = -D/A)
                         <Line
                             points={[
-                                [-D / A, 0, -traceLength],
-                                [-D / A, 0, traceLength]
+                                [-D / A, -traceLength, 0],
+                                [-D / A, traceLength, 0]
                             ]}
                             color={color}
                             lineWidth={1}
@@ -156,11 +156,11 @@ export default function PlaneObject({ element }: Props) {
 
                     {/* Label Position */}
                     {Math.abs(C) > 1e-6 ? (
-                        <Billboard position={[traceLength / 2, 0, (-D - A * traceLength / 2) / C + 1]}>
+                        <Billboard position={[traceLength / 2, (-D - A * traceLength / 2) / C + 1, 0]}>
                             <Text fontSize={0.6} color={color} outlineWidth={0.05} outlineColor="#000000">{name}''</Text>
                         </Billboard>
                     ) : (
-                        <Billboard position={[-D / A, 0, traceLength - 2]}>
+                        <Billboard position={[-D / A, traceLength - 2, 0]}>
                             <Text fontSize={0.6} color={color} outlineWidth={0.05} outlineColor="#000000">{name}''</Text>
                         </Billboard>
                     )}
@@ -176,8 +176,8 @@ export default function PlaneObject({ element }: Props) {
                             // y = (-D - Ax) / B
                             <Line
                                 points={[
-                                    [-traceLength, (-D - A * -traceLength) / B, 0],
-                                    [traceLength, (-D - A * traceLength) / B, 0]
+                                    [-traceLength, 0, (-D - A * -traceLength) / B],
+                                    [traceLength, 0, (-D - A * traceLength) / B]
                                 ]}
                                 color={color}
                                 lineWidth={1}
@@ -187,8 +187,8 @@ export default function PlaneObject({ element }: Props) {
                             // Line x = -D/A (Perpendicular to LT)
                             <Line
                                 points={[
-                                    [-D / A, -traceLength, 0],
-                                    [-D / A, traceLength, 0]
+                                    [-D / A, 0, -traceLength],
+                                    [-D / A, 0, traceLength]
                                 ]}
                                 color={color}
                                 lineWidth={1}
@@ -198,11 +198,11 @@ export default function PlaneObject({ element }: Props) {
 
                         {/* Label Position */}
                         {Math.abs(B) > 1e-6 ? (
-                            <Billboard position={[traceLength / 2, (-D - A * traceLength / 2) / B, 0.5]}>
+                            <Billboard position={[traceLength / 2, 0, (-D - A * traceLength / 2) / B]}>
                                 <Text fontSize={0.6} color={color} outlineWidth={0.05} outlineColor="#000000">{name}'</Text>
                             </Billboard>
                         ) : (
-                            <Billboard position={[-D / A, traceLength - 2, 0.5]}>
+                            <Billboard position={[-D / A, 0, traceLength - 2]}>
                                 <Text fontSize={0.6} color={color} outlineWidth={0.05} outlineColor="#000000">{name}'</Text>
                             </Billboard>
                         )}

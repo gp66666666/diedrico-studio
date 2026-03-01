@@ -149,6 +149,8 @@ export default function Scene() {
                         <GizmoViewport
                             axisColors={['#ef4444', '#10b981', '#3b82f6']}
                             labelColor="white"
+                            // @ts-ignore
+                            labels={['X', 'Z', 'Y']}
                         />
                     </GizmoHelper>
                 </Suspense>

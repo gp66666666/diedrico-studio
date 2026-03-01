@@ -19,7 +19,7 @@ export default function LineObject({ element }: Props) {
     const object3DRef = useRef<THREE.Group>(null);
 
     useFrame((state, delta) => {
-        const targetRot = isFlattened ? -Math.PI / 2 : 0;
+        const targetRot = isFlattened ? Math.PI / 2 : 0;
         const targetScale = isFlattened ? 0 : 1;
 
         if (groupHRef.current) {
@@ -43,17 +43,17 @@ export default function LineObject({ element }: Props) {
 
     if (element.p2) {
         // Line defined by two points
-        p1 = new THREE.Vector3(point.x, point.y, point.z);
-        p2 = new THREE.Vector3(element.p2.x, element.p2.y, element.p2.z);
+        p1 = new THREE.Vector3(point.x, point.z, point.y);
+        p2 = new THREE.Vector3(element.p2.x, element.p2.z, element.p2.y);
         lineDirection = p2.clone().sub(p1).normalize();
         lineCenter = p1.clone().add(p2).multiplyScalar(0.5);
     } else {
         // Line defined by a point and a direction (infinite line representation)
         const length = 20; // Arbitrary length for visualization
-        p1 = new THREE.Vector3(point.x - direction.x * length, point.y - direction.y * length, point.z - direction.z * length);
-        p2 = new THREE.Vector3(point.x + direction.x * length, point.y + direction.y * length, point.z + direction.z * length);
-        lineDirection = new THREE.Vector3(direction.x, direction.y, direction.z);
-        lineCenter = new THREE.Vector3(point.x, point.y, point.z);
+        p1 = new THREE.Vector3(point.x - direction.x * length, point.z - direction.z * length, point.y - direction.y * length);
+        p2 = new THREE.Vector3(point.x + direction.x * length, point.z + direction.z * length, point.y + direction.y * length);
+        lineDirection = new THREE.Vector3(direction.x, direction.z, direction.y);
+        lineCenter = new THREE.Vector3(point.x, point.z, point.y);
     }
 
     const traces = calculateLineTraces(lineCenter, lineDirection);
@@ -87,7 +87,7 @@ export default function LineObject({ element }: Props) {
                     dashScale={2}
                     gapSize={1}
                 />
-                <Billboard position={[point.x, point.y + 0.5, point.z]}>
+                <Billboard position={[point.x, point.z + 0.5, point.y]}>
                     {!name.startsWith('proc_') && (
                         <Text
                             fontSize={isSelected ? 0.8 : 0.5}
@@ -104,12 +104,12 @@ export default function LineObject({ element }: Props) {
 
                 {/* Traces Markers in 3D */}
                 {traces.hTrace && (
-                    <Sphere position={[traces.hTrace.x, traces.hTrace.y, traces.hTrace.z]} args={[0.15]}>
+                    <Sphere position={[traces.hTrace.x, 0, traces.hTrace.y]} args={[0.15]}>
                         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
                     </Sphere>
                 )}
                 {traces.vTrace && (
-                    <Sphere position={[traces.vTrace.x, traces.vTrace.y, traces.vTrace.z]} args={[0.15]}>
+                    <Sphere position={[traces.vTrace.x, traces.vTrace.z, 0]} args={[0.15]}>
                         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
                     </Sphere>
                 )}
@@ -119,8 +119,8 @@ export default function LineObject({ element }: Props) {
             <group>
                 <Line
                     points={[
-                        [p1.x, 0, p1.z],
-                        [p2.x, 0, p2.z]
+                        [p1.x, p1.y, 0], // p1.y is actually p1.z here? Wait.
+                        [p2.x, p2.y, 0]
                     ]}
                     color={color}
                     lineWidth={1.5}
@@ -130,7 +130,7 @@ export default function LineObject({ element }: Props) {
                     opacity={0.6}
                     transparent
                 />
-                <Billboard position={[point.x, 0.5, point.z]}>
+                <Billboard position={[point.x, point.z + 0.5, 0]}>
                     <Text fontSize={0.4} color={color} outlineWidth={0.02} outlineColor="#000000" fillOpacity={0.8}>
                         {name}''
                     </Text>
@@ -138,7 +138,7 @@ export default function LineObject({ element }: Props) {
 
                 {/* Vertical Trace Projection (v'') on Wall */}
                 {traces.vTrace && (
-                    <group position={[traces.vTrace.x, 0, traces.vTrace.z]}>
+                    <group position={[traces.vTrace.x, traces.vTrace.z, 0]}>
                         <Sphere args={[0.1]}><meshBasicMaterial color={color} opacity={0.7} transparent /></Sphere>
                         <Billboard position={[0, 0.3, 0]}><Text fontSize={0.4} color={color}>V''</Text></Billboard>
                     </group>
@@ -156,8 +156,8 @@ export default function LineObject({ element }: Props) {
             <group ref={groupHRef}>
                 <Line
                     points={[
-                        [p1.x, p1.y, 0],
-                        [p2.x, p2.y, 0]
+                        [p1.x, 0, p1.z],
+                        [p2.x, 0, p2.z]
                     ]}
                     color={color}
                     lineWidth={1.5}
@@ -167,7 +167,7 @@ export default function LineObject({ element }: Props) {
                     opacity={0.6}
                     transparent
                 />
-                <Billboard position={[point.x, point.y, 0.3]}>
+                <Billboard position={[point.x, 0, point.y + 0.3]}>
                     <Text fontSize={0.4} color={color} outlineWidth={0.02} outlineColor="#000000" fillOpacity={0.8}>
                         {name}'
                     </Text>
@@ -175,7 +175,7 @@ export default function LineObject({ element }: Props) {
 
                 {/* Horizontal Trace Projection (h') on Floor */}
                 {traces.hTrace && (
-                    <group position={[traces.hTrace.x, traces.hTrace.y, 0]}>
+                    <group position={[traces.hTrace.x, 0, traces.hTrace.y]}>
                         <Sphere args={[0.1]}><meshBasicMaterial color={color} opacity={0.7} transparent /></Sphere>
                         <Billboard position={[0, 0, 0.3]}><Text fontSize={0.4} color={color}>H'</Text></Billboard>
                     </group>
@@ -205,7 +205,7 @@ function DefiningPoint({ coords, color }: { coords: { x: number, y: number, z: n
     const object3DRef = useRef<THREE.Group>(null);
 
     useFrame((state, delta) => {
-        const targetRot = isFlattened ? -Math.PI / 2 : 0;
+        const targetRot = isFlattened ? Math.PI / 2 : 0;
         const targetScale = isFlattened ? 0 : 1;
 
         if (groupHRef.current) {
@@ -221,14 +221,14 @@ function DefiningPoint({ coords, color }: { coords: { x: number, y: number, z: n
     return (
         <group>
             {/* 3D Sphere */}
-            <group ref={object3DRef} position={[coords.x, coords.y, coords.z]}>
+            <group ref={object3DRef} position={[coords.x, coords.z, coords.y]}>
                 <Sphere args={[0.12]}>
                     <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.2} />
                 </Sphere>
             </group>
 
             {/* Vertical Proj */}
-            <group position={[coords.x, 0, coords.z]}>
+            <group position={[coords.x, coords.z, 0]}>
                 <Sphere args={[0.06]}>
                     <meshBasicMaterial color={color} opacity={0.8} transparent />
                 </Sphere>
@@ -236,7 +236,7 @@ function DefiningPoint({ coords, color }: { coords: { x: number, y: number, z: n
 
             {/* Horizontal Proj */}
             <group ref={groupHRef}>
-                <group position={[coords.x, coords.y, 0]}>
+                <group position={[coords.x, 0, coords.y]}>
                     <Sphere args={[0.06]}>
                         <meshBasicMaterial color={color} opacity={0.8} transparent />
                     </Sphere>
