@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-    Box, Layers, Eye, EyeOff, Plus, Trash2,
+    Box, Layers, Eye, EyeOff, Plus, Trash2, Plane as PlaneIcon,
     Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,10 @@ import DistanceTool from './tools/DistanceTool';
 import RotationTool from './tools/RotationTool';
 import CambioPlanoTool from './tools/CambioPlanoTool';
 import PlaneCreatorTool from './tools/PlaneCreatorTool';
+import SegmentTool from './tools/SegmentTool';
+import GroupTool from './tools/GroupTool';
+import VMReconstructionTool from './tools/VMReconstructionTool';
+import SolidsTool from './tools/SolidsTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 
@@ -85,6 +89,9 @@ export default function Sidebar() {
             activeTool.startsWith('abatir-') ||
             activeTool.startsWith('desabatir-p') ||
             activeTool === 'plane-3-points' ||
+            activeTool === 'create-group' ||
+            activeTool === 'segment-2-points' ||
+            activeTool === 'reconstruct-vm' ||
             activeTool.startsWith('advanced-');
 
         if (needsSelection && activeTool !== 'none') {
@@ -92,7 +99,7 @@ export default function Sidebar() {
         }
     }, [activeTool]);
 
-    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'plane' | 'solid'>('point');
+    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'segment' | 'plane' | 'solid' | 'group'>('point');
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
     const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -701,12 +708,11 @@ export default function Sidebar() {
                             {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
                     </div>
-                )
-                }
-            </div >
+                )}
+            </div>
 
             {/* Cloud Save/Load - Collapsible */}
-            < div className={`p-2 border-b ${headerBorder}`}>
+            <div className={`p-2 border-b ${headerBorder}`}>
                 <button
                     onClick={() => setShowCloudOptions(!showCloudOptions)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
@@ -716,28 +722,26 @@ export default function Sidebar() {
                     </span>
                     {showCloudOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
-                {
-                    showCloudOptions && (
-                        <div className="flex gap-2 px-2 mt-2">
-                            <button
-                                onClick={() => setShowSaveModal(true)}
-                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
-                            >
-                                <Download size={16} /> Guardar
-                            </button>
-                            <button
-                                onClick={() => setShowLoadModal(true)}
-                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
-                            >
-                                <ArrowDownToLine size={16} /> Cargar
-                            </button>
-                        </div>
-                    )
-                }
-            </div >
+                {showCloudOptions && (
+                    <div className="flex gap-2 px-2 mt-2">
+                        <button
+                            onClick={() => setShowSaveModal(true)}
+                            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                        >
+                            <Download size={16} /> Guardar
+                        </button>
+                        <button
+                            onClick={() => setShowLoadModal(true)}
+                            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                        >
+                            <ArrowDownToLine size={16} /> Cargar
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* Export Options - Collapsible */}
-            < div className={`p-2 border-b ${headerBorder}`}>
+            <div className={`p-2 border-b ${headerBorder}`}>
                 <button
                     onClick={() => setShowExportOptions(!showExportOptions)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
@@ -747,32 +751,30 @@ export default function Sidebar() {
                     </span>
                     {showExportOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
-                {
-                    showExportOptions && (
-                        <div className="px-2 space-y-2 mt-2">
-                            <button
-                                onClick={() => handleExportCurrentView()}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
-                            >
-                                <span className="flex items-center gap-2">
-                                    <Download size={16} /> Vista Actual
-                                </span>
-                            </button>
-                            <button
-                                onClick={() => handleExportAllViews()}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
-                            >
-                                <span className="flex items-center gap-2">
-                                    <Download size={16} /> Todas las Vistas
-                                </span>
-                            </button>
-                        </div>
-                    )
-                }
-            </div >
+                {showExportOptions && (
+                    <div className="px-2 space-y-2 mt-2">
+                        <button
+                            onClick={() => handleExportCurrentView()}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Download size={16} /> Vista Actual
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => handleExportAllViews()}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Download size={16} /> Todas las Vistas
+                            </span>
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* Premium Modal */}
-            < PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+            <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
 
             {/* Tabs */}
             <div className="flex p-2 gap-2">
@@ -800,30 +802,41 @@ export default function Sidebar() {
             <div className="flex-1 overflow-y-auto p-4 pb-24 custom-scrollbar">
                 {activeTab === 'add' ? (
                     <div className="space-y-4">
-                        {/* Type selector */}
-                        {!editingElementId && (
-                            <div className="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-lg mb-4">
+                        {/* Type selector - Sub-tabs style */}
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {[
+                                { id: 'point', label: 'Punto' },
+                                { id: 'line', label: 'Recta' },
+                                { id: 'segment', label: 'Segmento' },
+                                { id: 'plane', label: 'Plano' },
+                                { id: 'solid', label: 'Sólido' },
+                            ].map((type) => (
                                 <button
-                                    onClick={() => setGeometryType('point')}
-                                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${geometryType === 'point' ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    key={type.id}
+                                    onClick={() => {
+                                        setGeometryType(type.id as any);
+                                        cancelEditing();
+                                        if (type.id === 'segment') setActiveTool('segment-2-points');
+                                        if (type.id !== 'segment' && activeTool === 'segment-2-points') setActiveTool('none');
+                                    }}
+                                    className={`flex-1 min-w-[28%] items-center justify-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${geometryType === type.id
+                                        ? 'bg-blue-600/20 text-blue-400 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
+                                        : 'text-gray-500 hover:text-gray-300 hover:bg-white/5 border-transparent'
+                                        }`}
                                 >
-                                    Punto
+                                    {type.label}
                                 </button>
-                                <button
-                                    onClick={() => setGeometryType('line')}
-                                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${geometryType === 'line' ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                >
-                                    Recta
-                                </button>
-                                <button
-                                    onClick={() => setGeometryType('plane')}
-                                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${geometryType === 'plane' ? 'bg-white dark:bg-gray-700 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                                >
-                                    Plano
-                                </button>
-                            </div>
-                        )}
+                            ))}
+                        </div>
 
+                        <div className="mb-4">
+                            <button
+                                onClick={() => setActiveTool('create-group')}
+                                className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg border-2 border-dashed transition-all ${activeTool === 'create-group' ? 'bg-blue-600/20 border-blue-500 text-blue-400' : `${buttonClass} ${isDark ? 'border-white/10 text-gray-400' : 'border-gray-200 text-gray-600'}`}`}
+                            >
+                                <Plus size={16} /> <span className="text-xs font-bold uppercase tracking-wider">Crear Grupo</span>
+                            </button>
+                        </div>
                         {editingElementId && (
                             <div className="bg-yellow-50 border border-yellow-200 p-2 rounded-lg mb-2 flex items-center justify-between">
                                 <span className="text-xs font-bold text-yellow-700">Editando: {elements.find(e => e.id === editingElementId)?.name}</span>
@@ -1256,22 +1269,77 @@ export default function Sidebar() {
                             </div>
                         )}
 
-                        {/* Herramienta para crear rectas por puntos - MOVIDO A LA SECCIÓN DE RECTAS */}
+                        {/* Solids Form */}
+                        {geometryType === 'solid' && (
+                            <div className="space-y-4">
+                                <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+                                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3">Poliedros Regulares</p>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                            { id: 'tetraedro', label: 'Tetraedro' },
+                                            { id: 'cubo', label: 'Cubo / Hexaedro' },
+                                            { id: 'octaedro', label: 'Octaedro' },
+                                            { id: 'dodecaedro', label: 'Dodecaedro' },
+                                            { id: 'icosaedro', label: 'Icosaedro' }
+                                        ].map(s => (
+                                            <button
+                                                key={s.id}
+                                                onClick={() => setActiveTool(`poliedro-${s.id}` as any)}
+                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `poliedro-${s.id}` ? 'bg-blue-600 border-blue-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                            >
+                                                {s.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-xl">
+                                    <p className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Prismas y Pirámides</p>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                            { id: 'prisma', label: 'Prisma' },
+                                            { id: 'piramide', label: 'Pirámide' }
+                                        ].map(s => (
+                                            <button
+                                                key={s.id}
+                                                onClick={() => setActiveTool(`solid-${s.id}` as any)}
+                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `solid-${s.id}` ? 'bg-purple-600 border-purple-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                            >
+                                                {s.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
+                                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Cuerpos de Revolución</p>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                            { id: 'cilindro', label: 'Cilindro' },
+                                            { id: 'cono', label: 'Cono' },
+                                            { id: 'esfera', label: 'Esfera' }
+                                        ].map(s => (
+                                            <button
+                                                key={s.id}
+                                                onClick={() => setActiveTool(`revolucion-${s.id}` as any)}
+                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `revolucion-${s.id}` ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                            >
+                                                {s.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : activeTab === 'tools' ? (
-                    <>
-                        {/* <AbatimientoTool /> */}
-                        <TrueMagnitudeTool />
-                        <ParallelismTool />
-                        {/* <RotationTool /> */}
-
-
-
+                    <div className="space-y-4">
+                        {/* Secondary Navigation Tools */}
                         <AdvancedToolsPanel isDark={isDark} />
 
                         {/* Measurements Panel */}
                         {measurements.length > 0 && (
-                            <div className={`mt-4 p-3 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                            <div className={`p-3 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <h3 className="text-sm font-semibold">Mediciones</h3>
                                     <button
@@ -1309,7 +1377,7 @@ export default function Sidebar() {
                                 </div>
                             </div>
                         )}
-                    </>
+                    </div>
                 ) : (
                     <div className="space-y-2">
                         {elements.length === 0 ? (
@@ -1345,7 +1413,9 @@ export default function Sidebar() {
                                                 <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
                                                     {el.type === 'point' && `(${el.coords.x}, ${el.coords.y}, ${el.coords.z})`}
                                                     {el.type === 'line' && 'Recta'}
+                                                    {el.type === 'segment' && 'Segmento'}
                                                     {el.type === 'plane' && 'Plano'}
+                                                    {el.type === 'group' && 'Grupo'}
                                                 </p>
                                             </div>
                                         </div>
@@ -1387,27 +1457,34 @@ export default function Sidebar() {
                     </div>
                 )}
             </div>
+
             {/* User Menu - Absolutely positioned at bottom */}
             <div className={`absolute bottom-0 left-0 right-0 p-2 border-t ${headerBorder} ${isDark ? 'bg-gray-900' : 'bg-white'} z-10`}>
                 <UserMenu />
             </div>
 
-
             {/* Tools that need to be always active - outside tabs */}
+            <AbatimientoTool />
             <IntersectionTool />
+            <AdvancedIntersectionTool />
+            <TrueMagnitudeTool />
             <ParallelismTool />
             <DistanceTool />
-            <AdvancedIntersectionTool />
             <RotationTool />
-            <AbatimientoTool />
-            <PlaneCreatorTool />
-            <TrueMagnitudeTool />
             <CambioPlanoTool />
-            {/* Modals */}
+            <PlaneCreatorTool />
+            <SegmentTool />
+            <GroupTool />
+            <VMReconstructionTool />
+            <SolidsTool />
+
+            {/* Exercise Overlay */}
             <ExerciseOverlay />
+
+            {/* Modals */}
             <HelpGuide isOpen={showHelp} onClose={toggleHelp} isDark={isDark} />
             <SaveProjectModal isOpen={showSaveModal} onClose={() => setShowSaveModal(false)} />
             <LoadProjectModal isOpen={showLoadModal} onClose={() => setShowLoadModal(false)} />
-        </div >
+        </div>
     );
 }

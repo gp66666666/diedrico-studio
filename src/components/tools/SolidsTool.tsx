@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
-import { Box, Maximize2 } from 'lucide-react';
+import { Box, Maximize2, X } from 'lucide-react';
 import type { SolidElement } from '../../types';
 
 export default function SolidsTool() {
@@ -164,34 +164,28 @@ export default function SolidsTool() {
     return (
         <>
             <style>{panelStyle}</style>
-            <div
-                id={uniqueId}
-                className="fixed bottom-24 left-1/2 z-[100] p-6 rounded-3xl animate-fade-in"
-            >
-                {/* Header / Drag Area */}
+            <div id={uniqueId} className="fixed bottom-24 left-[60%] z-[100] p-6 rounded-3xl animate-fade-in">
                 <div
+                    className="flex items-center justify-between gap-4 mb-4 cursor-grab active:cursor-grabbing border-b border-white/10 pb-2"
                     onMouseDown={onMouseDownDrag}
-                    className="flex items-center justify-between border-b border-white/10 pb-4 mb-4"
-                    style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
                 >
-                    <div className="flex items-center gap-3">
-                        <Box size={20} style={{ color: '#60a5fa !important' }} />
+                    <div className="flex items-center gap-2">
+                        <Box className="text-blue-400" size={18} />
                         <h3 className="text-sm font-black uppercase tracking-[0.2em] m-0">
                             {isEditingSolid ? `Editar ${(selectedElement as SolidElement).name}` : `Crear ${activeTool?.split('-')[1] || ''}`}
                         </h3>
                     </div>
-                    {isEditingSolid && (
-                        <button
-                            onClick={() => selectElement(null)}
-                            className="hover:scale-125 transition-transform p-1"
-                        >
-                            <span className="text-2xl leading-none">✕</span>
-                        </button>
-                    )}
+                    <button
+                        onClick={() => setActiveTool('none')}
+                        className="p-1 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
+                        title="Cerrar"
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
 
                 {isEditingSolid ? (
-                    <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+                    <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
                         {/* Size Slider */}
                         <div className="space-y-3">
                             <div className="flex justify-between">

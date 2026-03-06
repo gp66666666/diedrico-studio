@@ -320,3 +320,229 @@ export const calculatePlaneTraces = (normal: Vector3, constant: number) => {
 
     return { hTrace, vTrace };
 };
+
+/**
+ * Calculates the abatimiento (flattening) of a point onto the horizontal plane (z=0)
+ * using the plane's horizontal trace as the hinge (charnela).
+ */
+export const calculateAbatimiento = (pt: Vector3, plane: { normal: Vector3, constant: number }): Vector3 => {
+    const A = plane.normal.x;
+    const B = plane.normal.y;
+    const C = plane.normal.z;
+    const D = plane.constant;
+
+    // Charnela (Horizontal Trace): Ax + By + D = 0 at Z=0
+    // Project pt onto Z=0
+    const px = pt.x;
+    const py = pt.y;
+    const pz = pt.z;
+
+    // Proyección del punto sobre la charnela en Z=0 (Centro de giro O)
+    const den = A * A + B * B;
+    if (den < 1e-8) {
+        // Plane parallel to PH (Horizontal plane) - VM is already in PH
+        return { x: pt.x, y: pt.y, z: 0 };
+    }
+
+    const t = -(A * px + B * py + D) / den;
+    const Ox = px + A * t;
+    const Oy = py + B * t;
+
+    // d es la distancia proyectada al eje. 
+    // Para que las líneas horizontales del plano sigan siendo paralelas tras el abatimiento, 
+    // el radio R debe depender directamente de la cota Z y de la pendiente del plano (afinidad).
+    // R = |pz| * sqrt(A^2 + B^2 + C^2) / sqrt(A^2 + B^2)
+    const n_sq = A * A + B * B + C * C;
+    const n_xy_sq = A * A + B * B;
+    const R = Math.abs(pz) * Math.sqrt(n_sq / n_xy_sq);
+
+    // Vector unitario de abatimiento (perpendicular a la charnela)
+    const lenNorm = Math.sqrt(n_xy_sq);
+    let ux = A / lenNorm;
+    let uy = B / lenNorm;
+
+    // Queremos que el abatimiento se haga siempre "hacia adelante" (+Y) o "derecha" (+X)
+    // para ser consistente con la vista 2D estándar (donde PH es y > 0).
+    if (uy < -1e-6) {
+        ux = -ux;
+        uy = -uy;
+    } else if (Math.abs(uy) < 1e-6) {
+        // Charnela vertical. Abatimos hacia la derecha por convención (+X)
+        if (ux < -1e-6) {
+            ux = -ux;
+            uy = -uy;
+        }
+    }
+
+    // Si la cota es negativa, abatimos hacia el lado opuesto para mantener la lógica de "apertura"
+    if (pz < -1e-6) {
+        ux = -ux;
+        uy = -uy;
+    }
+
+    return {
+        x: Ox + R * ux,
+        y: Oy + R * uy,
+        z: 0
+    };
+};
+
+/**
+ * Calculates the abated traces of a plane.
+ * Trace P (horizontal) is the hinge itself.
+ * Trace (P') is the vertical trace abated onto the horizontal plane.
+ */
+export const calculatePlaneAbatimientoTraces = (plane: { normal: Vector3, constant: number }) => {
+    const { normal, constant: D } = plane;
+    const { x: A, y: B, z: C } = normal;
+
+    // Vertex O: Ax + D = 0 (intersection of traces with LT)
+    let O: Vector3 | null = null;
+    if (Math.abs(A) > 1e-6) {
+        O = { x: -D / A, y: 0, z: 0 };
+    }
+
+    // Find a point on the vertical trace to abate
+    // Trace P': Ax + Cz + D = 0 (at y=0)
+    let ptV: Vector3 | null = null;
+    if (Math.abs(C) > 1e-6) {
+        // Find a point with z = 10 (arbitrary)
+        // Ax + C(10) + D = 0 => Ax = -D - 10C => x = (-D - 10C)/A
+        const zCoord = 5;
+        let xCoord = 0;
+        if (Math.abs(A) > 1e-6) {
+            xCoord = (-D - zCoord * C) / A;
+        } else {
+            // Plane parallel to LT: Cz + D = 0 => constant z, all x
+            xCoord = 0;
+        }
+        ptV = { x: xCoord, y: 0, z: zCoord };
+    }
+
+    const P = { A, B, D }; // Hinge line Ax + By + D = 0
+
+    let abatedTraceV: { p1: Vector3, p2: Vector3 } | null = null;
+    if (ptV) {
+        const abPtV = calculateAbatimiento(ptV, plane);
+        if (O) {
+            abatedTraceV = { p1: O, p2: abPtV };
+        } else {
+            // Parallel to LT or specific cases with no LT intersection
+            // The abated trace is parallel to the Ground Line (X-axis)
+            abatedTraceV = {
+                p1: { x: -100, y: abPtV.y, z: 0 },
+                p2: { x: 100, y: abPtV.y, z: 0 }
+            };
+        }
+    }
+
+    return { O, P, abatedTraceV };
+};
+
+/**
+ * Returns helper points for drawing the manual abatimiento construction.
+ */
+export const getAbatimientoConstructionPoints = (pt: Vector3, plane: { normal: Vector3, constant: number }) => {
+    const A = plane.normal.x;
+    const B = plane.normal.y;
+    const D = plane.constant;
+
+    // Horizontal projection of point
+    const ph = { x: pt.x, y: pt.y, z: 0 };
+    // Vertical projection of point (on PG)
+    const pv = { x: pt.x, y: 0, z: pt.z };
+
+    // Point on LT (x projection)
+    const plt = { x: pt.x, y: 0, z: 0 };
+
+    // Projection of ph onto charnela P (centro de giro local para el punto)
+    const t = -(A * ph.x + B * ph.y + D) / (A * A + B * B || 1);
+    const center = { x: ph.x + A * t, y: ph.y + B * t, z: 0 };
+
+    // Abated point
+    const abPt = calculateAbatimiento(pt, plane);
+
+    // Finding Vertex O (intersection of traces)
+    let O: Vector3 | null = null;
+    if (Math.abs(A) > 1e-6) {
+        O = { x: -D / A, y: 0, z: 0 };
+    }
+
+    return { ph, pv, plt, center, abPt, O };
+};
+
+/**
+ * Returns helper points for affinity-based abatimiento construction.
+ */
+export const getAffinityAbatimientoPoints = (pt: Vector3, plane: { normal: Vector3, constant: number }) => {
+    const A = plane.normal.x;
+    const B = plane.normal.y;
+    const C = plane.normal.z;
+    const D = plane.constant;
+
+    // 1. Projections
+    const ph = { x: pt.x, y: pt.y, z: 0 };
+    const pv = { x: pt.x, y: 0, z: pt.z };
+
+    // 2. Vertex O (Hinge intersection with LT, Ax + D = 0 at y=0)
+    let O: Vector3 | null = null;
+    if (Math.abs(A) > 1e-6) {
+        O = { x: -D / A, y: 0, z: 0 };
+    } else if (Math.abs(B) > 1e-6) {
+        // Parallel to LT or passing through O
+        // We can pick a "fake" origin on the hinge as a reference for rotation visuals
+        // For parallel to LT planes, we pick (pt.x, hingeY, 0)
+        const hingeY = -D / B;
+        O = { x: pt.x, y: hingeY, z: 0 };
+    }
+
+    // 3. Find H' on P' at same height as pt.z
+    // Trace P': Ax + Cz + D = 0 (at y=0)
+    let hPrime: Vector3 | null = null;
+    if (Math.abs(A) > 1e-6) {
+        // Oblique or Projecting Horizontal
+        hPrime = { x: (-D - pt.z * C) / A, y: 0, z: pt.z };
+    } else if (Math.abs(C) > 1e-6) {
+        // Plane parallel to LT (A=0, C!=0): Cz + D = 0 => constant Z.
+        // We take an offset X so the auxiliary line is visible.
+        hPrime = { x: pt.x + 2, y: 0, z: -D / C };
+    } else if (Math.abs(B) > 1e-6) {
+        // Plane parallel to XZ (A=0, C=0, B!=0): By + D = 0.
+        // Vertical trace is y=0 (XZ plane) if D=0, or no vertical trace if D!=0.
+        // If D=0, the plane is the XZ plane itself. hPrime is just pt.
+        // If D!=0, the plane is parallel to XZ, so it has no vertical trace on y=0.
+        // In this case, hPrime is not well-defined for affinity.
+        // For now, we'll return null, or could define a point on the plane at pt.z.
+        if (Math.abs(D) < 1e-6) { // Plane is y=0 (XZ plane)
+            hPrime = { x: pt.x, y: 0, z: pt.z };
+        } else {
+            // Plane is parallel to XZ and not the XZ plane itself. No P' on y=0.
+            hPrime = null;
+        }
+    }
+
+    // 4. Trace intersection with LT for affinity construction (horizontal projection of trace P')
+    // For oblique planes this is just O. For others it might differ.
+    let h_tr_lt = O;
+
+    // 5. Abated Point of hPrime - abHPrime and v_lt
+    let abHPrime: Vector3 | null = null;
+    let v_lt: Vector3 | null = null;
+    let hingeInter: Vector3 | null = null;
+    if (hPrime) {
+        abHPrime = calculateAbatimiento(hPrime, plane);
+        v_lt = { x: hPrime.x, y: 0, z: 0 };
+
+        // Intersection of perpendicular from v_lt to hinge (Ax + By + D = 0)
+        const den = A * A + B * B;
+        if (den > 1e-8) {
+            const t = (A * v_lt.x + B * v_lt.y + D) / den;
+            hingeInter = { x: v_lt.x - t * A, y: v_lt.y - t * B, z: 0 };
+        }
+    }
+
+    // 6. Final abated point
+    const abPt = calculateAbatimiento(pt, plane);
+
+    return { ph, pv, O, hPrime, v_lt, abHPrime, abPt, h_tr_lt, hingeInter };
+};

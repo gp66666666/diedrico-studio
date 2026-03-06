@@ -111,6 +111,34 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
     // Use theme-aware fill color for text labels
     const textFill = isDark ? '#ffffff' : '#000000';
 
+    if (element.role === 'abated') {
+        const x1 = p1.x * SCALE;
+        const x2 = p2.x * SCALE;
+        const y1 = p1.y * SCALE;
+        const y2 = p2.y * SCALE;
+        return (
+            <g onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+                <line
+                    x1={x1} y1={y1} x2={x2} y2={y2}
+                    stroke={element.color}
+                    strokeWidth="3"
+                    strokeDasharray="8 4"
+                />
+                <text
+                    x={(x1 + x2) / 2 + 10}
+                    y={(y1 + y2) / 2 - 10}
+                    fontSize="16"
+                    fontWeight="bold"
+                    fill={element.color}
+                    className="select-none"
+                    style={{ fontStyle: 'italic' }}
+                >
+                    {element.name}
+                </text>
+            </g>
+        );
+    }
+
     return (
         <g onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
             {/* Vertical Projection (r'') */}

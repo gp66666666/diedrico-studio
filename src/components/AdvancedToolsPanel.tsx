@@ -223,6 +223,20 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                             Calcula dimensiones reales
                         </div>
+                        <div className="mt-4 pt-4 border-t border-white/5">
+                            <button
+                                onClick={() => setActiveTool(activeTool === 'reconstruct-vm' ? 'none' : 'reconstruct-vm')}
+                                className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all ${activeTool === 'reconstruct-vm'
+                                    ? 'bg-purple-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.4)]'
+                                    : 'bg-purple-600/10 text-purple-400 border border-purple-500/30 hover:bg-purple-600/20'
+                                    }`}
+                            >
+                                <Maximize2 size={16} /> RECONSTRUIR EN VM
+                            </button>
+                            <p className="text-[10px] text-gray-500 mt-2 text-center">
+                                Selecciona elementos y un plano para ver su VM
+                            </p>
+                        </div>
                     </div>
                 )}
             </div>

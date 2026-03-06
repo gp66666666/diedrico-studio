@@ -17,8 +17,6 @@ import SolidsTool from './components/tools/SolidsTool';
 
 export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [footerVisible, setFooterVisible] = useState(true);
-    const [countdown, setCountdown] = useState(5);
     const { theme, viewMode, setViewMode } = useGeometryStore();
     const { isPremium } = useUserStore();
     const { generateExercise } = useAIStore();
@@ -49,16 +47,6 @@ export default function MainApp() {
         return () => window.removeEventListener('message', handleMessage);
     }, [generateExercise]);
 
-    // Auto-hide educational footer after countdown
-    useEffect(() => {
-        if (countdown > 0 && footerVisible) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
-        } else if (countdown === 0) {
-            setFooterVisible(false);
-        }
-    }, [countdown, footerVisible]);
-
     // Theme Classes
     const bgClass = isDark ? 'bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50';
     const tabBg = isDark ? 'bg-white/10 border-white/20' : 'bg-white border-gray-200 shadow-sm';
@@ -71,9 +59,9 @@ export default function MainApp() {
     return (
         <>
             <SEO />
-            <div className={`grid h-[100dvh] w-screen overflow-hidden transition-colors duration-300 select-none ${bgClass}`} style={{ gridTemplateRows: '1fr auto' }}>
-                {/* Main App Area (grows to fill available space) */}
-                <div className="overflow-hidden flex min-h-0">
+            <div className={`flex flex-col h-[100dvh] w-screen overflow-hidden transition-colors duration-300 select-none ${bgClass}`}>
+                {/* Main App Area (fills the screen) */}
+                <div className="flex-1 overflow-hidden flex min-h-0">
                     {/* Mobile Menu Button */}
                     {viewMode !== 'caballera' && viewMode !== 'laminas' && (
                         <button
@@ -175,62 +163,6 @@ export default function MainApp() {
                     </div>
                 </div>
 
-                {/* Ad Banner Removed for Policy Compliance */}
-
-                {/* 
-                  Educational Content Section - VISIBLE for AdSense compliance.
-                */}
-                <footer
-                    className={`fixed bottom-0 left-0 w-full border-t border-blue-500/20 transition-all duration-1000 ease-in-out overflow-hidden z-[100] backdrop-blur-xl educational-footer`}
-                    style={{
-                        maxHeight: footerVisible ? '55px' : '0px',
-                        opacity: footerVisible ? 1 : 0,
-                        transform: footerVisible ? 'translateY(0)' : 'translateY(100%)',
-                        pointerEvents: footerVisible ? 'auto' : 'none',
-                        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)'
-                    }}
-                >
-                    <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-6">
-                        <div className="flex items-center gap-3 overflow-hidden flex-1">
-                            <span className="shrink-0 px-2 py-0.5 rounded-full bg-blue-600 text-[9px] font-black uppercase tracking-tighter text-white">
-                                EDU
-                            </span>
-
-                            <p className="text-[10px] leading-tight truncate hidden md:block">
-                                <strong>Geometría Descriptiva:</strong> Estudio del Sistema Diédrico para representación 3D mediante planos de proyección (Alzado y Planta).
-                                Herramienta para cálculo de trazas e intersecciones reales.
-                            </p>
-                            <p className="text-[10px] leading-tight md:hidden">
-                                <strong>Geometría Descriptiva:</strong> Sistema Diédrico interactivo.
-                            </p>
-                        </div>
-
-                        <div className="flex items-center gap-4 md:gap-6 shrink-0">
-                            <nav className="flex items-center gap-3 md:gap-4 text-[10px] font-bold">
-                                <Link to="/about" className="hover:text-blue-500 transition-colors">Sobre nosotros</Link>
-                                <Link to="/contact" className="hover:text-blue-500 transition-colors">Contacto</Link>
-                                <Link to="/privacy" className="hover:text-blue-500 transition-colors hidden sm:block">Privacidad</Link>
-                                <Link to="/terms" className="hover:text-blue-500 transition-colors hidden sm:block">Términos</Link>
-                            </nav>
-
-                            <div className="flex items-center gap-3 border-l border-white/10 pl-4">
-                                {countdown > 0 && (
-                                    <span className="text-[9px] font-mono opacity-50">
-                                        {countdown}s
-                                    </span>
-                                )}
-
-                                <button
-                                    onClick={() => setFooterVisible(false)}
-                                    className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                                    title="Cerrar"
-                                >
-                                    <X size={14} className={isDark ? 'text-white/40' : 'text-gray-400'} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
             </div>
         </>
     );

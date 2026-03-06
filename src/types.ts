@@ -29,10 +29,13 @@ export interface ProjectionSystem {
 
 export interface BaseElement {
     id: string;
-    type: 'point' | 'line' | 'plane' | 'solid';
+    type: 'point' | 'line' | 'segment' | 'plane' | 'group' | 'solid';
     name: string;
     color: string;
     visible: boolean;
+    role?: 'abated';
+    parentPlaneId?: string;
+    sourceElementId?: string;
 }
 
 export interface PointElement extends BaseElement {
@@ -44,9 +47,15 @@ export interface LineElement extends BaseElement {
     type: 'line';
     point: Vector3;
     direction: Vector3;
-    p2?: Vector3; // Optional second point if defined by 2 points
+    p2?: Vector3;
     dashed?: boolean;
-    isInfinite?: boolean; // If true, drawn as infinite line
+    isInfinite?: boolean;
+}
+
+export interface SegmentElement extends BaseElement {
+    type: 'segment';
+    p1: Vector3;
+    p2: Vector3;
 }
 
 export interface PlaneElement extends BaseElement {
@@ -55,8 +64,14 @@ export interface PlaneElement extends BaseElement {
     constant: number;
 }
 
+export interface GroupElement extends BaseElement {
+    type: 'group';
+    elements: string[]; // IDs of children
+}
+
 export interface SolidElement extends BaseElement {
     type: 'solid';
+    // ... rest same
     subtype: 'tetrahedron' | 'cube' | 'octahedron' | 'dodecahedron' | 'icosahedron' | 'prism' | 'pyramid' | 'cylinder' | 'cone' | 'sphere';
     position: Vector3;
     size: Vector3; // For most, x=radius/sidelength, y=height
@@ -65,7 +80,7 @@ export interface SolidElement extends BaseElement {
     color: string;
 }
 
-export type GeometryElement = PointElement | LineElement | PlaneElement | SolidElement;
+export type GeometryElement = PointElement | LineElement | SegmentElement | PlaneElement | GroupElement | SolidElement;
 
 // Sketch Types
 export type SketchTool =

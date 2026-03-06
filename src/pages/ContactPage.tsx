@@ -228,7 +228,7 @@ export default function ContactPage() {
                         <div>
                             <p className="font-medium text-white mb-1">¿Es gratuito usar Diédrico Studio?</p>
                             <p className="text-white/70">
-                                Sí, Diédrico Studio es completamente gratuito. Hay versión premium que te da más herramientas y características. Los anuncios nos ayudan a mantener
+                                Sí, Diédrico Studio es completamente gratuito. Los anuncios nos ayudan a mantener
                                 el servidor y seguir desarrollando nuevas características.
                             </p>
                         </div>

@@ -10,6 +10,14 @@ export default function Point2D({ element, onClick, isDark = false }: { element:
     // Use theme-aware fill color for horizontal projection
     const horizontalFill = isDark ? '#1f2937' : '#ffffff';
 
+    if (element.role === 'abated') {
+        return (
+            <g className="point-geometry" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+                <circle cx={px} cy={py_h} r="4" fill={element.color} stroke={isDark ? 'white' : 'black'} strokeWidth="1" />
+            </g>
+        );
+    }
+
     return (
         <>
             {/* Geometry (rendered first) */}

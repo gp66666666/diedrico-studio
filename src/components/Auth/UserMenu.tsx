@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react';
 import { LogIn, LogOut, Crown, User as UserIcon, ChevronUp, ChevronDown, Info, Mail, Shield, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
-import PremiumModal from './PremiumModal';
 
 export default function UserMenu() {
     const { user, profile, isLoading, checkSession, signInWithGoogle, signOut } = useUserStore();
     const [isExpanded, setIsExpanded] = useState(false);
-    const [showPremiumModal, setShowPremiumModal] = useState(false);
 
     useEffect(() => {
         checkSession();
@@ -99,7 +97,6 @@ export default function UserMenu() {
                     </div>
                 )}
 
-                <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
             </div>
         );
     }
@@ -114,9 +111,6 @@ export default function UserMenu() {
                 <div className="flex items-center gap-1.5">
                     <UserIcon size={14} className="text-gray-500 dark:text-gray-400" />
                     <span className="text-xs text-gray-600 dark:text-gray-300">Usuario</span>
-                    {profile?.is_premium && !isExpanded && (
-                        <Crown size={10} className="text-yellow-500" />
-                    )}
                 </div>
                 {isExpanded ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
             </button>
@@ -137,13 +131,7 @@ export default function UserMenu() {
                             <p className="text-sm font-medium truncate text-gray-900 dark:text-white">
                                 {profile?.full_name || user.email}
                             </p>
-                            {profile?.is_premium ? (
-                                <span className="text-[10px] bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit">
-                                    <Crown size={8} /> PREMIUM
-                                </span>
-                            ) : (
-                                <span className="text-[10px] text-gray-500">Plan Gratuito</span>
-                            )}
+                            <span className="text-[10px] text-gray-500">Plan Gratuito</span>
                         </div>
                     </div>
 

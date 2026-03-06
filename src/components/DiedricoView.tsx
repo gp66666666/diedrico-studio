@@ -1,11 +1,18 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { useGeometryStore } from '../store/geometryStore';
-import { intersectLinePlane, intersectPlanePlane, intersectLineLine, calculateLineTraces } from '../utils/mathUtils';
+import {
+    calculateLineTraces, intersectLinePlane, intersectPlanePlane, intersectLineLine,
+    vectorAdd, vectorScale, calculateAbatimiento, calculatePlaneAbatimientoTraces,
+    getAbatimientoConstructionPoints, getAffinityAbatimientoPoints
+} from '../utils/mathUtils';
 import {
     ZoomIn, ZoomOut, Move, Eye, EyeOff,
     Magnet, PanelRight
 } from 'lucide-react';
-import type { GeometryElement, LineElement, PlaneElement, SketchElement, PointElement, SketchTool } from '../types';
+import {
+    PointElement, LineElement, SegmentElement, PlaneElement, GroupElement, SolidElement,
+    GeometryElement, SketchElement, SketchTool, Vector3
+} from '../types';
 import Point2D from './2D/Point2D';
 import Line2D from './2D/Line2D';
 import Plane2D from './2D/Plane2D';
@@ -234,9 +241,12 @@ const AuxSystem = memo(({ system, axisColor, isDark, elements }: { system: impor
 });
 
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
-    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, showProfile, toggleProfile, distanceResult, selectedForDistance, clearDistanceTool, activeTool: activeDistanceTool, selectForDistance, selectElement, cameraStates, setCameraState, measurements, auxSystems } = useGeometryStore();
-
-    // Viewport State - Initialize from Store
+    const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, distanceResult, selectedForDistance,
+        clearDistanceTool, activeTool: activeDistanceTool, selectForDistance,
+        selectElement, cameraStates, setCameraState, measurements, auxSystems,
+        vmElements, vmPlaneId, showVMConstruction, toggleVMConstruction,
+        showProfile, toggleProfile
+    } = useGeometryStore();
     // Ensure we use the correct mode key, default to 2d if undefined
     const storageMode = mode === 'sketch' ? 'sketch' : '2d';
     const savedState = cameraStates[storageMode];
@@ -1382,6 +1392,187 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         );
                     })}
 
+                    {/* Integrated VM Reconstruction (Abatimiento) */}
+                    {(vmPlaneId || elements.some(e => e.role === 'abated')) && (
+                        <g className="integrated-vm-layer">
+                            {(() => {
+                                // Find the effective plane for the procedure visualization
+                                let effectivePlaneId = vmPlaneId;
+                                if (!effectivePlaneId) {
+                                    const firstAbated = elements.find(e => e.role === 'abated' && e.parentPlaneId);
+                                    if (firstAbated) effectivePlaneId = (firstAbated as any).parentPlaneId;
+                                }
+
+                                const plane = elements.find(e => e.id === effectivePlaneId) as PlaneElement;
+                                if (!plane) return null;
+
+                                const { O, abatedTraceV } = calculatePlaneAbatimientoTraces(plane);
+                                const abHPrime = abatedTraceV ? abatedTraceV.p2 : null;
+
+                                // Logic to render construction lines for a specific element (original or abated)
+                                const renderVMElement = (targetId: string, isPersistent = false): JSX.Element | (JSX.Element | null)[] | null => {
+                                    // Find the abated element and its source
+                                    let abatedEl: any = null;
+                                    let sourceEl: any = null;
+
+                                    if (isPersistent) {
+                                        abatedEl = elements.find(e => e.id === targetId);
+                                        if (!abatedEl || abatedEl.role !== 'abated') return null;
+                                        sourceEl = elements.find(s => s.id === abatedEl.sourceElementId);
+                                    } else {
+                                        sourceEl = elements.find(e => e.id === targetId);
+                                        abatedEl = null;
+                                    }
+
+                                    if (!sourceEl || !sourceEl.visible) return null;
+
+                                    if (isPersistent && abatedEl && (abatedEl as any).parentPlaneId !== effectivePlaneId) return null;
+
+                                    const getConstruction = (point: Vector3, id: string) => {
+                                        const { ph, pv, O: ptO, hPrime, abHPrime: ptAbHPrime, abPt: mathAbPt, h_tr_lt, v_lt, hingeInter } = getAffinityAbatimientoPoints(point, plane);
+                                        const yellow = '#eab308';
+                                        const purple = '#a855f7';
+                                        const pink = '#f472b6'; // Matching user's request color
+
+                                        const R = ptO && hPrime ? Math.hypot(hPrime.x - ptO.x, hPrime.z - ptO.z) : 0;
+
+                                        const { x: A, y: B } = plane.normal;
+                                        const abPt = mathAbPt;
+
+                                        // Helper for right angle symbol
+                                        const renderRightAngle = (origin: Vector3, d1: { x: number, y: number }, d2: { x: number, y: number }, size = 0.2) => {
+                                            const p1 = { x: origin.x + d1.x * size, y: origin.y + d1.y * size };
+                                            const p2 = { x: origin.x + (d1.x + d2.x) * size, y: origin.y + (d1.y + d2.y) * size };
+                                            const p3 = { x: origin.x + d2.x * size, y: origin.y + d2.y * size };
+                                            return (
+                                                <path
+                                                    d={`M ${p1.x * SCALE} ${p1.y * SCALE} L ${p2.x * SCALE} ${p2.y * SCALE} L ${p3.x * SCALE} ${p3.y * SCALE}`}
+                                                    fill="none" stroke={pink} strokeWidth="1" opacity="0.8"
+                                                />
+                                            );
+                                        };
+
+                                        return (
+                                            <g key={`const-${id}-${point.x}-${point.z}`}>
+                                                {/* 1. Parallel to LT from pv to hPrime */}
+                                                {hPrime && (
+                                                    <line
+                                                        x1={pv.x * SCALE} y1={-pv.z * SCALE}
+                                                        x2={hPrime.x * SCALE} y2={-hPrime.z * SCALE}
+                                                        stroke={purple} strokeWidth="1" strokeDasharray="4 2" opacity="0.6"
+                                                    />
+                                                )}
+
+                                                {/* 2. Arc from hPrime to ptAbHPrime */}
+                                                {hPrime && ptO && ptAbHPrime && (
+                                                    <>
+                                                        <circle
+                                                            cx={ptO.x * SCALE} cy={ptO.y * SCALE} r={R * SCALE}
+                                                            fill="none" stroke={purple} strokeWidth="1" strokeDasharray="3 4" opacity="0.4"
+                                                        />
+                                                    </>
+                                                )}
+
+                                                {/* 3. Affinity drop: from ptAbHPrime to abPt (Parallel to hinge) */}
+                                                {ptAbHPrime && (
+                                                    <line
+                                                        x1={ptAbHPrime.x * SCALE} y1={ptAbHPrime.y * SCALE}
+                                                        x2={abPt.x * SCALE} y2={abPt.y * SCALE}
+                                                        stroke={yellow} strokeWidth="1.5" strokeDasharray="5 5"
+                                                    />
+                                                )}
+
+                                                {/* 4. Affinity parallel: from ph to abPt (Perpendicular to hinge) */}
+                                                <line
+                                                    x1={ph.x * SCALE} y1={ph.y * SCALE}
+                                                    x2={abPt.x * SCALE} y2={abPt.y * SCALE}
+                                                    stroke={yellow} strokeWidth="1" opacity="0.5"
+                                                />
+
+                                                {/* 5. Radial connection for affinity from hinge pivot (O or h_tr_lt) */}
+                                                {h_tr_lt && ptAbHPrime && (
+                                                    <line
+                                                        x1={h_tr_lt.x * SCALE} y1={h_tr_lt.y * SCALE}
+                                                        x2={ptAbHPrime.x * SCALE} y2={ptAbHPrime.y * SCALE}
+                                                        stroke={purple} strokeWidth="1" strokeDasharray="2 2" opacity="0.3"
+                                                    />
+                                                )}
+
+                                                {/* 6. Vertical and Perpendicular lines (requested by user) with right angles */}
+                                                {v_lt && hPrime && (
+                                                    <>
+                                                        <line
+                                                            x1={v_lt.x * SCALE} y1={0}
+                                                            x2={hPrime.x * SCALE} y2={-hPrime.z * SCALE}
+                                                            stroke={pink} strokeWidth="1.2" strokeDasharray="3 3"
+                                                        />
+                                                        {renderRightAngle(v_lt, { x: 1, y: 0 }, { x: 0, y: -1 })}
+                                                    </>
+                                                )}
+                                                {v_lt && ptAbHPrime && hingeInter && (
+                                                    <>
+                                                        <line
+                                                            x1={v_lt.x * SCALE} y1={0}
+                                                            x2={ptAbHPrime.x * SCALE} y2={ptAbHPrime.y * SCALE}
+                                                            stroke={pink} strokeWidth="1.2" strokeDasharray="3 3"
+                                                        />
+                                                        {(() => {
+                                                            // Perpendicular to hinge at hingeInter
+                                                            const hdx = A; const hdy = B;
+                                                            const hlen = Math.hypot(hdx, hdy);
+                                                            if (hlen < 1e-6) return null;
+                                                            const perp_dir = { x: -hdx / hlen, y: -hdy / hlen };
+                                                            const hinge_dir = { x: -hdy / hlen, y: hdx / hlen };
+                                                            return renderRightAngle(hingeInter, perp_dir, hinge_dir);
+                                                        })()}
+                                                    </>
+                                                )}
+                                            </g>
+                                        );
+                                    };
+
+                                    if (!showVMConstruction) return null;
+
+                                    if (sourceEl.type === 'point') {
+                                        return getConstruction((sourceEl as PointElement).coords, sourceEl.id);
+                                    } else if (sourceEl.type === 'segment') {
+                                        const s = sourceEl as SegmentElement;
+                                        return [
+                                            getConstruction(s.p1, `${sourceEl.id}-p1`),
+                                            getConstruction(s.p2, `${sourceEl.id}-p2`)
+                                        ];
+                                    }
+                                    return null;
+                                };
+
+                                return (
+                                    <g>
+                                        {/* Constructions for current selection */}
+                                        {vmElements.map(elId => renderVMElement(elId))}
+
+                                        {/* Constructions for persistent abated elements */}
+                                        {elements.filter(e => e.role === 'abated' && e.sourceElementId).map(el => renderVMElement(el.id, true))}
+                                    </g>
+                                );
+                            })()}
+                        </g>
+                    )}
+
+                    {/* Toggle Procedure Button */}
+                    {(vmPlaneId || elements.some(e => e.role === 'abated')) && (
+                        <foreignObject x={-offset.x / zoom + 20} y={-offset.y / zoom + 80} width="200" height="50">
+                            <button
+                                onClick={toggleVMConstruction}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all shadow-lg backdrop-blur-md ${showVMConstruction
+                                    ? 'bg-purple-600 text-white border-purple-500 shadow-purple-500/20'
+                                    : (isDark ? 'bg-gray-800/80 text-gray-400 border-gray-700' : 'bg-white/80 text-gray-600 border-gray-200')
+                                    }`}
+                            >
+                                {showVMConstruction ? <Eye size={14} /> : <EyeOff size={14} />}
+                                {showVMConstruction ? 'Ocultar Procedimiento' : 'Ver Procedimiento'}
+                            </button>
+                        </foreignObject>
+                    )}
 
                     {/* Merged Text Labels Layer (rendered on top) */}
                     <g className="merged-text-layer">
@@ -1423,9 +1614,14 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                                     const px = (el as any).coords.x * SCALE;
                                     const py_h = (el as any).coords.y * SCALE;
                                     const py_v = -(el as any).coords.z * SCALE;
-                                    // Points usually don't have subscripts in this notation, just the name with primes
-                                    allLabels.push({ x: px + 5, y: py_v - 5, main: `${el.name}''`, color: el.color, elementId: el.id, priority: 0 });
-                                    allLabels.push({ x: px + 5, y: py_h + 15, main: `${el.name}'`, color: el.color, elementId: el.id, priority: 0 });
+
+                                    if (el.role === 'abated') {
+                                        // Only one label for abated points
+                                        allLabels.push({ x: px + 8, y: py_h - 8, main: el.name, color: el.color, elementId: el.id, priority: 0 });
+                                    } else {
+                                        allLabels.push({ x: px + 5, y: py_v - 5, main: `${el.name}''`, color: el.color, elementId: el.id, priority: 0 });
+                                        allLabels.push({ x: px + 5, y: py_h + 15, main: `${el.name}'`, color: el.color, elementId: el.id, priority: 0 });
+                                    }
                                 } else if (el.type === 'line') {
                                     const line = el as any;
                                     const p2 = { x: line.point.x + line.direction.x * 15, y: line.point.y + line.direction.y * 15, z: line.point.z + line.direction.z * 15 };

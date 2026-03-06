@@ -57,6 +57,15 @@ interface GeometryState {
     showProfile: boolean;
     toggleProfile: () => void;
 
+    // Verdadera Magnitud (True Magnitude View)
+    vmElements: string[]; // Element IDs to show in VM view
+    vmPlaneId: string | null; // The plane used for reconstruction
+    setVMElements: (ids: string[], planeId: string) => void;
+    clearVM: () => void;
+    showVMConstruction: boolean;
+    toggleVMConstruction: () => void;
+    createGroup: (name: string, elementIds: string[]) => void;
+
     // Academy
     activeExercise: { id: string; title: string; statement: string; solutionHint?: string } | null;
     setActiveExercise: (ex: { id: string; title: string; statement: string; solutionHint?: string } | null) => void;
@@ -70,7 +79,7 @@ interface GeometryState {
         'laminas': { offset: { x: number, y: number }, zoom: number };
     };
     setCameraState: (mode: '3d' | '2d' | 'caballera' | 'sketch' | 'laminas', state: any) => void;
-    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'abatir-traza' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines' | 'cambio-plano-h' | 'cambio-plano-v' | 'desabatir-p-ph' | 'desabatir-p-pv' | 'plane-3-points' | 'poliedro-tetraedro' | 'poliedro-cubo' | 'poliedro-octaedro' | 'poliedro-dodecaedro' | 'poliedro-icosaedro' | 'solid-prisma' | 'solid-piramide' | 'revolucion-cilindro' | 'revolucion-cono' | 'revolucion-esfera' | 'solid-section' | 'solid-intersection' | 'solid-development';
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'abatir-traza' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines' | 'cambio-plano-h' | 'cambio-plano-v' | 'desabatir-p-ph' | 'desabatir-p-pv' | 'plane-3-points' | 'poliedro-tetraedro' | 'poliedro-cubo' | 'poliedro-octaedro' | 'poliedro-dodecaedro' | 'poliedro-icosaedro' | 'solid-prisma' | 'solid-piramide' | 'revolucion-cilindro' | 'revolucion-cono' | 'revolucion-esfera' | 'solid-section' | 'solid-intersection' | 'solid-development' | 'create-group' | 'segment-2-points' | 'reconstruct-vm';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
     distanceResult: {
@@ -291,6 +300,31 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     showProfile: false,
     toggleProfile: () => set((state) => ({ showProfile: !state.showProfile })),
 
+    vmElements: [],
+    vmPlaneId: null,
+    setVMElements: (ids, planeId) => set({ vmElements: ids, vmPlaneId: planeId }),
+    clearVM: () => set({ vmElements: [], vmPlaneId: null }),
+    showVMConstruction: true,
+    toggleVMConstruction: () => set((state) => ({ showVMConstruction: !state.showVMConstruction })),
+
+    createGroup: (name, elementIds) => set((state) => {
+        const newGroup = {
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'group',
+            name,
+            elements: elementIds,
+            color: '#3b82f6',
+            visible: true
+        } as any;
+        return {
+            elements: [...state.elements, newGroup],
+            history: {
+                past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+                future: []
+            }
+        };
+    }),
+
     activeExercise: null,
     setActiveExercise: (ex) => set({ activeExercise: ex }),
 
@@ -325,6 +359,9 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         else if (activeTool?.startsWith('intersection')) maxSelection = 2;
         else if (activeTool?.startsWith('advanced-intersection')) maxSelection = 3;
         else if (activeTool?.startsWith('poliedro-') || activeTool?.startsWith('solid-') || activeTool?.startsWith('revolucion-')) maxSelection = 1;
+        else if (activeTool === 'segment-2-points') maxSelection = 2;
+        else if (activeTool === 'create-group') maxSelection = 50; // Arbitrary high limit
+        else if (activeTool === 'reconstruct-vm') maxSelection = 50;
         else if (activeTool !== 'none') maxSelection = 1; // Default for other tools
 
         console.log(`[Store] selectForDistance: id=${id}, activeTool=${activeTool}, maxSelection=${maxSelection}`);
