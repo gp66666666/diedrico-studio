@@ -176,7 +176,10 @@ export default function SolidsTool() {
                         </h3>
                     </div>
                     <button
-                        onClick={() => setActiveTool('none')}
+                        onClick={() => {
+                            setActiveTool('none');
+                            selectElement(null);
+                        }}
                         className="p-1 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
                         title="Cerrar"
                     >
@@ -202,6 +205,26 @@ export default function SolidsTool() {
                                 className="w-full"
                             />
                         </div>
+
+                        {/* Height Slider (for non-uniform solids) */}
+                        {['tetrahedron', 'pyramid', 'prism', 'cylinder', 'cone'].includes((selectedElement as SolidElement).subtype) && (
+                            <div className="space-y-3">
+                                <div className="flex justify-between">
+                                    <span className="label-text">Altura</span>
+                                    <span className="magnitude-value">{(selectedElement as SolidElement).size.y.toFixed(1)} u</span>
+                                </div>
+                                <input
+                                    type="range" min="0.5" max="25" step="0.1"
+                                    value={(selectedElement as SolidElement).size.y}
+                                    onChange={(e) => {
+                                        const val = parseFloat(e.target.value);
+                                        const s = (selectedElement as SolidElement).size;
+                                        updateElement(selectedElementId!, { size: { ...s, y: val } });
+                                    }}
+                                    className="w-full"
+                                />
+                            </div>
+                        )}
 
                         {/* Rotation Axis */}
                         {['x', 'y', 'z'].map((axis) => {

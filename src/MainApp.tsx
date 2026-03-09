@@ -150,10 +150,7 @@ export default function MainApp() {
                                 <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />
                             )}
                         </div>
-                        {/* Global Tools that render UI overlays */}
-                        <SolidsTool />
                     </div>
-
                     {/* AI Assistant Panel - Premium Only - TEMPORARILY HIDDEN */}
                     {/* {FEATURES.AI_ASSISTANT && isPremium && viewMode !== 'caballera' && viewMode !== 'laminas' && <AIChatPanel isSidebarOpen={isSidebarOpen} />} */}
 

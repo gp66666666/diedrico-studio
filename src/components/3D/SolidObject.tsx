@@ -35,7 +35,8 @@ export default function SolidObject({ element }: SolidObjectProps) {
 
     switch (subtype) {
         case 'tetrahedron':
-            geometry = <tetrahedronGeometry args={[radius, 0]} />;
+            // Using a triangular pyramid (cone with 3 segments) to allow height adjustment
+            geometry = <coneGeometry args={[radius, height, 3]} />;
             break;
         case 'cube':
             geometry = <boxGeometry args={[radius * 1.5, radius * 1.5, radius * 1.5]} />; // Side length
