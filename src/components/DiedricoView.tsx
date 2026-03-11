@@ -7,8 +7,9 @@ import {
 } from '../utils/mathUtils';
 import {
     ZoomIn, ZoomOut, Move, Eye, EyeOff,
-    Magnet, PanelRight
+    Magnet, PanelRight, Box
 } from 'lucide-react';
+import MiniScene from './MiniScene';
 import {
     PointElement, LineElement, SegmentElement, PlaneElement, GroupElement, SolidElement,
     GeometryElement, SketchElement, SketchTool, Vector3
@@ -245,7 +246,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
         clearDistanceTool, activeTool: activeDistanceTool, selectForDistance,
         selectElement, cameraStates, setCameraState, measurements, auxSystems,
         vmElements, vmPlaneId, showVMConstruction, toggleVMConstruction,
-        showProfile, toggleProfile
+        showProfile, toggleProfile, showMiniScene, toggleMiniScene
     } = useGeometryStore();
     // Ensure we use the correct mode key, default to 2d if undefined
     const storageMode = mode === 'sketch' ? 'sketch' : '2d';
@@ -1028,7 +1029,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             <div className={`hidden md:block w-px my-1 ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
                         </>
                     )}
-                    <button onClick={() => setMagnetismEnabled(!magnetismEnabled)} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${magnetismEnabled ? 'bg-amber-500 text-white' : `${iconColor} hover:bg-gray-100`}`} title="Activar/Desactivar Magnetismo">
+                    <button onClick={setMagnetismEnabled.bind(null, !magnetismEnabled)} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${magnetismEnabled ? 'bg-amber-500 text-white' : `${iconColor} hover:bg-gray-100`}`} title="Activar/Desactivar Magnetismo">
                         <Magnet size={14} /> {magnetismEnabled ? 'Magnetismo ON' : 'Magnetismo OFF'}
                     </button>
                 </div>
@@ -1039,6 +1040,9 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                 <div className={`absolute bottom-4 left-4 flex gap-2 p-2 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg}`}>
                     <button onClick={toggleProfile} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${showProfile ? 'bg-purple-500 text-white' : `${iconColor} hover:bg-gray-100`}`}>
                         <PanelRight size={14} /> {showProfile ? 'Ocultar Perfil' : 'Vista de Perfil'}
+                    </button>
+                    <button onClick={toggleMiniScene} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium ${showMiniScene ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : `${iconColor} hover:bg-gray-100`}`}>
+                        <Box size={14} /> {showMiniScene ? 'Ocultar Mini-3D' : 'Ver Mini-3D'}
                     </button>
                 </div>
             )}
@@ -1740,6 +1744,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     )}
                 </g>
             </svg >
+            {mode !== 'sketch' && <MiniScene />}
         </div >
     );
 }

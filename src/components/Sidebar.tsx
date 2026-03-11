@@ -684,7 +684,7 @@ export default function Sidebar() {
                         <button
                             onClick={toggleIntersections}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${showIntersections
-                                ? 'bg-yellow-500/20 text-yellow-600 border border-yellow-500/50'
+                                ? (isDark ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' : 'bg-yellow-500/20 text-yellow-600 border border-yellow-500/50')
                                 : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
                                 }`}
                         >
@@ -698,7 +698,7 @@ export default function Sidebar() {
                         <button
                             onClick={toggleFlattening}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${isFlattened
-                                ? 'bg-green-500/20 text-green-600 border border-green-500/50'
+                                ? (isDark ? 'bg-green-500/20 text-green-500 border border-green-500/50' : 'bg-green-500/20 text-green-600 border border-green-500/50')
                                 : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
                                 }`}
                         >
@@ -1391,7 +1391,7 @@ export default function Sidebar() {
                                     <div
                                         key={el.id}
                                         className={`flex items-center justify-between p-3 rounded-lg border transition-all ${selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id))
-                                            ? 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400'
+                                            ? (isDark ? 'bg-blue-600/20 border-blue-500/50 shadow-lg' : 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400')
                                             : `${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 hover:bg-gray-50'}`
                                             }`}
                                     >
@@ -1407,10 +1407,16 @@ export default function Sidebar() {
                                         >
                                             <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: el.color }} />
                                             <div>
-                                                <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
+                                                <p className={`text-sm font-medium ${(selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id)))
+                                                    ? (isDark ? 'text-blue-400' : 'text-blue-900')
+                                                    : (isDark ? 'text-gray-200' : 'text-gray-900')
+                                                    }`}>
                                                     {el.name}
                                                 </p>
-                                                <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                <p className={`text-[10px] ${(selectedElementId === el.id || (selectedForDistance && selectedForDistance.includes(el.id)))
+                                                    ? (isDark ? 'text-blue-300/70' : 'text-blue-700/70')
+                                                    : 'text-gray-500'
+                                                    }`}>
                                                     {el.type === 'point' && `(${el.coords.x}, ${el.coords.y}, ${el.coords.z})`}
                                                     {el.type === 'line' && 'Recta'}
                                                     {el.type === 'segment' && 'Segmento'}

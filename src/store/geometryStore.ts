@@ -77,8 +77,15 @@ interface GeometryState {
         'caballera': { offset: { x: number, y: number }, zoom: number };
         'sketch': { offset: { x: number, y: number }, zoom: number };
         'laminas': { offset: { x: number, y: number }, zoom: number };
+        'mini-3d': { position: [number, number, number], target: [number, number, number] };
     };
-    setCameraState: (mode: '3d' | '2d' | 'caballera' | 'sketch' | 'laminas', state: any) => void;
+    setCameraState: (mode: '3d' | '2d' | 'caballera' | 'sketch' | 'laminas' | 'mini-3d', state: any) => void;
+
+    // Mini 3D View
+    showMiniScene: boolean;
+    toggleMiniScene: () => void;
+    miniSceneSize: number;
+    setMiniSceneSize: (size: number) => void;
     activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'abatir-traza' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines' | 'cambio-plano-h' | 'cambio-plano-v' | 'desabatir-p-ph' | 'desabatir-p-pv' | 'plane-3-points' | 'poliedro-tetraedro' | 'poliedro-cubo' | 'poliedro-octaedro' | 'poliedro-dodecaedro' | 'poliedro-icosaedro' | 'solid-prisma' | 'solid-piramide' | 'revolucion-cilindro' | 'revolucion-cono' | 'revolucion-esfera' | 'solid-section' | 'solid-intersection' | 'solid-development' | 'create-group' | 'segment-2-points' | 'reconstruct-vm';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
@@ -142,7 +149,8 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         '2d': { offset: { x: 400, y: 300 }, zoom: 1 },
         'caballera': { offset: { x: 400, y: 300 }, zoom: 1 },
         'sketch': { offset: { x: 400, y: 300 }, zoom: 1 },
-        'laminas': { offset: { x: 400, y: 300 }, zoom: 1 }
+        'laminas': { offset: { x: 400, y: 300 }, zoom: 1 },
+        'mini-3d': { position: [-30, 25, 30], target: [0, 0, 0] }
     },
     setCameraState: (mode, state) => set((prev) => ({
         cameraStates: {
@@ -150,6 +158,11 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
             [mode]: { ...prev.cameraStates[mode], ...state }
         }
     })),
+
+    showMiniScene: true,
+    toggleMiniScene: () => set((state) => ({ showMiniScene: !state.showMiniScene })),
+    miniSceneSize: 250,
+    setMiniSceneSize: (size) => set({ miniSceneSize: size }),
 
     // Caballero / Axonometric Construction
     caballeraState: {
