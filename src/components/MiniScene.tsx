@@ -46,6 +46,18 @@ function CameraHandler() {
     return null;
 }
 
+function MiniOrbitControls() {
+    const { gl } = useThree();
+    return (
+        <OrbitControls
+            makeDefault
+            enableDamping
+            dampingFactor={0.1}
+            domElement={gl.domElement}
+        />
+    );
+}
+
 export default function MiniScene() {
     const {
         elements, selectElement, showBisectors, theme, measurements,
@@ -57,50 +69,88 @@ export default function MiniScene() {
     const gridSectionColor = isDark ? '#4b5563' : '#d1d5db';
     const gridCellColor = isDark ? '#1f2937' : '#e5e7eb';
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+    useEffect(() => {
+        // If on mobile and size is at default, make it smaller
+        if (isMobile && miniSceneSize === 250) {
+            setMiniSceneSize(120);
+        }
+    }, [isMobile, setMiniSceneSize, miniSceneSize]);
+
     if (!showMiniScene) return null;
 
     const distanceMeasurements = measurements.filter(m => m.visualLine);
 
     return (
         <div
-            className={`fixed top-4 right-4 z-[100] rounded-xl overflow-hidden shadow-2xl border transition-all duration-300 ${isDark ? 'border-white/20 bg-gray-900' : 'border-gray-200 bg-white'}`}
+            className={`fixed top-32 md:top-6 right-4 z-[100] rounded-xl overflow-hidden shadow-2xl border transition-all duration-300 ${isDark ? 'border-white/20 bg-gray-900/90 backdrop-blur-md' : 'border-gray-200 bg-white/90 backdrop-blur-md'}`}
             style={{
-                width: `${miniSceneSize}px`,
-                height: `${miniSceneSize}px`,
-                aspectRatio: '1/1'
+                width: isMobile ? `min(${miniSceneSize}px, 50vw)` : `${miniSceneSize}px`,
+                height: isMobile ? `min(${miniSceneSize}px, 50vw)` : `${miniSceneSize}px`,
+                minWidth: isMobile ? '120px' : '150px',
+                minHeight: isMobile ? '120px' : '150px',
+                maxWidth: 'calc(100vw - 32px)',
+                maxHeight: 'calc(100vh - 200px)',
+                aspectRatio: '1/1',
+                touchAction: 'none'
             }}
+            // Comprehensive event isolation to prevent background 2D view from moving
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerMove={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseMove={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
+            onWheel={(e) => e.stopPropagation()}
+            onContextMenu={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
         >
             {/* Header / Controls */}
-            <div className={`absolute top-0 left-0 right-0 z-10 p-2 flex justify-between items-center pointer-events-none`}>
+            <div className={`absolute top-0 left-0 right-0 z-10 p-1 flex justify-between items-center pointer-events-none`}>
                 <div className="flex gap-1 pointer-events-auto">
                     <button
-                        onClick={() => setMiniSceneSize(Math.max(150, miniSceneSize - 50))}
-                        className={`p-1 rounded-md backdrop-blur-md transition-colors ${isDark ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-100/80 hover:bg-gray-200 text-gray-700'}`}
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                            setMiniSceneSize(Math.max(120, miniSceneSize - 30));
+                        }}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg backdrop-blur-md shadow-sm transition-all active:scale-95 ${isDark ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10' : 'bg-white/80 hover:bg-white text-gray-700 border border-gray-200'}`}
                         title="Reducir tamaño"
                     >
-                        <Minimize2 size={14} />
+                        <Minimize2 size={16} />
                     </button>
                     <button
-                        onClick={() => setMiniSceneSize(Math.min(600, miniSceneSize + 50))}
-                        className={`p-1 rounded-md backdrop-blur-md transition-colors ${isDark ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-100/80 hover:bg-gray-200 text-gray-700'}`}
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                            setMiniSceneSize(Math.min(600, miniSceneSize + 30));
+                        }}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg backdrop-blur-md shadow-sm transition-all active:scale-95 ${isDark ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10' : 'bg-white/80 hover:bg-white text-gray-700 border border-gray-200'}`}
                         title="Aumentar tamaño"
                     >
-                        <Maximize2 size={14} />
+                        <Maximize2 size={16} />
                     </button>
                 </div>
                 <button
-                    onClick={toggleMiniScene}
-                    className={`p-1 rounded-md backdrop-blur-md pointer-events-auto transition-colors ${isDark ? 'bg-red-500/20 hover:bg-red-500/40 text-red-400' : 'bg-red-50/80 hover:bg-red-100 text-red-500'}`}
+                    onPointerDown={(e) => {
+                        e.stopPropagation();
+                        toggleMiniScene();
+                    }}
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg backdrop-blur-md shadow-sm pointer-events-auto transition-all active:scale-95 ${isDark ? 'bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/20' : 'bg-red-50/80 hover:bg-red-100 text-red-500 border border-red-100'}`}
                 >
-                    <X size={16} />
+                    <X size={18} />
                 </button>
             </div>
 
             <Canvas
-                camera={{ position: [-30, 25, 30], fov: 50 }}
                 shadows
+                camera={{ position: [-30, 25, 30], fov: 50 }}
+                gl={{ preserveDrawingBuffer: true, antialias: true }}
                 onPointerMissed={() => selectElement(null)}
-                gl={{ preserveDrawingBuffer: true }}
+                className="w-full h-full"
+                style={{ touchAction: 'none' }}
+                onPointerDown={(e) => e.stopPropagation()}
             >
                 <Suspense fallback={null}>
                     <color attach="background" args={[bgColor]} />
@@ -145,11 +195,8 @@ export default function MiniScene() {
                     })}
 
                     <CameraHandler />
-                    <OrbitControls makeDefault enableDamping dampingFactor={0.1} />
+                    <MiniOrbitControls />
 
-                    <GizmoHelper alignment="bottom-right" margin={[60, 60]}>
-                        <GizmoViewport axisColors={['#ef4444', '#10b981', '#3b82f6']} labelColor="white" />
-                    </GizmoHelper>
                 </Suspense>
             </Canvas>
         </div>

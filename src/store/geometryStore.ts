@@ -159,7 +159,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         }
     })),
 
-    showMiniScene: true,
+    showMiniScene: false,
     toggleMiniScene: () => set((state) => ({ showMiniScene: !state.showMiniScene })),
     miniSceneSize: 250,
     setMiniSceneSize: (size) => set({ miniSceneSize: size }),
