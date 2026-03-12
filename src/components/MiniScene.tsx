@@ -52,8 +52,10 @@ function MiniOrbitControls() {
         <OrbitControls
             makeDefault
             enableDamping
-            dampingFactor={0.1}
+            dampingFactor={0.05}
             domElement={gl.domElement}
+            rotateSpeed={1.0}
+            screenSpacePanning={true}
         />
     );
 }
@@ -84,7 +86,7 @@ export default function MiniScene() {
 
     return (
         <div
-            className={`fixed top-32 md:top-6 right-4 z-[100] rounded-xl overflow-hidden shadow-2xl border transition-all duration-300 ${isDark ? 'border-white/20 bg-gray-900/90 backdrop-blur-md' : 'border-gray-200 bg-white/90 backdrop-blur-md'}`}
+            className={`fixed top-32 md:top-6 right-4 z-[100] rounded-xl overflow-hidden shadow-2xl border transition-all duration-300 ${isDark ? 'border-white/20 bg-gray-900/90 backdrop-blur-md' : 'border-gray-200 bg-white/90 backdrop-blur-md'} select-none pointer-events-auto`}
             style={{
                 width: isMobile ? `min(${miniSceneSize}px, 50vw)` : `${miniSceneSize}px`,
                 height: isMobile ? `min(${miniSceneSize}px, 50vw)` : `${miniSceneSize}px`,
@@ -95,18 +97,13 @@ export default function MiniScene() {
                 aspectRatio: '1/1',
                 touchAction: 'none'
             }}
-            // Comprehensive event isolation to prevent background 2D view from moving
+            // Only stop 'down' and 'wheel' to prevent background drag/zoom.
+            // Letting 'move' events flow fixes the "click-then-move" rotation issue.
             onPointerDown={(e) => e.stopPropagation()}
-            onPointerMove={(e) => e.stopPropagation()}
-            onPointerUp={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
-            onMouseMove={(e) => e.stopPropagation()}
-            onMouseUp={(e) => e.stopPropagation()}
-            onWheel={(e) => e.stopPropagation()}
-            onContextMenu={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
-            onTouchMove={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
+            onWheel={(e) => e.stopPropagation()}
+            onContextMenu={(e) => e.preventDefault()}
         >
             {/* Header / Controls */}
             <div className={`absolute top-0 left-0 right-0 z-10 p-1 flex justify-between items-center pointer-events-none`}>
@@ -150,7 +147,6 @@ export default function MiniScene() {
                 onPointerMissed={() => selectElement(null)}
                 className="w-full h-full"
                 style={{ touchAction: 'none' }}
-                onPointerDown={(e) => e.stopPropagation()}
             >
                 <Suspense fallback={null}>
                     <color attach="background" args={[bgColor]} />
