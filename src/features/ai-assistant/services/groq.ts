@@ -17,7 +17,6 @@ export class GroqService {
         await rateLimiter.checkLimit();
         colorManager.reset();
 
-        // 1. Get Current Context (The "Vision" of the AI)
         const elements: any[] = useGeometryStore.getState().elements;
         const contextDescription = elements.length > 0
             ? "ELEMENTOS EN EL LIENZO:\n" + elements.map(el => {
@@ -52,7 +51,6 @@ export class GroqService {
                             content: userPrompt
                         }
                     ],
-                    // ... remainder of file unchanged
                     temperature: 0.1,
                     max_tokens: 2000,
                 }),
@@ -65,14 +63,8 @@ export class GroqService {
 
             const data = await response.json();
             const text = data.choices[0].message.content;
-
-            console.log('Groq Response:', text);
-
             const steps = this.parseResponseToSteps(text);
-
             const cleanText = this.cleanResponseText(text, steps.length > 0);
-
-            console.log('Parsed Steps:', steps);
 
             return {
                 explanation: cleanText || "¡Hecho! Aquí tienes la construcción.",
@@ -80,16 +72,66 @@ export class GroqService {
             };
         } catch (error: any) {
             console.error('Groq API Error:', error);
+            throw error;
+        }
+    }
 
-            if (error.message?.includes('quota') || error.message?.includes('rate')) {
-                throw new Error('Límite de API alcanzado. Espera unos segundos.');
+    async scanImage(imageData: string): Promise<AIResponse> {
+        await rateLimiter.checkLimit();
+        colorManager.reset();
+
+        const SCAN_PROMPT = `Analiza esta imagen de un ejercicio de Sistema Diédrico hecho a mano. 
+Extrae la geometría y el texto (el enunciado).
+Devuelve el enunciado extraído y los elementos geométricos detectados (puntos, rectas, planos) en el formato de funciones solicitado.
+Si hay texto manuscrito con nombres de puntos (Ej: A, A', A''), úsalos.`;
+
+        try {
+            const response = await fetch(this.baseUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.2-11b-vision-preview',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: SYSTEM_PROMPT
+                        },
+                        {
+                            role: 'user',
+                            content: [
+                                { type: 'text', text: SCAN_PROMPT },
+                                {
+                                    type: 'image_url',
+                                    image_url: { url: imageData }
+                                }
+                            ]
+                        }
+                    ],
+                    temperature: 0.1,
+                    max_tokens: 2000,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'Error calling Groq API for Vision');
             }
 
-            if (error.message?.includes('auth') || error.message?.includes('401')) {
-                throw new Error('API key inválida. Verifica tu configuración.');
-            }
+            const data = await response.json();
+            const text = data.choices[0].message.content;
+            const steps = this.parseResponseToSteps(text);
+            const cleanText = this.cleanResponseText(text, steps.length > 0);
 
-            throw new Error(`Error de IA: ${error.message || 'Desconocido'}`);
+            return {
+                explanation: cleanText || "Imagen analizada correctamente.",
+                steps,
+            };
+        } catch (error: any) {
+            console.error('Groq Vision API Error:', error);
+            throw error;
         }
     }
 

@@ -41,6 +41,43 @@ export default function MainApp() {
                     }, '*');
                 }
             }
+
+            if (event.data?.type === 'DIGITIZE_IMAGE') {
+                const { image, corners } = event.data;
+                try {
+                    // Import service dynamically to avoid circular deps if any
+                    const { aiService } = await import('./features/ai-assistant/services/aiService');
+                    const result = await aiService.scanImage(image);
+                    
+                    if (iframeRef.current && iframeRef.current.contentWindow) {
+                        iframeRef.current.contentWindow.postMessage({
+                            type: 'DIGITIZATION_RESULT',
+                            text: result.explanation,
+                            elements: result.steps
+                        }, '*');
+                    }
+                } catch (error) {
+                    console.error('Scan error:', error);
+                }
+            }
+
+            if (event.data?.type === 'INSERT_INTO_MAIN') {
+                const { elements: newElements, viewMode: targetView } = event.data;
+                const { addElement, setViewMode: updateView } = useGeometryStore.getState();
+                
+                newElements.forEach((el: any) => {
+                    if (el.type === 'point') {
+                        addElement({
+                            type: 'point',
+                            name: el.name,
+                            coords: el.coords,
+                            color: '#3498db'
+                        } as any);
+                    }
+                });
+                
+                if (targetView) updateView(targetView);
+            }
         };
 
         window.addEventListener('message', handleMessage);

@@ -25,6 +25,13 @@ export class AIService {
     async solveExercise(prompt: string, systemPromptOverride?: string): Promise<AIResponse> {
         return this.service.solveExercise(prompt, systemPromptOverride);
     }
+
+    async scanImage(imageData: string): Promise<AIResponse> {
+        if ('scanImage' in this.service) {
+            return (this.service as any).scanImage(imageData);
+        }
+        throw new Error('El servicio de IA actual no soporta escaneo de imágenes.');
+    }
 }
 
 export const aiService = new AIService();

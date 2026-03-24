@@ -14,27 +14,27 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0
-        }
-
-        :root {
-            --bg: #0f1117;
-            --surface: #1a1d27;
-            --surface2: #232733;
-            --border: #2e3346;
-            --text: #e4e6ed;
-            --text-dim: #8b90a5;
+        }        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface2: #334155;
             --accent: #6c8cff;
-            --accent-glow: rgba(108, 140, 255, .15);
-            --red: #ff6b6b;
-            --green: #51cf66;
-            --orange: #ffa94d;
+            --accent-glow: rgba(108, 140, 255, 0.15);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(148, 163, 184, 0.1);
+            --danger: #ef4444;
+            --success: #10b981;
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
             color: var(--text);
-            min-height: 100vh
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .app {
@@ -43,15 +43,53 @@
             overflow: hidden
         }
 
-        /* ===== SIDEBAR ===== */
+        /* Responsive Sidebar */
         .sidebar {
-            width: 380px;
-            min-width: 380px;
-            background: var(--surface);
+            width: 320px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 0; display: none; }
+        }
+
+        .btn {
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, #1d4ed8, #0ea5e9); 
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4); }
+
+        .btn-ghost {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { background: var(--surface); border-color: var(--accent); }
+
+        .p-tag:hover {
+            transform: scale(1.05);
+            background: var(--accent-glow);
+            border-color: var(--accent) !important;
         }
 
         .sidebar-header {
@@ -788,9 +826,15 @@
             </div>
 
             <div class="sheet-list" id="sheetList"></div>
-            <button class="batch-btn" onclick="openBatchModal()">📋 Importar varios ejercicios</button>
+            <button class="batch-btn" onclick="openBatchModal()">📋 Importar en bloque</button>
             <button class="add-sheet-btn" onclick="addSheet()">＋ Nueva hoja vacía</button>
-            <button class="format-btn" onclick="openFormatModal()">🎨 Personalizar lámina</button>
+            <button class="format-btn" onclick="openFormatModal()" style="margin-bottom:4px">🎨 Personalizar lámina</button>
+            <!-- 
+            <button class="batch-btn" onclick="openScanModal()" 
+                style="margin: 0 10px 10px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(147, 51, 234, 0.25)); border: 1px solid rgba(147, 51, 234, 0.5); color: #fff; box-shadow: 0 0 15px rgba(147, 51, 234, 0.2); font-weight:700">
+                📷 Escanear con Foto (Cálco)
+            </button> 
+            -->
 
             <div class="global-config">
                 <h2>Configuración global</h2>
@@ -806,7 +850,7 @@
                     </div>
                 </div>
                 <div class="cfg-row-toggle">
-                    <input type="checkbox" id="gridVisible" checked onclick="toggleGrid()">
+                    <input type="checkbox" id="gridVisible" onclick="toggleGrid()">
                     <label for="gridVisible">Mostrar cuadrícula</label>
                 </div>
                 <div class="cfg-row">
@@ -835,6 +879,11 @@
                     oninput="onInputChange()"></textarea>
                 <div class="editor-actions">
                     <button class="btn btn-primary" onclick="analyzeActive()">🔍 Analizar</button>
+                    <!-- 
+                    <button class="btn btn-ghost" style="border-color: #51cf66; color: #51cf66;" onclick="exportToMainApp()">
+                        🚀 Cargar en Escena Principal
+                    </button> 
+                    -->
                     <div style="display:flex; align-items:center; gap:8px; margin-left:auto">
                         <div style="display:flex; align-items:center; gap:4px">
                             <label style="font-size:11px; color:var(--text-dim)">Origen:</label>
@@ -857,6 +906,15 @@
                         <button class="btn btn-ghost" style="padding:4px 8px; font-size:10px"
                             onclick="runAutoScale()">Auto</button>
                     </div>
+                </div>
+                
+                <!-- 
+                <div id="elementList" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; padding:10px; background:var(--bg); border-radius:8px; border:1px solid var(--border)">
+                    <span style="font-size:11px; color:var(--text-dim); width:100%; margin-bottom:4px">Puntos detectados (clic para renombrar):</span>
+                </div> 
+                -->
+                
+                <div class="editor-actions" style="margin-top:5px">
                     <span class="example-link" onclick="loadExample()">Cargar ejemplo</span>
                     <span id="editorStatus" class="status-warn"></span>
                 </div>
@@ -921,15 +979,15 @@
                             onchange="updateFormat()"> Leyenda (PV/PH)</label>
                     <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowTitle" checked
                             onchange="updateFormat()"> Título ejercicio</label>
-                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowScale" checked
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowScale"
                             onchange="updateFormat()"> Info escala</label>
-                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShow3D" checked
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShow3D"
                             onchange="updateFormat()"> Mini-vista 3D</label>
-                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowPageNum" checked
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowPageNum"
                             onchange="updateFormat()"> Num. Hoja</label>
                     <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowGuides" checked
                             onchange="updateFormat()"> Mostrar Guías de Ayuda</label>
-                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowFrame" checked
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowFrame"
                             onchange="updateFormat()"> Mostrar Marco/Rectángulo</label>
                 </div>
             </div>
@@ -955,6 +1013,45 @@
         </div>
     </div>
 
+    <!-- Scan Photo Modal -->
+    <div class="modal-overlay" id="scanModal">
+        <div class="modal" style="width: 800px; max-width: 95vw;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+                <h2>📷 Digitalizar desde Foto</h2>
+                <button class="btn btn-ghost" onclick="closeScanModal()">✕</button>
+            </div>
+            <p>Sube una foto de tu ejercicio. El algoritmo intentará aplanar la perspectiva y detectar los elementos.</p>
+            
+            <div id="scanStep1" style="display: flex; flex-direction: column; gap: 15px; align-items: center; padding: 20px;">
+                <div style="width: 100%; height: 200px; border: 2px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: var(--bg);" onclick="document.getElementById('photoInput').click()">
+                    <span style="font-size: 40px; margin-bottom: 10px;">📤</span>
+                    <span style="font-size: 14px; color: var(--text-dim);">Haz clic para subir foto o arrastra aquí</span>
+                    <input type="file" id="photoInput" hidden accept="image/*" onchange="handlePhotoUpload(event)">
+                </div>
+            </div>
+
+            <div id="scanStep2" style="display: none; flex-direction: column; gap: 10px;">
+                <div style="position: relative; background: #000; border-radius: 8px; overflow: hidden; display: flex; justify-content: center;">
+                    <canvas id="scanCanvas" style="max-width: 100%; max-height: 60vh; cursor: crosshair;"></canvas>
+                    <div id="scanInstructions" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 4px; font-size: 11px;"></div>
+                </div>
+                <div class="modal-actions" style="justify-content: space-between;">
+                    <div id="scanToolbar" style="font-size: 11px; color: var(--accent);">Paso: Selecciona las 4 esquinas del papel</div>
+                    <div>
+                        <button class="btn btn-ghost" onclick="resetScan()">Reiniciar</button>
+                        <button class="btn btn-primary" id="processScanBtn" disabled onclick="nextScanStep()">Continuar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scanStep3" style="display: none; flex-direction: column; align-items: center; gap: 15px; padding: 30px;">
+                <div class="ai-loader" style="display: block; width: 40px; height: 40px; border-width: 3px; border-top-color: #a78bfa;"></div>
+                <p style="color: #a78bfa; font-weight: 600;">Procesando imagen y detectando geometría...</p>
+                <span id="scanStatusText" style="font-size: 11px; opacity: 0.7;">Calculando homografía y filtrando ruido...</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==================== GLOBALS ====================
         const DPI = 96, MM = DPI / 25.4;
@@ -969,15 +1066,290 @@
             fontSizeLabels: 10,
             showLegend: true,
             showTitle: true,
-            showScale: true,
-            show3D: true,
+            showScale: false,
+            show3D: false,
             showGuides: true,
-            showPageNum: true,
-            showFrame: true,
+            showPageNum: false,
+            showFrame: false,
             pageSize: 'A4'
         };
 
-        function getLtPos() { return parseFloat(document.getElementById('gLtPos').value) || 50; }
+        // The original getLtPos function is replaced by the new scanning logic for origin.
+        // For sheets not created by scan, we'll use a default or previous value.
+        function getLtPos() { return parseFloat(document.getElementById('gLtPos')?.value) || 50; }
+
+        // ==================== SCANNING & DIGITALIZATION (NO AI) ====================
+        let scanImage = null;
+        let scanCorners = [];
+        let scanLT = []; // Two points for LT
+        let scanOrigin = null; // One point for Origin
+        let scanMode = 'corners'; // 'corners', 'lt', 'origin'
+        
+        const scanStepsDict = {
+            'corners': 'Marca las 4 esquinas del papel (Reloj: Sup-Izq -> Sup-Der -> Inf-Der -> Inf-Izq)',
+            'lt': 'Marca 2 puntos de la Línea de Tierra (LT) en el dibujo',
+            'origin': 'Marca el punto Origen (O) sobre la Línea de Tierra'
+        };
+
+        function openScanModal() { document.getElementById('scanModal').classList.add('open'); resetScan(); }
+        function closeScanModal() { document.getElementById('scanModal').classList.remove('open'); }
+        
+        function resetScan() {
+            scanCorners = [];
+            scanLT = [];
+            scanOrigin = null;
+            scanMode = 'corners';
+            scanImage = null;
+            document.getElementById('scanStep1').style.display = 'flex';
+            document.getElementById('scanStep2').style.display = 'none';
+            document.getElementById('scanStep3').style.display = 'none';
+            document.getElementById('photoInput').value = '';
+            document.getElementById('processScanBtn').innerText = 'Continuar';
+            document.getElementById('processScanBtn').disabled = true;
+            document.getElementById('scanInstructions').innerText = scanStepsDict[scanMode];
+            document.getElementById('scanToolbar').innerText = `Paso: ${scanMode === 'corners' ? 'Seleccionar esquinas' : scanMode === 'lt' ? 'Seleccionar LT' : 'Seleccionar Origen'}`;
+        }
+
+        function handlePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (re) => {
+                const img = new Image();
+                img.onload = () => {
+                    scanImage = img;
+                    document.getElementById('scanStep1').style.display = 'none';
+                    document.getElementById('scanStep2').style.display = 'flex';
+                    setupScanCanvas();
+                };
+                img.src = re.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setupScanCanvas() {
+            const canvas = document.getElementById('scanCanvas');
+            const instructions = document.getElementById('scanInstructions');
+            const toolbar = document.getElementById('scanToolbar');
+            instructions.innerText = scanStepsDict[scanMode];
+            toolbar.innerText = `Paso: ${scanMode === 'corners' ? 'Seleccionar esquinas' : scanMode === 'lt' ? 'Seleccionar LT' : 'Seleccionar Origen'}`;
+
+            const maxW = 1000, maxH = 1000;
+            let w = scanImage.width, h = scanImage.height;
+            if (w > maxW) { h = h * (maxW / w); w = maxW; }
+            if (h > maxH) { w = w * (maxH / h); h = maxH; }
+            canvas.width = w; canvas.height = h;
+            
+            drawScanUI();
+
+            canvas.onclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                if (scanMode === 'corners') {
+                    if (scanCorners.length < 4) scanCorners.push({ x, y });
+                    if (scanCorners.length === 4) document.getElementById('processScanBtn').disabled = false;
+                } else if (scanMode === 'lt') {
+                    if (scanLT.length < 2) scanLT.push({ x, y });
+                    if (scanLT.length === 2) document.getElementById('processScanBtn').disabled = false;
+                } else if (scanMode === 'origin') {
+                    scanOrigin = { x, y };
+                    document.getElementById('processScanBtn').disabled = false;
+                    document.getElementById('processScanBtn').innerText = 'Finalizar y Calcar';
+                }
+                drawScanUI();
+            };
+        }
+
+        function drawScanUI() {
+            const canvas = document.getElementById('scanCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(scanImage, 0, 0, canvas.width, canvas.height);
+            
+            // Draw Corners
+            ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 2;
+            ctx.fillStyle = '#a78bfa';
+            scanCorners.forEach((c, i) => {
+                ctx.beginPath(); ctx.arc(c.x, c.y, 6, 0, Math.PI * 2); ctx.fill();
+                if (i > 0) { ctx.moveTo(scanCorners[i-1].x, scanCorners[i-1].y); ctx.lineTo(c.x, c.y); ctx.stroke(); }
+                if (i === 3) { ctx.moveTo(c.x, c.y); ctx.lineTo(scanCorners[0].x, scanCorners[0].y); ctx.stroke(); }
+            });
+
+            // Draw LT
+            ctx.strokeStyle = '#ff6b6b'; ctx.lineWidth = 3;
+            ctx.fillStyle = '#ff6b6b';
+            scanLT.forEach(c => { ctx.beginPath(); ctx.arc(c.x, c.y, 6, 0, Math.PI * 2); ctx.fill(); });
+            if (scanLT.length === 2) {
+                ctx.beginPath(); ctx.moveTo(scanLT[0].x, scanLT[0].y); ctx.lineTo(scanLT[1].x, scanLT[1].y); ctx.stroke();
+            }
+
+            // Draw Origin
+            if (scanOrigin) {
+                ctx.fillStyle = '#51cf66'; ctx.beginPath(); ctx.arc(scanOrigin.x, scanOrigin.y, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('O', scanOrigin.x, scanOrigin.y + 4);
+            }
+        }
+
+        function nextScanStep() {
+            if (scanMode === 'corners') {
+                scanMode = 'lt';
+                document.getElementById('processScanBtn').disabled = true;
+            } else if (scanMode === 'lt') {
+                scanMode = 'origin';
+                document.getElementById('processScanBtn').disabled = true;
+            } else {
+                processScanAlgorithm();
+                return; // Exit after processing
+            }
+            setupScanCanvas();
+        }
+
+        async function processScanAlgorithm() {
+            document.getElementById('scanStep2').style.display = 'none';
+            document.getElementById('scanStep3').style.display = 'flex';
+            
+            // Wait a bit to show loader
+            setTimeout(() => {
+                // 1. Create Flattened Image
+                const result = runDigitalizationPipeline();
+                
+                // 2. Create Sheet
+                addSheet('Calco Digitalizado', false);
+                const lastSheet = sheets[sheets.length - 1];
+                
+                // Map coordinates
+                lastSheet.originX = result.originX;
+                lastSheet.originY = result.originY;
+                lastSheet.points = result.points;
+                lastSheet.text = "Ejercicio digitalizado desde foto.\n\n" + 
+                    result.points.map(p => `Punto ${p.name} (${p.x.toFixed(1)}, ${p.alej.toFixed(1)}, ${p.cota.toFixed(1)})`).join('\n');
+                
+                renderSheet(lastSheet);
+                closeScanModal();
+            }, 800);
+        }
+
+        function runDigitalizationPipeline() {
+            const canvas = document.getElementById('scanCanvas');
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            
+            // 1. Thresholding: find dark pixels
+            const threshold = 80; // Dark threshold
+            const darkPixels = [];
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i+1], b = data[i+2];
+                const lum = (r + g + b) / 3;
+                if (lum < threshold) {
+                    const idx = i / 4;
+                    darkPixels.push({ x: idx % canvas.width, y: Math.floor(idx / canvas.width) });
+                }
+            }
+
+            // 2. Clustering (Simple Blob Detection)
+            const blobs = [];
+            const visited = new Set();
+            const distSq = (p1, p2) => (p1.x - p2.x)**2 + (p1.y - p2.y)**2;
+            const clusterDist = 15**2;
+
+            for (const p of darkPixels) {
+                const key = `${p.x},${p.y}`;
+                if (visited.has(key)) continue;
+                
+                // New blob
+                const blob = [p];
+                visited.add(key);
+                
+                // Growing (Breadth-first search simplified)
+                for (let j = 0; j < blob.length; j++) {
+                    const curr = blob[j];
+                    for (const other of darkPixels) {
+                        const oKey = `${other.x},${other.y}`;
+                        if (!visited.has(oKey) && distSq(curr, other) < clusterDist) {
+                            visited.add(oKey);
+                            blob.push(other);
+                            if (blob.length > 300) break; // Limit size
+                        }
+                    }
+                }
+                
+                if (blob.length > 5 && blob.length < 500) {
+                    const sumX = blob.reduce((a, b) => a + b.x, 0);
+                    const sumY = blob.reduce((a, b) => a + b.y, 0);
+                    blobs.push({ x: sumX / blob.length, y: sumY / blob.length });
+                }
+            }
+
+            // 3. Mapping: Blobs to Diedrico Coordinates
+            // Scale: assume some standard mm/pixels based on A4 corners
+            const paperWidthPx = Math.sqrt(distSq(scanCorners[0], scanCorners[1]));
+            const pixelsPerMm = paperWidthPx / 210; // A4 width is 210mm
+            
+            const originX = scanOrigin.x;
+            const originY = scanOrigin.y;
+            
+            // Find LT orientation to rotate if needed
+            const dx = scanLT[1].x - scanLT[0].x;
+            const dy = scanLT[1].y - scanLT[0].y;
+            const angle = Math.atan2(dy, dx);
+            
+            const detectedPoints = [];
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            
+            // For now, map each blob to a point
+            // In Diédrico:
+            // X = horizontal offset from origin
+            // Y = alejamiento (positive is BELOW LT)
+            // Z = cota (positive is ABOVE LT)
+            
+            // Group blobs by vertical lines (belonging to same point A, A', A'')
+            const pointsMap = {}; // { x_coord: [blobs] }
+            
+            blobs.forEach(b => {
+                // Rotate to align with LT
+                const rx = (b.x - originX) * Math.cos(-angle) - (b.y - originY) * Math.sin(-angle);
+                const ry = (b.x - originX) * Math.sin(-angle) + (b.y - originY) * Math.cos(-angle);
+                
+                const ux = rx / pixelsPerMm;
+                const ur = ry / pixelsPerMm; // Vertical distance from LT
+                
+                // Snap points horizontally
+                const key = Math.round(ux / 2) * 2;
+                if (!pointsMap[key]) pointsMap[key] = [];
+                pointsMap[key].push({ x: ux, v: -ur }); // v > 0 is above LT (cota)
+            });
+
+            let pIdx = 0;
+            for (const xKey in pointsMap) {
+                const group = pointsMap[xKey];
+                const name = alphabet[pIdx % alphabet.length];
+                const cota = group.find(b => b.v > 1)?.v || 0;
+                const alej = group.find(b => b.v < -1)?.v || 0;
+                
+                detectedPoints.push({ name, x: group[0].x, alej: -alej, cota: cota });
+                pIdx++;
+            }
+
+            return {
+                originX: (scanOrigin.x / canvas.width) * 100, 
+                originY: (scanOrigin.y / canvas.height) * 100,
+                points: detectedPoints
+            };
+        }
+
+        // Listen for messages from parent (Not needed for No-AI, but keeping bridge for compatibility)
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'DIGITIZATION_RESULT') {
+                // This branch would be for an external AI service.
+                // For the internal "no AI" pipeline, processScanAlgorithm handles it.
+                const { text, elements } = event.data;
+                addSheet(text || 'Cáculo digitalizado', true);
+                closeScanModal();
+            }
+        });
 
         // ==================== SHEET MANAGEMENT ====================
         function addSheet(text = '', autoAnalyze = false, steps = null, explanation = null) {
@@ -1027,8 +1399,53 @@
                 // Scroll preview to this page
                 const el = document.getElementById('page-' + id);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                renderElementList(sheet);
             }
             renderSidebar();
+        }
+
+        function renderElementList(sheet) {
+            const list = document.getElementById('elementList');
+            if (!sheet.points.length) {
+                list.style.display = 'none';
+                return;
+            }
+            list.style.display = 'flex';
+            list.innerHTML = `<span style="font-size:11px; color:var(--text-dim); width:100%; margin-bottom:4px">Puntos detectados (clic para renombrar):</span>` + 
+                sheet.points.map((p, i) => {
+                    return `<div class="p-tag" style="background:var(--accent-glow); color:var(--accent); padding:4px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:700; border:1px solid rgba(108, 140, 255, 0.3)" onclick="renamePoint(${i})">${p.name}</div>`;
+                }).join('');
+        }
+
+        function renamePoint(idx) {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet) return;
+            const p = sheet.points[idx];
+            const newName = prompt(`Cambiar nombre de punto ${p.name}:`, p.name);
+            if (newName && newName.trim()) {
+                p.name = newName.trim().toUpperCase();
+                renderSheet(sheet);
+                renderElementList(sheet);
+                saveProject();
+            }
+        }
+
+        function exportToMainApp() {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet || !sheet.points.length) return alert('No hay elementos para exportar.');
+            
+            if (confirm('¿Quieres cargar estos puntos y rectas en el lienzo interactivo principal?')) {
+                window.parent.postMessage({
+                    type: 'INSERT_INTO_MAIN',
+                    elements: sheet.points.map(p => ({
+                        type: 'point',
+                        name: p.name,
+                        coords: { x: p.x, y: p.alej, z: p.cota }
+                    })),
+                    viewMode: '2d'
+                }, '*');
+            }
         }
 
         function renumberPages() {
@@ -1398,6 +1815,7 @@
             renderSheet(sheet);
             if (sheet.canvas3d) render3D(sheet);
             renderSidebar();
+            if (sheet.id === activeId) renderElementList(sheet);
             saveProject();
         }
 
