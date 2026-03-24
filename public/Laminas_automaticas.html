@@ -835,10 +835,25 @@
                     oninput="onInputChange()"></textarea>
                 <div class="editor-actions">
                     <button class="btn btn-primary" onclick="analyzeActive()">🔍 Analizar</button>
-                    <div style="display:flex; align-items:center; gap:6px; margin-left:auto">
-                        <label style="font-size:11px; color:var(--text-dim)">Escala:</label>
-                        <input type="number" id="manualScale" value="1.0" min="0.1" max="10" step="0.1"
-                            style="width:50px" oninput="onManualScale()">
+                    <div style="display:flex; align-items:center; gap:8px; margin-left:auto">
+                        <div style="display:flex; align-items:center; gap:4px">
+                            <label style="font-size:11px; color:var(--text-dim)">Origen:</label>
+                            <div style="position:relative">
+                                <span style="position:absolute; left:4px; top:-8px; font-size:8px; color:var(--text-dim)">X</span>
+                                <input type="number" id="originX" value="50" min="0" max="100" step="1"
+                                    style="width:45px; padding-top:8px" oninput="onOriginUpdate()" title="Posición horizontal (%)">
+                            </div>
+                            <div style="position:relative">
+                                <span style="position:absolute; left:4px; top:-8px; font-size:8px; color:var(--text-dim)">Y</span>
+                                <input type="number" id="originY" value="50" min="0" max="100" step="1"
+                                    style="width:45px; padding-top:8px" oninput="onOriginUpdate()" title="Posición vertical (%)">
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; margin-left:4px">
+                            <label style="font-size:11px; color:var(--text-dim)">Escala:</label>
+                            <input type="number" id="manualScale" value="1.0" min="0.1" max="10" step="0.1"
+                                style="width:50px" oninput="onManualScale()">
+                        </div>
                         <button class="btn btn-ghost" style="padding:4px 8px; font-size:10px"
                             onclick="runAutoScale()">Auto</button>
                     </div>
@@ -876,6 +891,14 @@
                             <option value="bottom">Abajo</option>
                         </select>
                     </div>
+                    <div class="cfg-row">
+                        <label>Tamaño Papel</label>
+                        <select id="fmtPageSize" class="fmt-select" onchange="updateFormat()">
+                            <option value="A3">A3 (Grande)</option>
+                            <option value="A4">A4 (Estándar)</option>
+                            <option value="A5">A5 (Pequeño)</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <h3 style="font-size:12px; margin-bottom:10px; color:var(--accent)">Fuentes (pt)</h3>
@@ -906,6 +929,8 @@
                             onchange="updateFormat()"> Num. Hoja</label>
                     <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowGuides" checked
                             onchange="updateFormat()"> Mostrar Guías de Ayuda</label>
+                    <label class="cfg-row-toggle"><input type="checkbox" id="fmtShowFrame" checked
+                            onchange="updateFormat()"> Mostrar Marco/Rectángulo</label>
                 </div>
             </div>
             <div class="modal-actions">
@@ -947,7 +972,9 @@
             showScale: true,
             show3D: true,
             showGuides: true,
-            showPageNum: true
+            showPageNum: true,
+            showFrame: true,
+            pageSize: 'A4'
         };
 
         function getLtPos() { return parseFloat(document.getElementById('gLtPos').value) || 50; }
@@ -955,7 +982,7 @@
         // ==================== SHEET MANAGEMENT ====================
         function addSheet(text = '', autoAnalyze = false, steps = null, explanation = null) {
             const id = nextId++;
-            const sheet = { id, text, title: '', points: [], lines: [], planes: [], scale: 1, manualScale: true, orient: 'portrait', guides: [], steps: steps || [], solutionExplanation: explanation };
+            const sheet = { id, text, title: '', points: [], lines: [], planes: [], scale: 1, manualScale: true, orient: 'portrait', originX: 50, originY: getLtPos(), guides: [], steps: steps || [], solutionExplanation: explanation };
             sheets.push(sheet);
             if (activeId === null) activeId = id;
             renderSidebar();
@@ -988,6 +1015,8 @@
                 document.getElementById('exerciseInput').value = sheet.text;
                 document.getElementById('editorNum').textContent = `Hoja ${sheets.indexOf(sheet) + 1}`;
                 document.getElementById('manualScale').value = sheet.scale;
+                document.getElementById('originX').value = sheet.originX ?? 50;
+                document.getElementById('originY').value = sheet.originY ?? getLtPos();
 
                 document.getElementById('editorStatus').textContent = sheet.points.length ? `✔ ${sheet.points.length} pto(s), ${sheet.lines.length} recta(s)` : '';
                 document.getElementById('editorStatus').className = sheet.points.length ? 'status-ok' : 'status-warn';
@@ -1042,7 +1071,12 @@
         // ==================== CANVAS CREATION ====================
         function createPageCanvas(sheet) {
             const isPort = sheet.orient === 'portrait';
-            const a4 = { w: 210, h: 297 };
+            const sizeMap = {
+                'A3': { w: 297, h: 420 },
+                'A4': { w: 210, h: 297 },
+                'A5': { w: 148, h: 210 }
+            };
+            const a4 = sizeMap[format.pageSize || 'A4'] || sizeMap['A4'];
             const cw = Math.round((isPort ? a4.w : a4.h) * MM);
             const ch = Math.round((isPort ? a4.h : a4.w) * MM);
             // Display scale to fit nicely (max ~700px wide)
@@ -1259,32 +1293,58 @@
         function autoScaleFor(sheet) {
             if (!sheet.points.length && !sheet.planes.filter(p => p.type === 'coord').length) { sheet.scale = 1; return; }
             const isPort = sheet.orient === 'portrait';
-            const a4 = isPort ? { w: 210, h: 297 } : { w: 297, h: 210 };
+            const sizeMap = {
+                'A3': { w: 297, h: 420 },
+                'A4': { w: 210, h: 297 },
+                'A5': { w: 148, h: 210 }
+            };
+            const a4Size = sizeMap[format.pageSize || 'A4'] || sizeMap['A4'];
+            const a4 = isPort ? { w: a4Size.w, h: a4Size.h } : { w: a4Size.h, h: a4Size.w };
             const mg = 20, pad = 15;
-            const halfW = a4.w / 2 - mg - pad;
-            const pct = getLtPos() / 100;
-            const above = (a4.h - 2 * mg) * pct - pad;
-            const below = (a4.h - 2 * mg) * (1 - pct) - pad;
+            
+            const oX = sheet.originX ?? 50;
+            const oY = sheet.originY ?? getLtPos();
+            
+            const spaceLeft = (a4.w * (oX / 100)) - mg - pad;
+            const spaceRight = (a4.w * (1 - oX / 100)) - mg - pad;
+            const spaceAbove = (a4.h * (oY / 100)) - mg - pad;
+            const spaceBelow = (a4.h * (1 - oY / 100)) - mg - pad;
 
             const xs = [
-                ...sheet.points.map(p => Math.abs(p.x)),
-                ...sheet.planes.filter(p => p.type === 'coord').map(p => Math.abs(p.x))
-            ].filter(v => !isNaN(v));
+                ...sheet.points.map(p => p.x),
+                ...sheet.planes.filter(p => p.type === 'coord').map(p => p.x)
+            ].filter(v => v !== null);
 
             const cs = [
-                ...sheet.points.map(p => p.cota).filter(v => v !== null).map(Math.abs),
-                ...sheet.planes.filter(p => p.type === 'coord').map(p => p.z).filter(v => v !== null).map(Math.abs)
+                ...sheet.points.map(p => p.cota).filter(v => v !== null),
+                ...sheet.planes.filter(p => p.type === 'coord').map(p => p.z).filter(v => v !== null)
             ];
 
             const as = [
-                ...sheet.points.map(p => p.alej).filter(v => v !== null).map(Math.abs),
-                ...sheet.planes.filter(p => p.type === 'coord').map(p => p.y).filter(v => v !== null).map(Math.abs)
+                ...sheet.points.map(p => p.alej).filter(v => v !== null),
+                ...sheet.planes.filter(p => p.type === 'coord').map(p => p.y).filter(v => v !== null)
             ];
 
             const scales = [];
-            if (xs.length && Math.max(...xs) > 0) scales.push(halfW / Math.max(...xs));
-            if (cs.length && Math.max(...cs) > 0) scales.push(above / Math.max(...cs));
-            if (as.length && Math.max(...as) > 0) scales.push(below / Math.max(...as));
+            if (xs.length) {
+                const maxLeft = -Math.min(0, ...xs);
+                const maxRight = Math.max(0, ...xs);
+                if (maxLeft > 0) scales.push(spaceLeft / maxLeft);
+                if (maxRight > 0) scales.push(spaceRight / maxRight);
+            }
+            if (cs.length) {
+                const maxAbove = Math.max(0, ...cs);
+                const maxBelow = -Math.min(0, ...cs);
+                if (maxAbove > 0) scales.push(spaceAbove / maxAbove);
+                if (maxBelow > 0) scales.push(spaceBelow / maxBelow);
+            }
+            if (as.length) {
+                const maxBelow = Math.max(0, ...as);
+                const maxAbove = -Math.min(0, ...as);
+                if (maxBelow > 0) scales.push(spaceBelow / maxBelow);
+                if (maxAbove > 0) scales.push(spaceAbove / maxAbove);
+            }
+            
             const sc = scales.length ? Math.min(...scales) : 1;
             sheet.scale = Math.max(0.3, Math.min(Math.round(sc * 10) / 10, 5));
         }
@@ -1309,6 +1369,15 @@
             sheet.manualScale = false;
             autoScaleFor(sheet);
             document.getElementById('manualScale').value = sheet.scale;
+            renderSheet(sheet);
+            saveProject();
+        }
+
+        function onOriginUpdate() {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet) return;
+            sheet.originX = parseFloat(document.getElementById('originX').value) || 50;
+            sheet.originY = parseFloat(document.getElementById('originY').value) || getLtPos();
             renderSheet(sheet);
             saveProject();
         }
@@ -1407,10 +1476,17 @@
             const a4 = { w: 210, h: 297 };
             const sc = sheet.scale * MM; // 1:1 or manual scale
             const mg = 15 * MM;
-            const ltY = h * (getLtPos() / 100);
-            const ox = w / 2;
+            const startX = format.showFrame ? mg : 0;
+            const endX = format.showFrame ? w - mg : w;
+            const startY = format.showFrame ? mg : 0;
+            const endY = format.showFrame ? h - mg : h;
+
+            const oX = sheet.originX ?? 50;
+            const oY = sheet.originY ?? getLtPos();
+            const ltY = h * (oY / 100);
+            const ox = w * (oX / 100);
             const fs = format.fontSizeLabels * MM / 4, sfs = 8 * MM / 4;
-            const rx = mg, ry = mg, rw = w - 2 * mg, rh = h - 2 * mg;
+            const rx = startX, ry = startY, rw = endX - startX, rh = endY - startY;
 
             function drawLabel(txt, x, y, col, size, halign, valign) {
                 ctx.font = `${size}px 'Inter',sans-serif`;
@@ -1451,8 +1527,10 @@
                 ctx.setLineDash([]);
             }
 
-            ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
-            ctx.strokeRect(mg, mg, rw, rh);
+            if (format.showFrame) {
+                ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(mg, mg, w - 2 * mg, h - 2 * mg);
+            }
 
             // Page number (subtle badge)
             const pageNum = sheets.indexOf(sheet) + 1;
@@ -1490,15 +1568,15 @@
 
             // LT
             ctx.strokeStyle = '#000'; ctx.lineWidth = 1.4;
-            ctx.beginPath(); ctx.moveTo(mg, ltY); ctx.lineTo(w - mg, ltY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(startX, ltY); ctx.lineTo(endX, ltY); ctx.stroke();
             // Terminal markings (small parallel lines below LT)
             ctx.lineWidth = 1; const tLen = 4 * MM, tDist = 2 * MM;
-            ctx.beginPath(); ctx.moveTo(mg, ltY + tDist); ctx.lineTo(mg + tLen, ltY + tDist); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(w - mg, ltY + tDist); ctx.lineTo(w - mg - tLen, ltY + tDist); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(startX, ltY + tDist); ctx.lineTo(startX + tLen, ltY + tDist); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(endX, ltY + tDist); ctx.lineTo(endX - tLen, ltY + tDist); ctx.stroke();
 
             ctx.fillStyle = '#000'; ctx.font = `bold ${11 * MM / 4}px 'Inter',sans-serif`;
             ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
-            ctx.fillText('LT', mg + 3, ltY - 4);
+            ctx.fillText('LT', startX + 3, ltY - 4);
 
             // Origin
             ctx.strokeStyle = '#555'; ctx.lineWidth = 0.8;
@@ -1815,8 +1893,8 @@
                 const boxPad = 4 * MM / 4;
                 const textFontSize = format.fontSizeText * MM / 4;
                 const lineH = textFontSize * 1.45;
-                const boxX = mg + 1;
-                const boxW = rw - 2;
+                const boxX = rx + 5 * MM;
+                const boxW = rw - 10 * MM;
 
                 ctx.font = `${textFontSize}px 'Inter',sans-serif`;
 
@@ -1824,7 +1902,7 @@
                 const linesArr = wrapText(ctx, displayText, boxW - 2 * boxPad, textFontSize);
 
                 const boxH = linesArr.length * lineH + boxPad * 2;
-                let boxY = (format.textPos === 'top') ? mg + 1 : h - mg - boxH - 1;
+                let boxY = (format.textPos === 'top') ? ry + 4 * MM : ry + rh - boxH - 4 * MM;
 
                 // Simple background for text
                 ctx.fillStyle = 'rgba(255,255,255,0.85)';
@@ -2016,14 +2094,20 @@
                 for (let i = 0; i < sheets.length; i++) {
                     const sheet = sheets[i];
                     const isPort = sheet.orient === 'portrait';
-                    const a4 = { w: 210, h: 297 };
+                    const sizeMap = {
+                        'A3': { w: 297, h: 420 },
+                        'A4': { w: 210, h: 297 },
+                        'A5': { w: 148, h: 210 }
+                    };
+                    const a4 = sizeMap[format.pageSize || 'A4'] || sizeMap['A4'];
                     const pw = isPort ? a4.w : a4.h;
                     const ph = isPort ? a4.h : a4.w;
+                    const pdfFormat = (format.pageSize || 'A4').toLowerCase();
 
                     if (!pdf) {
-                        pdf = new jsPDF({ orientation: isPort ? 'portrait' : 'landscape', unit: 'mm', format: 'a4' });
+                        pdf = new jsPDF({ orientation: isPort ? 'portrait' : 'landscape', unit: 'mm', format: pdfFormat });
                     } else {
-                        pdf.addPage('a4', isPort ? 'portrait' : 'landscape');
+                        pdf.addPage(pdfFormat, isPort ? 'portrait' : 'landscape');
                     }
 
                     // Render at high resolution
@@ -2146,6 +2230,8 @@
                 document.getElementById('fmtShow3D').checked = format.show3D !== false;
                 document.getElementById('fmtShowGuides').checked = format.showGuides !== false;
                 document.getElementById('fmtShowPageNum').checked = format.showPageNum !== false;
+                document.getElementById('fmtShowFrame').checked = format.showFrame !== false;
+                document.getElementById('fmtPageSize').value = format.pageSize || 'A4';
 
                 document.querySelectorAll('.orient-btn').forEach(b => b.classList.toggle('active', b.dataset.o === orient));
 
@@ -2175,6 +2261,9 @@
             format.show3D = document.getElementById('fmtShow3D').checked;
             format.showGuides = document.getElementById('fmtShowGuides').checked;
             format.showPageNum = document.getElementById('fmtShowPageNum').checked;
+            format.showFrame = document.getElementById('fmtShowFrame').checked;
+            format.pageSize = document.getElementById('fmtPageSize').value;
+            rebuildAllCanvases();
             renderAll();
             saveProject();
         }
