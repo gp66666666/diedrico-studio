@@ -297,6 +297,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     // Sketch State
     const [activeTool, setActiveTool] = useState<SketchTool>('select');
     const [selectedColor, setSelectedColor] = useState('#000000');
+    const [selectedDash, setSelectedDash] = useState<number[]>([]);
     const [drawingStep, setDrawingStep] = useState(0);
     const [p1, setP1] = useState<{ x: number, y: number } | null>(null);
     const [p2, setP2] = useState<{ x: number, y: number } | null>(null);
@@ -593,7 +594,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         type: 'line',
                         p1: { x: midX, y: midY },
                         p2: { x: p2X, y: p2Y },
-                        color: selectedColor
+                        color: selectedColor,
+                        dash: selectedDash
                     });
                     setDrawingStep(0); setP1(null);
                 }
@@ -629,7 +631,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         type: 'ray',
                         p1: p2, // Starts at Vertex
                         p2: { x: p2.x + dirX, y: p2.y + dirY },
-                        color: selectedColor
+                        color: selectedColor,
+                        dash: selectedDash
                     });
                     setDrawingStep(0); setP1(null); setP2(null);
                 }
@@ -681,7 +684,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             type: 'line',
                             p1: l.p1,
                             p2: l.p2,
-                            color: selectedColor
+                            color: selectedColor,
+                            dash: selectedDash
                         });
                     });
                 }
@@ -700,7 +704,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         id: Math.random().toString(36).substr(2, 9),
                         type: 'ellipse',
                         p1: p1, p2: p2, p3: snapPos,
-                        color: selectedColor
+                        color: selectedColor,
+                        dash: selectedDash
                     });
                     setDrawingStep(0); setP1(null); setP2(null);
                 }
@@ -715,7 +720,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         id: Math.random().toString(36).substr(2, 9),
                         type: 'parabola',
                         p1: p1, p2: snapPos,
-                        color: selectedColor
+                        color: selectedColor,
+                        dash: selectedDash
                     });
                     setDrawingStep(0); setP1(null);
                 }
@@ -731,7 +737,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         id: Math.random().toString(36).substr(2, 9),
                         type: 'hyperbola',
                         p1: p1, p2: p2, p3: snapPos,
-                        color: selectedColor
+                        color: selectedColor,
+                        dash: selectedDash
                     });
                     setDrawingStep(0); setP1(null); setP2(null);
                 }
@@ -752,13 +759,13 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
             return;
         }
         if (activeTool === 'point') {
-            addSketchElement({ id: Math.random().toString(36).substr(2, 9), type: 'point', p1: snapPos, p2: snapPos, color: selectedColor });
+            addSketchElement({ id: Math.random().toString(36).substr(2, 9), type: 'point', p1: snapPos, p2: snapPos, color: selectedColor, dash: selectedDash });
         } else if (activeTool === 'arc') {
             if (drawingStep === 0) { setP1(snapPos); setDrawingStep(1); }
             else if (drawingStep === 1) { setP2(snapPos); setDrawingStep(2); }
             else {
                 if (p1 && p2) {
-                    addSketchElement({ id: Math.random().toString(36).substr(2, 9), type: 'arc', p1: p1, p2: p2, p3: snapPos, color: selectedColor });
+                    addSketchElement({ id: Math.random().toString(36).substr(2, 9), type: 'arc', p1: p1, p2: p2, p3: snapPos, color: selectedColor, dash: selectedDash });
                     setDrawingStep(0); setP1(null); setP2(null);
                 }
             }
@@ -767,7 +774,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
             else {
                 if (p1) {
                     const sides = parseInt(prompt("Número de lados:", "5") || "5");
-                    addSketchElement({ id: Math.random().toString(36).substr(2, 9), type: 'polygon', p1: p1, p2: snapPos, extra: sides, color: selectedColor });
+                    addSketchElement({ id: Math.random().toString(36).substr(2, 9), type: 'polygon', p1: p1, p2: snapPos, extra: sides, color: selectedColor, dash: selectedDash });
                     setDrawingStep(0); setP1(null);
                 }
             }
@@ -846,7 +853,10 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                 addSketchElement({
                     id: Math.random().toString(36).substr(2, 9),
                     type: activeTool as any,
-                    p1: p1, p2: currentMousePos, color: selectedColor
+                    p1: p1, 
+                    p2: currentMousePos, 
+                    color: selectedColor,
+                    dash: selectedDash
                 });
             }
             setP1(null);
@@ -1005,6 +1015,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     setActiveTool={setActiveTool}
                     selectedColor={selectedColor}
                     setSelectedColor={setSelectedColor}
+                    selectedDash={selectedDash}
+                    setSelectedDash={setSelectedDash}
                     isDark={isDark}
                     isHidden={isSidebarOpen}
                 />
@@ -1756,10 +1768,11 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
 function SketchElementRenderer({ element, isDark, onClick, selected }: { element: SketchElement, isDark: boolean, onClick: (e: React.MouseEvent) => void, selected: boolean }) {
     const stroke = selected ? '#3b82f6' : (element.color || (isDark ? '#9ca3af' : '#4b5563'));
     const strokeWidth = selected ? 3 : 2;
-    const commonProps = { stroke, strokeWidth, className: "hover:stroke-blue-500 cursor-pointer transition-colors", onClick };
+    const dashArray = element.dash?.join(',') || '';
+    const commonProps = { stroke, strokeWidth, strokeDasharray: dashArray, className: "hover:stroke-blue-500 cursor-pointer transition-colors", onClick };
 
     switch (element.type) {
-        case 'point': return <circle cx={element.p1.x} cy={element.p1.y} r="4" fill={stroke} {...commonProps} />;
+        case 'point': return <circle cx={element.p1.x} cy={element.p1.y} r="4" fill={stroke} {...commonProps} strokeDasharray="" />;
         case 'text': return <text x={element.p1.x} y={element.p1.y} fill={stroke} fontSize="14" className="select-none cursor-move" onClick={onClick}>{element.text}</text>;
         case 'segment': return <line x1={element.p1.x} y1={element.p1.y} x2={element.p2.x} y2={element.p2.y} fill="none" {...commonProps} />;
         case 'ray':
@@ -1781,16 +1794,16 @@ function SketchElementRenderer({ element, isDark, onClick, selected }: { element
                 <g onClick={onClick} className="cursor-pointer">
                     {/* Fat Invisible Line for Touch */}
                     <line x1={ex1} y1={ey1} x2={ex2} y2={ey2} stroke="transparent" strokeWidth="20" />
-                    <line x1={ex1} y1={ey1} x2={ex2} y2={ey2} fill="none" stroke={stroke} strokeWidth={strokeWidth} className="transition-colors" />
+                    <line x1={ex1} y1={ey1} x2={ex2} y2={ey2} fill="none" {...commonProps} className="transition-colors" />
                 </g>
             );
         case 'circle':
-            const r = Math.hypot(element.p2.x - element.p1.x, element.p2.y - element.p1.y);
+            const r = Math.hypot(element.p1.x - element.p2.x, element.p1.y - element.p2.y);
             return (
                 <g onClick={onClick} className="cursor-pointer">
                     {/* Fat Invisible Circle for Touch */}
                     <circle cx={element.p1.x} cy={element.p1.y} r={r} fill="none" stroke="transparent" strokeWidth="20" />
-                    <circle cx={element.p1.x} cy={element.p1.y} r={r} fill="none" stroke={stroke} strokeWidth={strokeWidth} className="transition-colors" />
+                    <circle cx={element.p1.x} cy={element.p1.y} r={r} fill="none" {...commonProps} className="transition-colors" strokeDasharray={dashArray} />
                 </g>
             );
         case 'arc':
@@ -1804,16 +1817,16 @@ function SketchElementRenderer({ element, isDark, onClick, selected }: { element
             const eyArc = element.p1.y + rArc * Math.sin(endAngle);
             return <path d={`M ${element.p2.x} ${element.p2.y} A ${rArc} ${rArc} 0 ${largeArc} ${sweep} ${exArc} ${eyArc}`} fill="none" {...commonProps} />;
         case 'polygon':
-            const sides = element.extra || 5;
-            const rPoly = Math.hypot(element.p2.x - element.p1.x, element.p2.y - element.p1.y);
-            const angleStep = (Math.PI * 2) / sides;
-            const startAng = Math.atan2(element.p2.y - element.p1.y, element.p2.x - element.p1.x);
-            let points = "";
-            for (let i = 0; i < sides; i++) {
-                const ang = startAng + i * angleStep;
-                points += `${element.p1.x + rPoly * Math.cos(ang)},${element.p1.y + rPoly * Math.sin(ang)} `;
+            const sidesPoly = element.extra || 5;
+            const rPolyVal = Math.hypot(element.p2.x - element.p1.x, element.p2.y - element.p1.y);
+            const angleStepPoly = (Math.PI * 2) / sidesPoly;
+            const startAngPoly = Math.atan2(element.p2.y - element.p1.y, element.p2.x - element.p1.x);
+            let pointsStr = "";
+            for (let i = 0; i < sidesPoly; i++) {
+                const ang = startAngPoly + i * angleStepPoly;
+                pointsStr += `${element.p1.x + rPolyVal * Math.cos(ang)},${element.p1.y + rPolyVal * Math.sin(ang)} `;
             }
-            return <polygon points={points} fill="none" {...commonProps} />;
+            return <polygon points={pointsStr} fill="none" {...commonProps} />;
         case 'ellipse':
             if (!element.p3) return null;
             const rx = Math.hypot(element.p2.x - element.p1.x, element.p2.y - element.p1.y);

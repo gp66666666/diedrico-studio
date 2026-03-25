@@ -65,14 +65,57 @@ export default function MainApp() {
                 const { elements: newElements, viewMode: targetView } = event.data;
                 const { addElement, setViewMode: updateView } = useGeometryStore.getState();
                 
+                // Track created point IDs by name to link lines/segments
+                const pointMap: Record<string, string> = {};
+
+                // FIRST PASS: Points
                 newElements.forEach((el: any) => {
                     if (el.type === 'point') {
+                        const id = Math.random().toString(36).substr(2, 9);
                         addElement({
+                            id,
                             type: 'point',
                             name: el.name,
                             coords: el.coords,
-                            color: '#3498db'
+                            color: '#3498db',
+                            visible: true
                         } as any);
+                        if (el.name) pointMap[el.name] = id;
+                    }
+                });
+
+                // SECOND PASS: Lines and Planes
+                newElements.forEach(async (el: any) => {
+                    if (el.type === 'line' || el.type === 'segment') {
+                        // We use segments if we have two points
+                        if (el.p1 && el.p2) {
+                            const p1 = newElements.find((p: any) => p.name === el.p1)?.coords;
+                            const p2 = newElements.find((p: any) => p.name === el.p2)?.coords;
+                            if (p1 && p2) {
+                                addElement({
+                                    type: 'segment',
+                                    name: el.name || 'r',
+                                    p1,
+                                    p2,
+                                    color: '#e67e22',
+                                    visible: true
+                                } as any);
+                            }
+                        }
+                    } else if (el.type === 'plane') {
+                        // Convert intercepts to normal/constant
+                        const { calculatePlaneFromIntercepts } = await import('./utils/mathUtils');
+                        const planeData = calculatePlaneFromIntercepts(el.intercepts.x, el.intercepts.y, el.intercepts.z);
+                        if (planeData) {
+                            addElement({
+                                type: 'plane',
+                                name: el.name,
+                                normal: planeData.normal,
+                                constant: planeData.constant,
+                                color: '#2ecc71',
+                                visible: true
+                            } as any);
+                        }
                     }
                 });
                 

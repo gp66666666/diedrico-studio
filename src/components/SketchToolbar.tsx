@@ -12,11 +12,18 @@ interface SketchToolbarProps {
     setActiveTool: (tool: SketchTool) => void;
     selectedColor: string;
     setSelectedColor: (color: string) => void;
+    selectedDash: number[];
+    setSelectedDash: (dash: number[]) => void;
     isDark: boolean;
     isHidden?: boolean;
 }
 
 const COLORS = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#eab308', '#a855f7', '#ec4899', '#ffffff'];
+const DASH_STYLES = [
+    { label: 'Continua', value: [], icon: <div className="w-6 h-[2px] bg-current" /> },
+    { label: 'Discontinua', value: [10, 5], icon: <div className="w-6 h-[2px] border-b-2 border-dashed border-current" /> },
+    { label: 'Puntos', value: [2, 4], icon: <div className="w-6 h-[2px] border-b-2 border-dotted border-current" /> }
+];
 
 type ToolGroup = {
     id: string;
@@ -85,7 +92,7 @@ const TOOL_GROUPS: ToolGroup[] = [
     }
 ];
 
-export default function SketchToolbar({ activeTool, setActiveTool, selectedColor, setSelectedColor, isDark, isHidden }: SketchToolbarProps) {
+export default function SketchToolbar({ activeTool, setActiveTool, selectedColor, setSelectedColor, selectedDash, setSelectedDash, isDark, isHidden }: SketchToolbarProps) {
     const [expandedGroup, setExpandedGroup] = useState<string | null>('basic');
 
     const bgClass = isDark ? 'bg-gray-800/90 backdrop-blur-md border-gray-700 text-gray-200' : 'bg-white/90 backdrop-blur-md border-gray-200 text-gray-700';
@@ -142,6 +149,29 @@ export default function SketchToolbar({ activeTool, setActiveTool, selectedColor
 
                 <div className={`h-px my-1 w-full ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
 
+                {/* Line Style Selection (Desktop) */}
+                <div className="flex flex-col gap-2 p-1">
+                    <div className="flex items-center gap-3 p-1">
+                        <Pencil size={18} />
+                        <span className="text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">Trazo</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        {DASH_STYLES.map(style => (
+                            <button
+                                key={style.label}
+                                onClick={() => setSelectedDash(style.value)}
+                                className={`flex items-center gap-3 p-2 rounded-lg text-xs transition-all w-full border ${JSON.stringify(selectedDash) === JSON.stringify(style.value) ? activeClass : hoverClass}`}
+                                title={style.label}
+                            >
+                                <div className="min-w-[20px] flex justify-center">{style.icon}</div>
+                                <span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">{style.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className={`h-px my-1 w-full ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
+
                 {/* Color Picker (Desktop) */}
                 <div className="flex flex-col gap-2 p-1">
                     <div className="flex items-center gap-3 p-1">
@@ -177,17 +207,32 @@ export default function SketchToolbar({ activeTool, setActiveTool, selectedColor
                             </button>
                         ))}
                     </div>
-                    {/* Mobile Color Picker Bar */}
-                    <div className={`flex items-center gap-2 p-2 border-t overflow-x-auto ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <Palette size={16} className="min-w-[16px]" />
-                        {COLORS.map(c => (
-                            <button
-                                key={c}
-                                onClick={() => setSelectedColor(c)}
-                                className={`w-6 h-6 rounded-full border flex-shrink-0 ${selectedColor === c ? 'border-white ring-1 ring-black' : 'border-transparent'}`}
-                                style={{ backgroundColor: c }}
-                            />
-                        ))}
+
+                    {/* Mobile Style & Color Picker Bar */}
+                    <div className={`flex flex-col gap-2 p-2 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                         <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
+                            <span className="text-[10px] uppercase opacity-50 font-bold min-w-[40px]">Trazo</span>
+                            {DASH_STYLES.map(style => (
+                                <button
+                                    key={style.label}
+                                    onClick={() => setSelectedDash(style.value)}
+                                    className={`p-2 rounded-md border min-w-[40px] flex justify-center ${JSON.stringify(selectedDash) === JSON.stringify(style.value) ? activeClass : hoverClass}`}
+                                >
+                                    {style.icon}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                            <span className="text-[10px] uppercase opacity-50 font-bold min-w-[40px]">Color</span>
+                            {COLORS.map(c => (
+                                <button
+                                    key={c}
+                                    onClick={() => setSelectedColor(c)}
+                                    className={`w-6 h-6 rounded-full border flex-shrink-0 ${selectedColor === c ? 'border-white ring-1 ring-black' : 'border-transparent'}`}
+                                    style={{ backgroundColor: c }}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}

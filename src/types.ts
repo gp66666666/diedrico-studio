@@ -99,6 +99,7 @@ export interface SketchElement {
     color?: string;
     text?: string;
     rotation?: number; // in radians
+    dash?: number[]; // [10, 5] for dashed, [2, 4] for dotted, [] for solid
 }
 
 // Academy Types

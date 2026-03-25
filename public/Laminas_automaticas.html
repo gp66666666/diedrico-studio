@@ -33,12 +33,14 @@
             color: var(--text);
             margin: 0;
             display: flex;
+            width: 100%;
             height: 100vh;
             overflow: hidden;
         }
 
         .app {
             display: flex;
+            width: 100%;
             height: 100vh;
             overflow: hidden
         }
@@ -872,18 +874,19 @@
             <div class="sheet-editor" id="sheetEditor">
                 <div class="editor-header">
                     <span class="sheet-num-big" id="editorNum">Hoja 1</span>
-                    <h3>Enunciado</h3>
+                    <input type="text" id="sheetTitleInput" class="sheet-title-input" 
+                        placeholder="Título de la lámina (opcional)..." 
+                        oninput="onTitleChange()">
+                    <h3 style="margin-left:auto; display:none">Enunciado</h3>
                 </div>
                 <textarea class="exercise-input" id="exerciseInput"
                     placeholder="Pega aquí el enunciado del ejercicio...&#10;Ej: Las rectas R [A (5, 10, 60), B (39, 23, 0)] y S [A, C (-64, 90, 0)] determinan el plano P."
                     oninput="onInputChange()"></textarea>
                 <div class="editor-actions">
                     <button class="btn btn-primary" onclick="analyzeActive()">🔍 Analizar</button>
-                    <!-- 
                     <button class="btn btn-ghost" style="border-color: #51cf66; color: #51cf66;" onclick="exportToMainApp()">
                         🚀 Cargar en Escena Principal
                     </button> 
-                    -->
                     <div style="display:flex; align-items:center; gap:8px; margin-left:auto">
                         <div style="display:flex; align-items:center; gap:4px">
                             <label style="font-size:11px; color:var(--text-dim)">Origen:</label>
@@ -908,11 +911,9 @@
                     </div>
                 </div>
                 
-                <!-- 
                 <div id="elementList" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; padding:10px; background:var(--bg); border-radius:8px; border:1px solid var(--border)">
-                    <span style="font-size:11px; color:var(--text-dim); width:100%; margin-bottom:4px">Puntos detectados (clic para renombrar):</span>
-                </div> 
-                -->
+                    <span style="font-size:11px; color:var(--text-dim); width:100%; margin-bottom:4px">Puntos detectados (clic para editar):</span>
+                </div>
                 
                 <div class="editor-actions" style="margin-top:5px">
                     <span class="example-link" onclick="loadExample()">Cargar ejemplo</span>
@@ -1009,6 +1010,34 @@
             <div class="modal-actions">
                 <button class="btn btn-ghost" onclick="closeBatchModal()">Cancelar</button>
                 <button class="btn btn-primary" onclick="importBatch()">✔ Importar y generar hojas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit element modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal" style="width: 400px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+                <h2 id="editModalTitle">✏ Editar Elemento</h2>
+                <button class="btn btn-ghost" onclick="closeEditModal()">✕</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="cfg-row" style="flex-direction: column; align-items: flex-start;">
+                    <label>Nombre</label>
+                    <input type="text" id="editName" style="width: 100%; text-align: left;">
+                </div>
+                <div class="cfg-row">
+                    <label>Color</label>
+                    <input type="color" id="editColor" style="width: 45px; padding: 2px;">
+                </div>
+                <div class="cfg-row">
+                    <label>Tamaño (px)</label>
+                    <input type="number" id="editSize" min="1" max="20" step="1">
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button class="btn btn-ghost" onclick="closeEditModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveEdit()">✔ Guardar</button>
             </div>
         </div>
     </div>
@@ -1352,22 +1381,36 @@
         });
 
         // ==================== SHEET MANAGEMENT ====================
-        function addSheet(text = '', autoAnalyze = false, steps = null, explanation = null) {
+        function addSheet(text = '', autoAnalyze = false, steps = null, explanation = null, skipScroll = false) {
             const id = nextId++;
             const sheet = { id, text, title: '', points: [], lines: [], planes: [], scale: 1, manualScale: true, orient: 'portrait', originX: 50, originY: getLtPos(), guides: [], steps: steps || [], solutionExplanation: explanation };
             sheets.push(sheet);
             if (activeId === null) activeId = id;
-            renderSidebar();
+            
             createPageCanvas(sheet);
-            if (autoAnalyze && text) { setActive(id); analyzeSheet(sheet); }
-            else if (steps) { setActive(id); renderSheet(sheet); }
-            else setActive(id);
+            if (autoAnalyze && text) { 
+                // Set active WITHOUT scrolling/redundant render to speed up batch
+                activeId = id;
+                analyzeSheet(sheet); 
+            }
+            else if (steps) { 
+                activeId = id;
+                renderSheet(sheet); 
+            }
+            else {
+                setActive(id, skipScroll);
+            }
+            
             saveProject();
-            // Scroll preview to bottom
-            setTimeout(() => {
-                const ps = document.getElementById('previewScroll');
-                ps.scrollTop = ps.scrollHeight;
-            }, 50);
+            
+            if (!skipScroll) {
+                // Scroll preview to bottom
+                setTimeout(() => {
+                    const ps = document.getElementById('previewScroll');
+                    if (ps) ps.scrollTop = ps.scrollHeight;
+                }, 50);
+            }
+            renderSidebar();
         }
 
         function removeSheet(id, e) {
@@ -1379,13 +1422,14 @@
             saveProject();
         }
 
-        function setActive(id) {
+        function setActive(id, skipScroll = false) {
             activeId = id;
             document.querySelectorAll('.sheet-item').forEach(el => el.classList.toggle('active', parseInt(el.dataset.id) === id));
             const sheet = sheets.find(s => s.id === id);
             if (sheet) {
-                document.getElementById('exerciseInput').value = sheet.text;
+                document.getElementById('exerciseInput').value = sheet.text || '';
                 document.getElementById('editorNum').textContent = `Hoja ${sheets.indexOf(sheet) + 1}`;
+                document.getElementById('sheetTitleInput').value = sheet.title || '';
                 document.getElementById('manualScale').value = sheet.scale;
                 document.getElementById('originX').value = sheet.originX ?? 50;
                 document.getElementById('originY').value = sheet.originY ?? getLtPos();
@@ -1397,8 +1441,10 @@
                 document.querySelectorAll('.orient-btn').forEach(b => b.classList.toggle('active', b.dataset.o === sheet.orient));
 
                 // Scroll preview to this page
-                const el = document.getElementById('page-' + id);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (!skipScroll) {
+                    const el = document.getElementById('page-' + id);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 
                 renderElementList(sheet);
             }
@@ -1407,42 +1453,249 @@
 
         function renderElementList(sheet) {
             const list = document.getElementById('elementList');
-            if (!sheet.points.length) {
+            if (!list) return;
+
+            const pLen = (sheet.points || []).length;
+            const lLen = (sheet.lines || []).length;
+            const plLen = (sheet.planes || []).length;
+            
+            if (pLen === 0 && lLen === 0 && plLen === 0) {
                 list.style.display = 'none';
                 return;
             }
+            
             list.style.display = 'flex';
-            list.innerHTML = `<span style="font-size:11px; color:var(--text-dim); width:100%; margin-bottom:4px">Puntos detectados (clic para renombrar):</span>` + 
+            list.style.flexDirection = 'column';
+            list.style.gap = '8px';
+            
+            let html = '';
+            
+            // POINTS
+            if (pLen > 0) {
+                html += `<div style="display:flex; justify-content:space-between; width:100%; margin-bottom:4px">
+                    <span style="font-size:11px; color:var(--text-dim)">Puntos:</span>
+                    <button class="btn btn-primary" style="padding: 2px 8px; font-size: 10px; height: 20px;" onclick="exportToMainApp()">🚀 Pasar a 2D/3D</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px">` + 
                 sheet.points.map((p, i) => {
-                    return `<div class="p-tag" style="background:var(--accent-glow); color:var(--accent); padding:4px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:700; border:1px solid rgba(108, 140, 255, 0.3)" onclick="renamePoint(${i})">${p.name}</div>`;
-                }).join('');
+                    const color = p.color || (p.type === 'alzado' ? '#2b6cb0' : '#c92a2a');
+                    return `<div class="p-tag" style="background:var(--accent-glow); color:${color}; padding:4px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:700; border:1px solid rgba(108, 140, 255, 0.3)" onclick="openEditModal(${i})">${p.name || ''}</div>`;
+                }).join('') + `</div>`;
+            }
+
+            // LINES
+            if (lLen > 0) {
+                html += `<div style="display:flex; justify-content:space-between; width:100%; margin-top:10px; margin-bottom:4px">
+                    <span style="font-size:11px; color:var(--text-dim)">Rectas:</span>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px">` + 
+                sheet.lines.map((ln, i) => {
+                    return `<div class="p-tag" style="background:rgba(217, 115, 13, 0.15); color:#d9730d; padding:4px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:700; border:1px solid rgba(217, 115, 13, 0.3)" onclick="openLineEditModal(${i})">${ln.name || 'r'} (${ln.p1}-${ln.p2})</div>`;
+                }).join('') + `</div>`;
+            }
+
+            // PLANES
+            if (plLen > 0) {
+                html += `<div style="display:flex; justify-content:space-between; width:100%; margin-top:10px; margin-bottom:4px">
+                    <span style="font-size:11px; color:var(--text-dim)">Planos:</span>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px">` + 
+                sheet.planes.map((pl, i) => {
+                    return `<div class="p-tag" style="background:rgba(56, 161, 105, 0.15); color:#2f855a; padding:4px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:700; border:1px solid rgba(56, 161, 105, 0.3)" onclick="openPlaneEditModal(${i})">${pl.name || 'Plano'}</div>`;
+                }).join('') + `</div>`;
+            }
+
+            list.innerHTML = html;
         }
 
-        function renamePoint(idx) {
+        let editingPlaneIdx = null;
+        let editingLineIdx = null;
+
+        let editingIdx = null;
+        function openEditModal(idx) {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet || !sheet.points || !sheet.points[idx]) return;
+            editingIdx = idx;
+            editingPlaneIdx = null;
+            editingLineIdx = null;
+            const p = sheet.points[idx];
+            document.getElementById('editModalTitle').textContent = `✏ Editar Punto ${p.name}`;
+            document.getElementById('editName').value = p.name || '';
+            document.getElementById('editColor').value = p.color || (p.type === 'alzado' ? '#2b6cb0' : '#c92a2a');
+            document.getElementById('editSize').value = p.size || 4;
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function openPlaneEditModal(idx) {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet || !sheet.planes || !sheet.planes[idx]) return;
+            editingPlaneIdx = idx;
+            editingIdx = null;
+            editingLineIdx = null;
+            const pl = sheet.planes[idx];
+            document.getElementById('editModalTitle').textContent = `✏ Editar Plano ${pl.name}`;
+            document.getElementById('editName').value = pl.name || '';
+            document.getElementById('editColor').value = pl.color || '#2f855a';
+            document.getElementById('editSize').value = 4; // Not typically used for planes but keeping it for compatibility
+            document.getElementById('editModal').classList.add('open');
+            // Overwrite save function temporary? No, better use a generic save function
+        }
+
+        function openLineEditModal(idx) {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (!sheet || !sheet.lines || !sheet.lines[idx]) return;
+            editingLineIdx = idx;
+            editingIdx = null;
+            editingPlaneIdx = null;
+            const ln = sheet.lines[idx];
+            document.getElementById('editModalTitle').textContent = `✏ Editar Recta ${ln.name}`;
+            document.getElementById('editName').value = ln.name || '';
+            document.getElementById('editColor').value = ln.color || '#d9730d';
+            document.getElementById('editSize').value = 4;
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditModal() { document.getElementById('editModal').classList.remove('open'); editingIdx = null; }
+
+        function saveEdit() {
             const sheet = sheets.find(s => s.id === activeId);
             if (!sheet) return;
-            const p = sheet.points[idx];
-            const newName = prompt(`Cambiar nombre de punto ${p.name}:`, p.name);
-            if (newName && newName.trim()) {
-                p.name = newName.trim().toUpperCase();
-                renderSheet(sheet);
-                renderElementList(sheet);
-                saveProject();
+            
+            if (editingIdx !== null) {
+                const p = sheet.points[editingIdx];
+                p.name = document.getElementById('editName').value.trim().toUpperCase();
+                p.color = document.getElementById('editColor').value;
+                p.size = parseInt(document.getElementById('editSize').value) || 4;
+            } else if (editingPlaneIdx !== null) {
+                const pl = sheet.planes[editingPlaneIdx];
+                pl.name = document.getElementById('editName').value.trim().toUpperCase();
+                pl.color = document.getElementById('editColor').value;
+            } else if (editingLineIdx !== null) {
+                const ln = sheet.lines[editingLineIdx];
+                ln.name = document.getElementById('editName').value.trim().toLowerCase();
+                ln.color = document.getElementById('editColor').value;
             }
+            
+            editingIdx = null;
+            editingPlaneIdx = null;
+            editingLineIdx = null;
+            renderSheet(sheet);
+            renderElementList(sheet);
+            saveProject();
+            closeEditModal();
+            document.getElementById('editModalTitle').textContent = `✏ Editar Elemento`;
+        }
+
+        function handleCanvasClick(e, sheet) {
+            setActive(sheet.id);
+            const rect = sheet.canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (sheet.canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (sheet.canvas.height / rect.height);
+            
+            const cv = sheet.canvas;
+            const w = cv.width, h = cv.height;
+            const sc = sheet.scale * MM;
+            const ltY = h * ((sheet.originY ?? getLtPos()) / 100);
+            const ox = w * ((sheet.originX ?? 50) / 100);
+
+            let minDist = 15;
+            let foundPoint = null;
+            let foundLine = null;
+            let foundPlane = null;
+
+            // 1. Hit test points
+            sheet.points.forEach((pt, i) => {
+                const px = ox + pt.x * sc;
+                const pyA = ltY - pt.cota * sc;
+                const pyP = ltY + pt.alej * sc;
+                const d1 = Math.hypot(mouseX - px, mouseY - pyA);
+                const d2 = Math.hypot(mouseX - px, mouseY - pyP);
+                if (d1 < minDist || d2 < minDist) {
+                    minDist = Math.min(d1, d2);
+                    foundPoint = i;
+                }
+            });
+
+            if (foundPoint !== null) return openEditModal(foundPoint);
+
+            // 2. Hit test lines (check distance to traces)
+            sheet.lines.forEach((ln, i) => {
+                // Projection V (r')
+                const p1v = { x: ox + ln.p1.x * sc, y: ltY - ln.p1.z * sc };
+                const p2v = { x: ox + ln.p2.x * sc, y: ltY - ln.p2.z * sc };
+                if (distToSegment(mouseX, mouseY, p1v.x, p1v.y, p2v.x, p2v.y) < minDist) foundLine = i;
+                
+                // Projection H (r)
+                const p1h = { x: ox + ln.p1.x * sc, y: ltY + ln.p1.y * sc };
+                const p2h = { x: ox + ln.p2.x * sc, y: ltY + ln.p2.y * sc };
+                if (distToSegment(mouseX, mouseY, p1h.x, p1h.y, p2h.x, p2h.y) < minDist) foundLine = i;
+            });
+
+            if (foundLine !== null) return openLineEditModal(foundLine);
+
+            // 3. Hit test planes (check distance to traces)
+            sheet.planes.forEach((pl, i) => {
+                if (pl.type !== 'coord') return;
+                const vx = ox + pl.x * sc, vy = ltY;
+                const zx = ox, zy = ltY - pl.z * sc;
+                const yx = ox, yy = ltY + pl.y * sc;
+                if (distToSegment(mouseX, mouseY, vx, vy, zx, zy) < minDist) foundPlane = i;
+                if (distToSegment(mouseX, mouseY, vx, vy, yx, yy) < minDist) foundPlane = i;
+            });
+
+            if (foundPlane !== null) return openPlaneEditModal(foundPlane);
+        }
+
+        function distToSegment(px, py, x1, y1, x2, y2) {
+            const l2 = (x1 - x2) ** 2 + (y1 - y2) ** 2;
+            if (l2 === 0) return Math.hypot(px - x1, py - y1);
+            let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2;
+            t = Math.max(0, Math.min(1, t));
+            return Math.hypot(px - (x1 + t * (x2 - x1)), py - (y1 + t * (y2 - y1)));
         }
 
         function exportToMainApp() {
             const sheet = sheets.find(s => s.id === activeId);
             if (!sheet || !sheet.points.length) return alert('No hay elementos para exportar.');
             
-            if (confirm('¿Quieres cargar estos puntos y rectas en el lienzo interactivo principal?')) {
-                window.parent.postMessage({
-                    type: 'INSERT_INTO_MAIN',
-                    elements: sheet.points.map(p => ({
+            if (confirm('¿Quieres cargar todos los elementos (puntos, rectas y planos) en el lienzo interactivo principal? Nota: Se aplicará una escala de 1/10 para mejor visualización.')) {
+                const elements = [];
+                const scaleDown = 0.1; // Divide by 10 for better 3D fit
+                
+                // Add Points
+                sheet.points.forEach(p => {
+                    elements.push({
                         type: 'point',
                         name: p.name,
-                        coords: { x: p.x, y: p.alej, z: p.cota }
-                    })),
+                        coords: { x: p.x * scaleDown, y: p.alej * scaleDown, z: p.cota * scaleDown }
+                    });
+                });
+
+                // Add Lines
+                sheet.lines.forEach(ln => {
+                    elements.push({
+                        type: 'line',
+                        name: ln.name,
+                        p1: ln.p1,
+                        p2: ln.p2
+                        // Coords will be derived from points in the main app (which are already scaled)
+                    });
+                });
+
+                // Add Planes
+                sheet.planes.forEach(pl => {
+                    if (pl.type === 'coord') {
+                        elements.push({
+                            type: 'plane',
+                            name: pl.name,
+                            intercepts: { x: pl.x * scaleDown, y: pl.y * scaleDown, z: pl.z * scaleDown }
+                        });
+                    }
+                });
+
+                window.parent.postMessage({
+                    type: 'INSERT_INTO_MAIN',
+                    elements: elements,
                     viewMode: '2d'
                 }, '*');
             }
@@ -1468,10 +1721,15 @@
         // ==================== SIDEBAR RENDER ====================
         function renderSidebar() {
             const list = document.getElementById('sheetList');
+            if (!list) return;
             list.innerHTML = sheets.map((s, i) => {
                 const num = i + 1;
-                const title = s.title || (s.text.trim().split('\n')[0].slice(0, 40) || 'Sin título');
-                const status = s.points.length ? `${s.points.length} pto · ${s.lines.length} recta` : 'Sin datos';
+                const txt = s.text || '';
+                const title = s.title || (txt.trim().split('\n')[0].slice(0, 40) || 'Sin título');
+                const pLen = s.points ? s.points.length : 0;
+                const lLen = s.lines ? s.lines.length : 0;
+                const plLen = s.planes ? s.planes.length : 0;
+                const status = (pLen || lLen || plLen) ? `${pLen} pto · ${lLen} rect · ${plLen} pl` : 'Sin datos';
                 return `<div class="sheet-item${s.id === activeId ? ' active' : ''}" onclick="setActive(${s.id})">
             <div class="sheet-item-header">
                 <span class="sheet-num">Hoja ${num}</span>
@@ -1519,7 +1777,11 @@
             cv.style.width = (cw * ds) + 'px';
             cv.style.height = (ch * ds) + 'px';
             cv.id = 'cv-' + sheet.id;
-            cv.onclick = () => setActive(sheet.id);
+            cv.onclick = (e) => handleCanvasClick(e, sheet);
+            cv.oncontextmenu = (e) => {
+                e.preventDefault();
+                handleCanvasClick(e, sheet);
+            };
 
             shadow.appendChild(cv);
             wrapper.appendChild(label);
@@ -1603,13 +1865,14 @@
             const points = [];
             const planeCoords = [];
 
-            // 1. Detect structures: NAME (x, y, z)
-            const coordRx = /([A-Zα-ωΑ-Ω])(?:\s*[₁₂₃₄₅₆₇₈₉₀\d])*\s*\(\s*([^)]+)\)/gi;
-            let m;
+            // 1. Detect structures: NAME (x, y, z) or just (x, y, z)
+            const coordRx = /([A-Zα-ωΑ-Ω])?(?:\s*[₁₂₃₄₅₆₇₈₉₀\d])*\s*\(\s*([^)]+)\)/gi;
+            let m, anonIdx = 1;
             while ((m = coordRx.exec(text)) !== null) {
-                const name = m[1];
+                const name = m[1] || `P${anonIdx++}`;
                 const coordsStr = m[2];
-                const coords = coordsStr.split(',').map(s => s.trim());
+                // Support both comma and semicolon
+                const coords = coordsStr.split(/[,;]/).map(s => s.trim());
                 if (coords.length < 3) continue;
 
                 const x = parseC(coords[0]);
@@ -1627,7 +1890,8 @@
                 } else if (isExplicitPlane) {
                     isPlane = true;
                 } else {
-                    isPlane = /^[PQRSt]$/.test(name);
+                    // Planes are usually Greek or common letters like P, Q, R, S, T
+                    isPlane = /^[PQRStα-ωΑ-Ω]$/.test(name);
                 }
 
                 if (isPlane && x !== null) {
@@ -1834,6 +2098,16 @@
             }
         }
 
+        function onTitleChange() {
+            const sheet = sheets.find(s => s.id === activeId);
+            if (sheet) {
+                sheet.title = document.getElementById('sheetTitleInput').value;
+                renderAll();
+                renderSidebar();
+                saveProject();
+            }
+        }
+
         function onInputChange() {
             const sheet = sheets.find(s => s.id === activeId);
             if (sheet) {
@@ -1886,6 +2160,7 @@
         }
 
         function renderSheet(sheet) {
+            if (!sheet) return;
             const cv = sheet.canvas;
             if (!cv) return;
             const ctx = cv.getContext('2d');
@@ -2067,8 +2342,12 @@
             });
 
             // ===== POINTS =====
-            const cr = 4;
             sheet.points.forEach(pt => {
+                const cr = pt.size || 4;
+                const ptColor = pt.color || null;
+                const alzadoColor = ptColor || '#2b6cb0';
+                const plantaColor = ptColor || '#c92a2a';
+                
                 const xK = pt.x !== null, cK = pt.cota !== null, aK = pt.alej !== null;
                 const px = xK ? ox + pt.x * sc : null;
                 const pyA = cK ? ltY - pt.cota * sc : null;
@@ -2120,18 +2399,18 @@
 
                     // Alzado (name')
                     if (cK) {
-                        ctx.strokeStyle = '#2b6cb0'; ctx.lineWidth = 1.2;
+                        ctx.strokeStyle = alzadoColor; ctx.lineWidth = 1.2;
                         ctx.beginPath(); ctx.moveTo(px - cr, pyA - cr); ctx.lineTo(px + cr, pyA + cr);
                         ctx.moveTo(px + cr, pyA - cr); ctx.lineTo(px - cr, pyA + cr); ctx.stroke();
-                        drawLabel(pt.name + "'", px + 8, pyA, '#2b6cb0', fs, 'left', 'middle');
+                        drawLabel(pt.name + "'", px + 8, pyA, alzadoColor, fs, 'left', 'middle');
                     }
 
                     // Planta (name)
                     if (aK) {
-                        ctx.strokeStyle = '#c92a2a'; ctx.lineWidth = 1.2;
+                        ctx.strokeStyle = plantaColor; ctx.lineWidth = 1.2;
                         ctx.beginPath(); ctx.moveTo(px - cr, pyP - cr); ctx.lineTo(px + cr, pyP + cr);
                         ctx.moveTo(px + cr, pyP - cr); ctx.lineTo(px - cr, pyP + cr); ctx.stroke();
-                        drawLabel(pt.name, px + 8, pyP, '#c92a2a', fs, 'left', 'middle');
+                        drawLabel(pt.name, px + 8, pyP, plantaColor, fs, 'left', 'middle');
                     }
                 }
             });
@@ -2139,8 +2418,9 @@
             // ===== PLANES (using x, y, z coords) =====
             sheet.planes.forEach(pl => {
                 if (pl.type !== 'coord') return;
-                const color = '#38a169'; // Greenish
+                const color = '#2f855a'; // Solid green
                 const lw = 1.4;
+                const cr = 4; // Cross radius for vertex/intercepts
                 const vx = ox + pl.x * sc, vy = ltY; // Vertex on LT
 
                 // Draw vertex cross
@@ -2162,6 +2442,7 @@
 
                     const full = extendAndClip(vx, vy, zx, zy, rx, ry, rw, rh);
                     if (full) {
+                        const mid = { x: (full[0].x + full[1].x) / 2, y: (full[0].y + full[1].y) / 2 };
                         const dx = full[1].x - full[0].x, dy = full[1].y - full[0].y;
                         let crossX = null;
                         if (Math.abs(dy) > 0.001) { const t = (ltY - full[0].y) / dy; if (t > 0 && t < 1) crossX = full[0].x + t * dx; }
@@ -2173,7 +2454,7 @@
                             drawSegClipped(ctx, crossX, ltY, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, full[1].y <= ltY ? [] : [6, 4]);
                         }
                         ctx.fillStyle = color;
-                        drawLabel(pl.name + "'", zx - 5, zy - 5, color, fs * 1.1, 'right', 'bottom');
+                        drawLabel(pl.name + "'", mid.x + 10, mid.y - 10, color, fs * 1.1, 'left', 'bottom');
                     }
                 }
 
@@ -2196,8 +2477,8 @@
                             const below = (full[0].y + full[1].y) / 2 >= ltY;
                             drawSegClipped(ctx, full[0].x, full[0].y, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, below ? [] : [6, 4]);
                         } else {
-                            drawSegClipped(ctx, full[0].x, full[0].y, crossX, ltY, rx, ry, rw, rh, color, lw, full[0].y >= ltY ? [] : [6, 4]);
                             drawSegClipped(ctx, crossX, ltY, full[1].x, full[1].y, rx, ry, rw, rh, color, lw, full[1].y >= ltY ? [] : [6, 4]);
+                            drawSegClipped(ctx, full[0].x, full[0].y, crossX, ltY, rx, ry, rw, rh, color, lw, full[0].y >= ltY ? [] : [6, 4]);
                         }
                         ctx.fillStyle = color;
                         drawLabel(pl.name, yx - 5, yy + 5, color, fs * 1.1, 'right', 'top');
@@ -2571,42 +2852,77 @@
             if (e.target === this) closeBatchModal();
         });
 
-        function importBatch() {
-            const raw = document.getElementById('batchInput').value.trim();
-            if (!raw) return;
-
-            // Split line-by-line: start a new block on any line containing 'EJERCICIO'
+        function splitBlocks(raw) {
             const allLines = raw.split(/\r?\n/);
-            const parts = [];
+            const blocks = [];
             let current = [];
+            
+            // Regex for common block starters
+            const headerRx = /^\s*(EJERCICIO|PROBLEMA|HOJA|TEMA|ACTIVIDAD|PREGUNTA|PAU|EXAMEN|OPCIÓN|EJ\b|PROB\b)\s*([\d\.\-\:]*)/i;
+            const numberedRx = /^\s*(\d+)[\.\)]\s+/;
+
             for (const line of allLines) {
-                if (/EJERCICIO/i.test(line) && current.length > 0) {
-                    parts.push(current.join('\n').trim());
+                const isHeader = headerRx.test(line) || numberedRx.test(line);
+                if (isHeader && current.length > 0) {
+                    blocks.push(current.join('\n').trim());
                     current = [line];
                 } else {
                     current.push(line);
                 }
             }
-            if (current.length > 0 && current.join('').trim()) parts.push(current.join('\n').trim());
-            if (!parts.length) {
-                alert('No se encontraron bloques que empiecen por "EJERCICIO".');
+            if (current.length > 0 && current.join('').trim()) blocks.push(current.join('\n').trim());
+            return blocks;
+        }
+
+        function importBatch() {
+            const raw = document.getElementById('batchInput').value.trim();
+            if (!raw) return;
+
+            // More robust and flexible splitting logic
+            const allLines = raw.split(/\r?\n/);
+            const blocks = [];
+            let current = [];
+            
+            // Look for Exercise, Problem, or Numbered lists at start of line
+            const startRx = /^\s*(?:EJERCICIO|PROBLEMA|HOJA|TEMA|ACTIVIDAD|PREGUNTA|PAU|EXAMEN|OPCIÓN|EJ\b|PROB\b|\d+[\.\)])/i;
+
+            for (const line of allLines) {
+                if (startRx.test(line) && current.length > 0) {
+                    blocks.push(current.join('\n').trim());
+                    current = [line];
+                } else {
+                    current.push(line);
+                }
+            }
+            if (current.length > 0 && current.join('').trim()) blocks.push(current.join('\n').trim());
+
+            if (!blocks.length) {
+                alert('No se encontraron bloques de enunciados válidos.');
                 return;
             }
 
-            // Clear existing sheets
+            if (sheets.length > 0 && !confirm(`Vas a importar ${blocks.length} ejercicios. ¿Esta acción borrará las hojas actuales?`)) return;
+
+            // Clear state
             sheets = [];
             document.getElementById('previewScroll').innerHTML = '';
             nextId = 1;
             activeId = null;
 
-            // Create one sheet per exercise block
-            parts.forEach(text => addSheet(text, true));
-
+            // Add sheets in a loop
+            for (const text of blocks) {
+                try {
+                    addSheet(text, true, null, null, true);
+                } catch (err) {
+                    console.error('Error importing block:', err);
+                }
+            }
+            
+            // Set first one active and finalize
+            if (sheets.length > 0) setActive(sheets[0].id);
+            renderSidebar();
             closeBatchModal();
             document.getElementById('batchInput').value = '';
-
-            // Activate first sheet
-            if (sheets.length) setActive(sheets[0].id);
         }
 
         // ==================== PERSISTENCE ====================
@@ -2759,10 +3075,14 @@
 
                     const data = JSON.parse(jsonText);
                     const statement = data.statement;
-                    const steps = data.steps || [];
-
-                    if (statement) {
-                        // Create only the Exercise Sheet (Statement)
+                    // Support multiple statements if returned as array (undocumented AI behavior but safe)
+                    const multipleStatements = data.statements || (Array.isArray(statement) ? statement : null);
+                    
+                    if (multipleStatements && multipleStatements.length > 0) {
+                        multipleStatements.forEach(s => addSheet(s, true, null, null, true));
+                        if (sheets.length > 0) setActive(sheets[sheets.length-1].id);
+                        document.getElementById('aiPrompt').value = '';
+                    } else if (statement) {
                         addSheet(statement, true);
                         document.getElementById('aiPrompt').value = '';
                     } else if (data.error) {
@@ -2770,9 +3090,11 @@
                     }
                 } catch (e) {
                     console.error("Error processing AI response:", e);
-                    // Fallback to old behavior if it's not JSON
+                    // Fallback to old behavior but with smart block splitting
                     if (rawContent && !rawContent.startsWith('Error:')) {
-                        addSheet(rawContent, true);
+                        const parts = splitBlocks(rawContent);
+                        parts.forEach(p => addSheet(p, true, null, null, true));
+                        if (sheets.length > 0) setActive(sheets[sheets.length-1].id);
                         document.getElementById('aiPrompt').value = '';
                     } else {
                         alert('Hubo un error al generar el ejercicio: ' + rawContent);
