@@ -1,6 +1,7 @@
 import { AcademyTopic } from '../types';
 import { StepByStepVisualizer } from '../components/Academy/StepByStepVisualizer';
 import { ACADEMY_THEORY, ACADEMY_EXERCISES, ACADEMY_DESCRIPTIONS } from './academyExtra';
+import { ACADEMY_ADVANCED_TOPICS } from './academyAdvanced';
 import React from 'react';
 
 export const ACADEMY_CONTENT: AcademyTopic[] = [
@@ -1189,5 +1190,12 @@ ACADEMY_CONTENT.forEach((topic) => {
     }
     if (ACADEMY_EXERCISES[topic.id]) {
         topic.exercises = [...topic.exercises, ...ACADEMY_EXERCISES[topic.id]];
+    }
+});
+
+// Temas que completan el currículo de Dibujo Técnico II
+ACADEMY_ADVANCED_TOPICS.forEach((topic) => {
+    if (!ACADEMY_CONTENT.some((t) => t.id === topic.id)) {
+        ACADEMY_CONTENT.push(topic);
     }
 });

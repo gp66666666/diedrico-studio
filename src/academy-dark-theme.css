@@ -143,3 +143,38 @@
 .dark h3:contains("Los Planos de Proyección") {
     color: #FFD700 !important;
 }
+/* ===========================================
+   CONTRASTE EN MODO OSCURO (contenido de teoría)
+   =========================================== */
+/* Los temas 1-5 se escribieron como HTML con clases de modo claro
+   (bg-white, text-slate-700...). En oscuro quedaban ilegibles: fondo blanco
+   con texto claro, o texto oscuro sobre fondo oscuro. Se fuerzan aquí. */
+.dark .academy-page .bg-white,
+.dark .academy-page .bg-slate-50,
+.dark .academy-page .bg-slate-100,
+.dark .academy-page .bg-indigo-50,
+.dark .academy-page .bg-blue-50,
+.dark .academy-page .bg-amber-50,
+.dark .academy-page .bg-emerald-50,
+.dark .academy-page .bg-purple-50 {
+    background-color: #1e293b !important;
+}
+
+.dark .academy-page .text-slate-900,
+.dark .academy-page .text-slate-800,
+.dark .academy-page .text-slate-700,
+.dark .academy-page .text-slate-600,
+.dark .academy-page .text-gray-900,
+.dark .academy-page .text-gray-800,
+.dark .academy-page .text-gray-700,
+.dark .academy-page .text-gray-600 {
+    color: #e2e8f0 !important;
+}
+
+.dark .academy-page .border-slate-200,
+.dark .academy-page .border-slate-100,
+.dark .academy-page .border-indigo-100,
+.dark .academy-page .border-blue-100,
+.dark .academy-page .border-amber-100 {
+    border-color: rgba(148, 163, 184, 0.35) !important;
+}
