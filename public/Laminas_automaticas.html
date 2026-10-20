@@ -894,6 +894,46 @@
             .drawer-backdrop,
             .drawer-close { display: none !important; }
         }
+
+        /* ===== MÓVIL: editor compacto ===== */
+        /* En pantalla pequeña el editor ocupaba casi toda la altura y la hoja
+           quedaba fuera de vista. Se reduce a lo imprescindible. */
+        @media (max-width: 768px) {
+            .sheet-editor {
+                padding: 8px 10px !important;
+            }
+
+            textarea.exercise-input {
+                min-height: 54px !important;
+                max-height: 90px !important;
+                padding: 6px 8px !important;
+            }
+
+            .editor-header {
+                margin-bottom: 6px !important;
+            }
+
+            .editor-actions {
+                margin-top: 6px !important;
+                gap: 6px !important;
+            }
+
+            .editor-actions .btn {
+                padding: 7px 10px !important;
+                font-size: 12px !important;
+            }
+
+            #elementList {
+                max-height: 74px !important;
+                overflow-y: auto !important;
+                margin-top: 6px !important;
+                padding: 6px !important;
+            }
+
+            #elementList span {
+                font-size: 10px !important;
+            }
+        }
     </style>
 </head>
 
