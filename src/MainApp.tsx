@@ -25,6 +25,7 @@ import SolidsTool from './components/tools/SolidsTool';
 export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [shared, setShared] = useState<{ title?: string; count: number } | null>(null);
+    const [hintDismissed, setHintDismissed] = useState(() => localStorage.getItem('emptyHintDismissed') === '1');
     const { theme, viewMode, setViewMode, elements } = useGeometryStore();
     const { isPremium } = useUserStore();
     const { generateExercise } = useAIStore();
@@ -283,9 +284,20 @@ export default function MainApp() {
 
                         {/* View Content */}
                         <div key={viewMode} className="flex-1 relative w-full h-full animate-fade-in">
-                            {elements.length === 0 && viewMode === '3d' && (
+                            {elements.length === 0 && viewMode === '3d' && !hintDismissed && (
                                 <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">
-                                    <div className="max-w-xs rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-center backdrop-blur-sm">
+                                    <div className="relative max-w-xs rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-center backdrop-blur-sm">
+                                        <button
+                                            onClick={() => {
+                                                setHintDismissed(true);
+                                                localStorage.setItem('emptyHintDismissed', '1');
+                                            }}
+                                            className="pointer-events-auto absolute right-2 top-2 rounded p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
+                                            aria-label="Ocultar este aviso"
+                                            title="No volver a mostrar"
+                                        >
+                                            <X size={14} />
+                                        </button>
                                         <p className="text-sm font-semibold text-white">Tu lienzo está vacío</p>
                                         <p className="mt-1 text-xs leading-relaxed text-white/70">
                                             <span className="md:hidden">Pulsa ☰ y añade tu primer punto.</span>

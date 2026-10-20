@@ -1,5 +1,6 @@
 import { AcademyTopic } from '../types';
 import { StepByStepVisualizer } from '../components/Academy/StepByStepVisualizer';
+import { ACADEMY_THEORY, ACADEMY_EXERCISES } from './academyExtra';
 import React from 'react';
 
 export const ACADEMY_CONTENT: AcademyTopic[] = [
@@ -1175,3 +1176,15 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
         exercises: []
     }
 ];
+
+// Contenido ampliado: teoría de las secciones que eran un esbozo y ejercicios
+// para todos los temas. Se aplica después de definir el array para no tocar
+// el contenido original.
+ACADEMY_CONTENT.forEach((topic) => {
+    if (ACADEMY_THEORY[topic.id]) {
+        topic.theoryContent = ACADEMY_THEORY[topic.id];
+    }
+    if (ACADEMY_EXERCISES[topic.id]) {
+        topic.exercises = [...topic.exercises, ...ACADEMY_EXERCISES[topic.id]];
+    }
+});

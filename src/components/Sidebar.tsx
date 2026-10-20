@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2, Plane as PlaneIcon,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen, Share2
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen, Share2, ListChecks
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../sidebar-theme-protection.css';
@@ -660,7 +660,7 @@ export default function Sidebar() {
                     <div className="flex items-center gap-3">
                         <img src="/logo-128.png" alt="Diédrico Studio" className="w-10 h-10 object-contain rounded-lg bg-white/10 p-1" />
                         <div>
-                            <h1 className={`text-lg font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            <h1 className={`text-base font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                 Diédrico Studio
                             </h1>
                             <p className={`text-[10px] uppercase tracking-wider font-semibold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Professional CAD</p>
@@ -669,16 +669,28 @@ export default function Sidebar() {
                     <div className="flex items-center gap-1">
                         <button
                             onClick={() => navigate('/academy')}
-                            className={`p-2 rounded-lg transition-colors ${buttonClass} group`}
+                            className={`p-1.5 rounded-lg transition-colors ${buttonClass} group`}
                             title="Academia (Premium)"
                         >
-                            <BookOpen size={18} className="text-purple-500 group-hover:scale-110 transition-transform" />
+                            <BookOpen size={16} className="text-purple-500 group-hover:scale-110 transition-transform" />
                         </button>
-                        <button onClick={() => navigate('/guia')} className={`p-2 rounded-lg transition-colors ${buttonClass}`} title="Guía de uso">
-                            <HelpCircle size={18} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
+                        <button
+                            onClick={() => navigate('/ejercicios')}
+                            className={`p-1.5 rounded-lg transition-colors ${buttonClass} group`}
+                            title="Ejercicios resueltos"
+                        >
+                            <ListChecks size={16} className="text-emerald-500 group-hover:scale-110 transition-transform" />
                         </button>
-                        <button onClick={toggleTheme} className={`p-2 rounded-lg transition-colors ${buttonClass}`}>
-                            {isDark ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-gray-600" />}
+                        <button onClick={() => navigate('/guia')} className={`p-1.5 rounded-lg transition-colors ${buttonClass}`} title="Guía de uso">
+                            <HelpCircle size={16} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
+                        </button>
+                        <button
+                            onClick={toggleTheme}
+                            className={`p-1.5 rounded-lg transition-colors ${buttonClass}`}
+                            aria-label={isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+                            title={isDark ? 'Tema claro' : 'Tema oscuro'}
+                        >
+                            {isDark ? <Sun size={16} className="text-yellow-400" /> : <Moon size={16} className="text-gray-600" />}
                         </button>
                     </div>
                 </div>
