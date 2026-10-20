@@ -3,6 +3,7 @@ import { RotateCw, X, Info } from 'lucide-react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { LineElement, PointElement, SolidElement, SegmentElement } from '../../types';
 import { axisAngleToMatrix, multiplyMat3, storeEulerToMatrix, matrixToStoreEuler } from '../../lib/solidGeometry';
+import { toast } from '../../lib/toast';
 
 const QUICK_ANGLES = [30, 45, 60, 90, 180];
 
@@ -81,7 +82,7 @@ export default function RotationTool() {
         }
 
         if (!axis) {
-            alert('Uno de los elementos debe ser una RECTA (eje de giro).');
+            toast('Uno de los elementos debe ser una RECTA (eje de giro).');
             return false;
         }
 
@@ -93,7 +94,7 @@ export default function RotationTool() {
         else if (objectToRotate.type === 'segment') rotateSegment(objectToRotate as SegmentElement, axis, angleRad);
         else if (objectToRotate.type === 'solid') rotateSolid(objectToRotate as SolidElement, axis, angleRad);
         else {
-            alert('Este elemento no se puede girar todavía.');
+            toast('Este elemento no se puede girar todavía.');
             return false;
         }
 
@@ -112,7 +113,7 @@ export default function RotationTool() {
             line = el1 as LineElement;
             axis = el2 as LineElement;
         } else {
-            alert('Selecciona: 1. Recta a girar, 2. Eje de giro.');
+            toast('Selecciona: 1. Recta a girar, 2. Eje de giro.');
             return;
         }
 
@@ -122,12 +123,12 @@ export default function RotationTool() {
         const rotation = solveRotationAngleForZeroComponent(line.direction, axis.direction, targetComponent);
 
         if (rotation === null) {
-            alert(`No es posible hacer la recta paralela al plano ${targetComponent === 'y' ? 'Vertical' : 'Horizontal'} con este eje.`);
+            toast(`No es posible hacer la recta paralela al plano ${targetComponent === 'y' ? 'Vertical' : 'Horizontal'} con este eje.`);
             return;
         }
 
         rotateLine(line, axis, rotation);
-        alert(`Girada ${((rotation * 180) / Math.PI).toFixed(1)}° para dejarla paralela a la ${targetComponent === 'y' ? 'PV' : 'PH'}.`);
+        toast(`Girada ${((rotation * 180) / Math.PI).toFixed(1)}° para dejarla paralela a la ${targetComponent === 'y' ? 'PV' : 'PH'}.`);
 
         setActiveTool('none');
         clearDistanceTool();

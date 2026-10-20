@@ -17,154 +17,123 @@ export default function PrivacyPage() {
 
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20 space-y-6 text-sm">
                     <p className="text-white/70">
-                        <strong>Última actualización:</strong> Diciembre 2025
+                        <strong>Última actualización:</strong> Octubre 2026
                     </p>
 
                     <section>
-                        <h2 className="text-2xl font-semibold mb-3">1. Información que Recopilamos</h2>
+                        <h2 className="text-2xl font-semibold mb-3">1. Información que recopilamos</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            Diédrico Studio recopila la siguiente información:
+                            Diédrico Studio funciona sin cuenta. Si decides crear una, recopilamos lo mínimo:
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
-                            <li><strong>Información de cuenta:</strong> Si creas una cuenta, recopilamos tu email y nombre de usuario.</li>
-                            <li><strong>Datos de uso:</strong> Información sobre cómo utilizas la aplicación (proyectos guardados, herramientas utilizadas).</li>
-                            <li><strong>Datos de navegación:</strong> Dirección IP, tipo de navegador, páginas visitadas, mediante Google Analytics.</li>
-                            <li><strong>Cookies:</strong> Utilizamos cookies para mejorar tu experiencia y para publicidad (Google AdSense).</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">2. Cómo Utilizamos Tu Información</h2>
-                        <p className="text-white/80 leading-relaxed mb-3">
-                            Utilizamos la información recopilada para:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
-                            <li>Proporcionar y mejorar nuestros servicios</li>
-                            <li>Guardar tus proyectos y preferencias</li>
-                            <li>Autenticar tu cuenta</li>
-                            <li>Analizar el uso de la aplicación para mejorar la experiencia del usuario</li>
-                            <li>Mostrar anuncios relevantes mediante Google AdSense</li>
-                            <li>Comunicarnos contigo sobre actualizaciones o problemas técnicos</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">3. Google AdSense y Cookies</h2>
-                        <p className="text-white/80 leading-relaxed mb-3">
-                            Este sitio web utilizará Google AdSense para mostrar anuncios. Google utilizará cookies
-                            para mostrar anuncios basados en tus visitas anteriores a este u otros sitios web.
-                        </p>
-                        <p className="text-white/80 leading-relaxed mb-3">
-                            Puedes inhabilitar el uso de cookies de publicidad personalizada visitando
-                            <a
-                                href="https://www.google.com/settings/ads"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300 ml-1"
-                            >
-                                Configuración de anuncios de Google
-                            </a>.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">4. Compartir Información con Terceros</h2>
-                        <p className="text-white/80 leading-relaxed mb-3">
-                            NO vendemos ni alquilamos tu información personal a terceros. Compartimos información solo con:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
-                            <li><strong>Google AdSense:</strong> Para mostrar anuncios relevantes</li>
-                            <li><strong>Google Analytics:</strong> Para análisis de uso del sitio</li>
-                            <li><strong>Supabase:</strong> Para autenticación y almacenamiento de datos (cumple con GDPR)</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">5. Almacenamiento y Seguridad</h2>
-                        <p className="text-white/80 leading-relaxed">
-                            Tus datos se almacenan de forma segura en servidores de Supabase, que cumple con las
-                            regulaciones de protección de datos GDPR. Utilizamos encriptación y medidas de seguridad
-                            para proteger tu información personal.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">6. Tus Derechos</h2>
-                        <p className="text-white/80 leading-relaxed mb-3">
-                            Tienes derecho a:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
-                            <li>Acceder a tus datos personales</li>
-                            <li>Rectificar datos incorrectos</li>
-                            <li>Solicitar la eliminación de tus datos</li>
-                            <li>Exportar tus datos</li>
-                            <li>Oponerte al procesamiento de tus datos</li>
-                            <li>Retirar el consentimiento en cualquier momento</li>
+                            <li><strong>Cuenta:</strong> tu email y, si inicias sesión con Google, tu nombre y foto de perfil.</li>
+                            <li><strong>Tus proyectos:</strong> los elementos geométricos y las láminas que guardas en la nube.</li>
+                            <li><strong>Progreso:</strong> los temas y ejercicios de la Academia que marcas como completados.</li>
+                            <li><strong>Plan:</strong> si tienes Premium activo y hasta qué fecha.</li>
+                            <li><strong>Preferencias:</strong> tema claro/oscuro y posición del panel del asistente.</li>
                         </ul>
                         <p className="text-white/80 leading-relaxed mt-3">
-                            Para ejercer estos derechos, contáctanos en
-                            <Link to="/contact" className="text-blue-400 hover:text-blue-300 ml-1">
-                                nuestra página de contacto
-                            </Link>.
+                            No usamos cookies publicitarias, ni Google Analytics, ni vendemos datos a nadie.
                         </p>
                     </section>
 
                     <section>
-                        <h2 className="text-2xl font-semibold mb-3">7. Cookies</h2>
+                        <h2 className="text-2xl font-semibold mb-3">2. Para qué usamos esos datos</h2>
+                        <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
+                            <li>Guardar tus proyectos y láminas para que los recuperes en cualquier equipo.</li>
+                            <li>Mantener tu sesión iniciada y proteger tu cuenta.</li>
+                            <li>Saber si tu plan Premium está activo.</li>
+                            <li>Guardar tu progreso en la Academia.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">3. Asistente IA</h2>
+                        <p className="text-white/80 leading-relaxed">
+                            Cuando usas el asistente, el texto que escribes se envía a través de nuestro servidor
+                            (Supabase Edge Function) al proveedor del modelo (Groq) para generar la respuesta.
+                            <strong> No guardamos tus conversaciones</strong>: se pierden al recargar la página.
+                            Solo se registra un contador anónimo de peticiones para evitar abusos.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">4. Pagos</h2>
+                        <p className="text-white/80 leading-relaxed">
+                            Las suscripciones Premium se cobran a través de <strong>Ko-fi</strong> (PayPal o Stripe).
+                            Los datos de tu tarjeta los gestiona Ko-fi y su pasarela de pago: Diédrico Studio
+                            <strong> nunca ve ni almacena datos bancarios</strong>. Nosotros solo recibimos el aviso
+                            del pago y el email que hayas usado, para activar tu cuenta.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">5. Con quién compartimos</h2>
                         <p className="text-white/80 leading-relaxed mb-3">
-                            Utilizamos las siguientes tipos de cookies:
+                            No vendemos ni alquilamos información personal. Usamos estos proveedores, solo con lo
+                            necesario para que la aplicación funcione:
                         </p>
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
-                            <li><strong>Cookies esenciales:</strong> Necesarias para el funcionamiento del sitio</li>
-                            <li><strong>Cookies de análisis:</strong> Google Analytics para entender el uso del sitio</li>
-                            <li><strong>Cookies de publicidad:</strong> Google AdSense para mostrar anuncios</li>
+                            <li><strong>Supabase:</strong> base de datos, login y servidor del asistente (servidores en la UE).</li>
+                            <li><strong>Vercel:</strong> alojamiento de la web.</li>
+                            <li><strong>Groq:</strong> procesamiento de las peticiones del asistente IA.</li>
+                            <li><strong>Ko-fi:</strong> gestión de suscripciones y pagos.</li>
+                            <li><strong>Google:</strong> solo si eliges iniciar sesión con tu cuenta de Google.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">6. Almacenamiento y seguridad</h2>
+                        <p className="text-white/80 leading-relaxed">
+                            Los datos se guardan en Supabase con cifrado en tránsito y reglas de acceso por usuario
+                            (cada cuenta solo puede leer y escribir sus propios proyectos). El acceso a la base de
+                            datos desde la aplicación está limitado por esas reglas, no por confianza en el navegador.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">7. Cuánto tiempo los guardamos</h2>
+                        <p className="text-white/80 leading-relaxed">
+                            Tus proyectos y láminas se conservan mientras tengas la cuenta. Puedes borrarlos tú
+                            mismo desde la aplicación. Si quieres eliminar la cuenta completa, escríbenos y se
+                            borran la cuenta, los proyectos y el progreso.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">8. Tus derechos</h2>
+                        <p className="text-white/80 leading-relaxed mb-3">Puedes solicitar en cualquier momento:</p>
+                        <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
+                            <li>Acceder a tus datos personales.</li>
+                            <li>Rectificar datos incorrectos.</li>
+                            <li>Eliminar tu cuenta y tus datos.</li>
+                            <li>Exportar tus proyectos.</li>
+                            <li>Oponerte al tratamiento o retirar el consentimiento.</li>
                         </ul>
                         <p className="text-white/80 leading-relaxed mt-3">
-                            Puedes configurar tu navegador para rechazar cookies, pero esto puede afectar
-                            la funcionalidad del sitio.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">8. Menores de Edad</h2>
-                        <p className="text-white/80 leading-relaxed">
-                            Este sitio no está dirigido a menores de 13 años. No recopilamos intencionadamente
-                            información de menores de 13 años. Si descubres que un menor ha proporcionado
-                            información personal, contáctanos.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">9. Cambios a esta Política</h2>
-                        <p className="text-white/80 leading-relaxed">
-                            Podemos actualizar esta política de privacidad ocasionalmente. Te notificaremos
-                            de cambios significativos mediante un aviso en el sitio web. El uso continuado
-                            del sitio después de los cambios constituye la aceptación de la nueva política.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-3">10. Contacto</h2>
-                        <p className="text-white/80 leading-relaxed">
-                            Si tienes preguntas sobre esta política de privacidad, contáctanos en:
-                        </p>
-                        <p className="text-blue-400 mt-2">
-                            Email: diedrico.studio25@gmail.com
-                        </p>
-                        <p className="text-white/70 mt-2">
-                            O visita nuestra
+                            Para ejercerlos, escríbenos desde
                             <Link to="/contact" className="text-blue-400 hover:text-blue-300 ml-1">
-                                página de contacto
-                            </Link>.
+                                la página de contacto
+                            </Link>
+                            .
                         </p>
                     </section>
 
-                    <div className="border-t border-white/20 pt-6 mt-8">
-                        <p className="text-xs text-white/50">
-                            Al utilizar Diédrico Studio, aceptas esta política de privacidad y el uso de cookies
-                            según lo descrito.
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">9. Menores</h2>
+                        <p className="text-white/80 leading-relaxed">
+                            La aplicación está pensada para estudiantes de secundaria y universidad. Si eres menor de
+                            edad, necesitas la autorización de tu padre, madre o tutor para crear una cuenta.
                         </p>
-                    </div>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold mb-3">10. Cambios en esta política</h2>
+                        <p className="text-white/80 leading-relaxed">
+                            Si cambiamos algo relevante (por ejemplo, un nuevo proveedor), actualizaremos esta página
+                            y la fecha de arriba.
+                        </p>
+                    </section>
                 </div>
             </div>
         </div>

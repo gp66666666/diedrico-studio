@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { PlaneElement, GeometryElement } from '../../types';
+import { toast } from '../../lib/toast';
 
 export default function AbatimientoTool() {
     const { activeTool, elements, addElement, setActiveTool, selectedForDistance, clearDistanceTool, removeElement } = useGeometryStore();
@@ -32,7 +33,7 @@ export default function AbatimientoTool() {
                     clearDistanceTool();
                 } else {
                     // Si seleccionan algo inválido, reseteamos la herramienta
-                    alert('Debes seleccionar un PLANO y un PUNTO para abatir.');
+                    toast('Debes seleccionar un PLANO y un PUNTO para abatir.');
                     setActiveTool('none');
                     clearDistanceTool();
                 }
@@ -50,13 +51,13 @@ export default function AbatimientoTool() {
         const distToPlane = Math.abs(A * pt.coords.x + B * pt.coords.y + C_plane * pt.coords.z + D) / lenN;
 
         if (distToPlane > 0.1) {
-            alert(`El punto ${pt.name} no pertenece al plano ${plane.name}. No se puede abatir.`);
+            toast(`El punto ${pt.name} no pertenece al plano ${plane.name}. No se puede abatir.`);
             return;
         }
 
         const flatName = `(${pt.name})`;
         if (elements.some(e => e.name === flatName)) {
-            alert(`El punto ${pt.name} ya está abatido.`);
+            toast(`El punto ${pt.name} ya está abatido.`);
             return; // Ya abatido
         }
 

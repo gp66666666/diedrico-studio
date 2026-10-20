@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { Check, X } from 'lucide-react';
+import { toast } from '../../lib/toast';
 
 export default function GroupTool() {
     const { activeTool, selectedForDistance, createGroup, setActiveTool, clearDistanceTool, elements, theme } = useGeometryStore();
@@ -10,7 +11,7 @@ export default function GroupTool() {
 
     const handleConfirm = () => {
         if (selectedForDistance.length === 0) {
-            alert('Selecciona al menos un elemento para crear un grupo.');
+            toast('Selecciona al menos un elemento para crear un grupo.');
             return;
         }
         const name = groupName.trim() || `Grupo ${elements.filter(e => e.type === 'group').length + 1}`;

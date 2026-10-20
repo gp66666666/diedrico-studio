@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     ArrowLeft, Box, Layers, PencilRuler, Sparkles, BookOpen,
@@ -6,6 +7,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { PREMIUM } from '../config/premium';
+import { trackEvent } from '../lib/analytics';
 
 /* ------------------------------------------------------------------ */
 
@@ -80,6 +82,10 @@ const TOC = [
 ];
 
 export default function GuidePage() {
+    useEffect(() => {
+        trackEvent('guide_view');
+    }, []);
+
     return (
         <>
             <SEO
@@ -455,8 +461,9 @@ export default function GuidePage() {
                         {/* 13 */}
                         <Section id="trucos" number="13" title="Trucos y atajos" icon={<Move3d size={20} />}>
                             <ul className="space-y-2 text-sm">
-                                <li><b className="text-white">Ctrl + Z / Ctrl + Y</b>: deshacer y rehacer.</li>
-                                <li><b className="text-white">Rueda del ratón</b>: zoom. En 3D, botón derecho + arrastrar para orbitar.</li>
+                                <li><b className="text-white">Ctrl + Z / Ctrl + Y</b>: deshacer y rehacer (también en Mac con ⌘).</li>
+                                <li><b className="text-white">Supr</b>: borra el elemento seleccionado. <b className="text-white">Escape</b>: cancela la herramienta activa.</li>
+                                <li><b className="text-white">Rueda del ratón</b>: zoom. En 3D, arrastra con el botón izquierdo para orbitar y con el derecho para desplazar la vista.</li>
                                 <li><b className="text-white">Mini 3D</b>: comprueba en el espacio lo que estás dibujando en 2D.</li>
                                 <li><b className="text-white">Nombra los puntos</b>: A, B, C… hace que el asistente y los enunciados se entiendan mucho mejor.</li>
                                 <li><b className="text-white">Trabaja por capas</b>: oculta las construcciones auxiliares con el ojo de la lista.</li>

@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, FileText, PenTool, Menu, X, Layers, Printer, Info, HelpCircle } from 'lucide-react';
-import Scene from './components/Scene';
+// El motor 3D (three.js) es el trozo más pesado: se carga aparte para que la
+// interfaz aparezca antes en móviles.
+const Scene = lazy(() => import('./components/Scene'));
 import Sidebar from './components/Sidebar';
-import DiedricoView from './components/DiedricoView';
-import CaballeraView from './features/caballera/components/CaballeraView';
+const DiedricoView = lazy(() => import('./components/DiedricoView'));
+const CaballeraView = lazy(() => import('./features/caballera/components/CaballeraView'));
 import SEO from './components/SEO';
 import { useGeometryStore } from './store/geometryStore';
 import { useUserStore } from './store/userStore';
@@ -13,12 +15,14 @@ import LaminasCloudSync from './components/LaminasCloudSync';
 import { AIChatPanel } from './features/ai-assistant';
 import { useAIStore } from './features/ai-assistant/store/aiStore';
 import { useThemeSync, useThemeInitializer } from './hooks/useThemeSync';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useDraftAutosave } from './hooks/useDraftAutosave';
 import SolidsTool from './components/tools/SolidsTool';
 // AdBanner import removed
 
 export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { theme, viewMode, setViewMode } = useGeometryStore();
+    const { theme, viewMode, setViewMode, elements } = useGeometryStore();
     const { isPremium } = useUserStore();
     const { generateExercise } = useAIStore();
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -27,6 +31,8 @@ export default function MainApp() {
     // Inicializar y sincronizar el tema
     useThemeInitializer();
     useThemeSync();
+    useKeyboardShortcuts();
+    useDraftAutosave();
 
     // Listen for messages from the Láminas iframe
     useEffect(() => {
@@ -158,7 +164,7 @@ export default function MainApp() {
                     {viewMode !== 'caballera' && viewMode !== 'laminas' && (
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className={`md:hidden absolute top-4 left-4 z-50 p-2 rounded-lg backdrop-blur-md border transition-colors ${tabBg} ${textMain}`}
+                            className={`md:hidden absolute top-4 left-4 z-50 p-3 rounded-lg backdrop-blur-md border transition-colors ${tabBg} ${textMain}`}
                         >
                             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
@@ -188,7 +194,7 @@ export default function MainApp() {
                         <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 backdrop-blur-md p-1 rounded-xl border flex gap-1 transition-colors max-w-[90vw] overflow-x-auto no-scrollbar ${tabBg}`}>
                             <button
                                 onClick={() => setViewMode('3d')}
-                                className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === '3d' ? tabActive : tabInactive}`}
+                                className={`px-3 md:px-4 py-2.5 md:py-2 min-h-[44px] md:min-h-0 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${viewMode === '3d' ? tabActive : tabInactive}`}
                             >
                                 <Box size={16} /> <span className="hidden sm:inline">Vista</span> 3D
                             </button>
@@ -222,11 +228,28 @@ export default function MainApp() {
 
                         {/* View Content */}
                         <div key={viewMode} className="flex-1 relative w-full h-full animate-fade-in">
+                            {elements.length === 0 && viewMode === '3d' && (
+                                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">
+                                    <div className="max-w-xs rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-center backdrop-blur-sm">
+                                        <p className="text-sm font-semibold text-white">Tu lienzo está vacío</p>
+                                        <p className="mt-1 text-xs leading-relaxed text-white/70">
+                                            <span className="md:hidden">Pulsa ☰ y añade tu primer punto.</span>
+                                            <span className="hidden md:inline">Añade tu primer punto en el panel de la izquierda.</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
                             {viewMode === '3d' ? (
-                                <>
+                                <Suspense
+                                    fallback={
+                                        <div className="flex h-full w-full items-center justify-center bg-[#0b1120]">
+                                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                                        </div>
+                                    }
+                                >
                                     <Scene />
-                                    {/* Instructions overlay removed for aesthetics and mobile usability */}
-                                </>
+                                </Suspense>
                             ) : viewMode === 'caballera' ? (
                                 <CaballeraView />
                             ) : viewMode === 'laminas' ? (

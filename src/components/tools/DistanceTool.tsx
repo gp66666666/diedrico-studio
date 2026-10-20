@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { LineElement, PlaneElement, PointElement } from '../../types';
+import { toast } from '../../lib/toast';
 
 export default function DistanceTool() {
     const { activeTool, elements, addMeasurement, setActiveTool, selectedForDistance } = useGeometryStore();
@@ -45,7 +46,7 @@ export default function DistanceTool() {
             }
         } catch (error) {
             console.error('Distance calculation error:', error);
-            alert('Error al calcular la distancia.');
+            toast('Error al calcular la distancia.');
         }
 
         setActiveTool('none');
@@ -57,7 +58,7 @@ export default function DistanceTool() {
         const p2 = elements.find(e => e.id === id2) as PointElement;
 
         if (!p1 || !p2 || p1.type !== 'point' || p2.type !== 'point') {
-            alert('Selecciona dos puntos.');
+            toast('Selecciona dos puntos.');
             return;
         }
 
@@ -97,7 +98,7 @@ export default function DistanceTool() {
             line = el1 as LineElement;
             point = el2 as PointElement;
         } else {
-            alert('Selecciona un punto y una recta.');
+            toast('Selecciona un punto y una recta.');
             return;
         }
 
@@ -158,7 +159,7 @@ export default function DistanceTool() {
             plane = el1 as PlaneElement;
             point = el2 as PointElement;
         } else {
-            alert('Selecciona un punto y un plano.');
+            toast('Selecciona un punto y un plano.');
             return;
         }
 
@@ -203,7 +204,7 @@ export default function DistanceTool() {
         const el2 = elements.find(e => e.id === id2) as LineElement;
 
         if (el1?.type !== 'line' || el2?.type !== 'line') {
-            alert('Selecciona dos rectas.');
+            toast('Selecciona dos rectas.');
             return;
         }
 
@@ -297,13 +298,13 @@ export default function DistanceTool() {
 
         if (el1?.type === 'line' && el2?.type === 'plane') { line = el1 as LineElement; plane = el2 as PlaneElement; }
         else if (el1?.type === 'plane' && el2?.type === 'line') { plane = el1 as PlaneElement; line = el2 as LineElement; }
-        else { alert('Selecciona recta y plano.'); return; }
+        else { toast('Selecciona recta y plano.'); return; }
 
         // Check if parallel: Line dir . Plane normal = 0
         const dot = line.direction.x * plane.normal.x + line.direction.y * plane.normal.y + line.direction.z * plane.normal.z;
 
         if (Math.abs(dot) > 1e-6) {
-            alert('La recta y el plano se cortan (Distancia = 0).');
+            toast('La recta y el plano se cortan (Distancia = 0).');
             return;
         }
 
@@ -343,7 +344,7 @@ export default function DistanceTool() {
         const el1 = elements.find(e => e.id === id1) as PlaneElement;
         const el2 = elements.find(e => e.id === id2) as PlaneElement;
 
-        if (el1?.type !== 'plane' || el2?.type !== 'plane') { alert('Selecciona dos planos.'); return; }
+        if (el1?.type !== 'plane' || el2?.type !== 'plane') { toast('Selecciona dos planos.'); return; }
 
         // Check parallel: n1 x n2 = 0
         const n1 = el1.normal;
@@ -357,7 +358,7 @@ export default function DistanceTool() {
         const crossMag = Math.sqrt(cross.x ** 2 + cross.y ** 2 + cross.z ** 2);
 
         if (crossMag > 1e-5) {
-            alert('Los planos se cortan (Distancia = 0).');
+            toast('Los planos se cortan (Distancia = 0).');
             return;
         }
 

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { LineElement, PlaneElement, PointElement } from '../../types';
 import { getNextName } from '../../utils/namingUtils';
+import { toast } from '../../lib/toast';
 
 export default function ParallelismTool() {
     const { activeTool, elements, addElement, setActiveTool, selectForDistance, selectedForDistance } = useGeometryStore();
@@ -61,7 +62,7 @@ export default function ParallelismTool() {
             }
         } catch (error) {
             console.error('Parallelism/Perpendicularity error:', error);
-            alert('Error al crear el elemento paralelo/perpendicular.');
+            toast('Error al crear el elemento paralelo/perpendicular.');
         }
 
         setActiveTool('none');
@@ -82,7 +83,7 @@ export default function ParallelismTool() {
             point = el1 as PointElement;
             refLine = el2 as LineElement;
         } else {
-            alert('Selecciona una recta y un punto.');
+            toast('Selecciona una recta y un punto.');
             return;
         }
 
@@ -124,7 +125,7 @@ export default function ParallelismTool() {
             point = el1 as PointElement;
             plane = el2 as PlaneElement;
         } else {
-            alert('Selecciona un plano y un punto.');
+            toast('Selecciona un plano y un punto.');
             return;
         }
 
@@ -184,7 +185,7 @@ export default function ParallelismTool() {
             point = el1 as PointElement;
             line = el2 as LineElement;
         } else {
-            alert('Selecciona una recta y un punto.');
+            toast('Selecciona una recta y un punto.');
             return;
         }
 
@@ -238,7 +239,7 @@ export default function ParallelismTool() {
             pointEl = el1 as PointElement;
             plane = el2 as PlaneElement;
         } else {
-            alert('Selecciona un plano y un punto.');
+            toast('Selecciona un plano y un punto.');
             return;
         }
 
@@ -279,7 +280,7 @@ export default function ParallelismTool() {
             pointEl = el1 as PointElement;
             line = el2 as LineElement;
         } else {
-            alert('Selecciona una recta y un punto.');
+            toast('Selecciona una recta y un punto.');
             return;
         }
 
@@ -314,7 +315,7 @@ export default function ParallelismTool() {
             point = el1 as PointElement;
             refLine = el2 as LineElement;
         } else {
-            alert('Selecciona una recta y un punto.');
+            toast('Selecciona una recta y un punto.');
             return;
         }
 
@@ -372,7 +373,7 @@ export default function ParallelismTool() {
             point = el1 as PointElement;
             plane = el2 as PlaneElement;
         } else {
-            alert('Selecciona un plano y un punto.');
+            toast('Selecciona un plano y un punto.');
             return;
         }
 
@@ -399,7 +400,7 @@ export default function ParallelismTool() {
         const planes = els.filter(e => e?.type === 'plane') as PlaneElement[];
 
         if (!point || planes.length !== 2) {
-            alert('Selecciona un punto y dos planos.');
+            toast('Selecciona un punto y dos planos.');
             return;
         }
 
@@ -434,7 +435,7 @@ export default function ParallelismTool() {
         const planes = els.filter(e => e?.type === 'plane') as PlaneElement[];
 
         if (!point || planes.length !== 2) {
-            alert('Selecciona un punto y dos planos.');
+            toast('Selecciona un punto y dos planos.');
             return;
         }
 
@@ -474,7 +475,7 @@ export default function ParallelismTool() {
         const lines = els.filter(e => e?.type === 'line') as LineElement[];
 
         if (!point || lines.length !== 2) {
-            alert('Selecciona un punto y dos rectas.');
+            toast('Selecciona un punto y dos rectas.');
             return;
         }
 

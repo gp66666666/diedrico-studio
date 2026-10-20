@@ -31,6 +31,7 @@ import VMReconstructionTool from './tools/VMReconstructionTool';
 import SolidsTool from './tools/SolidsTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
+import { toast } from '../lib/toast';
 
 export default function Sidebar() {
     const {
@@ -289,12 +290,12 @@ export default function Sidebar() {
                 const vz = getVal(planeInterceptTypes.z, planeInterceptsStr.z);
 
                 if (vx === 0 || vy === 0 || vz === 0) {
-                    alert('Las trazas no pueden cortar en el origen (0). Usa otro método para planos que pasen por la línea de tierra.');
+                    toast('Las trazas no pueden cortar en el origen (0). Usa otro método para planos que pasen por la línea de tierra.');
                     return;
                 }
 
                 if (vx === Infinity && vy === Infinity && vz === Infinity) {
-                    alert('El plano no puede tener todas sus trazas en el infinito.');
+                    toast('El plano no puede tener todas sus trazas en el infinito.');
                     return;
                 }
 
@@ -313,11 +314,11 @@ export default function Sidebar() {
                     const line1 = elements.find(e => e.id === selectedLine1Id) as LineElement;
                     const line2 = elements.find(e => e.id === selectedLine2Id) as LineElement;
                     if (!line1 || !line2) {
-                        alert("Selecciona dos rectas válidas");
+                        toast("Selecciona dos rectas válidas");
                         return;
                     }
                     if (line1.id === line2.id) {
-                        alert("Selecciona dos rectas diferentes");
+                        toast("Selecciona dos rectas diferentes");
                         return;
                     }
                     l1 = { point: line1.point, direction: line1.direction };
@@ -329,7 +330,7 @@ export default function Sidebar() {
 
                 const result = calculatePlaneFromTwoLines(l1, l2);
                 if (!result) {
-                    alert("Las rectas no forman un plano válido (son cruzadas o coincidentes)");
+                    toast("Las rectas no forman un plano válido (son cruzadas o coincidentes)");
                     return;
                 }
                 normal = result.normal;
@@ -465,7 +466,7 @@ export default function Sidebar() {
             // 3D Export (Canvas)
             const canvas = document.querySelector('canvas');
             if (!canvas) {
-                alert('No se encontró la vista 3D para exportar');
+                toast('No se encontró la vista 3D para exportar');
                 return;
             }
 
@@ -478,7 +479,7 @@ export default function Sidebar() {
             // 2D/Sketch Export (SVG)
             const svg = document.getElementById('main-drawing-svg') as unknown as SVGSVGElement;
             if (!svg) {
-                alert('No se encontró ninguna vista para exportar');
+                toast('No se encontró ninguna vista para exportar');
                 return;
             }
 
@@ -607,7 +608,7 @@ export default function Sidebar() {
 
         } catch (error) {
             console.error('Error exporting all views:', error);
-            alert('Error al exportar las vistas. Por favor, inténtalo de nuevo.');
+            toast('Error al exportar las vistas. Por favor, inténtalo de nuevo.');
         }
     };
 
@@ -622,7 +623,7 @@ export default function Sidebar() {
             <div className={`p-4 border-b ${headerBorder}`}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain rounded-lg bg-white/10 p-1" />
+                        <img src="/logo-128.png" alt="Diédrico Studio" className="w-10 h-10 object-contain rounded-lg bg-white/10 p-1" />
                         <div>
                             <h1 className={`text-lg font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                 Diédrico Studio

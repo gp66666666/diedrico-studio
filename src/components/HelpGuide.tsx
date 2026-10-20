@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Book, Pencil, Box, RotateCw, Ruler, MousePointer2 } from 'lucide-react';
+import { useModalA11y } from '../hooks/useModalA11y';
 
 interface HelpGuideProps {
     isOpen: boolean;
@@ -10,6 +11,7 @@ interface HelpGuideProps {
 
 export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
     const [activeTab, setActiveTab] = useState<'intro' | 'sketch' | 'diedrico'>('intro');
+    const panelRef = useModalA11y(isOpen, onClose);
 
     if (!isOpen) return null;
 
@@ -68,7 +70,14 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md p-4 transition-all duration-300">
-            <div className={`w-full max-w-3xl h-[80vh] flex flex-col rounded-2xl shadow-2xl border ${bgClass} ring-1 ring-white/10 help-guide-modal`}>
+            <div
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Manual de usuario"
+                tabIndex={-1}
+                className={`w-full max-w-3xl h-[80vh] flex flex-col rounded-2xl shadow-2xl border ${bgClass} ring-1 ring-white/10 help-guide-modal outline-none`}
+            >
                 {/* Header */}
                 <div className={`flex items-center justify-between p-4 border-b ${headerClass}`}>
                     <h2 className={`text-xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
@@ -113,7 +122,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                     </h3>
                                     <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
                                         • <b>Click Izquierdo:</b> Seleccionar.<br />
-                                        • <b>Click Derecho + Arrastrar:</b> Orbitar (3D) o Desplazar (2D).<br />
+                                        • <b>Arrastrar:</b> orbitar en 3D o mover la vista en 2D (botón izquierdo).<br />
                                         • <b>Rueda:</b> Zoom.
                                     </p>
                                 </div>

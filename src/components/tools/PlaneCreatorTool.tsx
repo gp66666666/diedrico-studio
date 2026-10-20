@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { PointElement } from '../../types';
+import { toast } from '../../lib/toast';
 
 export default function PlaneCreatorTool() {
     const { activeTool, elements, addElement, setActiveTool, selectedForDistance, clearDistanceTool } = useGeometryStore();
@@ -30,7 +31,7 @@ export default function PlaneCreatorTool() {
                 // Check if pins are collinear
                 const mag = Math.sqrt(normal.x ** 2 + normal.y ** 2 + normal.z ** 2);
                 if (mag < 1e-6) {
-                    alert('Los puntos son colineales. No definen un plano.');
+                    toast('Los puntos son colineales. No definen un plano.');
                     setActiveTool('none');
                     clearDistanceTool();
                     return;

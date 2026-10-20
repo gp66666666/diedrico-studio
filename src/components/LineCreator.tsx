@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useGeometryStore } from '../store/geometryStore';
 import { getNextName } from '../utils/namingUtils';
+import { toast } from '../lib/toast';
 
 export default function LineCreator() {
     const { elements, addElement } = useGeometryStore();
@@ -13,12 +14,12 @@ export default function LineCreator() {
 
     const handleCreateLine = () => {
         if (!point1 || !point2) {
-            alert('Selecciona ambos puntos');
+            toast('Selecciona ambos puntos');
             return;
         }
 
         if (point1 === point2) {
-            alert('Los puntos deben ser diferentes');
+            toast('Los puntos deben ser diferentes');
             return;
         }
 
@@ -26,7 +27,7 @@ export default function LineCreator() {
         const p2 = points.find(p => p.id === point2);
 
         if (!p1 || !p2) {
-            alert('Puntos no encontrados');
+            toast('Puntos no encontrados');
             return;
         }
 

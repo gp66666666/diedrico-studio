@@ -6,6 +6,7 @@ import { ACADEMY_CONTENT } from '../data/academyContent';
 import type { AcademyTopic, AcademyExercise } from '../types';
 import { Sun, Moon, ArrowLeft, BookOpen, CheckCircle2, Printer, Play, ChevronUp } from 'lucide-react';
 import PremiumModal from '../components/Auth/PremiumModal';
+import { trackEvent } from '../lib/analytics';
 import { useThemeSync } from '../hooks/useThemeSync';
 
 export default function AcademyPage() {
@@ -23,6 +24,10 @@ export default function AcademyPage() {
     const contentRef = useRef<HTMLDivElement>(null);
 
     const isDark = geom.theme === 'dark';
+
+    useEffect(() => {
+        trackEvent('academy_view', { premium: isPremium });
+    }, [isPremium]);
 
     // Sincronizar tema usando el hook centralizado
     useThemeSync();

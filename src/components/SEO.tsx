@@ -13,7 +13,7 @@ export default function SEO({
     title = 'Diédrico Studio - Herramienta Educativa de Sistema Diédrico',
     description = 'Aprende sistema diédrico de forma interactiva con visualización 3D en tiempo real. Herramientas de geometría descriptiva, proyecciones diédricas automáticas y asistente AI. Gratis y educativo.',
     keywords = 'sistema diédrico, geometría descriptiva, dibujo técnico, visualización 3D, educación, ingeniería, arquitectura, proyecciones diédricas, alzado, planta, perfil',
-    ogImage = 'https://diedrico-studio.vercel.app/logo.png',
+    ogImage = 'https://diedrico-studio.vercel.app/og-image.jpg',
     canonicalUrl = 'https://diedrico-studio.vercel.app/',
     type = 'website'
 }: SEOProps) {
@@ -24,11 +24,27 @@ export default function SEO({
         "description": description,
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Web Browser",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "EUR"
-        },
+        // Hay plan gratuito y plan Premium: no anunciar solo "gratis"
+        "offers": [
+            {
+                "@type": "Offer",
+                "name": "Gratis",
+                "price": "0",
+                "priceCurrency": "EUR"
+            },
+            {
+                "@type": "Offer",
+                "name": "Premium",
+                "price": "4.99",
+                "priceCurrency": "EUR",
+                "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "4.99",
+                    "priceCurrency": "EUR",
+                    "billingDuration": "P1M"
+                }
+            }
+        ],
         "creator": {
             "@type": "Person",
             "name": "Eloi García",

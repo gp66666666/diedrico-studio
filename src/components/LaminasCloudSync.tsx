@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Cloud, CloudOff, Loader2, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useUserStore } from '../store/userStore';
+import { trackEvent } from '../lib/analytics';
 
 /**
  * Sincroniza las láminas con Supabase.
@@ -153,6 +154,7 @@ export default function LaminasCloudSync({ iframeRef }: { iframeRef: React.RefOb
             localStorage.setItem(MARKER_KEY, hash(json));
             lastSaved.current = json;
             setState('saved');
+            trackEvent('lamina_saved');
         } catch (e) {
             console.error('No se pudieron guardar las láminas', e);
             setState('error');

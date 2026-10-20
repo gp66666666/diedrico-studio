@@ -2,7 +2,7 @@
 import { useGeometryStore } from '../../../store/geometryStore';
 import type { AIStep } from '../types/ai.types';
 import { executeAdvancedTool } from './aiAdvancedTools';
-import { evaluate } from 'mathjs';
+import { toast } from '../../../lib/toast';
 
 export class AIExecutor {
     async executeStep(step: AIStep): Promise<void> {
@@ -291,15 +291,17 @@ export class AIExecutor {
         });
     }
 
-    private executeCalculateMath(step: AIStep): void {
+    private async executeCalculateMath(step: AIStep): Promise<void> {
         const { expression } = step.params;
         try {
+            // mathjs solo se descarga si el asistente tiene que calcular algo
+            const { evaluate } = await import('mathjs');
             const result = evaluate(expression);
             console.log(`[AI Math] ${expression} = ${result}`);
-            window.alert(`🧮 Cálculo IA: ${expression} = ${result}`);
+            toast(`🧮 Cálculo IA: ${expression} = ${result}`);
         } catch (error) {
             console.error('[AI Math] Error calculating:', error);
-            window.alert(`❌ Error de cálculo: ${expression}`);
+            toast(`❌ Error de cálculo: ${expression}`);
         }
     }
 }

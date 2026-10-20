@@ -2,6 +2,7 @@ import { useGeometryStore } from '../../store/geometryStore';
 import { Check, X } from 'lucide-react';
 import { calculateAbatimiento, calculatePlaneAbatimientoTraces } from '../../utils/mathUtils';
 import { PointElement, SegmentElement, PlaneElement } from '../../types';
+import { toast } from '../../lib/toast';
 
 export default function VMReconstructionTool() {
     const { activeTool, selectedForDistance, setActiveTool, clearDistanceTool, elements, theme, addElement } = useGeometryStore();
@@ -16,11 +17,11 @@ export default function VMReconstructionTool() {
 
     const handleConfirm = () => {
         if (planeSelection.length === 0) {
-            alert('Debes seleccionar un PLANO como referencia para la reconstrucción.');
+            toast('Debes seleccionar un PLANO como referencia para la reconstrucción.');
             return;
         }
         if (elementSelection.length === 0) {
-            alert('Selecciona al menos un elemento para reconstruir.');
+            toast('Selecciona al menos un elemento para reconstruir.');
             return;
         }
 

@@ -9,9 +9,10 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
     const size = 40;
     // Dark Mode: White/Light gray planes
     // Light Mode: Purple planes
-    const opacity = isDark ? 0.15 : 0.25;
-    const planeColor = isDark ? "#e5e7eb" : "#8b5cf6";
-    const gridColor = isDark ? "white" : "black";
+    // En claro, un plano violeta al 25% sobre fondo gris dejaba todo lavado.
+    const opacity = isDark ? 0.15 : 0.10;
+    const planeColor = isDark ? "#e5e7eb" : "#334155";
+    const gridColor = isDark ? "white" : "#0f172a";
     const bisectorOpacity = 0.15;
 
     return (
@@ -65,10 +66,10 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             )}
 
             {/* --- Quadrant Labels --- */}
-            <Text position={[5, 5, 5]} fontSize={1} color={gridColor} fillOpacity={0.5}>I Cuadrante</Text>
-            <Text position={[5, 5, -5]} fontSize={1} color={gridColor} fillOpacity={0.5}>II Cuadrante</Text>
-            <Text position={[5, -5, -5]} fontSize={1} color={gridColor} fillOpacity={0.5}>III Cuadrante</Text>
-            <Text position={[5, -5, 5]} fontSize={1} color={gridColor} fillOpacity={0.5}>IV Cuadrante</Text>
+            <Text position={[5, 5, 5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>I Cuadrante</Text>
+            <Text position={[5, 5, -5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>II Cuadrante</Text>
+            <Text position={[5, -5, -5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>III Cuadrante</Text>
+            <Text position={[5, -5, 5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>IV Cuadrante</Text>
 
         </group>
     );

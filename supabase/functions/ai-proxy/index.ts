@@ -30,6 +30,10 @@ const LIMIT_WINDOW_S = 3600;    // por hora y por IP
 // 300 llamadas/día cubren de sobra un uso de estudio; el coste real sigue siendo céntimos.
 const USER_LIMIT_REQUESTS = 300;
 const USER_LIMIT_WINDOW_S = 86400;
+// Prueba gratuita: 3 mensajes por cuenta y mes, para que se pueda probar
+// lo que se vende sin abrir la puerta a un uso gratis indefinido.
+const TRIAL_REQUESTS = 3;
+const TRIAL_WINDOW_S = 30 * 86400;
 
 function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
@@ -95,10 +99,36 @@ Deno.serve(async (req: Request) => {
       (!profile.premium_until || new Date(profile.premium_until) > new Date());
 
     if (!active) {
-      return json(
-        { error: { code: "premium_required", message: "El asistente IA es una función Premium. Actívala desde tu cuenta." } },
-        402,
-      );
+      // Sin Premium: 3 mensajes de prueba por cuenta y mes
+      const trial = await fetch(`${supabaseUrl}/rest/v1/rpc/check_ai_rate_limit`, {
+        method: "POST",
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          p_key: await sha256Hex(`trial:${userId}`),
+          p_limit: TRIAL_REQUESTS,
+          p_window_seconds: TRIAL_WINDOW_S,
+        }),
+      });
+
+      const usedRaw = trial.ok ? Number(await trial.json()) : 0;
+      const used = Number.isFinite(usedRaw) ? usedRaw : 0;
+
+      if (used > TRIAL_REQUESTS) {
+        return json(
+          {
+            error: {
+              code: "premium_required",
+              message:
+                "Has usado tus 3 mensajes de prueba. El asistente es Premium: actívalo desde tu cuenta para seguir.",
+            },
+          },
+          402,
+        );
+      }
     }
   } catch (e) {
     console.error("premium check", e);

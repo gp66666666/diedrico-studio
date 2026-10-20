@@ -55,8 +55,8 @@ export default function Scene() {
 
     const isDark = theme === 'dark';
     const bgColor = isDark ? '#0a0e1a' : '#f3f4f6';
-    const gridSectionColor = isDark ? '#4b5563' : '#d1d5db';
-    const gridCellColor = isDark ? '#1f2937' : '#e5e7eb';
+    const gridSectionColor = isDark ? '#4b5563' : '#94a3b8';
+    const gridCellColor = isDark ? '#1f2937' : '#cbd5e1';
 
     // Filter measurements with visualLine for 3D rendering
     const distanceMeasurements = measurements.filter(m => m.visualLine);

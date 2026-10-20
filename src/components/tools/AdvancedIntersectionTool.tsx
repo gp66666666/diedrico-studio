@@ -7,6 +7,7 @@ import {
     intersectTwoLinesOnePlane
 } from '../../utils/mathUtils';
 import type { LineElement, PlaneElement } from '../../types';
+import { toast } from '../../lib/toast';
 
 export default function AdvancedIntersectionTool() {
     const activeTool = useGeometryStore(state => state.activeTool);
@@ -85,17 +86,17 @@ export default function AdvancedIntersectionTool() {
                             coords: result.point,
                             color: '#ff9900'
                         } as any);
-                        alert('⚠️ Mostrando una de las infinitas posibles soluciones');
+                        toast('⚠️ Mostrando una de las infinitas posibles soluciones');
                         console.log('[AdvancedIntersectionTool] ⚠️ INFINITE solutions - showing one');
                         clearDistanceTool();
                         setActiveTool('none');
                     } else {
-                        alert('Los 3 planos no se intersectan en un punto común');
+                        toast('Los 3 planos no se intersectan en un punto común');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
                 } else {
-                    alert('Selecciona 3 planos');
+                    toast('Selecciona 3 planos');
                     clearDistanceTool();
                     setActiveTool('none');
                 }
@@ -127,12 +128,12 @@ export default function AdvancedIntersectionTool() {
                         clearDistanceTool();
                         setActiveTool('none');
                     } else {
-                        alert('Las 3 rectas no se intersectan en un punto común');
+                        toast('Las 3 rectas no se intersectan en un punto común');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
                 } else {
-                    alert('Selecciona 3 rectas');
+                    toast('Selecciona 3 rectas');
                     clearDistanceTool();
                     setActiveTool('none');
                 }
@@ -163,12 +164,12 @@ export default function AdvancedIntersectionTool() {
                         clearDistanceTool();
                         setActiveTool('none');
                     } else {
-                        alert('No hay intersección común');
+                        toast('No hay intersección común');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
                 } else {
-                    alert('Selecciona 2 planos y 1 recta');
+                    toast('Selecciona 2 planos y 1 recta');
                     clearDistanceTool();
                     setActiveTool('none');
                 }
@@ -215,19 +216,19 @@ export default function AdvancedIntersectionTool() {
                         clearDistanceTool();
                         setActiveTool('none');
                     } else {
-                        alert('Ninguna recta intersecta el plano');
+                        toast('Ninguna recta intersecta el plano');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
                 } else {
-                    alert('Selecciona 2 rectas y 1 plano');
+                    toast('Selecciona 2 rectas y 1 plano');
                     clearDistanceTool();
                     setActiveTool('none');
                 }
             }
         } catch (error) {
             console.error('[AdvancedIntersectionTool] ❌ ERROR:', error);
-            alert('Error al calcular la intersección: ' + error);
+            toast('Error al calcular la intersección: ' + error);
             clearDistanceTool();
             setActiveTool('none');
         }

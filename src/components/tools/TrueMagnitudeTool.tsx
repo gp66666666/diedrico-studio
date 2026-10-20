@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { LineElement, PlaneElement } from '../../types';
+import { toast } from '../../lib/toast';
 
 export default function TrueMagnitudeTool() {
     const { activeTool, elements, addMeasurement, setActiveTool, selectForDistance, selectedForDistance } = useGeometryStore();
@@ -39,7 +40,7 @@ export default function TrueMagnitudeTool() {
             }
         } catch (error) {
             console.error('Measurement error:', error);
-            alert('Error al calcular la medición.');
+            toast('Error al calcular la medición.');
         }
 
         setActiveTool('none');
@@ -50,7 +51,7 @@ export default function TrueMagnitudeTool() {
         const line = elements.find(e => e.id === id) as LineElement;
 
         if (!line || line.type !== 'line') {
-            alert('Selecciona una recta para medir su longitud.');
+            toast('Selecciona una recta para medir su longitud.');
             return;
         }
 
@@ -87,7 +88,7 @@ export default function TrueMagnitudeTool() {
         const line2 = elements.find(e => e.id === id2) as LineElement;
 
         if (!line1 || !line2 || line1.type !== 'line' || line2.type !== 'line') {
-            alert('Selecciona dos rectas para medir el ángulo.');
+            toast('Selecciona dos rectas para medir el ángulo.');
             return;
         }
 
@@ -135,7 +136,7 @@ export default function TrueMagnitudeTool() {
             line = el2 as LineElement;
             plane = el1 as PlaneElement;
         } else {
-            alert('Selecciona una recta y un plano para medir el ángulo.');
+            toast('Selecciona una recta y un plano para medir el ángulo.');
             return;
         }
 
@@ -171,7 +172,7 @@ export default function TrueMagnitudeTool() {
         const el2 = elements.find(e => e.id === id2);
 
         if (!el1 || !el2 || el1.type !== 'plane' || el2.type !== 'plane') {
-            alert('Selecciona dos planos para medir el ángulo.');
+            toast('Selecciona dos planos para medir el ángulo.');
             return;
         }
 

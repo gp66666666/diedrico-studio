@@ -5,6 +5,7 @@ import './index.css'
 import './sidebar-theme-protection.css'
 import './academy-dark-theme.css'
 import App from './App'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // Herramienta de desarrollo: permite inspeccionar y manipular el estado
 // desde la consola del navegador. No se incluye en la build de producción.
@@ -24,8 +25,10 @@ if (import.meta.env.DEV) {
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <HelmetProvider>
-            <App />
-        </HelmetProvider>
+        <ErrorBoundary>
+            <HelmetProvider>
+                <App />
+            </HelmetProvider>
+        </ErrorBoundary>
     </StrictMode>,
 )

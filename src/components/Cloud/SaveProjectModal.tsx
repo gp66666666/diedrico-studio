@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Save, Loader } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
+import { useModalA11y } from '../../hooks/useModalA11y';
+import { trackEvent } from '../../lib/analytics';
+import { toast } from '../../lib/toast';
 
 interface SaveProjectModalProps {
     isOpen: boolean;
@@ -14,7 +17,17 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
 
-    const { saveProject } = useGeometryStore();
+    const { saveProject, currentProjectId, currentProjectTitle } = useGeometryStore();
+    const panelRef = useModalA11y(isOpen, onClose);
+
+    // Al abrir, si ya hay un proyecto en curso, se precarga para actualizarlo
+    useEffect(() => {
+        if (isOpen) {
+            setTitle(currentProjectTitle || '');
+            setError('');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -29,10 +42,10 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
 
         try {
             await saveProject(title, description);
-            setTitle('');
+            trackEvent('project_saved', { updated: !!currentProjectId });
             setDescription('');
             onClose();
-            alert('✅ Proyecto guardado en la nube');
+            toast.success(currentProjectId ? 'Proyecto actualizado en la nube' : 'Proyecto guardado en la nube');
         } catch (err: any) {
             setError(err.message || 'Error al guardar el proyecto');
         } finally {
@@ -42,12 +55,21 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full">
+            <div
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Guardar proyecto"
+                tabIndex={-1}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full outline-none"
+            >
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-2">
                         <Save size={20} className="text-blue-600" />
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Guardar Proyecto</h3>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                            {currentProjectId ? 'Actualizar proyecto' : 'Guardar proyecto'}
+                        </h3>
                     </div>
                     <button
                         onClick={onClose}
@@ -59,6 +81,11 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
 
                 {/* Content */}
                 <div className="p-4 space-y-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {currentProjectId
+                            ? `Se actualizará «${currentProjectTitle}». Para crear uno nuevo, usa "Limpiar" antes de guardar.`
+                            : 'Se creará un proyecto nuevo en tu cuenta.'}
+                    </p>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Título *
@@ -116,7 +143,7 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
                         ) : (
                             <>
                                 <Save size={16} />
-                                Guardar
+                                {currentProjectId ? 'Actualizar' : 'Guardar'}
                             </>
                         )}
                     </button>

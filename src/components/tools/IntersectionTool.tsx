@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { intersectLineLine, intersectLinePlane, intersectPlanePlane } from '../../utils/mathUtils';
 import type { LineElement, PlaneElement } from '../../types';
+import { toast } from '../../lib/toast';
 
 export default function IntersectionTool() {
     const activeTool = useGeometryStore(state => state.activeTool);
@@ -70,7 +71,7 @@ export default function IntersectionTool() {
                         clearDistanceTool();
                         setActiveTool('none');
                     } else {
-                        alert('Las rectas no se intersectan');
+                        toast('Las rectas no se intersectan');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
@@ -104,7 +105,7 @@ export default function IntersectionTool() {
                         clearDistanceTool();
                         setActiveTool('none');
                     } else {
-                        alert('La recta es paralela al plano');
+                        toast('La recta es paralela al plano');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
@@ -143,7 +144,7 @@ export default function IntersectionTool() {
                         clearDistanceTool();
                         setActiveTool('none');
                     } else {
-                        alert('Los planos son paralelos');
+                        toast('Los planos son paralelos');
                         clearDistanceTool();
                         setActiveTool('none');
                     }
@@ -151,7 +152,7 @@ export default function IntersectionTool() {
             }
         } catch (error) {
             console.error('[IntersectionTool] ❌ ERROR:', error);
-            alert('Error: ' + error);
+            toast('Error: ' + error);
             clearDistanceTool();
             setActiveTool('none');
         }

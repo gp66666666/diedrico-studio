@@ -2,14 +2,43 @@ import { create } from 'zustand';
 import type { GeometryElement, SketchElement } from '../types';
 import { supabase } from '../lib/supabase';
 
+/** Estado que se guarda en cada paso de deshacer/rehacer. */
+type HistorySnapshot = {
+    elements: GeometryElement[];
+    sketchElements: SketchElement[];
+    measurements: Array<{
+        id: string;
+        type: 'length' | 'angle' | 'distance';
+        value: number;
+        label: string;
+        elementIds: string[];
+        visible?: boolean;
+        visualLine?: { p1: { x: number; y: number; z: number }; p2: { x: number; y: number; z: number } };
+    }>;
+    auxSystems: import('../types').ProjectionSystem[];
+};
+
+const snapshotOf = (state: {
+    elements: GeometryElement[];
+    sketchElements: SketchElement[];
+    measurements: HistorySnapshot['measurements'];
+    auxSystems: HistorySnapshot['auxSystems'];
+}): HistorySnapshot => ({
+    elements: state.elements,
+    sketchElements: state.sketchElements,
+    measurements: state.measurements,
+    auxSystems: state.auxSystems,
+});
+
 interface GeometryState {
     elements: GeometryElement[];
     sketchElements: SketchElement[];
 
-    // History
+    // History: incluye también medidas y sistemas auxiliares para que
+    // deshacer no deje etiquetas de distancia huérfanas.
     history: {
-        past: { elements: GeometryElement[], sketchElements: SketchElement[] }[];
-        future: { elements: GeometryElement[], sketchElements: SketchElement[] }[];
+        past: HistorySnapshot[];
+        future: HistorySnapshot[];
     };
     undo: () => void;
     redo: () => void;
@@ -127,6 +156,9 @@ interface GeometryState {
     updateCaballeraPreview: (coords: Partial<GeometryState['caballeraState']['previewCoords']>) => void;
 
     // Cloud Save/Load (Premium)
+    /** Proyecto abierto/guardado en esta sesión (para actualizar en vez de duplicar). */
+    currentProjectId: string | null;
+    currentProjectTitle: string | null;
     saveProject: (title: string, description?: string) => Promise<string>;
     loadProject: (projectId: string) => Promise<void>;
     getUserProjects: () => Promise<any[]>;
@@ -174,6 +206,8 @@ export function selectionCountForTool(tool: string): number {
 export const useGeometryStore = create<GeometryState>((set, get) => ({
     elements: [],
     sketchElements: [],
+    currentProjectId: null,
+    currentProjectTitle: null,
 
     // Camera Persistence
     cameraStates: {
@@ -217,35 +251,39 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     },
 
     undo: () => {
-        const { history, elements, sketchElements } = get();
+        const state = get();
+        const { history } = state;
         if (history.past.length === 0) return;
 
         const previous = history.past[history.past.length - 1];
-        const newPast = history.past.slice(0, -1);
 
         set({
             elements: previous.elements,
             sketchElements: previous.sketchElements,
+            measurements: previous.measurements,
+            auxSystems: previous.auxSystems,
             history: {
-                past: newPast,
-                future: [{ elements, sketchElements }, ...history.future]
+                past: history.past.slice(0, -1),
+                future: [snapshotOf(state), ...history.future]
             }
         });
     },
 
     redo: () => {
-        const { history, elements, sketchElements } = get();
+        const state = get();
+        const { history } = state;
         if (history.future.length === 0) return;
 
         const next = history.future[0];
-        const newFuture = history.future.slice(1);
 
         set({
             elements: next.elements,
             sketchElements: next.sketchElements,
+            measurements: next.measurements,
+            auxSystems: next.auxSystems,
             history: {
-                past: [...history.past, { elements, sketchElements }],
-                future: newFuture
+                past: [...history.past, snapshotOf(state)],
+                future: history.future.slice(1)
             }
         });
     },
@@ -255,7 +293,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         return {
             elements: [...state.elements, newElement],
             history: {
-                past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+                past: [...state.history.past, snapshotOf(state)],
                 future: []
             }
         };
@@ -267,7 +305,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         measurements: state.measurements.filter((m) => !m.elementIds?.includes(id)),
         selectedElementId: state.selectedElementId === id ? null : state.selectedElementId,
         history: {
-            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            past: [...state.history.past, snapshotOf(state)],
             future: []
         }
     })),
@@ -277,7 +315,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
             el.id === id ? { ...el, ...updates } as GeometryElement : el
         ),
         history: {
-            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            past: [...state.history.past, snapshotOf(state)],
             future: []
         }
     })),
@@ -287,7 +325,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
             el.id === id ? { ...el, visible: !el.visible } : el
         ),
         history: {
-            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            past: [...state.history.past, snapshotOf(state)],
             future: []
         }
     })),
@@ -301,8 +339,10 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         selectedElementId: null,
         selectedForDistance: [],
         distanceResult: null,
+        currentProjectId: null,
+        currentProjectTitle: null,
         history: {
-            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            past: [...state.history.past, snapshotOf(state)],
             future: []
         }
     })),
@@ -311,7 +351,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     addSketchElement: (element) => set((state) => ({
         sketchElements: [...state.sketchElements, element],
         history: {
-            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            past: [...state.history.past, snapshotOf(state)],
             future: []
         }
     })),
@@ -319,7 +359,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     removeSketchElement: (id) => set((state) => ({
         sketchElements: state.sketchElements.filter((el) => el.id !== id),
         history: {
-            past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+            past: [...state.history.past, snapshotOf(state)],
             future: []
         }
     })),
@@ -372,7 +412,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         return {
             elements: [...state.elements, newGroup],
             history: {
-                past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
+                past: [...state.history.past, snapshotOf(state)],
                 future: []
             }
         };
@@ -438,19 +478,24 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     // Measurements (True Magnitude)
     measurements: [],
     addMeasurement: (measurement) => set((state) => ({
-        measurements: [...state.measurements, { ...measurement, id: Math.random().toString(36).substr(2, 9), visible: true }]
+        measurements: [...state.measurements, { ...measurement, id: Math.random().toString(36).substr(2, 9), visible: true }],
+        history: { past: [...state.history.past, snapshotOf(state)], future: [] }
     })),
     removeMeasurement: (id) => set((state) => ({
-        measurements: state.measurements.filter(m => m.id !== id)
+        measurements: state.measurements.filter(m => m.id !== id),
+        history: { past: [...state.history.past, snapshotOf(state)], future: [] }
     })),
     toggleMeasurementVisibility: (id) => set((state) => ({
         measurements: state.measurements.map(m => m.id === id ? { ...m, visible: !m.visible } : m)
     })),
-    clearAllMeasurements: () => set({ measurements: [] }),
+    clearAllMeasurements: () => set((state) => ({
+        measurements: [],
+        history: { past: [...state.history.past, snapshotOf(state)], future: [] }
+    })),
 
     // Cloud Save/Load (Premium)
     saveProject: async (title: string, description?: string) => {
-        const { elements, sketchElements } = get();
+        const { elements, sketchElements, currentProjectId } = get();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) throw new Error('Must be logged in to save projects');
@@ -459,8 +504,24 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
             user_id: user.id,
             title,
             description: description || '',
-            data: { elements, sketchElements }
+            data: { elements, sketchElements },
+            updated_at: new Date().toISOString(),
         };
+
+        // Si hay un proyecto abierto se actualiza: antes cada "Guardar" creaba
+        // una copia nueva y el usuario acababa con cinco versiones iguales.
+        if (currentProjectId) {
+            const { data, error } = await supabase
+                .from('projects')
+                .update(projectData)
+                .eq('id', currentProjectId)
+                .select()
+                .single();
+
+            if (error) throw error;
+            set({ currentProjectTitle: title });
+            return data.id;
+        }
 
         const { data, error } = await supabase
             .from('projects')
@@ -469,6 +530,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
             .single();
 
         if (error) throw error;
+        set({ currentProjectId: data.id, currentProjectTitle: title });
         return data.id;
     },
 
@@ -485,6 +547,16 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         set({
             elements,
             sketchElements,
+            // Sin esto se quedaban las medidas y los cambios de plano del
+            // proyecto anterior flotando sobre el nuevo.
+            measurements: [],
+            auxSystems: [],
+            selectedElementId: null,
+            selectedForDistance: [],
+            distanceResult: null,
+            activeTool: 'none',
+            currentProjectId: data.id,
+            currentProjectTitle: data.title,
             history: { past: [], future: [] }
         });
     },
@@ -525,9 +597,11 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     // Auxiliary Systems
     auxSystems: [],
     addAuxSystem: (system) => set((state) => ({
-        auxSystems: [...state.auxSystems, { ...system, id: Math.random().toString(36).substr(2, 9) }]
+        auxSystems: [...state.auxSystems, { ...system, id: Math.random().toString(36).substr(2, 9) }],
+        history: { past: [...state.history.past, snapshotOf(state)], future: [] }
     })),
     removeAuxSystem: (id) => set((state) => ({
-        auxSystems: state.auxSystems.filter(s => s.id !== id)
+        auxSystems: state.auxSystems.filter(s => s.id !== id),
+        history: { past: [...state.history.past, snapshotOf(state)], future: [] }
     })),
 }));

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { X, FolderOpen, Loader, Trash2, Calendar, Edit2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
+import { useModalA11y } from '../../hooks/useModalA11y';
+import { toast } from '../../lib/toast';
 
 interface LoadProjectModalProps {
     isOpen: boolean;
@@ -14,6 +16,7 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
     const [error, setError] = useState('');
 
     const { loadProject, getUserProjects, deleteProject, renameProject } = useGeometryStore();
+    const panelRef = useModalA11y(isOpen, onClose);
 
     useEffect(() => {
         if (isOpen) {
@@ -38,7 +41,7 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
         try {
             await loadProject(projectId);
             onClose();
-            alert('✅ Proyecto cargado correctamente');
+            toast('✅ Proyecto cargado correctamente');
         } catch (err: any) {
             setError(err.message || 'Error al cargar el proyecto');
         }
@@ -66,7 +69,14 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[600px] flex flex-col">
+            <div
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Abrir proyecto"
+                tabIndex={-1}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[600px] flex flex-col outline-none"
+            >
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-2">

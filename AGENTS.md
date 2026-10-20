@@ -52,16 +52,26 @@ src/
 └── utils/                      matemáticas, distancias, etiquetas
 
 scripts/premium.sh              activar/quitar premium a mano (service_role)
+scripts/kofi-token.sh           guardar el Verification Token de Ko-fi en Supabase
+
+Analítica: @vercel/analytics (sin cookies). Eventos en `src/lib/analytics.ts`
+(premium_modal_open, premium_kofi_click, ai_gate, ai_message, academy_view, guide_view...).
+Hay que activar Web Analytics en el panel de Vercel.
 ```
 
 ## Base de datos (Supabase)
 
-Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Solo dos tablas en `public`:
+Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 
 - `projects(id, user_id, title, description, thumbnail_url, data jsonb, created_at, updated_at)`
   — `data = { elements, sketchElements }`. RLS por `auth.uid() = user_id`.
+  **Guardar actualiza** si hay `currentProjectId` en el store; si no, inserta.
+- `laminas_docs(user_id PK, data jsonb, updated_at)` — un documento de láminas por usuario.
+  RLS por `auth.uid() = user_id`. Se sincroniza desde `LaminasCloudSync` escuchando el
+  `localStorage` del iframe (mismo origen).
 - `kofi_events(...)` — pagos del webhook de Ko-fi (auditoría + idempotencia). Sin políticas RLS:
   solo `service_role`.
+- `ai_rate_limits(key, window_start, count)` — contadores de rate limit (IP, usuario y prueba).
 - `profiles(id, email, full_name, avatar_url, is_premium, premium_until, role, completed_topics text[],
   completed_exercises text[], created_at)` — RLS por `auth.uid() = id`; un trigger protege
   `is_premium`/`premium_until`/`role`/`email` para que el cliente no pueda escalar privilegios.
@@ -71,8 +81,10 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Solo dos tablas en `
 - Config única: `src/config/premium.ts` (features, enlace de Ko-fi, texto de precio).
 - Premium = **Academia** + **Asistente IA**. La nube (guardar proyectos) es gratis.
 - `isPremium` del `userStore` es derivado: `is_premium && (!premium_until || premium_until > now)`.
-- El panel de IA lo ve todo el mundo; sin premium muestra un aviso y no llama a la API
-  (el proxy tiene además rate limit por IP).
+- El panel de IA lo ve todo el mundo. Sin premium tiene **3 mensajes de prueba** por cuenta y
+  mes (los cuenta el proxy, no el cliente). Al agotarlos, 402 y se abre el modal de Premium.
+- El proxy exige JWT de una cuenta válida y comprueba el plan: 401 sin sesión, 402 sin Premium
+  ni prueba. Además: 60/h por IP, 300/día por cuenta.
 - Activación automática: `supabase/functions/kofi-webhook` recibe los pagos de Ko-fi y suma 1 mes
   a `premium_until` por pago (idempotente por `message_id`). Requiere el secret
   `KOFI_VERIFICATION_TOKEN` con el token de Ko-fi.
@@ -102,6 +114,10 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 ## Convenciones
 
 - TypeScript estricto; el build falla si hay errores de tipos (`tsc -b`).
+- Avisos al usuario con `toast()` (`src/lib/toast.ts`), **no** `alert()`.
+- Modales con `useModalA11y` (Escape, foco atrapado, `role="dialog"`).
+- Rutas secundarias en `lazy()`; el motor 3D (`Scene`, `DiedricoView`) también, para que la
+  interfaz pinte antes. Los `console.log` se eliminan en producción (`esbuild.pure`).
 - Estado global con Zustand; no introducir otra librería de estado.
 - Los errores de Supabase deben comprobarse (`if (error)`) — hay `try/catch` heredados que se
   comen fallos en silencio (p. ej. en `userStore`); no añadir más.
@@ -117,10 +133,13 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
   `parameters` y no se ejecutaba **ningún** paso. Ya acepta ambos (y `args`), y quita el JSON
   crudo de la respuesta.
 - Las **láminas** (`public/Laminas_automaticas.html`) guardan su estado en `localStorage`
-  (`diedricoProject`), no en Supabase: no se sincronizan entre dispositivos.
+  (`diedricoProject`) y `LaminasCloudSync` lo replica en `laminas_docs`. Una hoja vacía nunca
+  se sube encima de un documento con contenido.
+- El **borrador** del lienzo se guarda en `localStorage['diedricoDraft']` y se restaura al abrir
+  si el lienzo está vacío (`useDraftAutosave`).
 - No hay modelo de visión en la cuenta: `scanImage()` lanza un error explicativo.
-- El panel `AIChatPanel` está comentado en `MainApp.tsx`; la IA se usa desde el iframe
-  (generar ejercicios / digitalizar imagen), no desde un chat visible.
+- El chat de IA (`AIChatPanel`) es visible: botón flotante. Tiene dos modos, resolver y crear
+  ejercicio. El generador de las láminas también exige Premium.
 - El modo invitado guarda progreso en `localStorage`; el usuario logueado en `profiles`.
 - Auth: Google OAuth + email/contraseña (registro desactivado en el dashboard).
 - `site_url` de Auth debe ser la URL de producción; las URLs locales (`localhost:5173`) están

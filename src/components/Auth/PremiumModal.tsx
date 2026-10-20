@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
 import { X, Crown, Check, ExternalLink } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { PREMIUM } from '../../config/premium';
 import { useUserStore } from '../../store/userStore';
+import { useModalA11y } from '../../hooks/useModalA11y';
+import { trackEvent } from '../../lib/analytics';
 
 interface PremiumModalProps {
     isOpen: boolean;
@@ -10,12 +13,24 @@ interface PremiumModalProps {
 
 export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
     const { isPremium, user } = useUserStore();
+    const panelRef = useModalA11y(isOpen, onClose);
+
+    useEffect(() => {
+        if (isOpen) trackEvent('premium_modal_open', { premium: isPremium });
+    }, [isOpen, isPremium]);
 
     if (!isOpen) return null;
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Diédrico Studio Premium"
+                tabIndex={-1}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden outline-none"
+            >
                 {/* Header */}
                 <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-6 text-white relative">
                     <button
@@ -84,6 +99,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                                 href={PREMIUM.kofiUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={() => trackEvent('premium_kofi_click', { source: 'premium' })}
                                 className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold hover:opacity-90 transition-opacity"
                             >
                                 <Crown size={18} /> Hacerme Premium

@@ -6,6 +6,8 @@ import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
 import PremiumModal from '../../../components/Auth/PremiumModal';
 import { useUserStore } from '../../../store/userStore';
+import { useAIStore } from '../store/aiStore';
+import { trackEvent } from '../../../lib/analytics';
 
 interface AIChatPanelProps {
     isSidebarOpen?: boolean;
@@ -123,6 +125,25 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     // Modo del asistente: resolver un enunciado o inventar uno nuevo.
     const [mode, setMode] = useState<'solve' | 'generate'>('solve');
 
+    // Prueba gratuita (3 mensajes). El servidor es quien manda: esto solo
+    // sirve para mostrar cuántos quedan. Si se desincroniza, el proxy corta.
+    const TRIAL = 3;
+    const [trialUsed, setTrialUsed] = useState(() => {
+        const raw = Number(localStorage.getItem('aiTrialUsed') || '0');
+        return Number.isFinite(raw) ? raw : 0;
+    });
+    const trialLeft = Math.max(0, TRIAL - trialUsed);
+
+    // Si el servidor responde 402, se abre el modal de Premium
+    useEffect(() => {
+        if (error && /premium|prueba/i.test(error)) {
+            trackEvent('ai_gate');
+            setShowPremiumModal(true);
+            setTrialUsed(TRIAL);
+            localStorage.setItem('aiTrialUsed', String(TRIAL));
+        }
+    }, [error]);
+
     // Guardar posición al cambiar
     useEffect(() => {
         if (isInitialized) {
@@ -135,16 +156,24 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
 
         if (!input.trim() || isProcessing) return;
 
-        if (!isPremium) {
-            setShowPremiumModal(true);
-            return;
-        }
-
+        // Sin Premium se deja intentar: los 3 primeros mensajes son gratis.
+        // A partir de ahí el servidor devuelve 402 y se abre el modal.
         if (mode === 'generate') {
             await generateStatement(input);
         } else {
             await sendPrompt(input);
         }
+
+        if (!useAIStore.getState().error) {
+            trackEvent('ai_message', { premium: isPremium });
+        }
+
+        if (!isPremium && !useAIStore.getState().error) {
+            const used = Math.min(TRIAL, trialUsed + 1);
+            setTrialUsed(used);
+            localStorage.setItem('aiTrialUsed', String(used));
+        }
+
         setInput('');
     };
 
@@ -557,7 +586,10 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     onClick={() => setShowPremiumModal(true)}
                                     className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-xs font-medium text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
                                 >
-                                    <Lock size={13} /> El asistente es Premium · ver qué incluye
+                                    <Lock size={13} />
+                                    {trialLeft > 0
+                                        ? `Prueba gratis: te quedan ${trialLeft} de ${TRIAL} mensajes · ver Premium`
+                                        : 'Prueba terminada · ver Premium'}
                                 </button>
                             )}
                             <div className="flex gap-2">
@@ -566,7 +598,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder={!isPremium
-                                        ? 'Función Premium'
+                                        ? (trialLeft > 0 ? 'Escribe y prueba gratis' : 'Prueba terminada')
                                         : mode === 'generate'
                                             ? 'Ej: intersección de plano y recta'
                                             : 'Escribe un ejercicio...'}
