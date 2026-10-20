@@ -6,7 +6,7 @@ export const PREMIUM = {
     kofiUrl: 'https://ko-fi.com/eloigperezzds',
 
     /** Texto libre; vacío = no se muestra precio en la web. */
-    priceLabel: '',
+    priceLabel: '4,99 €/mes',
 
     /** Lo que desbloquea el plan. Se pinta tal cual en el modal. */
     features: [
