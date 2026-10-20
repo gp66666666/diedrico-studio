@@ -18,6 +18,7 @@ import { useThemeSync, useThemeInitializer } from './hooks/useThemeSync';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useDraftAutosave } from './hooks/useDraftAutosave';
 import { decodeScene } from './lib/shareScene';
+import { toast } from './lib/toast';
 import SolidsTool from './components/tools/SolidsTool';
 // AdBanner import removed
 
@@ -290,12 +291,28 @@ export default function MainApp() {
                                             <span className="md:hidden">Pulsa ☰ y añade tu primer punto.</span>
                                             <span className="hidden md:inline">Añade tu primer punto en el panel de la izquierda.</span>
                                         </p>
-                                        <a
-                                            href="/ejercicios"
-                                            className="pointer-events-auto mt-2 inline-block text-[11px] font-semibold text-blue-300 underline underline-offset-2 hover:text-blue-200"
-                                        >
-                                            o abre un ejercicio resuelto
-                                        </a>
+                                        <div className="pointer-events-auto mt-3 flex flex-col gap-1.5">
+                                            <button
+                                                onClick={() => {
+                                                    useGeometryStore.getState().addElement({
+                                                        type: 'point',
+                                                        name: 'A',
+                                                        coords: { x: 0, y: 5, z: 5 },
+                                                        color: '#f87171',
+                                                    });
+                                                    toast.success('Punto A creado. Prueba la pestaña Diédrico (2D).');
+                                                }}
+                                                className="rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-blue-500"
+                                            >
+                                                Crear un punto de ejemplo
+                                            </button>
+                                            <a
+                                                href="/ejercicios"
+                                                className="text-[11px] font-semibold text-blue-300 underline underline-offset-2 hover:text-blue-200"
+                                            >
+                                                o abre un ejercicio resuelto
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             )}
