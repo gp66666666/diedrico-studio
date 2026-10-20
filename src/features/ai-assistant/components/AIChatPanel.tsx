@@ -1,12 +1,13 @@
 // AI Chat Panel - Main UI Component - CON ARRASTRE CORREGIDO
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, ChevronRight, Move, Crown, Lock } from 'lucide-react';
+import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, ChevronRight, Move, Crown, Lock, ClipboardCheck } from 'lucide-react';
 import { useAIAssistant } from '../hooks/useAIAssistant';
 import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
 import PremiumModal from '../../../components/Auth/PremiumModal';
 import { useUserStore } from '../../../store/userStore';
 import { useAIStore } from '../store/aiStore';
+import { useGeometryStore } from '../../../store/geometryStore';
 import { trackEvent } from '../../../lib/analytics';
 
 interface AIChatPanelProps {
@@ -26,6 +27,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
 
     // El asistente es función premium: el panel se ve, pero sin plan no gasta tokens.
     const { isPremium } = useUserStore();
+    const elements = useGeometryStore((s) => s.elements);
 
     // Estados para arrastre
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -117,6 +119,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
         error,
         sendPrompt,
         generateStatement,
+        reviewScene,
         executeSteps,
         executeNextStep,
         reset,
@@ -558,6 +561,19 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
 
                         {/* Input Area */}
                         <form onSubmit={handleSubmit} className="border-t border-gray-200 dark:border-gray-700 p-4">
+                            {elements.length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const lastUser = [...messages].reverse().find((m) => m.role === 'user');
+                                        void reviewScene(lastUser?.content || '');
+                                    }}
+                                    disabled={isProcessing}
+                                    className="mb-2 flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:opacity-50 dark:border-emerald-500/30 dark:bg-emerald-900/20 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
+                                >
+                                    <ClipboardCheck size={14} /> Revisar mi dibujo ({elements.length})
+                                </button>
+                            )}
                             <div className="mb-2 grid grid-cols-2 gap-1 rounded-lg bg-gray-100 dark:bg-gray-700/50 p-1">
                                 <button
                                     type="button"

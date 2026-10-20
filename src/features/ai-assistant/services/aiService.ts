@@ -11,8 +11,12 @@ export class AIService {
         this.service = new GroqService();
     }
 
-    async solveExercise(prompt: string, systemPromptOverride?: string): Promise<AIResponse> {
-        return this.service.solveExercise(prompt, systemPromptOverride);
+    async solveExercise(
+        prompt: string,
+        systemPromptOverride?: string,
+        options?: { includeFunctions?: boolean; includeContext?: boolean; maxTokens?: number },
+    ): Promise<AIResponse> {
+        return this.service.solveExercise(prompt, systemPromptOverride, options);
     }
 
     async scanImage(imageData: string): Promise<AIResponse> {

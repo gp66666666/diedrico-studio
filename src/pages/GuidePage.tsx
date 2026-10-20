@@ -421,6 +421,11 @@ export default function GuidePage() {
                                 <Step n={4} title="Comprueba en 3D y en 2D">
                                     Lo que dibuja el asistente son elementos normales: aparecen en las dos vistas y puedes seguir trabajando con ellos.
                                 </Step>
+                                <Step n={5} title="Pídele que corrija tu dibujo">
+                                    Con algo dibujado aparece el botón «Revisar mi dibujo». Envía el enunciado y lo que has
+                                    construido, y te dice si está bien o dónde está el error (por ejemplo, si un punto no
+                                    pertenece a una recta).
+                                </Step>
                             </ol>
                             <p className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-sm">
                                 El asistente es la función Premium principal. Sin plan Premium verás el panel y el botón de mejora de plan,
@@ -510,12 +515,20 @@ export default function GuidePage() {
                         <div className="mt-10 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-6 text-center">
                             <p className="text-lg font-semibold text-white">¿Listo para practicar?</p>
                             <p className="mt-1 text-sm text-slate-300">Abre la aplicación y prueba a crear tres puntos y girar un cubo.</p>
-                            <Link
-                                to="/"
-                                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
-                            >
-                                <Box size={18} /> Abrir Diédrico Studio
-                            </Link>
+                            <div className="mt-4 flex flex-wrap justify-center gap-2">
+                                <Link
+                                    to="/"
+                                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+                                >
+                                    <Box size={18} /> Abrir Diédrico Studio
+                                </Link>
+                                <Link
+                                    to="/ejercicios"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
+                                >
+                                    Ejercicios resueltos
+                                </Link>
+                            </div>
                         </div>
                     </main>
                 </div>

@@ -9,7 +9,12 @@ import { callAIProxy, AI_PROXY_MODEL } from './aiProxy';
 export class GroqService {
     constructor() {}
 
-    async solveExercise(userPrompt: string, systemPromptOverride?: string): Promise<AIResponse> {
+    async solveExercise(
+        userPrompt: string,
+        systemPromptOverride?: string,
+        options: { includeFunctions?: boolean; includeContext?: boolean; maxTokens?: number } = {},
+    ): Promise<AIResponse> {
+        const { includeFunctions = true, includeContext = true, maxTokens = 2000 } = options;
         await rateLimiter.checkLimit();
         colorManager.reset();
 
@@ -23,13 +28,19 @@ export class GroqService {
             }).join('\n')
             : "Lienzo vacío.";
 
-        const baseSystemPrompt = systemPromptOverride || SYSTEM_PROMPT;
-        const fullSystemPrompt = baseSystemPrompt +
-            "\n\nCONTEXTO ACTUAL (LO QUE YA EXISTE):\n" + contextDescription +
-            "\n\nDEFINICIONES DE FUNCIONES DISPONIBLES (ÚSALAS):\n" + JSON.stringify(FUNCTION_DEFINITIONS);
+        // El esquema de funciones ocupa miles de tokens: solo se manda cuando el
+        // modelo tiene que dibujar. Para generar un enunciado o corregir, sobra
+        // (era la causa de tocar el límite de tokens por minuto del plan gratuito).
+        let fullSystemPrompt = systemPromptOverride || SYSTEM_PROMPT;
+        if (includeContext) {
+            fullSystemPrompt += "\n\nCONTEXTO ACTUAL (LO QUE YA EXISTE):\n" + contextDescription;
+        }
+        if (includeFunctions) {
+            fullSystemPrompt += "\n\nDEFINICIONES DE FUNCIONES DISPONIBLES (ÚSALAS):\n" + JSON.stringify(FUNCTION_DEFINITIONS);
+        }
 
         try {
-            const response = await callAIProxy({
+            const request = () => callAIProxy({
                 model: AI_PROXY_MODEL,
                 messages: [
                     {
@@ -42,8 +53,16 @@ export class GroqService {
                     }
                 ],
                 temperature: 0.1,
-                max_tokens: 2000,
+                max_tokens: maxTokens,
             });
+
+            let response = await request();
+
+            // Límite de tokens por minuto del plan gratuito: un reintento tras 5 s
+            if (response.status === 429) {
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+                response = await request();
+            }
 
             if (!response.ok) {
                 const error = await response.json();

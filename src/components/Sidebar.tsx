@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2, Plane as PlaneIcon,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen, Share2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../sidebar-theme-protection.css';
@@ -32,6 +32,7 @@ import SolidsTool from './tools/SolidsTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 import { toast } from '../lib/toast';
+import { encodeScene, buildShareUrl } from '../lib/shareScene';
 
 export default function Sidebar() {
     const {
@@ -40,6 +41,7 @@ export default function Sidebar() {
         removeElement,
         updateElement,
         toggleVisibility,
+        currentProjectTitle,
         selectedElementId,
         selectElement,
         showIntersections,
@@ -517,6 +519,39 @@ export default function Sidebar() {
         }
     };
 
+    /** Comparte el dibujo actual en un enlace (sin cuentas ni servidor). */
+    const handleShareScene = async () => {
+        if (elements.length === 0) {
+            toast('Añade algo al lienzo antes de compartir');
+            return;
+        }
+
+        try {
+            const payload = await encodeScene(elements, currentProjectTitle || undefined);
+            const url = buildShareUrl(payload);
+
+            if (url.length > 1800) {
+                toast.error('El ejercicio es muy grande para un enlace. Expórtalo como imagen.');
+                return;
+            }
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Ejercicio de Diédrico Studio', url });
+                    return;
+                } catch {
+                    // el usuario canceló o el navegador no deja: se copia
+                }
+            }
+
+            await navigator.clipboard.writeText(url);
+            toast.success('Enlace copiado: cualquiera puede abrir el ejercicio sin cuenta');
+        } catch (e) {
+            console.error('No se pudo compartir', e);
+            toast.error('No se pudo crear el enlace');
+        }
+    };
+
     const handleExportAllViews = async () => {
         try {
             const JSZip = (await import('jszip')).default;
@@ -766,6 +801,15 @@ export default function Sidebar() {
                         >
                             <span className="flex items-center gap-2">
                                 <Download size={16} /> Todas las Vistas
+                            </span>
+                        </button>
+                        <div className={`my-1 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`} />
+                        <button
+                            onClick={() => void handleShareScene()}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Share2 size={16} /> Compartir ejercicio
                             </span>
                         </button>
                     </div>

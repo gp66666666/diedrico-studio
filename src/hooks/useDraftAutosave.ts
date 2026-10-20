@@ -16,9 +16,12 @@ export function useDraftAutosave() {
     const ready = useRef(false);
 
     useEffect(() => {
-        // 1. Recuperar el último borrador
+        // Un ejercicio compartido por enlace manda sobre el borrador local
+        const hasShared = new URLSearchParams(window.location.search).has('e');
+
+        // 1. Recuperar el último borrador (salvo si viene un ejercicio por enlace)
         try {
-            const raw = localStorage.getItem(KEY);
+            const raw = hasShared ? null : localStorage.getItem(KEY);
             if (raw) {
                 const draft = JSON.parse(raw);
                 const state = useGeometryStore.getState();

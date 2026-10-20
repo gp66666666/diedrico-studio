@@ -144,8 +144,15 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 - El **borrador** del lienzo se guarda en `localStorage['diedricoDraft']` y se restaura al abrir
   si el lienzo está vacío (`useDraftAutosave`).
 - No hay modelo de visión en la cuenta: `scanImage()` lanza un error explicativo.
-- El chat de IA (`AIChatPanel`) es visible: botón flotante. Tiene dos modos, resolver y crear
-  ejercicio. El generador de las láminas también exige Premium.
+- El chat de IA (`AIChatPanel`) es visible: botón flotante. Tiene dos modos (resolver y crear
+  ejercicio) y un botón «Revisar mi dibujo» que manda el enunciado + las coordenadas del lienzo
+  (`describeScene`) y devuelve una corrección. El generador de las láminas también exige Premium.
+- `solveExercise` acepta `{ includeFunctions, includeContext, maxTokens }`. El esquema de
+  funciones ocupa miles de tokens: en generar/corregir se omite (antes se tocaba el límite TPM
+  del plan gratuito con dos llamadas seguidas).
+- Compartir: `src/lib/shareScene.ts` comprime el dibujo (deflate + base64url) en `?e=`. No usa
+  base de datos ni cuentas. La biblioteca `/ejercicios` reutiliza el mismo formato para abrir
+  cada ejercicio en el editor.
 - El modo invitado guarda progreso en `localStorage`; el usuario logueado en `profiles`.
 - Auth: Google OAuth + email/contraseña (registro desactivado en el dashboard).
 - `site_url` de Auth debe ser la URL de producción; las URLs locales (`localhost:5173`) están

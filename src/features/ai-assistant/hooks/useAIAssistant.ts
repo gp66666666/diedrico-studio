@@ -13,6 +13,7 @@ export function useAIAssistant() {
         reset,
         setCurrentStep,
         generateStatement,
+        reviewScene,
     } = useAIStore();
 
     return {
@@ -22,6 +23,7 @@ export function useAIAssistant() {
         error,
         sendPrompt,
         generateStatement,
+        reviewScene,
         executeSteps,
         executeNextStep,
         reset,

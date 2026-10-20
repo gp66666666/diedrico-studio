@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { Box, FileText, PenTool, Menu, X, Layers, Printer, Info, HelpCircle } from 'lucide-react';
+import { Box, FileText, PenTool, Menu, X, Layers, Printer, Info, HelpCircle, Share2 } from 'lucide-react';
 // El motor 3D (three.js) es el trozo más pesado: se carga aparte para que la
 // interfaz aparezca antes en móviles.
 const Scene = lazy(() => import('./components/Scene'));
@@ -17,16 +17,44 @@ import { useAIStore } from './features/ai-assistant/store/aiStore';
 import { useThemeSync, useThemeInitializer } from './hooks/useThemeSync';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useDraftAutosave } from './hooks/useDraftAutosave';
+import { decodeScene } from './lib/shareScene';
 import SolidsTool from './components/tools/SolidsTool';
 // AdBanner import removed
 
 export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [shared, setShared] = useState<{ title?: string; count: number } | null>(null);
     const { theme, viewMode, setViewMode, elements } = useGeometryStore();
     const { isPremium } = useUserStore();
     const { generateExercise } = useAIStore();
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const isDark = theme === 'dark';
+
+    // Ejercicio compartido por enlace: ?e=<datos comprimidos>
+    useEffect(() => {
+        const param = new URLSearchParams(window.location.search).get('e');
+        if (!param) return;
+
+        let cancelled = false;
+        void decodeScene(param).then((payload) => {
+            if (cancelled || !payload || payload.e.length === 0) return;
+            useGeometryStore.setState({
+                elements: payload.e,
+                sketchElements: [],
+                measurements: [],
+                auxSystems: [],
+                history: { past: [], future: [] },
+                selectedElementId: null,
+            });
+            setShared({ title: payload.title, count: payload.e.length });
+            // Quitar el parámetro para que el enlace no se quede pegado al navegar
+            window.history.replaceState({}, '', '/');
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     // Inicializar y sincronizar el tema
     useThemeInitializer();
@@ -226,6 +254,32 @@ export default function MainApp() {
                             </button>
                         </div>
 
+                        {/* Aviso de ejercicio compartido */}
+                        {shared && (
+                            <div className="absolute left-1/2 top-20 z-20 w-[min(92vw,420px)] -translate-x-1/2 rounded-xl border border-blue-400/30 bg-blue-950/80 px-4 py-3 text-sm text-blue-50 shadow-2xl backdrop-blur">
+                                <div className="flex items-start gap-3">
+                                    <Share2 size={18} className="mt-0.5 shrink-0 text-blue-300" />
+                                    <div className="flex-1">
+                                        <p className="font-semibold">
+                                            {shared.title ? `Ejercicio compartido: ${shared.title}` : 'Ejercicio compartido'}
+                                        </p>
+                                        <p className="text-xs text-blue-200/80">
+                                            {shared.count} {shared.count === 1 ? 'elemento' : 'elementos'} cargados. Puedes moverlo y probarlo.
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setShared(null);
+                                            useGeometryStore.getState().clearAll();
+                                        }}
+                                        className="rounded-lg bg-blue-500/20 px-3 py-1.5 text-xs font-semibold text-blue-100 transition-colors hover:bg-blue-500/30"
+                                    >
+                                         Crear el mío
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         {/* View Content */}
                         <div key={viewMode} className="flex-1 relative w-full h-full animate-fade-in">
                             {elements.length === 0 && viewMode === '3d' && (
@@ -236,6 +290,12 @@ export default function MainApp() {
                                             <span className="md:hidden">Pulsa ☰ y añade tu primer punto.</span>
                                             <span className="hidden md:inline">Añade tu primer punto en el panel de la izquierda.</span>
                                         </p>
+                                        <a
+                                            href="/ejercicios"
+                                            className="pointer-events-auto mt-2 inline-block text-[11px] font-semibold text-blue-300 underline underline-offset-2 hover:text-blue-200"
+                                        >
+                                            o abre un ejercicio resuelto
+                                        </a>
                                     </div>
                                 </div>
                             )}

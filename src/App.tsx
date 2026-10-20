@@ -13,6 +13,8 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const AcademyPage = lazy(() => import('./pages/AcademyPage'));
 const GuidePage = lazy(() => import('./pages/GuidePage'));
+const ExercisesPage = lazy(() => import('./pages/ExercisesPage'));
+const ExerciseDetailPage = lazy(() => import('./pages/ExerciseDetailPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function PageLoader() {
@@ -35,6 +37,8 @@ function App() {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/academy" element={<AcademyPage />} />
                 <Route path="/guia" element={<GuidePage />} />
+                <Route path="/ejercicios" element={<ExercisesPage />} />
+                <Route path="/ejercicios/:slug" element={<ExerciseDetailPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
                 {/* Cualquier otra URL: antes se quedaba en blanco */}
