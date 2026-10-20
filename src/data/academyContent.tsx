@@ -1,6 +1,6 @@
 import { AcademyTopic } from '../types';
 import { StepByStepVisualizer } from '../components/Academy/StepByStepVisualizer';
-import { ACADEMY_THEORY, ACADEMY_EXERCISES } from './academyExtra';
+import { ACADEMY_THEORY, ACADEMY_EXERCISES, ACADEMY_DESCRIPTIONS } from './academyExtra';
 import React from 'react';
 
 export const ACADEMY_CONTENT: AcademyTopic[] = [
@@ -1183,6 +1183,9 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
 ACADEMY_CONTENT.forEach((topic) => {
     if (ACADEMY_THEORY[topic.id]) {
         topic.theoryContent = ACADEMY_THEORY[topic.id];
+    }
+    if (ACADEMY_DESCRIPTIONS[topic.id]) {
+        topic.description = ACADEMY_DESCRIPTIONS[topic.id];
     }
     if (ACADEMY_EXERCISES[topic.id]) {
         topic.exercises = [...topic.exercises, ...ACADEMY_EXERCISES[topic.id]];
