@@ -10,6 +10,8 @@ import {
     Magnet, PanelRight, Box
 } from 'lucide-react';
 import MiniScene from './MiniScene';
+import SceneBoundary from './SceneBoundary';
+import { hasWebGL } from '../lib/webgl';
 import {
     PointElement, LineElement, SegmentElement, PlaneElement, GroupElement, SolidElement,
     GeometryElement, SketchElement, SketchTool, Vector3
@@ -1758,7 +1760,11 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     )}
                 </g>
             </svg >
-            {mode !== 'sketch' && <MiniScene />}
+            {mode !== 'sketch' && hasWebGL() && (
+                <SceneBoundary compact>
+                    <MiniScene />
+                </SceneBoundary>
+            )}
         </div >
     );
 }

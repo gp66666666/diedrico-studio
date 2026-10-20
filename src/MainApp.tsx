@@ -18,6 +18,9 @@ import { useThemeSync, useThemeInitializer } from './hooks/useThemeSync';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useDraftAutosave } from './hooks/useDraftAutosave';
 import { decodeScene } from './lib/shareScene';
+import { hasWebGL } from './lib/webgl';
+import SceneBoundary from './components/SceneBoundary';
+import WebGLFallback from './components/WebGLFallback';
 import { toast } from './lib/toast';
 import SolidsTool from './components/tools/SolidsTool';
 // AdBanner import removed
@@ -56,6 +59,13 @@ export default function MainApp() {
         return () => {
             cancelled = true;
         };
+    }, []);
+
+    // Sin WebGL la vista 3D no puede montarse: se arranca en diédrico, que es SVG
+    const webgl = hasWebGL();
+    useEffect(() => {
+        if (!webgl && viewMode === '3d') setViewMode('2d');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Inicializar y sincronizar el tema
@@ -330,15 +340,21 @@ export default function MainApp() {
                             )}
 
                             {viewMode === '3d' ? (
-                                <Suspense
-                                    fallback={
-                                        <div className="flex h-full w-full items-center justify-center bg-[#0b1120]">
-                                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                                        </div>
-                                    }
-                                >
-                                    <Scene />
-                                </Suspense>
+                                webgl ? (
+                                    <SceneBoundary onGo2D={() => setViewMode('2d')}>
+                                        <Suspense
+                                            fallback={
+                                                <div className="flex h-full w-full items-center justify-center bg-[#0b1120]">
+                                                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                                                </div>
+                                            }
+                                        >
+                                            <Scene />
+                                        </Suspense>
+                                    </SceneBoundary>
+                                ) : (
+                                    <WebGLFallback onGo2D={() => setViewMode('2d')} />
+                                )
                             ) : viewMode === 'caballera' ? (
                                 <CaballeraView />
                             ) : viewMode === 'laminas' ? (
