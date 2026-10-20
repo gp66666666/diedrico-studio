@@ -1,55 +1,74 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { RotateCw, X, Info } from 'lucide-react';
 import { useGeometryStore } from '../../store/geometryStore';
 import { LineElement, PointElement, SolidElement, SegmentElement } from '../../types';
 import { axisAngleToMatrix, multiplyMat3, storeEulerToMatrix, matrixToStoreEuler } from '../../lib/solidGeometry';
 
+const QUICK_ANGLES = [30, 45, 60, 90, 180];
+
 export default function RotationTool() {
-    const { activeTool, elements, addElement, setActiveTool, selectElement, selectedForDistance, clearDistanceTool } = useGeometryStore();
+    const {
+        activeTool, setActiveTool, elements, addElement,
+        selectedForDistance, clearDistanceTool, theme,
+    } = useGeometryStore();
+
+    const [angle, setAngle] = useState('90');
+    const [pending, setPending] = useState<{ objectId: string; axisId: string } | null>(null);
+
+    const isActive = !!activeTool && activeTool.startsWith('rotation-');
+    const isDark = theme === 'dark';
 
     useEffect(() => {
-        if (!activeTool || (!activeTool.startsWith('rotation-'))) {
+        if (!isActive) {
+            setPending(null);
             return;
         }
 
-        // Check if we have enough elements selected
-        if (selectedForDistance.length === 2) {
-            performRotation();
-        }
-    }, [activeTool, selectedForDistance]); // Run when tool activates or selection changes
-
-    const performRotation = () => {
-        try {
-            switch (activeTool) {
-                case 'rotation-point-axis':
-                case 'rotation-any':
-                    performGeneralRotation();
-                    break;
-                case 'rotation-parallel-lt':
-                    performParallelLTRotation();
-                    break;
-            }
-        } catch (error) {
-            console.error('Rotation error:', error);
-            alert('Error al realizar el giro.');
+        // "Paralela a la LT" calcula el ángulo solo: no necesita panel
+        if (activeTool === 'rotation-parallel-lt') {
+            if (selectedForDistance.length === 2) performParallelLTRotation();
+            return;
         }
 
+        if (selectedForDistance.length !== 2) {
+            setPending(null);
+            return;
+        }
+
+        const [id1, id2] = selectedForDistance;
+        const el1 = elements.find((e) => e.id === id1);
+        const el2 = elements.find((e) => e.id === id2);
+        if (!el1 || !el2) return;
+
+        // La recta es el eje; el otro elemento es lo que gira
+        if (el1.type === 'line' && el2.type !== 'line') setPending({ objectId: id2, axisId: id1 });
+        else if (el2.type === 'line' && el1.type !== 'line') setPending({ objectId: id1, axisId: id2 });
+        else setPending({ objectId: id1, axisId: id2 });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedForDistance, activeTool, elements]);
+
+    const close = () => {
+        setPending(null);
         setActiveTool('none');
-        clearDistanceTool(); // Clear the store selection
+        clearDistanceTool();
     };
 
-    const performGeneralRotation = () => {
-        const [id1, id2] = selectedForDistance;
-        const el1 = elements.find(e => e.id === id1);
-        const el2 = elements.find(e => e.id === id2);
+    const applyRotation = () => {
+        const deg = parseFloat(angle);
+        if (!Number.isFinite(deg) || deg === 0) return;
+        const ok = performGeneralRotation(deg);
+        if (ok) close();
+    };
 
-        if (!el1 || !el2) return;
+    const performGeneralRotation = (angleDeg: number): boolean => {
+        const [id1, id2] = selectedForDistance;
+        const el1 = elements.find((e) => e.id === id1);
+        const el2 = elements.find((e) => e.id === id2);
+        if (!el1 || !el2) return false;
 
         let objectToRotate: any;
         let axis: LineElement | undefined;
 
-        // Logic: Find the Line acting as Axis.
-        // User convention: Select Object -> Select Axis. 
-        // Or heuristic: Line is likely Axis if other is Point/Plane.
         if (el1.type === 'line' && el2.type !== 'line') {
             axis = el1 as LineElement;
             objectToRotate = el2;
@@ -57,39 +76,39 @@ export default function RotationTool() {
             axis = el2 as LineElement;
             objectToRotate = el1;
         } else if (el1.type === 'line' && el2.type === 'line') {
-            // Both lines. Assume second selection is Axis.
             objectToRotate = el1;
             axis = el2 as LineElement;
         }
 
-        if (!axis || axis.type !== 'line') {
-            alert('Uno de los elementos debe ser una RECTA (Eje de giro).');
-            return;
+        if (!axis) {
+            alert('Uno de los elementos debe ser una RECTA (eje de giro).');
+            return false;
         }
 
-        const angleStr = prompt('Ángulo de giro (grados):', '90');
-        if (!angleStr) return;
-        const angleDeg = parseFloat(angleStr);
-        if (isNaN(angleDeg)) return;
         const angleRad = (angleDeg * Math.PI) / 180;
 
-        if (objectToRotate.type === 'point') rotatePoint(objectToRotate as PointElement, axis, angleRad, angleDeg);
-        else if (objectToRotate.type === 'line') rotateLine(objectToRotate as LineElement, axis, angleRad, angleDeg);
-        else if (objectToRotate.type === 'plane') rotatePlane(objectToRotate as any, axis, angleRad, angleDeg);
+        if (objectToRotate.type === 'point') rotatePoint(objectToRotate as PointElement, axis, angleRad);
+        else if (objectToRotate.type === 'line') rotateLine(objectToRotate as LineElement, axis, angleRad);
+        else if (objectToRotate.type === 'plane') rotatePlane(objectToRotate as any, axis, angleRad);
         else if (objectToRotate.type === 'segment') rotateSegment(objectToRotate as SegmentElement, axis, angleRad);
         else if (objectToRotate.type === 'solid') rotateSolid(objectToRotate as SolidElement, axis, angleRad);
+        else {
+            alert('Este elemento no se puede girar todavía.');
+            return false;
+        }
+
+        return true;
     };
 
     const performParallelLTRotation = () => {
         const [id1, id2] = selectedForDistance;
-        const el1 = elements.find(e => e.id === id1);
-        const el2 = elements.find(e => e.id === id2);
+        const el1 = elements.find((e) => e.id === id1);
+        const el2 = elements.find((e) => e.id === id2);
 
         let line: LineElement | undefined;
         let axis: LineElement | undefined;
 
         if (el1?.type === 'line' && el2?.type === 'line') {
-            // Assume order: Object, Axis
             line = el1 as LineElement;
             axis = el2 as LineElement;
         } else {
@@ -97,165 +116,127 @@ export default function RotationTool() {
             return;
         }
 
-        // Detect if Axis is vertical-ish (mostly Z)
         const u = axis.direction;
         const isVertical = Math.abs(u.z) > Math.abs(u.y) && Math.abs(u.z) > Math.abs(u.x);
+        const targetComponent: 'y' | 'z' = isVertical ? 'y' : 'z';
+        const rotation = solveRotationAngleForZeroComponent(line.direction, axis.direction, targetComponent);
 
-        // Target: If Vertical Axis -> Target Y constant (Frontal line). If Axis is Y-oriented -> Target Z constant (Horizontal).
-        let targetComponent: 'y' | 'z' = isVertical ? 'y' : 'z';
-
-        const angle = solveRotationAngleForZeroComponent(line.direction, axis.direction, targetComponent);
-
-        if (angle === null) {
+        if (rotation === null) {
             alert(`No es posible hacer la recta paralela al plano ${targetComponent === 'y' ? 'Vertical' : 'Horizontal'} con este eje.`);
             return;
         }
 
-        // Perform rotation
-        rotateLine(line, axis, angle, (angle * 180) / Math.PI);
-        alert(`Girado ${(angle * 180 / Math.PI).toFixed(1)}° para ser paralela a ${targetComponent === 'y' ? 'PV' : 'PH'}.`);
+        rotateLine(line, axis, rotation);
+        alert(`Girada ${((rotation * 180) / Math.PI).toFixed(1)}° para dejarla paralela a la ${targetComponent === 'y' ? 'PV' : 'PH'}.`);
+
+        setActiveTool('none');
+        clearDistanceTool();
     };
 
-    // --- Helpers ---
+    // --- Helpers geométricos ---
 
-    const calculateRotatedPoint = (P: { x: number, y: number, z: number }, axis: LineElement, angleRad: number) => {
+    const calculateRotatedPoint = (P: { x: number; y: number; z: number }, axis: LineElement, angleRad: number) => {
         const A0 = axis.point;
         const u = axis.direction;
-
-        const uMag = Math.sqrt(u.x ** 2 + u.y ** 2 + u.z ** 2);
+        const uMag = Math.sqrt(u.x ** 2 + u.y ** 2 + u.z ** 2) || 1;
         const ux = u.x / uMag;
         const uy = u.y / uMag;
         const uz = u.z / uMag;
 
-        // Rodrigues' Formula: v = P - A0
-        // v_rot = v*cos + (u x v)*sin + u*(u.v)*(1-cos)
         const v = { x: P.x - A0.x, y: P.y - A0.y, z: P.z - A0.z };
-
         const dotUV = ux * v.x + uy * v.y + uz * v.z;
-
         const crossUV = {
             x: uy * v.z - uz * v.y,
             y: uz * v.x - ux * v.z,
-            z: ux * v.y - uy * v.x
+            z: ux * v.y - uy * v.x,
         };
-
         const cos = Math.cos(angleRad);
         const sin = Math.sin(angleRad);
         const k = (1 - cos) * dotUV;
 
-        const vRot = {
-            x: v.x * cos + crossUV.x * sin + ux * k,
-            y: v.y * cos + crossUV.y * sin + uy * k,
-            z: v.z * cos + crossUV.z * sin + uz * k
-        };
-
         return {
-            x: A0.x + vRot.x,
-            y: A0.y + vRot.y,
-            z: A0.z + vRot.z
+            x: A0.x + v.x * cos + crossUV.x * sin + ux * k,
+            y: A0.y + v.y * cos + crossUV.y * sin + uy * k,
+            z: A0.z + v.z * cos + crossUV.z * sin + uz * k,
         };
     };
 
-    const solveRotationAngleForZeroComponent = (v: { x: number, y: number, z: number }, u: { x: number, y: number, z: number }, component: 'y' | 'z'): number | null => {
-        // Normalize u
-        const mag = Math.sqrt(u.x * u.x + u.y * u.y + u.z * u.z);
-        const ux = u.x / mag; const uy = u.y / mag; const uz = u.z / mag;
+    const solveRotationAngleForZeroComponent = (v: { x: number; y: number; z: number }, u: { x: number; y: number; z: number }, component: 'y' | 'z'): number | null => {
+        const mag = Math.sqrt(u.x * u.x + u.y * u.y + u.z * u.z) || 1;
+        const ux = u.x / mag, uy = u.y / mag, uz = u.z / mag;
 
         const dot = ux * v.x + uy * v.y + uz * v.z;
-        const kx = ux * dot; const ky = uy * dot; const kz = uz * dot;
+        const kx = ux * dot, ky = uy * dot, kz = uz * dot;
 
-        // cross = u x v
         const cx = uy * v.z - uz * v.y;
         const cy = uz * v.x - ux * v.z;
         const cz = ux * v.y - uy * v.x;
 
-        // Equation: A cos + B sin = -C
         let A, B, C;
-        if (component === 'y') {
-            A = v.y - ky; B = cy; C = ky;
-        } else { // z
-            A = v.z - kz; B = cz; C = kz;
-        }
+        if (component === 'y') { A = v.y - ky; B = cy; C = ky; }
+        else { A = v.z - kz; B = cz; C = kz; }
 
         const R = Math.sqrt(A * A + B * B);
         if (R < 0.000001) return null;
 
         const rhs = -C / R;
-        if (Math.abs(rhs) > 1.000001) return null; // clamp if barely > 1 due to float error?
+        if (Math.abs(rhs) > 1.000001) return null;
         const safeRhs = Math.max(-1, Math.min(1, rhs));
-
         const angleOffset = Math.acos(safeRhs);
         const alpha = Math.atan2(B, A);
 
         return alpha + angleOffset;
     };
 
-    const rotatePoint = (point: PointElement, axis: LineElement, angleRad: number, angleDeg: number) => {
-        const newCoords = calculateRotatedPoint(point.coords, axis, angleRad);
+    // --- Copias giradas (subíndice ₁ para no confundir con P' = planta) ---
+
+    const rotatePoint = (point: PointElement, axis: LineElement, angleRad: number) => {
         addElement({
             type: 'point',
             name: `${point.name}₁`,
-            coords: newCoords,
+            coords: calculateRotatedPoint(point.coords, axis, angleRad),
             color: '#FFA500',
-            visible: true
+            visible: true,
         } as any);
-        console.log(`Rotated Point ${point.name}`);
     };
 
-    const rotateLine = (line: LineElement, axis: LineElement, angleRad: number, angleDeg: number) => {
+    const rotateLine = (line: LineElement, axis: LineElement, angleRad: number) => {
         const newP1 = calculateRotatedPoint(line.point, axis, angleRad);
-
-        // Rotate a second point to get direction
         const p2 = {
             x: line.point.x + line.direction.x,
             y: line.point.y + line.direction.y,
-            z: line.point.z + line.direction.z
+            z: line.point.z + line.direction.z,
         };
         const newP2 = calculateRotatedPoint(p2, axis, angleRad);
-
-        const newDir = {
-            x: newP2.x - newP1.x,
-            y: newP2.y - newP1.y,
-            z: newP2.z - newP1.z
-        };
 
         addElement({
             type: 'line',
             name: `${line.name}₁`,
             point: newP1,
-            direction: newDir,
+            direction: { x: newP2.x - newP1.x, y: newP2.y - newP1.y, z: newP2.z - newP1.z },
             isInfinite: true,
             color: '#FFA500',
-            visible: true
+            visible: true,
         } as any);
     };
 
-    const rotatePlane = (plane: any, axis: LineElement, angleRad: number, angleDeg: number) => {
+    const rotatePlane = (plane: any, axis: LineElement, angleRad: number) => {
         const n = plane.normal;
-        const mag = Math.sqrt(n.x ** 2 + n.y ** 2 + n.z ** 2);
-        const nx = n.x / mag; const ny = n.y / mag; const nz = n.z / mag;
+        const mag = Math.sqrt(n.x ** 2 + n.y ** 2 + n.z ** 2) || 1;
+        const nx = n.x / mag, ny = n.y / mag, nz = n.z / mag;
 
-        // Closest point to origin P
-        const P_on_plane = {
-            x: -plane.constant * nx,
-            y: -plane.constant * ny,
-            z: -plane.constant * nz
-        };
-        const P_rotated = calculateRotatedPoint(P_on_plane, axis, angleRad);
-
-        // Rotate Normal (as vector from origin)
-        const originAxis = { ...axis, point: { x: 0, y: 0, z: 0 } };
-        const newNormalTip = calculateRotatedPoint(n, originAxis, angleRad);
-
-        const newD = -(newNormalTip.x * P_rotated.x + newNormalTip.y * P_rotated.y + newNormalTip.z * P_rotated.z);
+        const pointOnPlane = { x: -plane.constant * nx, y: -plane.constant * ny, z: -plane.constant * nz };
+        const rotatedPoint = calculateRotatedPoint(pointOnPlane, axis, angleRad);
+        const newNormal = calculateRotatedPoint(n, { ...axis, point: { x: 0, y: 0, z: 0 } }, angleRad);
+        const newD = -(newNormal.x * rotatedPoint.x + newNormal.y * rotatedPoint.y + newNormal.z * rotatedPoint.z);
 
         addElement({
             type: 'plane',
             name: `${plane.name}₁`,
-            normal: newNormalTip,
+            normal: newNormal,
             constant: newD,
             color: '#FFA500',
-            visible: true
+            visible: true,
         } as any);
     };
 
@@ -266,14 +247,14 @@ export default function RotationTool() {
             p1: calculateRotatedPoint(segment.p1, axis, angleRad),
             p2: calculateRotatedPoint(segment.p2, axis, angleRad),
             color: '#FFA500',
-            visible: true
+            visible: true,
         } as any);
     };
 
     /**
-     * Giro de un sólido: se traslada su centro y se compone la rotación del
-     * eje con la que ya tenía. La malla compartida (lib/solidGeometry) usa
-     * esta misma convención, así que 3D y 2D siguen coincidiendo.
+     * Giro de un sólido: se traslada su centro y se compone la rotación del eje
+     * con la que ya tenía. La malla compartida usa la misma convención, así que
+     * 3D y 2D siguen coincidiendo.
      */
     const rotateSolid = (solid: SolidElement, axis: LineElement, angleRad: number) => {
         const newPosition = calculateRotatedPoint(solid.position, axis, angleRad);
@@ -290,9 +271,89 @@ export default function RotationTool() {
             rotation: newRotation,
             color: '#FFA500',
             opacity: solid.opacity ?? 0.8,
-            visible: true
+            visible: true,
         } as any);
     };
 
-    return null;
+    if (!isActive) return null;
+
+    const object = pending ? elements.find((e) => e.id === pending.objectId) : null;
+    const axis = pending ? elements.find((e) => e.id === pending.axisId) : null;
+    const axisIsLine = axis?.type === 'line';
+
+    return (
+        <div
+            className={`fixed bottom-20 left-1/2 z-50 flex min-w-[320px] -translate-x-1/2 flex-col gap-3 rounded-2xl border border-white/20 p-4 shadow-2xl backdrop-blur-xl ${isDark ? 'bg-gray-900/90 text-white' : 'bg-white/90 text-gray-900'
+                }`}
+        >
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="rounded-lg bg-blue-500/20 p-2">
+                        <RotateCw size={20} className="text-blue-500" />
+                    </div>
+                    <h3 className="text-sm font-bold">Giro</h3>
+                </div>
+                <button onClick={close} className="rounded-full p-1 transition-colors hover:bg-white/10" aria-label="Cancelar giro">
+                    <X size={18} />
+                </button>
+            </div>
+
+            {!pending || !object || !axisIsLine ? (
+                <div className={`flex gap-3 rounded-xl border p-3 ${isDark ? 'border-blue-500/30 bg-blue-500/10' : 'border-blue-200 bg-blue-50'}`}>
+                    <Info size={18} className="shrink-0 text-blue-500" />
+                    <p className="text-xs leading-relaxed">
+                        Selecciona <b>el objeto</b> que quieres girar y después <b>la recta</b> que hace de eje.
+                        {pending && !axisIsLine ? ' Uno de los dos tiene que ser una recta.' : ''}
+                    </p>
+                </div>
+            ) : (
+                <>
+                    <div className={`rounded-xl border p-3 text-xs ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
+                        <b>{object.name}</b> alrededor de <b>{axis.name}</b>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                        {QUICK_ANGLES.map((a) => (
+                            <button
+                                key={a}
+                                onClick={() => setAngle(String(a))}
+                                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${angle === String(a)
+                                    ? 'bg-blue-600 text-white'
+                                    : isDark ? 'bg-white/5 text-gray-300 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                            >
+                                {a}°
+                            </button>
+                        ))}
+                    </div>
+
+                    <label className="flex items-center gap-2 text-xs">
+                        Ángulo
+                        <input
+                            type="number"
+                            value={angle}
+                            onChange={(e) => setAngle(e.target.value)}
+                            className={`w-24 rounded-lg border px-2 py-1.5 text-sm ${isDark ? 'border-white/10 bg-black/30 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
+                        />
+                        <span className="opacity-60">grados</span>
+                    </label>
+
+                    <div className="mt-1 flex gap-2">
+                        <button
+                            onClick={applyRotation}
+                            className="flex-1 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+                        >
+                            Girar y crear copia
+                        </button>
+                        <button
+                            onClick={close}
+                            className={`rounded-xl px-4 py-2 text-sm ${isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-gray-100 hover:bg-gray-200'}`}
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </>
+            )}
+        </div>
+    );
 }

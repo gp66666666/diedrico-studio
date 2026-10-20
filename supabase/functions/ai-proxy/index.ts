@@ -26,6 +26,10 @@ const ALLOWED_MODELS = new Set([
 const DEFAULT_MODEL = "openai/gpt-oss-120b";
 const LIMIT_REQUESTS = 60;      // peticiones
 const LIMIT_WINDOW_S = 3600;    // por hora y por IP
+// Tope por cuenta y día: evita que un solo suscriptor queme el margen.
+// 300 llamadas/día cubren de sobra un uso de estudio; el coste real sigue siendo céntimos.
+const USER_LIMIT_REQUESTS = 300;
+const USER_LIMIT_WINDOW_S = 86400;
 
 function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
@@ -99,6 +103,35 @@ Deno.serve(async (req: Request) => {
   } catch (e) {
     console.error("premium check", e);
     return json({ error: { message: "No se pudo comprobar tu plan. Inténtalo de nuevo." } }, 500);
+  }
+
+  // ---- Tope diario por cuenta (protege el margen) ----
+  try {
+    const rlUser = await fetch(`${supabaseUrl}/rest/v1/rpc/check_ai_rate_limit`, {
+      method: "POST",
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        p_key: await sha256Hex(`user:${userId}`),
+        p_limit: USER_LIMIT_REQUESTS,
+        p_window_seconds: USER_LIMIT_WINDOW_S,
+      }),
+    });
+    if (rlUser.ok) {
+      const usedToday = Number(await rlUser.json());
+      if (Number.isFinite(usedToday) && usedToday > USER_LIMIT_REQUESTS) {
+        return json(
+          { error: { message: "Has llegado al límite diario del asistente. Vuelve mañana." } },
+          429,
+          { "Retry-After": "3600" },
+        );
+      }
+    }
+  } catch (e) {
+    console.error("user rate limit error", e);
   }
 
   // ---- Rate limit por IP (la IP no se guarda en claro: solo su hash) ----

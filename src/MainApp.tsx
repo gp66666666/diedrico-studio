@@ -9,6 +9,7 @@ import SEO from './components/SEO';
 import { useGeometryStore } from './store/geometryStore';
 import { useUserStore } from './store/userStore';
 import { FEATURES } from './config/features';
+import LaminasCloudSync from './components/LaminasCloudSync';
 import { AIChatPanel } from './features/ai-assistant';
 import { useAIStore } from './features/ai-assistant/store/aiStore';
 import { useThemeSync, useThemeInitializer } from './hooks/useThemeSync';
@@ -229,13 +230,14 @@ export default function MainApp() {
                             ) : viewMode === 'caballera' ? (
                                 <CaballeraView />
                             ) : viewMode === 'laminas' ? (
-                                <div className="w-full h-full bg-white overflow-hidden">
+                                <div className="relative w-full h-full bg-white overflow-hidden">
                                     <iframe
                                         ref={iframeRef}
                                         src="/Laminas_automaticas.html"
                                         className="w-full h-full border-none"
                                         title="Láminas Automáticas"
                                     />
+                                    <LaminasCloudSync iframeRef={iframeRef} />
                                 </div>
                             ) : (
                                 <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />

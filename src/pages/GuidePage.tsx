@@ -375,6 +375,11 @@ export default function GuidePage() {
                                 <li><b className="text-white">Generador de ejercicios (IA)</b>: escribe un tema y crea un enunciado nuevo. Es una función Premium.</li>
                                 <li><b className="text-white">Exportar PDF</b>: saca las hojas listas para imprimir.</li>
                             </ul>
+                            <p className="text-sm">
+                                Las láminas se guardan solas en tu cuenta: el indicador de abajo a la derecha
+                                muestra "Láminas guardadas". Al entrar desde otro equipo se cargan las que tenías
+                                en la nube. Sin sesión se guardan solo en este navegador.
+                            </p>
                         </Section>
 
                         {/* 11 */}
@@ -481,7 +486,7 @@ export default function GuidePage() {
                                     },
                                     {
                                         q: '¿Las láminas se guardan en la nube?',
-                                        a: 'Por ahora las láminas se guardan en el navegador. Si cambias de dispositivo, expórtalas a PDF.',
+                                        a: 'Sí, si has iniciado sesión: se sincronizan solas en tu cuenta y las recuperas en cualquier equipo. Como invitado se quedan en este navegador.',
                                     },
                                 ].map((item) => (
                                     <details key={item.q} className="group p-4">
