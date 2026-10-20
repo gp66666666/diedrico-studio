@@ -1,4 +1,5 @@
 import { AlertTriangle, Layers, RefreshCw } from 'lucide-react';
+import { hardReload } from '../lib/hardReload';
 
 interface Props {
     onGo2D?: () => void;
@@ -52,7 +53,7 @@ export default function WebGLFallback({ onGo2D, compact = false }: Props) {
                         <li>Prueba en otro navegador (Firefox o Edge).</li>
                     </ul>
                     <button
-                        onClick={() => window.location.reload()}
+                        onClick={() => void hardReload()}
                         className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-400 hover:text-blue-300"
                     >
                         <RefreshCw size={12} /> Ya lo he activado: recargar

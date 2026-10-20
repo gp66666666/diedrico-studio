@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { hardReload } from '../lib/hardReload';
 
 interface Props {
     children: ReactNode;
@@ -42,7 +43,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                 </p>
                 <div className="mt-6 flex flex-col gap-2 sm:flex-row">
                     <button
-                        onClick={() => window.location.reload()}
+                        onClick={() => void hardReload()}
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
                     >
                         <RefreshCw size={16} /> Recargar
