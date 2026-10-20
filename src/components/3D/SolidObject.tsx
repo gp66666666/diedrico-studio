@@ -1,96 +1,68 @@
-import { useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { SolidElement } from '../../types';
 import * as THREE from 'three';
 import { Edges } from '@react-three/drei';
 import { useGeometryStore } from '../../store/geometryStore';
+import { buildSolidMesh } from '../../lib/solidGeometry';
 
 interface SolidObjectProps {
     element: SolidElement;
 }
 
+/**
+ * Sólido en 3D.
+ *
+ * La malla viene de `lib/solidGeometry`, la MISMA que usa la vista diédrica.
+ * Así el 3D y el 2D no pueden representar formas distintas.
+ *
+ * Ejes: el store usa z como altura; Three usa Y como altura.
+ * Por eso posición (x, y, z) → (x, z, y) y la rotación (rx, ry, rz) → [rx, rz, ry].
+ */
 export default function SolidObject({ element }: SolidObjectProps) {
     const { selectElement, selectedElementId } = useGeometryStore();
-    const meshRef = useRef<THREE.Mesh>(null);
     const { id, subtype, position, size, color, opacity = 0.5 } = element;
     const isSelected = selectedElementId === id;
 
-    // Convert coordinates: Z is up in 3D Store? 
-    // In geometryStore: x, y is horizontal plane, z is height (vertical).
-    // In THREE.js: Y is usually up.
-    // So we map: x -> x, y -> z, z -> y
-
-    // Wait, let's verify PointObject.tsx or similar to be sure.
-    // Viewing Scene.tsx, lines 113-114: [p1.x, p1.z, p1.y] where Y is up.
     const pos: [number, number, number] = [position.x, position.z, position.y];
 
-    // Geometry selection
-    // Size.x = radius or side length
-    // Size.y = height (for prisms/cones)
-
-    // Polyhedrons usually take a radius
-    const radius = size.x;
-    const height = size.y;
-
-    let geometry;
-
-    switch (subtype) {
-        case 'tetrahedron':
-            // Using a triangular pyramid (cone with 3 segments) to allow height adjustment
-            geometry = <coneGeometry args={[radius, height, 3]} />;
-            break;
-        case 'cube':
-            geometry = <boxGeometry args={[radius * 1.5, radius * 1.5, radius * 1.5]} />; // Side length
-            break;
-        case 'octahedron':
-            geometry = <octahedronGeometry args={[radius, 0]} />;
-            break;
-        case 'dodecahedron':
-            geometry = <dodecahedronGeometry args={[radius, 0]} />;
-            break;
-        case 'icosahedron':
-            geometry = <icosahedronGeometry args={[radius, 0]} />;
-            break;
-        case 'sphere':
-            geometry = <sphereGeometry args={[radius, 32, 32]} />;
-            break;
-        case 'cone':
-            // radius, height, radialSegments
-            geometry = <coneGeometry args={[radius, height, 32]} />;
-            break;
-        case 'cylinder':
-            // radiusTop, radiusBottom, height, radialSegments
-            geometry = <cylinderGeometry args={[radius, radius, height, 32]} />;
-            break;
-        case 'prism':
-            // Hexagonal prism by default? or Square? Let's say Hexagonal (6)
-            geometry = <cylinderGeometry args={[radius, radius, height, 6]} />;
-            break;
-        case 'pyramid':
-            // Square pyramid (4 segments)
-            geometry = <coneGeometry args={[radius, height, 4]} />;
-            break;
-        default:
-            geometry = <boxGeometry args={[radius, radius, radius]} />;
-    }
-
-    // Rotation: x, y, z usually refers to Diédrico system.
-    // In THREE.js (Y-up), if we want to rotate around vertical axis, we rotate around Y.
-    // In our store, 'z' is often the height/vertical.
-    // Let's use Euler rotation [x, z, y] to match our pos mapping.
     const rot: [number, number, number] = element.rotation
         ? [element.rotation.x, element.rotation.z, element.rotation.y]
         : [0, 0, 0];
 
+    // Malla compartida con la vista 2D (coordenadas locales del store)
+    const geometry = useMemo(() => {
+        const mesh = buildSolidMesh(subtype, size);
+        const positions: number[] = [];
+
+        mesh.faces.forEach((face) => {
+            // Abanico desde el primer vértice (las caras son convexas)
+            for (let i = 1; i < face.length - 1; i++) {
+                [face[0], face[i], face[i + 1]].forEach((index) => {
+                    const v = mesh.vertices[index];
+                    // store (x, y, z) → three (x, z, y)
+                    positions.push(v.x, v.z, v.y);
+                });
+            }
+        });
+
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geo.computeVertexNormals();
+        return geo;
+    }, [subtype, size.x, size.y, size.z]);
+
+    // Liberar la geometría anterior al cambiar de forma o desmontar
+    useEffect(() => () => geometry.dispose(), [geometry]);
+
     return (
         <group position={pos} rotation={rot}>
             <mesh
-                ref={meshRef}
+                geometry={geometry}
                 onClick={(e) => {
                     e.stopPropagation();
                     selectElement(id);
                 }}
             >
-                {geometry}
                 <meshStandardMaterial
                     color={color}
                     transparent
@@ -101,8 +73,6 @@ export default function SolidObject({ element }: SolidObjectProps) {
                 />
                 <Edges color="white" threshold={15} />
             </mesh>
-
-            {/* Optional: Add a label or specific markers? */}
         </group>
     );
 }

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useGeometryStore } from '../../store/geometryStore';
-import { LineElement, PointElement } from '../../types';
+import { LineElement, PointElement, SolidElement, SegmentElement } from '../../types';
+import { axisAngleToMatrix, multiplyMat3, storeEulerToMatrix, matrixToStoreEuler } from '../../lib/solidGeometry';
 
 export default function RotationTool() {
     const { activeTool, elements, addElement, setActiveTool, selectElement, selectedForDistance, clearDistanceTool } = useGeometryStore();
@@ -75,6 +76,8 @@ export default function RotationTool() {
         if (objectToRotate.type === 'point') rotatePoint(objectToRotate as PointElement, axis, angleRad, angleDeg);
         else if (objectToRotate.type === 'line') rotateLine(objectToRotate as LineElement, axis, angleRad, angleDeg);
         else if (objectToRotate.type === 'plane') rotatePlane(objectToRotate as any, axis, angleRad, angleDeg);
+        else if (objectToRotate.type === 'segment') rotateSegment(objectToRotate as SegmentElement, axis, angleRad);
+        else if (objectToRotate.type === 'solid') rotateSolid(objectToRotate as SolidElement, axis, angleRad);
     };
 
     const performParallelLTRotation = () => {
@@ -191,7 +194,7 @@ export default function RotationTool() {
         const newCoords = calculateRotatedPoint(point.coords, axis, angleRad);
         addElement({
             type: 'point',
-            name: `${point.name}'`,
+            name: `${point.name}₁`,
             coords: newCoords,
             color: '#FFA500',
             visible: true
@@ -218,7 +221,7 @@ export default function RotationTool() {
 
         addElement({
             type: 'line',
-            name: `${line.name}'`,
+            name: `${line.name}₁`,
             point: newP1,
             direction: newDir,
             isInfinite: true,
@@ -248,10 +251,45 @@ export default function RotationTool() {
 
         addElement({
             type: 'plane',
-            name: `${plane.name}'`,
+            name: `${plane.name}₁`,
             normal: newNormalTip,
             constant: newD,
             color: '#FFA500',
+            visible: true
+        } as any);
+    };
+
+    const rotateSegment = (segment: SegmentElement, axis: LineElement, angleRad: number) => {
+        addElement({
+            type: 'segment',
+            name: `${segment.name}₁`,
+            p1: calculateRotatedPoint(segment.p1, axis, angleRad),
+            p2: calculateRotatedPoint(segment.p2, axis, angleRad),
+            color: '#FFA500',
+            visible: true
+        } as any);
+    };
+
+    /**
+     * Giro de un sólido: se traslada su centro y se compone la rotación del
+     * eje con la que ya tenía. La malla compartida (lib/solidGeometry) usa
+     * esta misma convención, así que 3D y 2D siguen coincidiendo.
+     */
+    const rotateSolid = (solid: SolidElement, axis: LineElement, angleRad: number) => {
+        const newPosition = calculateRotatedPoint(solid.position, axis, angleRad);
+        const current = storeEulerToMatrix(solid.rotation || { x: 0, y: 0, z: 0 });
+        const applied = axisAngleToMatrix(axis.direction, angleRad);
+        const newRotation = matrixToStoreEuler(multiplyMat3(applied, current));
+
+        addElement({
+            type: 'solid',
+            name: `${solid.name}₁`,
+            subtype: solid.subtype,
+            position: newPosition,
+            size: solid.size,
+            rotation: newRotation,
+            color: '#FFA500',
+            opacity: solid.opacity ?? 0.8,
             visible: true
         } as any);
     };

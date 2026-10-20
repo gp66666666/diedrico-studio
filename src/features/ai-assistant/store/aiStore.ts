@@ -7,11 +7,31 @@ import { aiExecutor } from '../services/executor';
 interface AIStore extends AIConversation {
     addMessage: (message: Omit<AIMessage, 'id' | 'timestamp'>) => void;
     sendPrompt: (prompt: string) => Promise<void>;
+    generateStatement: (prompt: string) => Promise<void>;
     executeSteps: () => Promise<void>;
     executeNextStep: () => Promise<void>;
     reset: () => void;
     setCurrentStep: (stepNumber: number | null) => void;
     generateExercise: (prompt: string) => Promise<string>;
+}
+
+/** Saca `{"statement": "..."}` de la respuesta del generador; si no hay JSON, usa el texto. */
+function extractStatement(text: string): string {
+    const first = text.indexOf('{');
+    const last = text.lastIndexOf('}');
+
+    if (first !== -1 && last > first) {
+        try {
+            const parsed = JSON.parse(text.slice(first, last + 1));
+            if (typeof parsed?.statement === 'string' && parsed.statement.trim()) {
+                return parsed.statement.trim();
+            }
+        } catch {
+            // no era JSON: se devuelve el texto tal cual
+        }
+    }
+
+    return text.trim();
 }
 
 export const useAIStore = create<AIStore>((set, get) => ({
@@ -58,6 +78,39 @@ export const useAIStore = create<AIStore>((set, get) => ({
                 error: error.message || 'Error desconocido',
             });
 
+            addMessage({
+                role: 'assistant',
+                content: `❌ Error: ${error.message}`,
+            });
+        }
+    },
+
+    /**
+     * Modo "crear ejercicio": el modelo inventa un enunciado (no lo resuelve).
+     * Se guarda en el chat como mensaje `variant: 'statement'` para poder resolverlo después.
+     */
+    generateStatement: async (prompt) => {
+        const { addMessage } = get();
+
+        try {
+            set({ isProcessing: true, error: null });
+            addMessage({ role: 'user', content: prompt });
+
+            const { EXERCISE_GENERATOR_PROMPT } = await import('../services/prompts');
+            const response = await aiService.solveExercise(prompt, EXERCISE_GENERATOR_PROMPT);
+
+            addMessage({
+                role: 'assistant',
+                content: extractStatement(response.explanation),
+                variant: 'statement',
+            });
+
+            set({ isProcessing: false });
+        } catch (error: any) {
+            set({
+                isProcessing: false,
+                error: error.message || 'Error desconocido',
+            });
             addMessage({
                 role: 'assistant',
                 content: `❌ Error: ${error.message}`,

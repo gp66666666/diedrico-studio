@@ -12,6 +12,8 @@ export interface AIMessage {
     content: string;
     timestamp: number;
     steps?: AIStep[];
+    /** 'statement' = enunciado generado, con botón para resolverlo. */
+    variant?: 'statement';
 }
 
 export interface AIStep {

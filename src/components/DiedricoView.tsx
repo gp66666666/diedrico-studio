@@ -17,6 +17,7 @@ import {
 import Point2D from './2D/Point2D';
 import Line2D from './2D/Line2D';
 import Plane2D from './2D/Plane2D';
+import Segment2D from './2D/Segment2D';
 import Solid2D from './2D/Solid2D';
 import HelpGuide from './HelpGuide';
 import SketchToolbar from './SketchToolbar';
@@ -1230,6 +1231,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         switch (el.type) {
                             case 'point': return <Point2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'line': return <Line2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
+                            case 'segment': return <Segment2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'plane': return <Plane2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'solid': return <Solid2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             default: return null;

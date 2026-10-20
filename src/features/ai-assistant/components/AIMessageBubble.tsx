@@ -1,13 +1,14 @@
 // AI Message Bubble Component
 import { useState } from 'react';
 import type { AIMessage } from '../types/ai.types';
-import { User, Sparkles, Copy, Check } from 'lucide-react';
+import { User, Sparkles, Copy, Check, PlayCircle } from 'lucide-react';
 
 interface Props {
     message: AIMessage;
+    onSolveStatement?: (statement: string) => void;
 }
 
-export default function AIMessageBubble({ message }: Props) {
+export default function AIMessageBubble({ message, onSolveStatement }: Props) {
     const isUser = message.role === 'user';
     const [copied, setCopied] = useState(false);
 
@@ -50,6 +51,15 @@ export default function AIMessageBubble({ message }: Props) {
                         <div className="whitespace-pre-wrap text-sm leading-relaxed pr-6">
                             {message.content}
                         </div>
+
+                        {message.variant === 'statement' && onSolveStatement && (
+                            <button
+                                onClick={() => onSolveStatement(message.content)}
+                                className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-700 transition-colors"
+                            >
+                                <PlayCircle size={15} /> Resolver este ejercicio y dibujarlo
+                            </button>
+                        )}
                     </div>
 
                     {/* Timestamp */}

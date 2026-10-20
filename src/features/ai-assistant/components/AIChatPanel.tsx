@@ -91,10 +91,14 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
         currentStep,
         error,
         sendPrompt,
+        generateStatement,
         executeSteps,
         executeNextStep,
         reset,
     } = useAIAssistant();
+
+    // Modo del asistente: resolver un enunciado o inventar uno nuevo.
+    const [mode, setMode] = useState<'solve' | 'generate'>('solve');
 
     // Guardar posición al cambiar
     useEffect(() => {
@@ -113,8 +117,22 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
             return;
         }
 
-        await sendPrompt(input);
+        if (mode === 'generate') {
+            await generateStatement(input);
+        } else {
+            await sendPrompt(input);
+        }
         setInput('');
+    };
+
+    /** Desde una tarjeta de enunciado: cambia a resolver y lanza el ejercicio. */
+    const handleSolveStatement = async (statement: string) => {
+        if (!isPremium) {
+            setShowPremiumModal(true);
+            return;
+        }
+        setMode('solve');
+        await sendPrompt(statement);
     };
 
     // FUNCIONES PARA ARRASTRE
@@ -409,9 +427,13 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                                     <Sparkles size={48} className="mx-auto mb-4 opacity-50" />
                                     <p className="text-sm">
-                                        Escribe un ejercicio de geometría descriptiva
+                                        {mode === 'generate'
+                                            ? 'Dime el tema y te planteo un ejercicio nuevo'
+                                            : 'Escribe un ejercicio de geometría descriptiva'}
                                         <br />
-                                        y lo resolveré paso a paso
+                                        {mode === 'generate'
+                                            ? 'y, si quieres, lo resolvemos y dibujamos'
+                                            : 'y lo resolveré paso a paso'}
                                     </p>
                                     <div className="mt-4 text-xs text-gray-400 dark:text-gray-500">
                                         <p>Ejemplo:</p>
@@ -422,7 +444,11 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                 </div>
                             ) : (
                                 messages.map((message) => (
-                                    <AIMessageBubble key={message.id} message={message} />
+                                    <AIMessageBubble
+                                        key={message.id}
+                                        message={message}
+                                        onSolveStatement={handleSolveStatement}
+                                    />
                                 ))
                             )}
 
@@ -480,6 +506,28 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
 
                         {/* Input Area */}
                         <form onSubmit={handleSubmit} className="border-t border-gray-200 dark:border-gray-700 p-4">
+                            <div className="mb-2 grid grid-cols-2 gap-1 rounded-lg bg-gray-100 dark:bg-gray-700/50 p-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setMode('solve')}
+                                    className={`rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${mode === 'solve'
+                                        ? 'bg-white text-purple-700 shadow-sm dark:bg-gray-600 dark:text-white'
+                                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-300'
+                                        }`}
+                                >
+                                    Resolver enunciado
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setMode('generate')}
+                                    className={`rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${mode === 'generate'
+                                        ? 'bg-white text-purple-700 shadow-sm dark:bg-gray-600 dark:text-white'
+                                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-300'
+                                        }`}
+                                >
+                                    Crear ejercicio
+                                </button>
+                            </div>
                             {!isPremium && (
                                 <button
                                     type="button"
@@ -494,7 +542,11 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     type="text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder={isPremium ? 'Escribe un ejercicio...' : 'Función Premium'}
+                                    placeholder={!isPremium
+                                        ? 'Función Premium'
+                                        : mode === 'generate'
+                                            ? 'Ej: intersección de plano y recta'
+                                            : 'Escribe un ejercicio...'}
                                     disabled={isProcessing}
                                     className="flex-1 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 text-gray-900 dark:text-white"
                                     onMouseDown={(e) => e.stopPropagation()}

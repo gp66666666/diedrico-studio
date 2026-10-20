@@ -139,6 +139,38 @@ interface GeometryState {
     removeAuxSystem: (id: string) => void;
 }
 
+/**
+ * Número de elementos que consume cada herramienta.
+ *
+ * Antes esto era una cadena de `if` incompleta: giros, distancias entre
+ * rectas/planos, abatimientos, cambios de plano o "plano por 3 puntos"
+ * se quedaban en 1 selección y no llegaban a ejecutarse nunca.
+ */
+export function selectionCountForTool(tool: string): number {
+    if (tool === 'none') return 0;
+
+    if (tool.startsWith('distance-')) return 2;
+    if (tool.startsWith('advanced-intersection')) return 3;
+    if (tool.startsWith('intersection')) return 2;
+    if (tool.startsWith('rotation-')) return 2;
+    if (tool.startsWith('abatir-') || tool.startsWith('desabatir')) return 2;
+    if (tool.startsWith('angle-')) return 2;
+
+    if (tool === 'cambio-plano-h' || tool === 'cambio-plano-v') return 2;
+    if (tool === 'plane-3-points') return 3;
+    if (tool === 'segment-2-points') return 2;
+    if (tool === 'create-group' || tool === 'reconstruct-vm') return 50;
+
+    if (tool.startsWith('poliedro-') || tool.startsWith('solid-') || tool.startsWith('revolucion-')) return 1;
+    if (tool === 'true-length') return 1;
+
+    // Paralelismo / perpendicularidad: 3 cuando hay dos planos o dos rectas de referencia
+    if (['plane-perp-2-planes', 'line-parallel-2-planes', 'plane-parallel-2-lines'].includes(tool)) return 3;
+    if (tool.startsWith('parallel-') || tool.startsWith('perp-') || tool.startsWith('plane-') || tool.startsWith('line-')) return 2;
+
+    return 1;
+}
+
 export const useGeometryStore = create<GeometryState>((set, get) => ({
     elements: [],
     sketchElements: [],
@@ -231,6 +263,8 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
     removeElement: (id) => set((state) => ({
         elements: state.elements.filter((el) => el.id !== id),
+        // Las medidas que usaban ese elemento dejan de tener sentido
+        measurements: state.measurements.filter((m) => !m.elementIds?.includes(id)),
         selectedElementId: state.selectedElementId === id ? null : state.selectedElementId,
         history: {
             past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
@@ -261,6 +295,12 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     clearAll: () => set((state) => ({
         elements: [],
         sketchElements: [],
+        // Sin esto quedaban distancias/ángulos y cambios de plano "fantasma"
+        measurements: [],
+        auxSystems: [],
+        selectedElementId: null,
+        selectedForDistance: [],
+        distanceResult: null,
         history: {
             past: [...state.history.past, { elements: state.elements, sketchElements: state.sketchElements }],
             future: []
@@ -352,30 +392,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         const { selectedForDistance, activeTool, elements } = get();
 
         // Determine how many elements we need
-        let maxSelection = 0;
-        if (activeTool === 'distance-point-point') maxSelection = 2;
-        else if (activeTool === 'distance-point-line') maxSelection = 2;
-        else if (activeTool === 'distance-point-plane') maxSelection = 2;
-        else if (activeTool === 'parallel-line-line') maxSelection = 2;
-        else if (activeTool === 'perp-line-plane') maxSelection = 2;
-        else if (activeTool === 'perp-plane-line') maxSelection = 2;
-        else if (activeTool === 'perp-line-line') maxSelection = 2;
-        else if (activeTool === 'plane-parallel-plane') maxSelection = 2;
-        else if (activeTool === 'plane-perp-2-planes') maxSelection = 3;
-        else if (activeTool === 'line-parallel-2-planes') maxSelection = 3;
-        else if (activeTool === 'plane-parallel-2-lines') maxSelection = 3;
-        else if (activeTool === 'rotation-point-axis') maxSelection = 2;
-        else if (activeTool === 'angle-line-line') maxSelection = 2;
-        else if (activeTool === 'angle-line-plane') maxSelection = 2;
-        else if (activeTool === 'abatir-ph') maxSelection = 2; // Plano y luego Punto
-        else if (activeTool === 'true-length') maxSelection = 1;
-        else if (activeTool?.startsWith('intersection')) maxSelection = 2;
-        else if (activeTool?.startsWith('advanced-intersection')) maxSelection = 3;
-        else if (activeTool?.startsWith('poliedro-') || activeTool?.startsWith('solid-') || activeTool?.startsWith('revolucion-')) maxSelection = 1;
-        else if (activeTool === 'segment-2-points') maxSelection = 2;
-        else if (activeTool === 'create-group') maxSelection = 50; // Arbitrary high limit
-        else if (activeTool === 'reconstruct-vm') maxSelection = 50;
-        else if (activeTool !== 'none') maxSelection = 1; // Default for other tools
+        const maxSelection = selectionCountForTool(activeTool ?? 'none');
 
         console.log(`[Store] selectForDistance: id=${id}, activeTool=${activeTool}, maxSelection=${maxSelection}`);
 
