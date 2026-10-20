@@ -38,10 +38,11 @@ Function `supabase/functions/ai-proxy`. El navegador llama a `/functions/v1/ai-p
 ```
 src/
 ├── App.tsx / MainApp.tsx        raíz de rutas y layout
-├── pages/                      Academy, About, Contact, Privacy, Terms
+├── pages/                      Academy, Guide, About, Contact, Privacy, Terms
 ├── components/                 Sidebar, Scene (3D), DiedricoView (2D), ChatInterface...
 │   ├── 2D/  3D/  tools/        renderizado y herramientas geométricas
 ├── features/ai-assistant/      servicios del asistente + store + prompts (aiProxy.ts → Edge Function)
+├── lib/solidGeometry.ts        malla única de sólidos (la usan 3D y 2D: no duplicar)
 ├── store/geometryStore.ts      elementos 3D + CRUD de proyectos en Supabase
 ├── store/userStore.ts          sesión, perfil, progreso (temas/ejercicios)
 ├── lib/supabase.ts             cliente Supabase
@@ -59,6 +60,8 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Solo dos tablas en `
 
 - `projects(id, user_id, title, description, thumbnail_url, data jsonb, created_at, updated_at)`
   — `data = { elements, sketchElements }`. RLS por `auth.uid() = user_id`.
+- `kofi_events(...)` — pagos del webhook de Ko-fi (auditoría + idempotencia). Sin políticas RLS:
+  solo `service_role`.
 - `profiles(id, email, full_name, avatar_url, is_premium, premium_until, role, completed_topics text[],
   completed_exercises text[], created_at)` — RLS por `auth.uid() = id`; un trigger protege
   `is_premium`/`premium_until`/`role`/`email` para que el cliente no pueda escalar privilegios.
@@ -70,7 +73,18 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Solo dos tablas en `
 - `isPremium` del `userStore` es derivado: `is_premium && (!premium_until || premium_until > now)`.
 - El panel de IA lo ve todo el mundo; sin premium muestra un aviso y no llama a la API
   (el proxy tiene además rate limit por IP).
-- Activación manual (Ko-fi no avisa a la app): `./scripts/premium.sh correo on [meses]`.
+- Activación automática: `supabase/functions/kofi-webhook` recibe los pagos de Ko-fi y suma 1 mes
+  a `premium_until` por pago (idempotente por `message_id`). Requiere el secret
+  `KOFI_VERIFICATION_TOKEN` con el token de Ko-fi.
+- Activación manual (respaldo): `./scripts/premium.sh correo on [meses]`.
+
+## Coherencia 3D ↔ 2D
+
+- Los sólidos se construyen en `src/lib/solidGeometry.ts`. 3D (`SolidObject`) y 2D (`Solid2D`) usan
+  la MISMA malla. Prohibido duplicar geometría en un componente: si algo no coincide, el fallo está
+  en la rotación (convención `Rx·Rz·Ry`, igual que Three con `rotation=[rx,rz,ry]`) o en las unidades.
+- Cada herramienta declara cuántos elementos consume en `selectionCountForTool` (geometryStore).
+  Si añades una herramienta nueva, añádela ahí o se quedará esperando selección para siempre.
 
 Cambios de esquema SIEMPRE como migración:
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
     ChevronDown, ChevronRight, Ruler, RotateCw,
-    GitBranch, Box, Maximize2
+    GitBranch, Box, Maximize2, Layers, Triangle
 } from 'lucide-react';
 import { useGeometryStore } from '../store/geometryStore';
 
@@ -20,6 +20,7 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
         paralelismo: false,
         giros: false,
         cambiosPlano: false,
+        planos: false,
         solidos: false
     });
 
@@ -330,25 +331,95 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
             </div>
 
 
-            {/* GIROS (DISABLED)
-             <div>
-                 <button
-@@ -382,5 +382,5 @@
-                         </div>
-                     </div>
-                 )}
--            </div>
-+            </div> */}
+            {/* GIROS */}
+            <div>
+                <button onClick={() => toggleSection('giros')} className={sectionClass}>
+                    <span className="flex items-center gap-2">
+                        <RotateCw size={16} />
+                        Giros
+                    </span>
+                    {expandedSections.giros ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
 
-            {/* CAMBIOS DE PLANO (DISABLED)
-             <div>
-                 <button
-@@ -414,5 +414,5 @@
- 
-                     </div>
-                 )}
--            </div>
-+            </div> */}
+                {expandedSections.giros && (
+                    <div className={contentClass}>
+                        <p className={`px-3 text-[10px] leading-tight ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                            Selecciona el objeto y después la recta que hace de eje. Se crea una copia girada.
+                        </p>
+                        <button
+                            className={getButtonClass('rotation-point-axis')}
+                            onClick={() => setActiveTool(activeTool === 'rotation-point-axis' ? 'none' : 'rotation-point-axis')}
+                        >
+                            🔄 Girar un punto
+                        </button>
+                        <button
+                            className={getButtonClass('rotation-any')}
+                            onClick={() => setActiveTool(activeTool === 'rotation-any' ? 'none' : 'rotation-any')}
+                        >
+                            🔄 Girar recta, plano, segmento o sólido
+                        </button>
+                        <button
+                            className={getButtonClass('rotation-parallel-lt')}
+                            onClick={() => setActiveTool(activeTool === 'rotation-parallel-lt' ? 'none' : 'rotation-parallel-lt')}
+                        >
+                            ↔️ Poner una recta paralela a la LT
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* CAMBIOS DE PLANO */}
+            <div>
+                <button onClick={() => toggleSection('cambiosPlano')} className={sectionClass}>
+                    <span className="flex items-center gap-2">
+                        <Maximize2 size={16} />
+                        Cambios de plano
+                    </span>
+                    {expandedSections.cambiosPlano ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+
+                {expandedSections.cambiosPlano && (
+                    <div className={contentClass}>
+                        <p className={`px-3 text-[10px] leading-tight ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                            Elige dos puntos: definen la nueva línea de tierra.
+                        </p>
+                        <button
+                            className={getButtonClass('cambio-plano-h')}
+                            onClick={() => setActiveTool(activeTool === 'cambio-plano-h' ? 'none' : 'cambio-plano-h')}
+                        >
+                            🔼 Cambio de plano horizontal
+                        </button>
+                        <button
+                            className={getButtonClass('cambio-plano-v')}
+                            onClick={() => setActiveTool(activeTool === 'cambio-plano-v' ? 'none' : 'cambio-plano-v')}
+                        >
+                            🔽 Cambio de plano vertical
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* PLANOS */}
+            <div>
+                <button onClick={() => toggleSection('planos')} className={sectionClass}>
+                    <span className="flex items-center gap-2">
+                        <Layers size={16} />
+                        Planos
+                    </span>
+                    {expandedSections.planos ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+
+                {expandedSections.planos && (
+                    <div className={contentClass}>
+                        <button
+                            className={getButtonClass('plane-3-points')}
+                            onClick={() => setActiveTool(activeTool === 'plane-3-points' ? 'none' : 'plane-3-points')}
+                        >
+                            <span className="inline-flex items-center gap-2"><Triangle size={12} /> Plano por 3 puntos</span>
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* SÓLIDOS */}
             <div>

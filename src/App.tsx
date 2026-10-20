@@ -5,6 +5,7 @@ import ContactPage from './pages/ContactPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AcademyPage from './pages/AcademyPage';
+import GuidePage from './pages/GuidePage';
 import { useThemeInitializer } from './hooks/useThemeSync';
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 {/* <Route path="/academy" element={<AcademyPage />} /> */}
+                <Route path="/academy" element={<AcademyPage />} />
+                <Route path="/guia" element={<GuidePage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
             </Routes>

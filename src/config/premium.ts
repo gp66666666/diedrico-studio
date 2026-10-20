@@ -22,9 +22,12 @@ export const PREMIUM = {
         },
     ],
 
-    /** Nota honesta: hoy la activación es manual (Ko-fi no avisa a la app). */
+    /**
+     * Cómo se activa: el webhook de Ko-fi acredita el mes automáticamente.
+     * Si el email de Ko-fi no coincide con el de la cuenta, se revisa a mano.
+     */
     activationNote:
-        'Tras el pago, activo tu cuenta a mano con el email con el que te registraste. Suele tardar menos de 24 h.',
+        'Se activa sola al pagar. Usa en Ko-fi el mismo email con el que te registraste aquí; si usaste otro, escríbeme y lo arreglo.',
 } as const;
 
 export const isPremiumFeature = (id: (typeof PREMIUM.features)[number]['id']): boolean =>

@@ -173,8 +173,14 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                 </div>
 
                 {/* Footer */}
-                <div className={`p-4 border-t text-xs opacity-40 text-center ${headerClass}`}>
-                    © 2025 Eloi García - Diédrico Studio
+                <div className={`p-4 border-t flex flex-col items-center gap-2 ${headerClass}`}>
+                    <a
+                        href="/guia"
+                        className="text-sm font-semibold text-blue-500 hover:text-blue-400 underline underline-offset-4"
+                    >
+                        Ver la guía completa, con imágenes de cada herramienta
+                    </a>
+                    <span className="text-xs opacity-40">© 2025 Eloi García - Diédrico Studio</span>
                 </div>
             </div>
         </div>,

@@ -30,16 +30,27 @@ export default function MainApp() {
     // Listen for messages from the Láminas iframe
     useEffect(() => {
         const handleMessage = async (event: MessageEvent) => {
-            if (event.data?.type === 'GENERATE_EXERCISE') {
-                const prompt = event.data.prompt;
-                const result = await generateExercise(prompt);
-
+            const replyToLaminas = (content: string) => {
                 if (iframeRef.current && iframeRef.current.contentWindow) {
                     iframeRef.current.contentWindow.postMessage({
                         type: 'EXERCISE_GENERATED',
-                        content: result
+                        content
                     }, '*');
                 }
+            };
+
+            if (event.data?.type === 'GENERATE_EXERCISE') {
+                // El generador de ejercicios de las láminas también es Premium
+                if (!isPremium) {
+                    replyToLaminas(JSON.stringify({
+                        error: 'El generador de ejercicios con IA es una función Premium. Actívala desde tu cuenta para usarlo.'
+                    }));
+                    return;
+                }
+
+                const prompt = event.data.prompt;
+                const result = await generateExercise(prompt);
+                replyToLaminas(result);
             }
 
             if (event.data?.type === 'DIGITIZE_IMAGE') {
@@ -125,7 +136,7 @@ export default function MainApp() {
 
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, [generateExercise]);
+    }, [generateExercise, isPremium]);
 
     // Theme Classes
     const bgClass = isDark ? 'bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50';
