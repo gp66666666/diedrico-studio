@@ -346,4 +346,72 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
             },
         ],
     },
+
+    /* ------------------------------ 20. MAPA DEL TEMARIO -------------------- */
+    {
+        id: 'theory-20-map',
+        title: '20. Mapa del temario',
+        description: 'Qué entra en la EBAU, qué cubre la Academia y en qué orden estudiarlo.',
+        category: 'Guía',
+        theory: 'Mapa del temario de diédrico.',
+        theoryContent: (
+            <div className="space-y-8 text-slate-700 dark:text-slate-300">
+                {caja('Para qué sirve', 'Antes de estudiar conviene saber qué hay. Este mapa resume el bloque de diédrico de Dibujo Técnico II (RD 243/2022) y en qué tema de la Academia está cada cosa.')}
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">Bases</h3>
+                        <ul className="text-sm space-y-1">
+                            <li>1. El punto</li>
+                            <li>2. La recta (trazas, tipos)</li>
+                            <li>3. El plano (trazas, clasificación)</li>
+                        </ul>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">Operaciones</h3>
+                        <ul className="text-sm space-y-1">
+                            <li>4. Intersecciones</li>
+                            <li>5. Paralelismo y perpendicularidad</li>
+                            <li>6. Distancias</li>
+                            <li>7. Ángulos</li>
+                            <li>15. Máxima pendiente e inclinación</li>
+                            <li>16. Ángulos con los planos de proyección</li>
+                        </ul>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">Métodos</h3>
+                        <ul className="text-sm space-y-1">
+                            <li>8. Abatimientos</li>
+                            <li>9. Giros</li>
+                            <li>10. Cambios de plano</li>
+                        </ul>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5">
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">Sólidos</h3>
+                        <ul className="text-sm space-y-1">
+                            <li>11. Poliedros (secciones, intersección con recta)</li>
+                            <li>12. Superficies (cilindro, cono, esfera)</li>
+                            <li>13. Secciones y su VM</li>
+                            <li>14. Desarrollos</li>
+                            <li>17. Posiciones características</li>
+                            <li>18. Cilindros y conos oblicuos</li>
+                            <li>19. La esfera</li>
+                        </ul>
+                    </div>
+                </div>
+
+                {tip('Orden recomendado: 1-3 (bases) → 4-7 (operaciones) → 8-10 (métodos) → 11-19 (sólidos). Las operaciones se usan dentro de los métodos, y los métodos dentro de los sólidos: si algo falla, casi siempre es una base.')}
+
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-5">
+                    <h3 className="font-bold text-slate-900 dark:text-white mb-2">Fuera de esta Academia</h3>
+                    <p className="text-sm">
+                        El bloque de diédrico está completo. La asignatura incluye además sistema axonométrico,
+                        planos acotados, perspectiva cónica y normalización (cortes, secciones, acotación):
+                        no están en la app todavía.
+                    </p>
+                </div>
+            </div>
+        ),
+        exercises: [],
+    },
 ];
