@@ -52,7 +52,7 @@ export const EXERCISES: Exercise[] = [
             'Traza la traza H: donde r″ corta a la línea de tierra baja una perpendicular hasta r′. Ese punto es H′ = H″.',
             'Traza la traza V: donde r′ corta a la línea de tierra sube una perpendicular hasta r″. Ese punto es V′ = V″.',
         ],
-        result: 'H(8, 0, 0) y V(6, 0, 0).',
+        result: 'H(7,5; 3,5; 0) y V(18, 0, −7).',
         tip: 'Una recta tiene dos trazas como máximo: si es paralela a un plano de proyección, solo corta al otro.',
         elements: [
             point('ex1-a', 'A', 0, 6, 5),
@@ -130,7 +130,7 @@ export const EXERCISES: Exercise[] = [
             'El punto A(3, 4, 5) pertenece al plano P: y = 4. Abate el plano sobre el horizontal y halla la posición abatida (A).',
         steps: [
             'La charnela es la traza horizontal del plano: la recta y = 4, z = 0, que es paralela a la línea de tierra.',
-            'La distancia de A a la charnela, medida en proyección horizontal, es de 4 unidades (su cota).',
+            'Como A′ cae sobre la charnela (el plano es y = 4), el radio de giro es la cota: 5 unidades.',
             'Al abatir, esa distancia se coloca perpendicular a la charnela: el punto gira hasta el plano horizontal.',
             'El resultado (A) queda en el plano z = 0, con la misma x que A.',
         ],

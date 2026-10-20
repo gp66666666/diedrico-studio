@@ -38,19 +38,32 @@ const pl = (
     type: 'plane', name, normal: { x: normal[0], y: normal[1], z: normal[2] }, constant, color,
 });
 
+/** Sólido en el store. `height` es la altura real (size.y); el resto, el radio. */
 const solid = (
     name: string,
     subtype: string,
     position: [number, number, number],
     size: number,
-    color = '#3b82f6'
+    color = '#3b82f6',
+    height?: number
 ): Partial<any> => ({
     type: 'solid', name, subtype,
     position: { x: position[0], y: position[1], z: position[2] },
-    size: { x: size, y: size, z: size },
+    size: { x: size, y: height ?? size, z: size },
     rotation: { x: 0, y: 0, z: 0 },
     color, opacity: 0.85,
 });
+
+/** Coloca un sólido apoyado en el PH: centro a media altura. */
+const solidOnFloor = (
+    name: string,
+    subtype: string,
+    x: number,
+    y: number,
+    radius: number,
+    height: number,
+    color?: string
+): Partial<any> => solid(name, subtype, [x, y, height / 2], radius, color, height);
 
 /* ------------------------------------------------------------------ */
 /* Utilidades de dibujo                                                */
@@ -745,7 +758,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Los cuatro cuadrantes',
             level: 'Medio',
             statement: 'Dibuja un punto en cada uno de los cuatro cuadrantes y explica qué signo tiene su cota y su alejamiento.',
-            setup: [p('A', 3, 2, 4), p('B', 9, 2, -4, '#a78bfa'), p('C', 15, -2, 4, '#f59e0b'), p('D', 21, -2, -4, '#34d399')],
+            setup: [p('A', 2, 3, 4), p('B', 8, 3, -4, '#a78bfa'), p('C', 12, -3, 4, '#f59e0b'), p('D', 5, -3, -4, '#34d399')],
             solutionHint: 'I: cota +, alejamiento +. II: cota −, alejamiento +. III: cota −, alejamiento −. IV: cota +, alejamiento −.',
         },
     ],
@@ -756,7 +769,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             level: 'Medio',
             statement: 'La recta r pasa por A(0, 6, 5) y B(12, 2, −3). Halla sus trazas H y V.',
             setup: [p('A', 0, 6, 5), p('B', 12, 2, -3), l('r', [0, 6, 5], [12, -4, -8])],
-            solutionHint: 'Prolonga r′ y r″ hasta la LT: por cada corte sube o baja una perpendicular hasta la otra proyección.',
+            solutionHint: 'Traza H donde r″ corta a la LT y sube la perpendicular hasta r′: H(7,5, 3,5, 0). Traza V donde r′ corta a la LT y baja hasta r″: V(18, 0, −7).',
         },
         {
             id: 'ex-line-horizontal',
@@ -784,8 +797,8 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             id: 'ex-plane-projecting',
             title: 'Plano proyectante vertical',
             level: 'Fácil',
-            statement: 'Dibuja un plano proyectante vertical que contenga a la recta r y explica por qué se ve de canto en el alzado.',
-            setup: [p('A', 0, 1, 2), p('B', 10, 5, 6), l('r', [0, 1, 2], [10, 4, 4])],
+            statement: 'La recta r pasa por A(0, 4, 2) y B(10, 4, 6). Dibuja un plano proyectante vertical que la contenga y explica por qué se ve de canto en el alzado.',
+            setup: [p('A', 0, 4, 2), p('B', 10, 4, 6), l('r', [0, 4, 2], [10, 0, 4])],
             solutionHint: 'Un plano proyectante vertical es perpendicular al PV: su traza vertical es una recta y todo el plano se proyecta sobre ella.',
         },
     ],
@@ -824,8 +837,8 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             id: 'ex-perpendicular-plane',
             title: 'Recta perpendicular a un plano',
             level: 'Medio',
-            statement: 'Por P(2, 4, 6) traza la recta perpendicular al plano y = 4.',
-            setup: [p('P', 2, 4, 6, '#a78bfa'), pl('P', [0, 1, 0], -4)],
+            statement: 'Por P(2, 4, 6) traza la recta perpendicular al plano α: y = 4.',
+            setup: [p('P', 2, 4, 6, '#a78bfa'), pl('α', [0, 1, 0], -4)],
             solutionHint: 'La dirección de la perpendicular es la normal del plano: (0, 1, 0). En la planta se ve perpendicular a la traza.',
         },
     ],
@@ -842,8 +855,8 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             id: 'ex-distance-point-line',
             title: 'Distancia de un punto a una recta',
             level: 'Difícil',
-            statement: 'Halla la distancia del punto P(4, 6, 2) a la recta r, que pasa por A(0, 6, 2) y B(8, 6, 2).',
-            setup: [p('A', 0, 6, 2), p('B', 8, 6, 2), p('P', 4, 6, 2, '#a78bfa'), l('r', [0, 6, 2], [8, 0, 0])],
+            statement: 'Halla la distancia del punto P(4, 10, 2) a la recta r, que pasa por A(0, 6, 2) y B(8, 6, 2).',
+            setup: [p('A', 0, 6, 2), p('B', 8, 6, 2), p('P', 4, 10, 2, '#a78bfa'), l('r', [0, 6, 2], [8, 0, 0])],
             solutionHint: 'La recta es paralela al PH (cota constante): la distancia se ve en planta, perpendicular a r′ desde P′.',
         },
     ],
@@ -871,8 +884,8 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Abatir un punto',
             level: 'Difícil',
             statement: 'El punto A(3, 4, 5) pertenece al plano y = 4. Abátelo sobre el horizontal.',
-            setup: [p('A', 3, 4, 5), pl('P', [0, 1, 0], -4)],
-            solutionHint: 'Charnela: la recta y = 4, z = 0. Radio de giro: √(4² + 5²). Llévalo desde la charnela en la planta.',
+            setup: [p('A', 3, 4, 5), pl('α', [0, 1, 0], -4)],
+            solutionHint: 'Charnela: la recta y = 4, z = 0. Como A′ cae sobre la charnela, el radio de giro es la cota: 5. Llévalo perpendicular a la charnela.',
         },
         {
             id: 'ex-flatten-vm',
@@ -915,7 +928,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Ver un plano de canto',
             level: 'Difícil',
             statement: 'Haz un cambio de plano para ver de canto el plano que contiene a la recta r y al punto P.',
-            setup: [p('A', 0, 2, 4), p('B', 8, 6, 4), p('P', 4, 4, 8, '#a78bfa'), l('r', [0, 2, 4], [8, 4, 0]), pl('α', [0, 4, -2], 0)],
+            setup: [p('A', 0, 2, 4), p('B', 8, 6, 4), p('P', 4, 4, 8, '#a78bfa'), l('r', [0, 2, 4], [8, 4, 0]), pl('α', [1, -2, 0], 4)],
             solutionHint: 'Traza una recta horizontal del plano y pon la nueva LT perpendicular a su proyección horizontal.',
         },
     ],
@@ -925,7 +938,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Cubo apoyado en el PH',
             level: 'Medio',
             statement: 'Dibuja un cubo de 6 unidades de arista apoyado en el plano horizontal, con una cara paralela al PV.',
-            setup: [p('O', 4, 4, 0), solid('Cubo', 'cube', [4, 4, 4], 4)],
+            setup: [p('O', 4, 4, 0), solidOnFloor('Cubo', 'cube', 4, 4, 4, 6)],
             solutionHint: 'En planta, un cuadrado en VM; en alzado, otro cuadrado a la altura de la arista. Las aristas ocultas van discontinuas.',
         },
         {
@@ -933,7 +946,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Tetraedro',
             level: 'Difícil',
             statement: 'Dibuja un tetraedro regular y localiza sus aristas ocultas en alzado y planta.',
-            setup: [p('O', 6, 6, 4), solid('Tetraedro', 'tetrahedron', [6, 6, 4], 4, '#ef4444')],
+            setup: [p('O', 6, 6, 0), solidOnFloor('Tetraedro', 'tetrahedron', 6, 6, 4, 7, '#ef4444')],
             solutionHint: 'La base es un triángulo equilátero; el vértice superior se proyecta en el centro de la base.',
         },
     ],
@@ -943,7 +956,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Cilindro recto',
             level: 'Fácil',
             statement: 'Dibuja un cilindro de radio 3 y altura 8 apoyado en el PH y señala su contorno aparente.',
-            setup: [p('O', 5, 5, 0), solid('Cilindro', 'cylinder', [5, 5, 4], 3)],
+            setup: [p('O', 5, 5, 0), solidOnFloor('Cilindro', 'cylinder', 5, 5, 3, 8)],
             solutionHint: 'Planta: circunferencia de radio 3. Alzado: rectángulo de 6 × 8. El contorno son las dos generatrices extremas.',
         },
         {
@@ -951,7 +964,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Cono recto',
             level: 'Medio',
             statement: 'Dibuja un cono de radio 4 y altura 7 y explica por qué en planta se ve una circunferencia.',
-            setup: [p('O', 6, 6, 0), solid('Cono', 'cone', [6, 6, 3.5], 4, '#f59e0b')],
+            setup: [p('O', 6, 6, 0), solidOnFloor('Cono', 'cone', 6, 6, 4, 7, '#f59e0b')],
             solutionHint: 'Todas las generatrices van del vértice a la base; en planta se superponen y solo se ve la circunferencia.',
         },
     ],
@@ -961,7 +974,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Sección de un cubo por un plano horizontal',
             level: 'Difícil',
             statement: 'El cubo está apoyado en el PH. Dibuja la sección que produce un plano horizontal a media altura.',
-            setup: [p('O', 5, 5, 0), solid('Cubo', 'cube', [5, 5, 4], 4), pl('Corte', [0, 0, 1], -4, '#f59e0b')],
+            setup: [p('O', 5, 5, 0), solidOnFloor('Cubo', 'cube', 5, 5, 4, 6), pl('Corte', [0, 0, 1], -3, '#f59e0b')],
             solutionHint: 'La sección es un cuadrado paralelo a la base, del mismo tamaño. En planta se ve en VM.',
         },
         {
@@ -969,7 +982,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Sección por un plano proyectante',
             level: 'Difícil',
             statement: 'Dibuja la sección de un prisma por un plano proyectante vertical y explica dónde se ve directamente.',
-            setup: [p('O', 5, 5, 0), solid('Prisma', 'prism', [5, 5, 4], 3), pl('Corte', [0, 1, 0.2], -5, '#f59e0b')],
+            setup: [p('O', 5, 5, 0), solidOnFloor('Prisma', 'prism', 5, 5, 3, 8), pl('Corte', [0, 1, 0.2], -5, '#f59e0b')],
             solutionHint: 'En la vista donde el plano se ve de canto (alzado), la sección aparece como un segmento: sus extremos son los puntos de corte con las aristas.',
         },
     ],
@@ -979,7 +992,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Desarrollo de un prisma',
             level: 'Medio',
             statement: 'Dibuja el desarrollo de un prisma hexagonal de radio 3 y altura 8.',
-            setup: [p('O', 6, 6, 0), solid('Prisma', 'prism', [6, 6, 4], 3)],
+            setup: [p('O', 6, 6, 0), solidOnFloor('Prisma', 'prism', 6, 6, 3, 8)],
             solutionHint: 'Seis rectángulos de base el lado del hexágono (igual al radio en un hexágono regular) y altura 8, más las dos bases.',
         },
         {
@@ -987,7 +1000,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Desarrollo de un cilindro',
             level: 'Fácil',
             statement: 'Calcula las dimensiones del desarrollo lateral de un cilindro de radio 3 y altura 8.',
-            setup: [p('O', 6, 6, 0), solid('Cilindro', 'cylinder', [6, 6, 4], 3)],
+            setup: [p('O', 6, 6, 0), solidOnFloor('Cilindro', 'cylinder', 6, 6, 3, 8)],
             solutionHint: 'Rectángulo de base 2πr ≈ 18,85 y altura 8, más dos círculos de radio 3.',
         },
     ],
