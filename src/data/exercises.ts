@@ -161,6 +161,111 @@ export const EXERCISES: Exercise[] = [
             plane('ex6-q', 'Q', [1, 0, 1], 0, '#a78bfa'),
         ],
     },
+    {
+        slug: 'pertenencia-de-un-punto-a-una-recta',
+        title: '¿Pertenece el punto a la recta?',
+        topic: 'La recta',
+        level: 'Básico',
+        statement:
+            'La recta r pasa por A(0, 3, 0) y B(8, 3, 4). Comprueba si el punto P(4, 3, 2) pertenece a r.',
+        steps: [
+            'Dibuja A y B con sus dos proyecciones y únelas: r′ pasa por A′ y B′, y r″ por A″ y B″.',
+            'Sitúa P′ y P″.',
+            'Un punto pertenece a la recta si sus DOS proyecciones caen sobre las homónimas de la recta.',
+            'P′ cae sobre r′ y P″ sobre r″, así que P sí pertenece a r. Además es el punto medio del segmento AB.',
+        ],
+        result: 'Sí pertenece: P está sobre r (es el punto medio de AB).',
+        tip: 'Basta con que falle una de las dos proyecciones para que el punto no pertenezca a la recta.',
+        elements: [
+            point('ex7-a', 'A', 0, 3, 0),
+            point('ex7-b', 'B', 8, 3, 4),
+            point('ex7-p', 'P', 4, 3, 2, '#a78bfa'),
+            line('ex7-r', 'r', [0, 3, 0], [8, 0, 4]),
+        ],
+    },
+    {
+        slug: 'perpendicular-a-un-plano',
+        title: 'Recta perpendicular a un plano',
+        topic: 'Perpendicularidad',
+        level: 'Medio',
+        statement:
+            'Por el punto P(2, 4, 6) traza la recta perpendicular al plano P: y = 4.',
+        steps: [
+            'El plano P es paralelo al plano vertical, así que se ve de canto en la planta: su traza es la recta y = 4.',
+            'Una recta perpendicular a un plano lo es a todas sus rectas, y su dirección es la normal del plano.',
+            'La normal de y = 4 es (0, 1, 0): una recta de punta, perpendicular a la traza en la planta.',
+            'Dibújala por P: en el alzado se ve como un punto (P″) y en la planta como una perpendicular a la traza.',
+        ],
+        result: 'Recta por P(2, 4, 6) con dirección (0, 1, 0).',
+        tip: 'En un plano proyectante, la perpendicular se ve directamente en la vista donde el plano se ve de canto.',
+        elements: [
+            point('ex8-p', 'P', 2, 4, 6, '#a78bfa'),
+            plane('ex8-pl', 'P', [0, 1, 0], -4),
+            line('ex8-r', 'r', [2, 4, 6], [0, 1, 0]),
+        ],
+    },
+    {
+        slug: 'interseccion-de-dos-planos',
+        title: 'Intersección de dos planos',
+        topic: 'Intersecciones',
+        level: 'Avanzado',
+        statement:
+            'Halla la recta intersección de los planos P: z = 2 y Q: y = 3.',
+        steps: [
+            'Los dos planos son proyectantes: P se ve de canto en el alzado y Q en la planta.',
+            'La intersección es el conjunto de puntos que cumplen las dos condiciones a la vez: y = 3 y z = 2.',
+            'Esa recta es paralela a la línea de tierra: en el alzado se ve como una recta horizontal a cota 2, y en la planta como una recta horizontal a alejamiento 3.',
+            'Marca dos puntos cualesquiera de esa recta para dibujarla.',
+        ],
+        result: 'Recta i: y = 3, z = 2 (paralela a la LT).',
+        tip: 'Si los dos planos son paralelos a la LT, su intersección también lo es (o son paralelos entre sí).',
+        elements: [
+            plane('ex9-p', 'P', [0, 0, 1], -2),
+            plane('ex9-q', 'Q', [0, 1, 0], -3, '#a78bfa'),
+            line('ex9-i', 'i', [0, 3, 2], [1, 0, 0], '#f59e0b'),
+        ],
+    },
+    {
+        slug: 'verdadera-magnitud-cambio-de-plano',
+        title: 'Verdadera magnitud por cambio de plano',
+        topic: 'Verdaderas magnitudes',
+        level: 'Avanzado',
+        statement:
+            'El segmento AB tiene A(0, 2, 2) y B(6, 5, 6). Halla su verdadera magnitud mediante un cambio de plano.',
+        steps: [
+            'Dibuja A y B con sus proyecciones y une A′B′ y A″B″.',
+            'Traza una nueva línea de tierra paralela a la proyección horizontal A′B′.',
+            'Lleva las cotas de A y B perpendiculares a la nueva LT, manteniendo la distancia.',
+            'La nueva proyección vertical A″₁B″₁ está en verdadera magnitud: mídela sobre el papel.',
+        ],
+        result: 'VM = √(6² + 3² + 4²) = √61 ≈ 7,81 unidades.',
+        tip: 'El cambio de plano no cambia el objeto: cambia el plano desde el que se mira. Por eso aparece la VM.',
+        elements: [
+            point('ex10-a', 'A', 0, 2, 2),
+            point('ex10-b', 'B', 6, 5, 6),
+            { id: 'ex10-s', type: 'segment', name: 'AB', p1: { x: 0, y: 2, z: 2 }, p2: { x: 6, y: 5, z: 6 }, color: '#f59e0b', visible: true },
+        ],
+    },
+    {
+        slug: 'giro-de-un-punto',
+        title: 'Giro de un punto alrededor de un eje vertical',
+        topic: 'Giros',
+        level: 'Medio',
+        statement:
+            'Gira el punto A(6, 4, 2) un ángulo de 90° alrededor del eje vertical que pasa por el origen de coordenadas.',
+        steps: [
+            'El eje es una recta perpendicular al plano horizontal, así que en la planta se ve como un punto (el origen).',
+            'La cota no cambia: el punto gira en un plano horizontal, así que A sigue a cota 2.',
+            'Dibuja en la planta el radio OA y gíralo 90° con el compás, en sentido antihorario.',
+            'Sube la nueva posición a la cota 2 para obtener A₁ y A₁″.',
+        ],
+        result: 'A₁(−4, 6, 2).',
+        tip: 'En un giro alrededor de un eje vertical, la proyección horizontal gira y la cota se mantiene.',
+        elements: [
+            point('ex11-a', 'A', 6, 4, 2),
+            line('ex11-eje', 'eje', [0, 0, 0], [0, 0, 1], '#94a3b8'),
+        ],
+    },
 ];
 
 export const EXERCISE_TOPICS = Array.from(new Set(EXERCISES.map((e) => e.topic)));

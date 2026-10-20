@@ -53,6 +53,13 @@
         <priority>0.3</priority>
     </url>
 
+
+
+
+
+
+
+
     <url>
         <loc>https://diedrico-studio.vercel.app/ejercicios</loc>
         <lastmod>2026-10-20</lastmod>
@@ -97,6 +104,41 @@
 
     <url>
         <loc>https://diedrico-studio.vercel.app/ejercicios/angulo-entre-dos-planos</loc>
+        <lastmod>2026-10-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://diedrico-studio.vercel.app/ejercicios/pertenencia-de-un-punto-a-una-recta</loc>
+        <lastmod>2026-10-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://diedrico-studio.vercel.app/ejercicios/perpendicular-a-un-plano</loc>
+        <lastmod>2026-10-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://diedrico-studio.vercel.app/ejercicios/interseccion-de-dos-planos</loc>
+        <lastmod>2026-10-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://diedrico-studio.vercel.app/ejercicios/verdadera-magnitud-cambio-de-plano</loc>
+        <lastmod>2026-10-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://diedrico-studio.vercel.app/ejercicios/giro-de-un-punto</loc>
         <lastmod>2026-10-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>

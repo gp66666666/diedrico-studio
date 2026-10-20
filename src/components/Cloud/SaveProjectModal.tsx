@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { X, Save, Loader } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
+import { captureThumbnail } from '../../lib/thumbnail';
 import { useModalA11y } from '../../hooks/useModalA11y';
 import { trackEvent } from '../../lib/analytics';
 import { toast } from '../../lib/toast';
@@ -41,7 +42,8 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
         setError('');
 
         try {
-            await saveProject(title, description);
+            const thumbnail = captureThumbnail();
+            await saveProject(title, description, thumbnail);
             trackEvent('project_saved', { updated: !!currentProjectId });
             setDescription('');
             onClose();

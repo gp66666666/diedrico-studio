@@ -160,7 +160,7 @@ interface GeometryState {
     /** Proyecto abierto/guardado en esta sesión (para actualizar en vez de duplicar). */
     currentProjectId: string | null;
     currentProjectTitle: string | null;
-    saveProject: (title: string, description?: string) => Promise<string>;
+    saveProject: (title: string, description?: string, thumbnail?: string | null) => Promise<string>;
     loadProject: (projectId: string) => Promise<void>;
     getUserProjects: () => Promise<any[]>;
     deleteProject: (projectId: string) => Promise<void>;
@@ -463,7 +463,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     })),
 
     // Cloud Save/Load (Premium)
-    saveProject: async (title: string, description?: string) => {
+    saveProject: async (title: string, description?: string, thumbnail?: string | null) => {
         const { elements, sketchElements, currentProjectId } = get();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -474,6 +474,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
             title,
             description: description || '',
             data: { elements, sketchElements },
+            thumbnail_url: thumbnail ?? null,
             updated_at: new Date().toISOString(),
         };
 
@@ -537,7 +538,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
         const { data, error } = await supabase
             .from('projects')
-            .select('id, title, description, created_at, updated_at')
+            .select('id, title, description, thumbnail_url, created_at, updated_at')
             .eq('user_id', user.id)
             .order('updated_at', { ascending: false });
 

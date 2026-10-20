@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, FolderOpen, Loader, Trash2, Calendar, Edit2 } from 'lucide-react';
+import { X, FolderOpen, Loader, Trash2, Calendar, Edit2, Box } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
 import { useModalA11y } from '../../hooks/useModalA11y';
@@ -117,6 +117,18 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
                                     className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group"
                                     onClick={() => handleLoad(project.id)}
                                 >
+                                    {project.thumbnail_url?.startsWith('data:image') ? (
+                                        <img
+                                            src={project.thumbnail_url}
+                                            alt={`Miniatura de ${project.title}`}
+                                            className="h-14 w-20 shrink-0 rounded-md border border-gray-200 object-cover dark:border-gray-700"
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-md border border-dashed border-gray-300 text-gray-400 dark:border-gray-700">
+                                            <Box size={18} />
+                                        </div>
+                                    )}
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium text-gray-900 dark:text-white truncate">
                                             {project.title}
