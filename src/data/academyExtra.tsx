@@ -909,6 +909,14 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
     ],
     'theory-4-intersections': [
         {
+            id: 'ex-intersection-oblique',
+            title: 'Corte con un plano oblicuo',
+            level: 'Difícil',
+            statement: 'Halla el punto donde la recta r (por A(0, 0, 3) y B(6, 6, 3)) corta al plano P: x + y + z = 6.',
+            setup: [p('A', 0, 0, 3), p('B', 6, 6, 3), l('r', [0, 0, 3], [6, 6, 0]), pl('P', [1, 1, 1], -6)],
+            solutionHint: 'A mitad de camino en la planta: I(1,5; 1,5; 3), que cumple x + y + z = 6.',
+        },
+        {
             id: 'ex-intersection-line-plane',
             title: 'Intersección recta-plano',
             level: 'Medio',
@@ -985,6 +993,14 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
     ],
     'theory-8-abatements': [
         {
+            id: 'ex-flatten-vertical',
+            title: 'Abatir un punto de un plano vertical',
+            level: 'Difícil',
+            statement: 'El punto A(2, 3, 4) pertenece al plano y = 3. Abátelo sobre el horizontal.',
+            setup: [p('A', 2, 3, 4), pl('α', [0, 1, 0], -3)],
+            solutionHint: 'La charnela es y = 3. Como A′ cae en ella, el radio es la cota (4): (A) queda a alejamiento 7, misma x.',
+        },
+        {
             id: 'ex-flatten-point',
             title: 'Abatir un punto',
             level: 'Difícil',
@@ -1039,6 +1055,14 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
     ],
     'theory-11-polyhedra': [
         {
+            id: 'ex-octahedron',
+            title: 'Octaedro apoyado en un vértice',
+            level: 'Difícil',
+            statement: 'Dibuja un octaedro regular de radio 4 y explica qué se ve en planta al apoyarlo en un vértice.',
+            setup: [solid('Octaedro', 'octahedron', [0, 6, 4], 4)],
+            solutionHint: 'En planta es un cuadrado con sus diagonales; en alzado, un rombo. Las aristas ocultas van discontinuas.',
+        },
+        {
             id: 'ex-cube-draw',
             title: 'Cubo apoyado en el PH',
             level: 'Medio',
@@ -1074,6 +1098,14 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
         },
     ],
     'theory-13-sections': [
+        {
+            id: 'ex-section-cylinder',
+            title: 'Sección de un cilindro',
+            level: 'Medio',
+            statement: 'El cilindro tiene radio 3 y altura 8. Dibuja la sección que produce un plano horizontal a media altura.',
+            setup: [solidOnFloor('Cilindro', 'cylinder', 0, 6, 3, 8), pl('Corte', [0, 0, 1], -4, '#f59e0b')],
+            solutionHint: 'La sección es una circunferencia de radio 3, en VM en la planta y como un segmento en el alzado.',
+        },
         {
             id: 'ex-section-cube',
             title: 'Sección de un cubo por un plano horizontal',
