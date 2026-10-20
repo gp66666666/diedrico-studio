@@ -65,9 +65,16 @@ export const useAIStore = create<AIStore>((set, get) => ({
 
             const response = await aiService.solveExercise(prompt);
 
+            // Si el modelo solo devolvió JSON, el texto queda vacío: mejor un
+            // resumen que una burbuja en blanco.
+            const explanation = (response.explanation || '').trim();
+            const fallback = response.steps?.length
+                ? `He preparado ${response.steps.length} ${response.steps.length === 1 ? 'paso' : 'pasos'}. Pulsa «Ejecutar Todo» para dibujarlo.`
+                : 'No he podido interpretar el ejercicio. Prueba a describirlo con más detalle.';
+
             addMessage({
                 role: 'assistant',
-                content: response.explanation,
+                content: explanation || fallback,
                 steps: response.steps,
             });
 

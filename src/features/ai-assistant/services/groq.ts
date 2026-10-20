@@ -261,6 +261,9 @@ export class GroqService {
     }
 
     private looksLikeSteps(parsed: any): boolean {
+        // Un único objeto también es un paso: {"function": "...", "arguments": {...}}
+        if (this.normalizeStepItem(parsed)) return true;
+
         const items = Array.isArray(parsed) ? parsed : (parsed?.steps ?? parsed?.actions);
         return Array.isArray(items) && items.some((i: any) => !!this.normalizeStepItem(i));
     }
