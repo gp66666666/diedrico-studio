@@ -24,10 +24,14 @@ npm run preview
 
 ## Variables de entorno (solo nombres)
 
-`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_GROQ_API_KEY`,
-`VITE_AI_PROVIDER` (default `groq`), `VITE_ENABLE_AI`, `VITE_GEMINI_API_KEY` (sin uso).
+`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_AI_PROVIDER` (default `groq`),
+`VITE_ENABLE_AI`. `VITE_GEMINI_API_KEY` está sin uso (legacy).
 
-⚠️ Todo `VITE_*` acaba en el bundle público: **nunca** metas una `service_role`/`sb_secret_`.
+⚠️ Todo `VITE_*` acaba en el bundle público: **nunca** metas una `service_role`/`sb_secret_`
+ni una API key de IA.
+
+⚠️ La clave de Groq **no** está en el cliente: vive como secreto `GROQ_API_KEY` de la Edge
+Function `supabase/functions/ai-proxy`. El navegador llama a `/functions/v1/ai-proxy`.
 
 ## Estructura
 
@@ -37,7 +41,7 @@ src/
 ├── pages/                      Academy, About, Contact, Privacy, Terms
 ├── components/                 Sidebar, Scene (3D), DiedricoView (2D), ChatInterface...
 │   ├── 2D/  3D/  tools/        renderizado y herramientas geométricas
-├── features/ai-assistant/      servicios Groq/Gemini + store + prompts
+├── features/ai-assistant/      servicios del asistente + store + prompts (aiProxy.ts → Edge Function)
 ├── store/geometryStore.ts      elementos 3D + CRUD de proyectos en Supabase
 ├── store/userStore.ts          sesión, perfil, progreso (temas/ejercicios)
 ├── lib/supabase.ts             cliente Supabase
@@ -80,8 +84,15 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 
 ## Hechos conocidos
 
+- La IA va por `supabase/functions/ai-proxy` (secreto `GROQ_API_KEY`, rate limit por IP en
+  `public.ai_rate_limits`). Modelo activo: `openai/gpt-oss-120b`; los Llama 3.x de Groq
+  fueron retirados y la app estuvo devolviendo `model_not_found` hasta el cambio.
+- No hay modelo de visión en la cuenta: `scanImage()` lanza un error explicativo.
+- El panel `AIChatPanel` está comentado en `MainApp.tsx`; la IA se usa desde el iframe
+  (generar ejercicios / digitalizar imagen), no desde un chat visible.
 - El modo invitado guarda progreso en `localStorage`; el usuario logueado en `profiles`.
 - Auth: Google OAuth + email/contraseña (registro desactivado en el dashboard).
 - `site_url` de Auth debe ser la URL de producción; las URLs locales (`localhost:5173`) están
   permitidas en la allow list.
-- La clave de Groq es pública por diseño (se extrae del bundle); no es un incidente abierto.
+- La clave de Groq **ya no se puede extraer del bundle**: se movió a un secreto de la Edge
+  Function `ai-proxy` (ver `AGENTS.md`).
