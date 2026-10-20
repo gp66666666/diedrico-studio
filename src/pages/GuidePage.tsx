@@ -76,6 +76,7 @@ const TOC = [
     { id: 'boceto', label: 'Boceto' },
     { id: 'laminas', label: 'Láminas y PDF' },
     { id: 'ia', label: 'Asistente IA' },
+    { id: 'academia', label: 'La Academia' },
     { id: 'cuenta', label: 'Cuenta y plan' },
     { id: 'trucos', label: 'Trucos y atajos' },
     { id: 'faq', label: 'Preguntas frecuentes' },
@@ -440,36 +441,65 @@ export default function GuidePage() {
                         </Section>
 
                         {/* 12 */}
-                        <Section id="cuenta" number="12" title="Cuenta y plan" icon={<GraduationCap size={20} />}>
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                                    <p className="font-semibold text-white">Gratis</p>
-                                    <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
-                                        <li>Todo el motor de dibujo 3D y diédrico</li>
-                                        <li>Todas las herramientas de geometría</li>
-                                        <li>Sólidos, boceto y láminas</li>
-                                        <li>Guardar proyectos en la nube</li>
-                                        <li>Exportar imágenes</li>
-                                    </ul>
-                                </div>
-                                <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
-                                    <p className="font-semibold text-purple-200">Premium</p>
-                                    <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
-                                        <li>Asistente IA: resolver y crear ejercicios</li>
-                                        <li>Generador de ejercicios en Láminas</li>
-                                        <li>Academia con teoría y ejercicios</li>
-                                        <li>Sin banner de anuncios</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <p className="text-sm">
-                                El plan se activa desde la cuenta, con el botón <b className="text-white">Hacerse Premium</b>.
-                                Cuando caduca, vuelve al plan gratuito automáticamente y tus proyectos siguen intactos.
+                        <Section id="academia" number="12" title="La Academia" icon={<GraduationCap size={20} />}>
+                            <p>
+                                La Academia es el curso completo de diédrico dentro de la aplicación. Tiene
+                                <b className="text-white"> 20 temas</b>: desde el punto hasta la esfera, pasando por
+                                abatimientos, giros, cambios de plano, secciones y desarrollos.
+                            </p>
+
+                            <ul className="space-y-2 text-sm">
+                                <li><b className="text-white">Teoría con pasos interactivos</b>: cada construcción se ve paso a paso, con el dibujo acumulado sobre la línea de tierra (botones Anterior / Siguiente / Repetir).</li>
+                                <li><b className="text-white">Ejercicios con los datos montados</b>: al pulsar ▶ el ejercicio se carga en el lienzo con sus puntos, rectas y planos, y una pista. Tú lo resuelves.</li>
+                                <li><b className="text-white">Progreso guardado</b>: puedes marcar temas como estudiados y ejercicios como completados; se guarda en tu cuenta.</li>
+                                <li><b className="text-white">Mapa del temario</b>: el tema 20 resume qué entra, en qué orden estudiarlo y qué queda fuera de la app.</li>
+                                <li><b className="text-white">Imprimir / PDF</b>: cualquier tema se puede imprimir para llevarlo en papel.</li>
+                            </ul>
+
+                            <p className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-3 text-sm">
+                                <b className="text-purple-300">La Academia es Premium.</b> Si no tienes plan, verás la portada
+                                del tema y el aviso para activarlo; no se gasta nada.
                             </p>
                         </Section>
 
                         {/* 13 */}
-                        <Section id="trucos" number="13" title="Trucos y atajos" icon={<Move3d size={20} />}>
+                        <Section id="cuenta" number="13" title="Cuenta y plan" icon={<GraduationCap size={20} />}>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <p className="font-semibold text-white">Gratis (para siempre)</p>
+                                    <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
+                                        <li>Motor 3D y vista diédrica completos</li>
+                                        <li>Todas las herramientas de geometría</li>
+                                        <li>Sólidos, boceto y láminas</li>
+                                        <li>Guardar proyectos y láminas en la nube</li>
+                                        <li>Exportar imágenes y PDF</li>
+                                        <li>Compartir ejercicios por enlace</li>
+                                        <li>Biblioteca de ejercicios resueltos</li>
+                                        <li>Funciona sin conexión (PWA)</li>
+                                    </ul>
+                                </div>
+                                <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
+                                    <p className="font-semibold text-purple-200">Premium · 4,99 €/mes</p>
+                                    <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
+                                        <li>Asistente IA: resuelve, crea y <b>corrige</b> ejercicios</li>
+                                        <li>Academia completa (20 temas y ejercicios)</li>
+                                        <li>Generador de ejercicios en Láminas</li>
+                                        <li>Sin anuncios</li>
+                                    </ul>
+                                    <p className="mt-3 text-xs text-purple-200/80">
+                                        3 mensajes de prueba gratis antes de decidir.
+                                    </p>
+                                </div>
+                            </div>
+                            <p className="text-sm">
+                                El cobro se hace en <b className="text-white">Ko-fi</b> (PayPal o tarjeta), nunca en esta web.
+                                Al pagar se activa sola: usa el <b className="text-white">mismo email</b> que en tu cuenta.
+                                Si un mes no renuevas, el plan caduca solo y vuelve al gratuito; tus proyectos y láminas siguen intactos.
+                            </p>
+                        </Section>
+
+                        {/* 14 */}
+                        <Section id="trucos" number="14" title="Trucos y atajos" icon={<Move3d size={20} />}>
                             <ul className="space-y-2 text-sm">
                                 <li><b className="text-white">Ctrl + Z / Ctrl + Y</b>: deshacer y rehacer (también en Mac con ⌘).</li>
                                 <li><b className="text-white">Supr</b>: borra el elemento seleccionado. <b className="text-white">Escape</b>: cancela la herramienta activa.</li>
@@ -481,8 +511,8 @@ export default function GuidePage() {
                             </ul>
                         </Section>
 
-                        {/* 14 */}
-                        <Section id="faq" number="14" title="Preguntas frecuentes" icon={<Sparkles size={20} />}>
+                        {/* 15 */}
+                        <Section id="faq" number="15" title="Preguntas frecuentes" icon={<Sparkles size={20} />}>
                             <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-white/[0.03]">
                                 {[
                                     {
