@@ -4,6 +4,28 @@ import type { AIStep } from '../types/ai.types';
 import { executeAdvancedTool } from './aiAdvancedTools';
 import { toast } from '../../../lib/toast';
 
+/**
+ * Alias de nombres dentro de una misma ejecución.
+ * Si el lienzo ya tiene un punto "A" distinto del que va a crear la IA, el
+ * nuevo se llama "A2" y los pasos siguientes ("recta por A y B") se traducen
+ * a ese nombre. Sin esto, la recta se enganchaba al A antiguo.
+ */
+const aliases = new Map<string, string>();
+
+export function resetNameAliases(): void {
+    aliases.clear();
+}
+
+const resolveName = (name: string): string => aliases.get(name) ?? name;
+
+const uniqueName = (base: string, elements: any[]): string => {
+    const taken = new Set(elements.map((el: any) => el.name));
+    if (!taken.has(base)) return base;
+    let i = 2;
+    while (taken.has(`${base}${i}`)) i++;
+    return `${base}${i}`;
+};
+
 export class AIExecutor {
     async executeStep(step: AIStep): Promise<void> {
         console.log('[AI Executor] 🚀 Starting step:', step.stepNumber, '-', step.action);
@@ -82,18 +104,48 @@ export class AIExecutor {
 
     private executeAddPoint(step: AIStep, store: any): void {
         const { name, x, y, z, color } = step.params;
+        const wanted = name || `P${Date.now()}`;
+
+        const existing = store.elements.find(
+            (el: any) => el.type === 'point' && el.name === wanted
+        );
+
+        if (existing) {
+            const same =
+                Math.abs(existing.coords.x - x) < 1e-6 &&
+                Math.abs(existing.coords.y - y) < 1e-6 &&
+                Math.abs(existing.coords.z - z) < 1e-6;
+
+            if (same) {
+                // Ya está dibujado: se reutiliza
+                aliases.set(wanted, existing.name);
+                return;
+            }
+
+            const renamed = uniqueName(wanted, store.elements);
+            aliases.set(wanted, renamed);
+            store.addElement({
+                type: 'point',
+                coords: { x, y, z },
+                color: color || step.color,
+                name: renamed,
+            });
+            return;
+        }
 
         store.addElement({
             type: 'point',
             coords: { x, y, z },
             color: color || step.color,
-            name: name || `P${Date.now()}`
+            name: wanted,
         });
     }
 
     private executeAddLineByPoints(step: AIStep, store: any): void {
         const { name, point1_name, point2_name, color } = step.params;
-        console.log('[AI] 🔍 Finding points:', point1_name, 'and', point2_name);
+        const p1Name = resolveName(point1_name);
+        const p2Name = resolveName(point2_name);
+        console.log('[AI] 🔍 Finding points:', p1Name, 'and', p2Name);
 
         // Get all available points
         const points = store.elements.filter((el: any) => el.type === 'point');
@@ -104,7 +156,8 @@ export class AIExecutor {
             if (!searchName) return null;
 
             // 1. Exact match (e.g. "A" === "A")
-            let found = points.find((el: any) => el.name === searchName);
+            const target = resolveName(searchName);
+            let found = points.find((el: any) => el.name === target);
             if (found) {
                 console.log('[AI] ✓ Found exact match:', found.name);
                 return found;

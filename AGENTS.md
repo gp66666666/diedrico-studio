@@ -99,6 +99,9 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - Los sólidos se construyen en `src/lib/solidGeometry.ts`. 3D (`SolidObject`) y 2D (`Solid2D`) usan
   la MISMA malla. Prohibido duplicar geometría en un componente: si algo no coincide, el fallo está
   en la rotación (convención `Rx·Rz·Ry`, igual que Three con `rotation=[rx,rz,ry]`) o en las unidades.
+- Si un paso de la IA crea un punto con un nombre que ya existe y otras coordenadas, el executor
+  lo renombra (A2) y traduce los pasos siguientes (`resetNameAliases`). Sin eso, una recta nueva
+  se enganchaba a un punto antiguo del mismo nombre.
 - Cada herramienta declara cuántos elementos consume en `selectionCountForTool` (geometryStore).
   Si añades una herramienta nueva, añádela ahí o se quedará esperando selección para siempre.
 
@@ -144,6 +147,9 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 - El **borrador** del lienzo se guarda en `localStorage['diedricoDraft']` y se restaura al abrir
   si el lienzo está vacío (`useDraftAutosave`).
 - No hay modelo de visión en la cuenta: `scanImage()` lanza un error explicativo.
+- El prompt del asistente (`SYSTEM_PROMPT`) exige **método de Dibujo Técnico**: proyecciones,
+  trazas, plano proyectante auxiliar, abatimiento/giro. Prohibido resolver con ecuaciones,
+  vectores o `calculate_math`. Los `step_description` se escriben como en un libro de clase.
 - El chat de IA (`AIChatPanel`) es visible: botón flotante. Tiene dos modos (resolver y crear
   ejercicio) y un botón «Revisar mi dibujo» que manda el enunciado + las coordenadas del lienzo
   (`describeScene`) y devuelve una corrección. El generador de las láminas también exige Premium.

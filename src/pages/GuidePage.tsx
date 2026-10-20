@@ -394,6 +394,11 @@ export default function GuidePage() {
                                 El botón morado abre el chat. Tiene dos modos que se cambian con las pestañas de abajo:
                                 <b className="text-white"> Resolver enunciado</b> y <b className="text-white"> Crear ejercicio</b>.
                             </p>
+                            <p className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3 text-sm">
+                                <b className="text-blue-300">Resuelve como en el papel</b>: trabaja con proyecciones, trazas,
+                                planos proyectantes auxiliares y abatimientos, no con ecuaciones ni vectores. Así los pasos
+                                te sirven para el examen.
+                            </p>
 
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <figure>

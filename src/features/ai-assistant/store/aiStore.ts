@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import type { AIMessage, AIStep, AIConversation } from '../types/ai.types';
 import { aiService } from '../services/aiService';
+import { resetNameAliases } from '../services/executor';
 import { useGeometryStore } from '../../../store/geometryStore';
 import { aiExecutor } from '../services/executor';
 
@@ -221,6 +222,7 @@ export const useAIStore = create<AIStore>((set, get) => ({
 
         try {
             set({ isProcessing: true });
+            resetNameAliases();
 
             for (let i = 0; i < lastMessage.steps.length; i++) {
                 const step = lastMessage.steps[i];
