@@ -799,6 +799,101 @@
                 justify-content: center;
             }
         }
+    
+        .drawer-close { display: none; }
+
+        /* ===== MÓVIL: cajón de herramientas ===== */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 56px; /* deja libres las pestañas de la app */
+                box-sizing: border-box;
+                height: 100dvh;
+                overflow: hidden;
+            }
+
+            .app {
+                flex-direction: row;
+                height: calc(100dvh - 56px);
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                bottom: 0;
+                width: 86vw;
+                max-width: 340px;
+                min-width: 0;
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                border-right: 1px solid var(--border);
+                border-bottom: none;
+                background: #0f172a;
+                transform: translateX(-105%);
+                transition: transform .25s ease;
+                z-index: 60;
+            }
+
+            .sidebar.open { transform: translateX(0); }
+
+            .sheet-list { max-height: 32vh; overflow-y: auto; }
+
+            .drawer-backdrop {
+                position: fixed;
+                top: 56px; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, .55);
+                z-index: 55;
+                display: none;
+            }
+
+            .drawer-backdrop.open { display: block; }
+
+            .sidebar-header { position: relative; }
+
+            .drawer-close {
+                display: inline-flex;
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                padding: 6px 10px;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+                background: var(--surface2);
+                color: var(--text);
+                font-size: 14px;
+                line-height: 1;
+            }
+
+            .drawer-toggle {
+                display: inline-flex;
+                flex: 0 0 auto;
+                align-self: flex-start;
+                margin: 8px 10px 0;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 12px;
+                border-radius: 10px;
+                border: 1px solid var(--border);
+                background: rgba(30, 41, 59, .92);
+                color: var(--text);
+                font-size: 12px;
+                font-weight: 600;
+                backdrop-filter: blur(8px);
+            }
+
+            .main { height: 100%; overflow: hidden; }
+            .preview-scroll { overflow: auto; }
+        }
+
+        @media (min-width: 769px) {
+            .drawer-toggle,
+            .drawer-backdrop,
+            .drawer-close { display: none !important; }
+        }
     </style>
 </head>
 
@@ -810,6 +905,7 @@
             <div class="sidebar-header">
                 <h1>📐 Diédrico – Documento</h1>
                 <p>Múltiples ejercicios · Exportar a PDF</p>
+                <button class="drawer-close" onclick="toggleDrawer(false)" aria-label="Cerrar herramientas">✕</button>
             </div>
 
             <div class="ai-generator" id="aiGenerator">
@@ -868,8 +964,14 @@
             </div>
         </div>
 
+        <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
+
         <!-- ===== MAIN ===== -->
         <div class="main">
+            <button class="drawer-toggle" onclick="toggleDrawer()" aria-label="Abrir herramientas de láminas">
+                ☰ Hojas
+            </button>
+
             <!-- Active sheet editor -->
             <div class="sheet-editor" id="sheetEditor">
                 <div class="editor-header">
@@ -2923,6 +3025,15 @@
             renderSidebar();
             closeBatchModal();
             document.getElementById('batchInput').value = '';
+        }
+
+        // ==================== CAJÓN MÓVIL ====================
+        function toggleDrawer(force) {
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.getElementById('drawerBackdrop');
+            const open = force === undefined ? !sidebar.classList.contains('open') : !!force;
+            sidebar.classList.toggle('open', open);
+            backdrop.classList.toggle('open', open);
         }
 
         // ==================== PERSISTENCE ====================

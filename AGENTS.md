@@ -16,6 +16,7 @@ npm install
 npm run dev      # Vite en http://localhost:5173
 npm run build    # tsc -b && vite build -> dist/   (debe pasar antes de push)
 npm run preview
+npm test         # vitest: geometría de sólidos, rotaciones y selección por herramienta
 ```
 
 - Vite 5 · React 18 · TypeScript 5.5 · Tailwind 3 · Zustand · three 0.163
@@ -72,6 +73,9 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - `kofi_events(...)` — pagos del webhook de Ko-fi (auditoría + idempotencia). Sin políticas RLS:
   solo `service_role`.
 - `ai_rate_limits(key, window_start, count)` — contadores de rate limit (IP, usuario y prueba).
+- `analytics_events(id, name, props, path, user_id, created_at)` — embudo de producto. Solo INSERT
+  desde la web (anon/authenticated); leer requiere service_role. Es el sustituto de los eventos
+  personalizados de Vercel, que son de pago.
 - `profiles(id, email, full_name, avatar_url, is_premium, premium_until, role, completed_topics text[],
   completed_exercises text[], created_at)` — RLS por `auth.uid() = id`; un trigger protege
   `is_premium`/`premium_until`/`role`/`email` para que el cliente no pueda escalar privilegios.
@@ -114,6 +118,8 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 ## Convenciones
 
 - TypeScript estricto; el build falla si hay errores de tipos (`tsc -b`).
+- `npm test` debe pasar. Los tests de `solidGeometry` comparan la rotación con la matriz real de
+  Three: si tocas ejes o signos, te avisan (ya pillaron un desfase de signo).
 - Avisos al usuario con `toast()` (`src/lib/toast.ts`), **no** `alert()`.
 - Modales con `useModalA11y` (Escape, foco atrapado, `role="dialog"`).
 - Rutas secundarias en `lazy()`; el motor 3D (`Scene`, `DiedricoView`) también, para que la

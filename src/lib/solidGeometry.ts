@@ -284,28 +284,33 @@ export function rotateStorePoint(p: Vec3, rotation?: Vec3): Vec3 {
     if (!rotation) return { ...p };
     let { x, y, z } = p;
 
-    // 1. Ry (giro alrededor de la vertical)
+    // OJO: al pasar de ejes de Three a ejes del store se intercambian Y y Z,
+    // y ese cambio de orientación invierte el sentido de los ángulos.
+    // Por eso aquí se giran los ángulos en negativo (lo comprueba
+    // solidGeometry.test.ts contra la matriz real de Three).
+
+    // 1. Giro alrededor del alejamiento (Y del store)
     if (rotation.y) {
-        const c = Math.cos(rotation.y);
-        const s = Math.sin(rotation.y);
+        const c = Math.cos(-rotation.y);
+        const s = Math.sin(-rotation.y);
         const x1 = x * c + z * s;
         const z1 = -x * s + z * c;
         x = x1;
         z = z1;
     }
-    // 2. Rz (giro alrededor del alejamiento)
+    // 2. Giro alrededor de la vertical (Z del store)
     if (rotation.z) {
-        const c = Math.cos(rotation.z);
-        const s = Math.sin(rotation.z);
+        const c = Math.cos(-rotation.z);
+        const s = Math.sin(-rotation.z);
         const x1 = x * c - y * s;
         const y1 = x * s + y * c;
         x = x1;
         y = y1;
     }
-    // 3. Rx (giro alrededor de la línea de tierra)
+    // 3. Giro alrededor de la línea de tierra (X del store)
     if (rotation.x) {
-        const c = Math.cos(rotation.x);
-        const s = Math.sin(rotation.x);
+        const c = Math.cos(-rotation.x);
+        const s = Math.sin(-rotation.x);
         const y1 = y * c - z * s;
         const z1 = y * s + z * c;
         y = y1;
@@ -422,9 +427,10 @@ export type Mat3 = [number, number, number, number, number, number, number, numb
 
 /** Matriz de una rotación del store: Rx(rx) · Rz(rz) · Ry(ry). */
 export function storeEulerToMatrix(rot: Vec3): Mat3 {
-    const ca = Math.cos(rot.x), sa = Math.sin(rot.x);
-    const cb = Math.cos(rot.z), sb = Math.sin(rot.z);
-    const cc = Math.cos(rot.y), sc = Math.sin(rot.y);
+    // M = Rx(-rx) · Rz(-rz) · Ry(-ry), igual que rotateStorePoint
+    const ca = Math.cos(-rot.x), sa = Math.sin(-rot.x);
+    const cb = Math.cos(-rot.z), sb = Math.sin(-rot.z);
+    const cc = Math.cos(-rot.y), sc = Math.sin(-rot.y);
 
     return [
         cb * cc, -sb, cb * sc,
@@ -441,15 +447,15 @@ export function matrixToStoreEuler(m: Mat3): Vec3 {
 
     if (Math.abs(cb) > 1e-6) {
         return {
-            x: Math.atan2(m[7], m[4]),
-            y: Math.atan2(m[2], m[0]),
-            z: b,
+            x: -Math.atan2(m[7], m[4]),
+            y: -Math.atan2(m[2], m[0]),
+            z: -b,
         };
     }
 
     // Caso singular (giro de 90°): se fija rx = 0
     const c = sb > 0 ? Math.atan2(m[5], m[3]) : Math.atan2(-m[5], -m[3]);
-    return { x: 0, y: c, z: b };
+    return { x: 0, y: -c, z: -b };
 }
 
 export function multiplyMat3(a: Mat3, b: Mat3): Mat3 {

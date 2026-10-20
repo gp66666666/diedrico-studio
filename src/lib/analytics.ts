@@ -1,8 +1,12 @@
-import { track } from '@vercel/analytics';
+import { supabase } from './supabase';
 
 /**
- * Eventos de producto. Sin cookies y sin datos personales.
- * Se ven en Vercel → Analytics → Events (hay que activar Web Analytics).
+ * Eventos de producto (embudo). Se guardan en Supabase porque los eventos
+ * personalizados de Vercel son de pago.
+ *
+ * No se envía IP, email ni contenido: solo el nombre del evento y, como mucho,
+ * datos técnicos del propio evento (si era premium, si fue actualización...).
+ * Es "fire and forget": si falla, la app sigue como si nada.
  */
 export type AnalyticsEvent =
     | 'premium_modal_open'
@@ -12,12 +16,20 @@ export type AnalyticsEvent =
     | 'academy_view'
     | 'guide_view'
     | 'project_saved'
-    | 'lamina_saved';
+    | 'lamina_saved'
+    | 'premium_page_view';
 
 export function trackEvent(event: AnalyticsEvent, props?: Record<string, string | number | boolean>) {
     try {
-        track(event, props);
+        void supabase
+            .from('analytics_events')
+            .insert({
+                name: event,
+                props: props ?? null,
+                path: typeof window !== 'undefined' ? window.location.pathname : null,
+            })
+            .then(() => undefined, () => undefined);
     } catch {
-        // En local o sin analítica activa no hace nada
+        // Sin red o sin tabla: no es crítico
     }
 }
