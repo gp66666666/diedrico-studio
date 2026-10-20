@@ -4,14 +4,10 @@ import { rateLimiter } from './rateLimiter';
 import type { AIStep, AIResponse, AIAction } from '../types/ai.types';
 import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
 import { useGeometryStore } from '../../../store/geometryStore';
+import { callAIProxy, AI_PROXY_MODEL } from './aiProxy';
 
 export class GroqService {
-    private apiKey: string;
-    private baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
-
-    constructor(apiKey: string) {
-        this.apiKey = apiKey;
-    }
+    constructor() {}
 
     async solveExercise(userPrompt: string, systemPromptOverride?: string): Promise<AIResponse> {
         await rateLimiter.checkLimit();
@@ -33,32 +29,25 @@ export class GroqService {
             "\n\nDEFINICIONES DE FUNCIONES DISPONIBLES (ÚSALAS):\n" + JSON.stringify(FUNCTION_DEFINITIONS);
 
         try {
-            const response = await fetch(this.baseUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    model: 'llama-3.3-70b-versatile',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: fullSystemPrompt
-                        },
-                        {
-                            role: 'user',
-                            content: userPrompt
-                        }
-                    ],
-                    temperature: 0.1,
-                    max_tokens: 2000,
-                }),
+            const response = await callAIProxy({
+                model: AI_PROXY_MODEL,
+                messages: [
+                    {
+                        role: 'system',
+                        content: fullSystemPrompt
+                    },
+                    {
+                        role: 'user',
+                        content: userPrompt
+                    }
+                ],
+                temperature: 0.1,
+                max_tokens: 2000,
             });
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error?.message || 'Error calling Groq API');
+                throw new Error(error.error?.message || 'Error calling AI proxy');
             }
 
             const data = await response.json();
@@ -76,63 +65,17 @@ export class GroqService {
         }
     }
 
-    async scanImage(imageData: string): Promise<AIResponse> {
+    async scanImage(_imageData: string): Promise<AIResponse> {
         await rateLimiter.checkLimit();
         colorManager.reset();
 
-        const SCAN_PROMPT = `Analiza esta imagen de un ejercicio de Sistema Diédrico hecho a mano. 
-Extrae la geometría y el texto (el enunciado).
-Devuelve el enunciado extraído y los elementos geométricos detectados (puntos, rectas, planos) en el formato de funciones solicitado.
-Si hay texto manuscrito con nombres de puntos (Ej: A, A', A''), úsalos.`;
-
-        try {
-            const response = await fetch(this.baseUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    model: 'llama-3.2-11b-vision-preview',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: SYSTEM_PROMPT
-                        },
-                        {
-                            role: 'user',
-                            content: [
-                                { type: 'text', text: SCAN_PROMPT },
-                                {
-                                    type: 'image_url',
-                                    image_url: { url: imageData }
-                                }
-                            ]
-                        }
-                    ],
-                    temperature: 0.1,
-                    max_tokens: 2000,
-                }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error?.message || 'Error calling Groq API for Vision');
-            }
-
-            const data = await response.json();
-            const text = data.choices[0].message.content;
-            const steps = this.parseResponseToSteps(text);
-            const cleanText = this.cleanResponseText(text, steps.length > 0);
-
-            return {
-                explanation: cleanText || "Imagen analizada correctamente.",
-                steps,
-            };
-        } catch (error: any) {
-            console.error('Groq Vision API Error:', error);
-            throw error;
-        }
+        // La cuenta de Groq ya no ofrece modelos de visión (los Llama 3.2 vision fueron
+        // retirados). Antes de esto la llamada fallaba con "model_not_found" y el error
+        // se perdía en consola; ahora se explica al usuario.
+        throw new Error(
+            'El escaneo de imágenes no está disponible con el proveedor de IA actual. ' +
+            'Puedes escribir el enunciado en el chat.'
+        );
     }
 
     private parseResponseToSteps(text: string): AIStep[] {

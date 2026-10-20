@@ -5,16 +5,14 @@ export const FEATURES = {
 } as const;
 
 export const AI_CONFIG = {
-    // Provider: 'gemini' or 'groq'
+    // Proveedor activo. La clave NO está en el cliente: ver supabase/functions/ai-proxy.
     provider: (import.meta.env.VITE_AI_PROVIDER || 'groq') as 'gemini' | 'groq',
 
-    // Gemini config
-    geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
+    // Gemini (legacy, sin clave en el cliente)
     geminiModel: 'gemini-1.5-pro-latest',
 
-    // Groq config (más fácil de configurar)
-    groqApiKey: import.meta.env.VITE_GROQ_API_KEY || '',
-    groqModel: 'llama-3.3-70b-versatile',
+    // Groq (se llama a través del proxy; el modelo real lo fija la Edge Function)
+    groqModel: 'openai/gpt-oss-120b',
 
     // Common config
     maxTokens: 4096,

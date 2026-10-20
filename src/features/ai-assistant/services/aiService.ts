@@ -1,25 +1,14 @@
-// AI Service Wrapper - Supports both Gemini and Groq
+// AI Service Wrapper
+// No hay claves de IA en el cliente: Groq se llama a través de la Edge Function
+// `ai-proxy` (supabase/functions/ai-proxy), que guarda la key como secreto.
 import { GroqService } from './groq';
-import { GeminiService } from './gemini';
-import { useUserStore } from '../../../store/userStore';
 import type { AIResponse } from '../types/ai.types';
 
-const AI_CONFIG = {
-    groqApiKey: import.meta.env.VITE_GROQ_API_KEY || '',
-    geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '', // Legacy
-};
-
 export class AIService {
-    private service: GeminiService | GroqService;
+    private service: GroqService;
 
     constructor() {
-        // Default to Groq
-        if (AI_CONFIG.groqApiKey) {
-            this.service = new GroqService(AI_CONFIG.groqApiKey);
-        } else {
-            console.warn('Groq API key not found, falling back to Gemini/Legacy');
-            this.service = new GeminiService();
-        }
+        this.service = new GroqService();
     }
 
     async solveExercise(prompt: string, systemPromptOverride?: string): Promise<AIResponse> {
@@ -27,10 +16,7 @@ export class AIService {
     }
 
     async scanImage(imageData: string): Promise<AIResponse> {
-        if ('scanImage' in this.service) {
-            return (this.service as any).scanImage(imageData);
-        }
-        throw new Error('El servicio de IA actual no soporta escaneo de imágenes.');
+        return this.service.scanImage(imageData);
     }
 }
 
