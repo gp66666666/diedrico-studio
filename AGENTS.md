@@ -85,6 +85,9 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - Config única: `src/config/premium.ts` (features, enlace de Ko-fi, texto de precio).
 - Premium = **Academia** + **Asistente IA**. La nube (guardar proyectos) es gratis.
 - `isPremium` del `userStore` es derivado: `is_premium && (!premium_until || premium_until > now)`.
+- **No existe vista caballera.** Hubo un prototipo (`features/caballera`) que nunca se conectó a
+  la interfaz; se eliminó. Si se retoma, hay que crearlo de verdad (proyección caballera +
+  herramientas), no reactivar la pestaña.
 - El panel de IA lo ve todo el mundo. Sin premium tiene **3 mensajes de prueba** por cuenta y
   mes (los cuenta el proxy, no el cliente). Al agotarlos, 402 y se abre el modal de Premium.
 - El proxy exige JWT de una cuenta válida y comprueba el plan: 401 sin sesión, 402 sin Premium

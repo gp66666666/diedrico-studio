@@ -6,7 +6,6 @@ import { Box, FileText, PenTool, Menu, X, Layers, Printer, Info, HelpCircle, Sha
 const Scene = lazy(() => import('./components/Scene'));
 import Sidebar from './components/Sidebar';
 const DiedricoView = lazy(() => import('./components/DiedricoView'));
-const CaballeraView = lazy(() => import('./features/caballera/components/CaballeraView'));
 import SEO from './components/SEO';
 import { useGeometryStore } from './store/geometryStore';
 import { useUserStore } from './store/userStore';
@@ -355,8 +354,6 @@ export default function MainApp() {
                                 ) : (
                                     <WebGLFallback onGo2D={() => setViewMode('2d')} />
                                 )
-                            ) : viewMode === 'caballera' ? (
-                                <CaballeraView />
                             ) : viewMode === 'laminas' ? (
                                 <div className="relative w-full h-full bg-white overflow-hidden">
                                     <iframe
@@ -368,7 +365,7 @@ export default function MainApp() {
                                     <LaminasCloudSync iframeRef={iframeRef} />
                                 </div>
                             ) : (
-                                <DiedricoView mode={viewMode} isSidebarOpen={isSidebarOpen} />
+                                <DiedricoView mode={viewMode === 'caballera' ? '2d' : viewMode} isSidebarOpen={isSidebarOpen} />
                             )}
                         </div>
                     </div>
