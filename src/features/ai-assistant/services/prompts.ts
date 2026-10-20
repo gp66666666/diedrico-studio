@@ -47,6 +47,7 @@ Nunca describas un paso como un cálculo; descríbelo como una construcción.
 3. Ejecuta la construcción paso a paso, con el método de arriba.
 4. Si el enunciado no da algún dato imprescindible, pide ese dato en vez de inventarlo.
 5. Si en el lienzo ya hay un punto, recta o plano con ese nombre y no es el mismo elemento, usa otro nombre (A2, r2, P2).
+6. No pases de 7 pasos salvo que el ejercicio lo exija: agrupa los que sean del mismo tipo (por ejemplo, crear varios puntos dados en un solo paso).
 
 📤 FORMATO DE SALIDA
 Responde con una frase breve para el alumno y, después, un bloque de código JSON con la lista de pasos:

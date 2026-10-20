@@ -200,4 +200,85 @@ export const ACADEMY_MORE_EXERCISES: Record<string, AcademyExercise[]> = {
             solutionHint: 'La distancia del centro a la recta es 3 (|7 − 4|), igual al radio: es tangente, con un solo punto de contacto.',
         },
     ],
+
+    'theory-1-point': [
+        {
+            id: 'ex-point-second',
+            title: 'Un punto en el segundo diedro',
+            level: 'Medio',
+            statement: 'Sitúa B(5, 3, −4) e indica en qué diedro está y cómo son sus dos proyecciones.',
+            setup: [p('B', 5, 3, -4, '#a78bfa')],
+            solutionHint: 'Cota negativa y alejamiento positivo: segundo diedro. B′ queda debajo de la LT y B″ por debajo de ella también.',
+        },
+    ],
+    'theory-2-line': [
+        {
+            id: 'ex-line-profile',
+            title: 'Recta de perfil',
+            level: 'Difícil',
+            statement: 'La recta r pasa por A(4, 2, 6) y B(4, 8, −2). ¿Qué tipo de recta es? Halla sus trazas.',
+            setup: [p('A', 4, 2, 6), p('B', 4, 8, -2), l('r', [4, 2, 6], [0, 6, -8])],
+            solutionHint: 'Tiene x constante: es de perfil. Sus trazas se hallan en el plano de perfil, no directamente en las proyecciones.',
+        },
+    ],
+    'theory-3-plane': [
+        {
+            id: 'ex-plane-parallel-pv',
+            title: 'Plano paralelo al vertical',
+            level: 'Fácil',
+            statement: 'Describe el plano α: y = 4. ¿Dónde están sus trazas?',
+            setup: [{ type: 'plane', name: 'α', normal: { x: 0, y: 1, z: 0 }, constant: -4, color: '#10b981' } as Partial<any>],
+            solutionHint: 'Es paralelo al PV: no tiene traza vertical (está en el infinito) y su traza horizontal es la recta y = 4.',
+        },
+    ],
+    'theory-4-intersections': [
+        {
+            id: 'ex-intersection-parallel-pv',
+            title: 'Corte con un plano paralelo al PV',
+            level: 'Medio',
+            statement: 'Halla el punto donde la recta r (por A(0, 2, 6) y B(8, 6, 2)) corta al plano y = 4.',
+            setup: [p('A', 0, 2, 6), p('B', 8, 6, 2), l('r', [0, 2, 6], [8, 4, -4]), { type: 'plane', name: 'P', normal: { x: 0, y: 1, z: 0 }, constant: -4, color: '#10b981' } as Partial<any>],
+            solutionHint: 'El alejamiento vale 4 a mitad de camino: I(4, 4, 4).',
+        },
+    ],
+    'theory-5-parallelism': [
+        {
+            id: 'ex-plane-perp-line',
+            title: 'Plano perpendicular a una recta por un punto',
+            level: 'Difícil',
+            statement: 'Halla el plano perpendicular a la recta r (dirección (1, 1, 0)) que pasa por P(2, 2, 4).',
+            setup: [p('P', 2, 2, 4, '#a78bfa'), l('r', [0, 0, 0], [1, 1, 0])],
+            solutionHint: 'La normal del plano es la dirección de la recta: (1, 1, 0). La constante sale de imponer que pase por P: −4.',
+        },
+    ],
+    'theory-6-distances': [
+        {
+            id: 'ex-distance-planes',
+            title: 'Distancia entre dos planos paralelos',
+            level: 'Fácil',
+            statement: 'Calcula la distancia entre los planos z = 1 y z = 5.',
+            setup: [{ type: 'plane', name: 'P', normal: { x: 0, y: 0, z: 1 }, constant: -1, color: '#10b981' } as Partial<any>, { type: 'plane', name: 'Q', normal: { x: 0, y: 0, z: 1 }, constant: -5, color: '#a78bfa' } as Partial<any>],
+            solutionHint: 'Son horizontales y paralelos: la distancia es la diferencia de cotas, 4.',
+        },
+    ],
+    'theory-7-angles': [
+        {
+            id: 'ex-angle-line-plane',
+            title: 'Ángulo entre recta y plano',
+            level: 'Medio',
+            statement: 'Calcula el ángulo que forma la recta vertical (dirección (0, 0, 1)) con el plano horizontal z = 0.',
+            setup: [l('r', [0, 0, 0], [0, 0, 1]), { type: 'plane', name: 'P', normal: { x: 0, y: 0, z: 1 }, constant: 0, color: '#10b981' } as Partial<any>],
+            solutionHint: 'La recta es perpendicular al plano: 90°.',
+        },
+    ],
+    'theory-8-abatements': [
+        {
+            id: 'ex-flatten-line',
+            title: 'Abatir una recta contenida en un plano',
+            level: 'Difícil',
+            statement: 'Abate la recta r (A(0, 4, 2), B(6, 4, 6)) contenida en el plano y = 4.',
+            setup: [p('A', 0, 4, 2), p('B', 6, 4, 6), l('r', [0, 4, 2], [6, 0, 4])],
+            solutionHint: 'Cada punto se abate como en el ejercicio anterior: (A) y (B) a distancia igual a su cota de la charnela.',
+        },
+    ],
 };
