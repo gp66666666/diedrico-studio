@@ -2,6 +2,7 @@ import { AcademyTopic } from '../types';
 import { StepByStepVisualizer } from '../components/Academy/StepByStepVisualizer';
 import { ACADEMY_THEORY, ACADEMY_EXERCISES, ACADEMY_DESCRIPTIONS } from './academyExtra';
 import { ACADEMY_ADVANCED_TOPICS } from './academyAdvanced';
+import { ACADEMY_INTRO_STEPS, ACADEMY_MORE_EXERCISES } from './academyIntro';
 import React from 'react';
 
 export const ACADEMY_CONTENT: AcademyTopic[] = [
@@ -1182,6 +1183,19 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
 // para todos los temas. Se aplica después de definir el array para no tocar
 // el contenido original.
 ACADEMY_CONTENT.forEach((topic) => {
+    // Temas 1-3: se mantiene el texto original y se añaden pasos interactivos debajo
+    if (ACADEMY_INTRO_STEPS[topic.id] && typeof topic.theoryContent === 'string') {
+        const html = topic.theoryContent;
+        topic.theoryContent = (
+            <>
+                <div dangerouslySetInnerHTML={{ __html: html }} />
+                {ACADEMY_INTRO_STEPS[topic.id]}
+            </>
+        );
+    }
+    if (ACADEMY_MORE_EXERCISES[topic.id]) {
+        topic.exercises = [...topic.exercises, ...ACADEMY_MORE_EXERCISES[topic.id]];
+    }
     if (ACADEMY_THEORY[topic.id]) {
         topic.theoryContent = ACADEMY_THEORY[topic.id];
     }
