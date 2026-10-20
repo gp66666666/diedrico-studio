@@ -12,10 +12,12 @@ if (import.meta.env.DEV) {
     void Promise.all([
         import('./store/geometryStore'),
         import('./store/userStore'),
-    ]).then(([geometry, user]) => {
+        import('./lib/supabase'),
+    ]).then(([geometry, user, supabaseModule]) => {
         Object.assign(window as any, {
             __geometryStore: geometry.useGeometryStore,
             __userStore: user.useUserStore,
+            __supabase: supabaseModule.supabase,
         })
     })
 }

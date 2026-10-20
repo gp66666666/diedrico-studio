@@ -3,9 +3,12 @@
 // La clave vive en el secreto GROQ_API_KEY del proyecto, nunca en el bundle.
 //
 // Seguridad:
+//  - Exige JWT de una cuenta con Premium activo (is_premium y premium_until).
+//    El bloqueo del navegador es solo interfaz: esto es lo que corta de verdad.
 //  - Rate limit por IP (tabla public.ai_rate_limits + rpc check_ai_rate_limit).
 //  - Lista blanca de modelos y límite de tokens para que no se use como API gratis.
-//  - No requiere JWT (los invitados también usan el asistente).
+//  - Se despliega con --no-verify-jwt porque la verificación se hace aquí,
+//    para poder devolver un mensaje claro (401 sin sesión, 402 sin Premium).
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const CORS = {
@@ -45,9 +48,60 @@ Deno.serve(async (req: Request) => {
     return json({ error: { message: "El asistente IA no está configurado en el servidor." } }, 503);
   }
 
-  // ---- Rate limit por IP (la IP no se guarda en claro: solo su hash) ----
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+  // ---- Solo cuentas con Premium activo ----
+  // El bloqueo del navegador es solo interfaz: cualquiera puede llamar a esta
+  // URL. Aquí se comprueba el JWT del usuario y su plan antes de gastar tokens.
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const token = authHeader.toLowerCase().startsWith("bearer ")
+    ? authHeader.slice(7).trim()
+    : "";
+
+  const loginError = json(
+    { error: { code: "premium_required", message: "Inicia sesión con tu cuenta Premium para usar el asistente." } },
+    401,
+  );
+  if (!token) return loginError;
+
+  let userId: string | null = null;
+  try {
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${token}` },
+    });
+    if (userRes.ok) {
+      const user = await userRes.json();
+      userId = user?.id ?? null;
+    }
+  } catch (e) {
+    console.error("auth check", e);
+  }
+  if (!userId) return loginError;
+
+  try {
+    const profRes = await fetch(
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=is_premium,premium_until`,
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
+    );
+    const rows = profRes.ok ? await profRes.json() : [];
+    const profile = Array.isArray(rows) ? rows[0] : null;
+    const active =
+      !!profile?.is_premium &&
+      (!profile.premium_until || new Date(profile.premium_until) > new Date());
+
+    if (!active) {
+      return json(
+        { error: { code: "premium_required", message: "El asistente IA es una función Premium. Actívala desde tu cuenta." } },
+        402,
+      );
+    }
+  } catch (e) {
+    console.error("premium check", e);
+    return json({ error: { message: "No se pudo comprobar tu plan. Inténtalo de nuevo." } }, 500);
+  }
+
+  // ---- Rate limit por IP (la IP no se guarda en claro: solo su hash) ----
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() ||
     req.headers.get("cf-connecting-ip") || "unknown";
 

@@ -2,6 +2,8 @@
 // La API key del proveedor (Groq) NO está en el navegador: vive como secreto
 // en la función `ai-proxy`. Aquí solo se usa la anon key, que es pública.
 
+import { supabase } from '../../../lib/supabase';
+
 const PROXY_URL = `${import.meta.env.VITE_SUPABASE_URL || ''}/functions/v1/ai-proxy`;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
@@ -17,12 +19,16 @@ export interface AIProxyPayload {
  * para que los servicios que ya parsean `data.choices[0].message.content` no cambien.
  */
 export async function callAIProxy(payload: AIProxyPayload): Promise<Response> {
+    // El proxy comprueba el JWT y que la cuenta tenga Premium activo.
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token || ANON_KEY;
+
     return fetch(PROXY_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             apikey: ANON_KEY,
-            Authorization: `Bearer ${ANON_KEY}`,
+            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
     });
