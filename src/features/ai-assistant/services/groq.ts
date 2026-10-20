@@ -98,9 +98,10 @@ export class GroqService {
 
                     if (Array.isArray(items)) {
                         for (const item of items) {
-                            if (item.name && item.params) {
+                            const normalized = this.normalizeStepItem(item);
+                            if (normalized) {
                                 stepCount++;
-                                steps.push(this.createStepObject(stepCount, item));
+                                steps.push(this.createStepObject(stepCount, normalized));
                             }
                         }
                     }
@@ -136,9 +137,10 @@ export class GroqService {
                             const items = Array.isArray(parsed) ? parsed : (parsed.steps || parsed.actions || [parsed]);
                             if (Array.isArray(items)) {
                                 for (const item of items) {
-                                    if (item.name && item.params) {
+                                    const normalized = this.normalizeStepItem(item);
+                                    if (normalized) {
                                         stepCount++;
-                                        steps.push(this.createStepObject(stepCount, item));
+                                        steps.push(this.createStepObject(stepCount, normalized));
                                     }
                                 }
                             }
@@ -190,23 +192,85 @@ export class GroqService {
 
     // Helper to clean text ONLY if steps were successfully found
     public cleanResponseText(text: string, stepsFound: boolean): string {
-        const hasCodeBlocks = /```(?:json|JSON)?\s*([\s\S]*?)\s*```/g.test(text);
-
-        if (!stepsFound && hasCodeBlocks) {
-            // If no steps found BUT code blocks were present, it's a format error
-            return text + "\n\n⚠️ **Alerta:** No se detectaron pasos ejecutables. Si ves código arriba, hubo un error de formato.";
+        if (!stepsFound) {
+            // Si no hubo pasos pero venía un bloque de código, es un error de formato: avisar.
+            const hasCodeBlocks = /```/.test(text);
+            return hasCodeBlocks
+                ? text + "\n\n⚠️ **Alerta:** No se detectaron pasos ejecutables. Si ves código arriba, hubo un error de formato."
+                : text.trim();
         }
 
-        // Otherwise, clean it up (remove code blocks if any, or just return text if none)
-        return text.replace(/```(?:json|JSON)?\s*([\s\S]*?)\s*```/g, '').trim();
+        // Con pasos: fuera bloques de código y, si el modelo se olvidó de las vallas,
+        // fuera también el JSON suelto (antes se le enseñaba al usuario en crudo).
+        return this.stripJsonPayloads(text);
     }
 
-    private createStepObject(stepCount: number, data: any): AIStep {
+    /**
+     * El prompt describe las funciones con la clave `parameters` (esquema tipo OpenAI),
+     * pero aquí se trabaja con `params`. Groq devuelve fielmente `parameters`, así que
+     * sin esto no se reconocía ni un solo paso.
+     */
+    private normalizeStepItem(item: any): { name: string; params: any } | null {
+        if (!item || typeof item !== 'object') return null;
+
+        const name = item.name ?? item.action ?? item.tool ?? item.function;
+        const params = item.params ?? item.parameters ?? item.args ?? item.arguments;
+
+        if (typeof name !== 'string' || !name || !params || typeof params !== 'object') return null;
+
+        return { name, params: this.coerceNumericParams(params) };
+    }
+
+    /** Los modelos a veces mandan "1" en vez de 1; el store necesita números. */
+    private coerceNumericParams(params: Record<string, any>): Record<string, any> {
+        const numericKeys = new Set([
+            'x', 'y', 'z', 'radius', 'angle', 'distance', 'length', 'scale',
+            'a', 'b', 'c', 'd', 'n1', 'n2', 'n3',
+        ]);
+        const out: Record<string, any> = { ...params };
+
+        for (const [key, value] of Object.entries(out)) {
+            if (numericKeys.has(key) && typeof value === 'string' && value.trim() !== '') {
+                const num = Number(value);
+                if (!Number.isNaN(num)) out[key] = num;
+            }
+        }
+        return out;
+    }
+
+    /** Quita del texto los bloques ``` y los JSON sueltos que sean payloads de pasos. */
+    private stripJsonPayloads(text: string): string {
+        let out = text.replace(/```(?:json|JSON)?[\s\S]*?```/g, ' ');
+
+        const start = out.search(/[[{]/);
+        if (start !== -1) {
+            for (let end = out.length; end > start; end--) {
+                try {
+                    const parsed = JSON.parse(out.slice(start, end));
+                    if (this.looksLikeSteps(parsed)) {
+                        out = out.slice(0, start) + out.slice(end);
+                        break;
+                    }
+                } catch {
+                    // seguimos recortando
+                }
+            }
+        }
+
+        return out.replace(/[ \t]{2,}/g, ' ').trim();
+    }
+
+    private looksLikeSteps(parsed: any): boolean {
+        const items = Array.isArray(parsed) ? parsed : (parsed?.steps ?? parsed?.actions);
+        return Array.isArray(items) && items.some((i: any) => !!this.normalizeStepItem(i));
+    }
+
+    private createStepObject(stepCount: number, data: { name: string; params: any }): AIStep {
         return {
             id: `step-${stepCount}`,
             stepNumber: stepCount,
             description: data.params?.step_description || `Paso ${stepCount}`,
-            action: data.name,
+            action: data.name as AIAction,
             params: {
                 ...data.params,
                 color: colorManager.getColorForStep(stepCount),

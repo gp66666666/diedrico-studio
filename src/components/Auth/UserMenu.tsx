@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { LogIn, LogOut, Crown, User as UserIcon, ChevronUp, ChevronDown, Info, Mail, Shield, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
+import PremiumModal from './PremiumModal';
 
 export default function UserMenu() {
-    const { user, profile, isLoading, checkSession, signInWithGoogle, signOut } = useUserStore();
+    const { user, profile, isLoading, isPremium, checkSession, signInWithGoogle, signOut } = useUserStore();
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showPremiumModal, setShowPremiumModal] = useState(false);
 
     useEffect(() => {
         checkSession();
@@ -131,18 +133,22 @@ export default function UserMenu() {
                             <p className="text-sm font-medium truncate text-gray-900 dark:text-white">
                                 {profile?.full_name || user.email}
                             </p>
-                            <span className="text-[10px] text-gray-500">Plan Gratuito</span>
+                            <span className={`inline-flex items-center gap-1 text-[10px] ${isPremium ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-gray-500'}`}>
+                                {isPremium && <Crown size={10} />}
+                                {isPremium ? 'Premium' : 'Plan gratuito'}
+                            </span>
                         </div>
                     </div>
 
-                    {/* 
-                    {!profile?.is_premium && (
-                        <button className="flex items-center justify-center gap-1.5 w-full p-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:shadow-md transition-all text-xs font-bold">
+                    {!isPremium && (
+                        <button
+                            onClick={() => setShowPremiumModal(true)}
+                            className="flex items-center justify-center gap-1.5 w-full p-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:shadow-md transition-all text-xs font-bold"
+                        >
                             <Crown size={14} />
                             <span>Hacerse Premium</span>
                         </button>
                     )}
-                    */}
 
                     <a
                         href="https://ko-fi.com/eloigperezzds"
@@ -197,6 +203,8 @@ export default function UserMenu() {
                     </button>
                 </div>
             )}
+
+            <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
         </div>
     );
 }

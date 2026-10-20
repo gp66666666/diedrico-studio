@@ -4,14 +4,14 @@ import { useUserStore } from '../store/userStore';
 
 export default function AdBanner() {
     const [isVisible, setIsVisible] = useState(true);
-    const { profile } = useUserStore();
+    const { isPremium } = useUserStore();
 
     // TEMPORARY: Hide ad banner until AdSense is approved and generating revenue
     // To re-enable: remove or set to false
     const TEMPORARILY_DISABLED = true;
 
     // Don't show banner to premium users, if user closed it, or if temporarily disabled
-    if (!isVisible || profile?.is_premium || TEMPORARILY_DISABLED) {
+    if (!isVisible || isPremium || TEMPORARILY_DISABLED) {
         return null;
     }
 

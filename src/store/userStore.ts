@@ -8,9 +8,17 @@ interface UserProfile {
     full_name?: string;
     avatar_url?: string;
     is_premium: boolean;
+    premium_until?: string | null; // ISO date; null = sin caducidad
     completed_exercises?: string[]; // Array of Exercise IDs
     completed_topics?: string[]; // Array of Topic IDs (Lessons)
     role: 'user' | 'admin';
+}
+
+/** Premium activo = flag a true y, si hay fecha, que no haya pasado. */
+function computeIsPremium(profile: Pick<UserProfile, 'is_premium' | 'premium_until'> | null): boolean {
+    if (!profile?.is_premium) return false;
+    if (!profile.premium_until) return true;
+    return new Date(profile.premium_until).getTime() > Date.now();
 }
 
 interface UserState {
@@ -47,7 +55,7 @@ export const useUserStore = create<UserState>((set, get) => ({
                     .single();
 
                 if (profile) {
-                    set({ profile, isPremium: profile.is_premium });
+                    set({ profile, isPremium: computeIsPremium(profile) });
                 } else {
                     // Create default profile if not exists
                     const newProfile = {

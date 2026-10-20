@@ -1,9 +1,11 @@
 // AI Chat Panel - Main UI Component - CON ARRASTRE CORREGIDO
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, ChevronRight, Move } from 'lucide-react';
+import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, ChevronRight, Move, Crown, Lock } from 'lucide-react';
 import { useAIAssistant } from '../hooks/useAIAssistant';
 import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
+import PremiumModal from '../../../components/Auth/PremiumModal';
+import { useUserStore } from '../../../store/userStore';
 
 interface AIChatPanelProps {
     isSidebarOpen?: boolean;
@@ -18,6 +20,10 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     const [input, setInput] = useState('');
     const [isMinimized, setIsMinimized] = useState(true);
     const [isStepsExpanded, setIsStepsExpanded] = useState(false);
+    const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+    // El asistente es función premium: el panel se ve, pero sin plan no gasta tokens.
+    const { isPremium } = useUserStore();
 
     // Estados para arrastre
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -101,6 +107,11 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
         e.preventDefault();
 
         if (!input.trim() || isProcessing) return;
+
+        if (!isPremium) {
+            setShowPremiumModal(true);
+            return;
+        }
 
         await sendPrompt(input);
         setInput('');
@@ -469,12 +480,21 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
 
                         {/* Input Area */}
                         <form onSubmit={handleSubmit} className="border-t border-gray-200 dark:border-gray-700 p-4">
+                            {!isPremium && (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPremiumModal(true)}
+                                    className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-xs font-medium text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+                                >
+                                    <Lock size={13} /> El asistente es Premium · ver qué incluye
+                                </button>
+                            )}
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Escribe un ejercicio..."
+                                    placeholder={isPremium ? 'Escribe un ejercicio...' : 'Función Premium'}
                                     disabled={isProcessing}
                                     className="flex-1 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 text-gray-900 dark:text-white"
                                     onMouseDown={(e) => e.stopPropagation()}
@@ -486,11 +506,16 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-2 rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     onMouseDown={(e) => e.stopPropagation()}
                                     onTouchStart={(e) => e.stopPropagation()}
+                                    aria-label={isPremium ? 'Enviar' : 'Desbloquear Premium'}
                                 >
-                                    <Send size={20} />
+                                    {isPremium ? <Send size={20} /> : <Crown size={20} />}
                                 </button>
                             </div>
                         </form>
+                        <PremiumModal
+                            isOpen={showPremiumModal}
+                            onClose={() => setShowPremiumModal(false)}
+                        />
                     </>
                 )}
             </div>

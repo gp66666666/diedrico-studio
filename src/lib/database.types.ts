@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_rate_limits: {
+        Row: {
+          count: number
+          key: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          window_start?: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -24,6 +42,7 @@ export type Database = {
           full_name: string | null
           id: string
           is_premium: boolean | null
+          premium_until: string | null
           role: string | null
         }
         Insert: {
@@ -35,6 +54,7 @@ export type Database = {
           full_name?: string | null
           id: string
           is_premium?: boolean | null
+          premium_until?: string | null
           role?: string | null
         }
         Update: {
@@ -46,6 +66,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_premium?: boolean | null
+          premium_until?: string | null
           role?: string | null
         }
         Relationships: []
@@ -88,7 +109,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_ai_rate_limit: {
+        Args: { p_key: string; p_limit?: number; p_window_seconds?: number }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
