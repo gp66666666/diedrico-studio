@@ -624,7 +624,7 @@ export default function Sidebar() {
                     <div className="flex items-center gap-3">
                         <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain rounded-lg bg-white/10 p-1" />
                         <div>
-                            <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            <h1 className={`text-lg font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                 Diédrico Studio
                             </h1>
                             <p className={`text-[10px] uppercase tracking-wider font-semibold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Professional CAD</p>

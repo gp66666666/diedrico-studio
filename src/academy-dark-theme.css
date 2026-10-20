@@ -115,25 +115,12 @@
     color: inherit !important;
 }
 
-/* ========== 10. ESPECIAL PARA CHAT IA Y SIDEBAR ========== */
-/* Excluir el chat de IA y la barra lateral de estas reglas */
-.dark .fixed,
-.dark [class*="z-50"],
-.dark [class*="z-999"],
-.dark [class*="chat"],
-.dark [class*="sidebar"],
-.dark [class*="Sidebar"] {
-    color: initial !important;
-}
-
-.dark .fixed *,
-.dark [class*="z-50"] *,
-.dark [class*="z-999"] *,
-.dark [class*="chat"] *,
-.dark [class*="sidebar"] *,
-.dark [class*="Sidebar"] * {
-    color: initial !important;
-}
+/* NOTA: aquí había reglas `.dark .fixed *` y `.dark [class*="z-50"] *` con
+   `color: initial !important` para "excluir" el chat y la barra lateral. Como
+   esas reglas se aplican a CUALQUIER elemento fijo (modales, chat, avisos),
+   pintaban el texto de negro sobre fondos oscuros. La barra lateral ya tiene su
+   protección en index.css y el chat define sus propios colores, así que se han
+   eliminado. Las reglas de la academia están limitadas a .academy-content. */
 
 /* ===========================================
    REGLA NUCLEAR ABSOLUTA - SOBREESCRIBE TODO
