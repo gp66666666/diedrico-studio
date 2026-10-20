@@ -48,6 +48,29 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Si cambia el tamaño de la ventana, recolocar el botón dentro
+    useEffect(() => {
+        const handleResize = () => setPosition((p) => clampPosition(p));
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    /**
+     * Mantiene el botón dentro de la pantalla. Sin esto, una posición guardada
+     * en un monitor grande deja el asistente fuera de la vista al abrir el
+     * portátil: el botón desaparece y no hay forma de recuperarlo.
+     */
+    const clampPosition = (p: Position): Position => {
+        const buttonSize = 56;
+        const margin = 8;
+        const maxX = Math.max(margin, window.innerWidth - buttonSize - margin);
+        const maxY = Math.max(margin, window.innerHeight - buttonSize - margin);
+        return {
+            x: Math.min(Math.max(p.x, margin), maxX),
+            y: Math.min(Math.max(p.y, margin), maxY),
+        };
+    };
+
     // Inicializar posición DESPUÉS de que se detecte si es móvil
     useEffect(() => {
         if (!isInitialized) {
@@ -56,7 +79,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
             if (savedPosition) {
                 try {
                     const parsed = JSON.parse(savedPosition);
-                    setPosition(parsed);
+                    setPosition(clampPosition(parsed));
                 } catch (e) {
                     console.log('Error loading saved position, using default');
                     // Si hay error, usar posición por defecto
