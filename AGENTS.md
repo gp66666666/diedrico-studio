@@ -46,8 +46,11 @@ src/
 ├── store/userStore.ts          sesión, perfil, progreso (temas/ejercicios)
 ├── lib/supabase.ts             cliente Supabase
 ├── lib/database.types.ts       tipos generados desde la DB (no editar a mano)
-├── config/features.ts          feature flags y claves IA
+├── config/features.ts          feature flags y proveedor IA
+├── config/premium.ts           qué es premium + enlace Ko-fi (único sitio a tocar)
 └── utils/                      matemáticas, distancias, etiquetas
+
+scripts/premium.sh              activar/quitar premium a mano (service_role)
 ```
 
 ## Base de datos (Supabase)
@@ -56,9 +59,18 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Solo dos tablas en `
 
 - `projects(id, user_id, title, description, thumbnail_url, data jsonb, created_at, updated_at)`
   — `data = { elements, sketchElements }`. RLS por `auth.uid() = user_id`.
-- `profiles(id, email, full_name, avatar_url, is_premium, role, completed_topics text[],
+- `profiles(id, email, full_name, avatar_url, is_premium, premium_until, role, completed_topics text[],
   completed_exercises text[], created_at)` — RLS por `auth.uid() = id`; un trigger protege
-  `is_premium`/`role`/`email` para que el cliente no pueda escalar privilegios.
+  `is_premium`/`premium_until`/`role`/`email` para que el cliente no pueda escalar privilegios.
+
+## Plan premium
+
+- Config única: `src/config/premium.ts` (features, enlace de Ko-fi, texto de precio).
+- Premium = **Academia** + **Asistente IA**. La nube (guardar proyectos) es gratis.
+- `isPremium` del `userStore` es derivado: `is_premium && (!premium_until || premium_until > now)`.
+- El panel de IA lo ve todo el mundo; sin premium muestra un aviso y no llama a la API
+  (el proxy tiene además rate limit por IP).
+- Activación manual (Ko-fi no avisa a la app): `./scripts/premium.sh correo on [meses]`.
 
 Cambios de esquema SIEMPRE como migración:
 
@@ -87,6 +99,11 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 - La IA va por `supabase/functions/ai-proxy` (secreto `GROQ_API_KEY`, rate limit por IP en
   `public.ai_rate_limits`). Modelo activo: `openai/gpt-oss-120b`; los Llama 3.x de Groq
   fueron retirados y la app estuvo devolviendo `model_not_found` hasta el cambio.
+- El parser de la IA exigía `params` pero el prompt enseña `parameters`: el modelo devolvía
+  `parameters` y no se ejecutaba **ningún** paso. Ya acepta ambos (y `args`), y quita el JSON
+  crudo de la respuesta.
+- Las **láminas** (`public/Laminas_automaticas.html`) guardan su estado en `localStorage`
+  (`diedricoProject`), no en Supabase: no se sincronizan entre dispositivos.
 - No hay modelo de visión en la cuenta: `scanImage()` lanza un error explicativo.
 - El panel `AIChatPanel` está comentado en `MainApp.tsx`; la IA se usa desde el iframe
   (generar ejercicios / digitalizar imagen), no desde un chat visible.
