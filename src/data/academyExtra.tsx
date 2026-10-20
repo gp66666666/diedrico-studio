@@ -555,6 +555,64 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
                 ]}
             />
 
+            <StepByStepVisualizer
+                title="Intersección de una recta con un sólido"
+                steps={[
+                    {
+                        title: 'Recta que atraviesa el sólido',
+                        description: 'La recta r entra y sale del prisma en dos puntos. Lo que buscamos son esos dos puntos de penetración.',
+                        diagram: (
+                            <DihSvg>
+                                <DLine a={[-5, -3, 0]} b={[5, -3, 0]} color="#3b82f6" />
+                                <DLine a={[5, -3, 0]} b={[5, 3, 0]} color="#3b82f6" />
+                                <DLine a={[5, 3, 0]} b={[-5, 3, 0]} color="#3b82f6" />
+                                <DLine a={[-5, 3, 0]} b={[-5, -3, 0]} color="#3b82f6" />
+                                <DLine a={[-5, -3, 0]} b={[-5, -3, 6]} color="#3b82f6" />
+                                <DLine a={[5, -3, 0]} b={[5, -3, 6]} color="#3b82f6" />
+                                <DLine a={[5, 3, 0]} b={[5, 3, 6]} color="#3b82f6" />
+                                <DLine a={[-5, 3, 0]} b={[-5, 3, 6]} color="#3b82f6" />
+                                <DLine a={[-5, -3, 6]} b={[5, -3, 6]} color="#3b82f6" />
+                                <DLine a={[5, -3, 6]} b={[5, 3, 6]} color="#3b82f6" />
+                                <DLine a={[5, 3, 6]} b={[-5, 3, 6]} color="#3b82f6" />
+                                <DLine a={[-5, 3, 6]} b={[-5, -3, 6]} color="#3b82f6" />
+                                <DLine a={[-7, 0, 1]} b={[7, 0, 5]} color="#ef4444" />
+                            </DihSvg>
+                        ),
+                    },
+                    {
+                        title: 'Plano proyectante que contiene a r',
+                        description: 'Se contiene la recta en un plano proyectante (aquí vertical). Ese plano corta al sólido en un polígono: la sección.',
+                        diagram: (
+                            <DihSvg>
+                                <DLine a={[-5, -3, 0]} b={[5, -3, 0]} color="#3b82f6" faded />
+                                <DLine a={[5, -3, 0]} b={[5, 3, 0]} color="#3b82f6" faded />
+                                <DLine a={[5, 3, 0]} b={[-5, 3, 0]} color="#3b82f6" faded />
+                                <DLine a={[-5, 3, 0]} b={[-5, -3, 0]} color="#3b82f6" faded />
+                                <DLine a={[-5, -3, 0]} b={[-5, -3, 6]} color="#3b82f6" faded />
+                                <DLine a={[5, -3, 0]} b={[5, -3, 6]} color="#3b82f6" faded />
+                                <DLine a={[5, 3, 0]} b={[5, 3, 6]} color="#3b82f6" faded />
+                                <DLine a={[-5, 3, 0]} b={[-5, 3, 6]} color="#3b82f6" faded />
+                                <DLine a={[-7, 0, 1]} b={[7, 0, 5]} color="#ef4444" />
+                                <VLine a={[proj([-7, 0, 1]).v[0], 30]} b={[proj([-7, 0, 1]).v[0], 250]} color="#a78bfa" dashed />
+                                <VText x={proj([-7, 0, 1]).v[0] + 6} y={40} color="#a78bfa" size={9}>plano proyectante</VText>
+                            </DihSvg>
+                        ),
+                    },
+                    {
+                        title: 'Puntos de entrada y salida',
+                        description: 'Donde la recta corta al polígono de la sección están los dos puntos de penetración. Se ven directamente porque el plano es proyectante.',
+                        diagram: (
+                            <DihSvg>
+                                <DLine a={[-7, 0, 1]} b={[7, 0, 5]} color="#ef4444" />
+                                <DPoint p={[-3, 0, 2]} label="1" color="#f59e0b" showProjections={false} />
+                                <DPoint p={[3, 0, 4]} label="2" color="#f59e0b" showProjections={false} />
+                                <VText x={60} y={250} color="#f59e0b">entrada y salida</VText>
+                            </DihSvg>
+                        ),
+                    },
+                ]}
+            />
+
             <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
                 <p className="text-slate-700 dark:text-slate-200"><strong>Los cinco regulares:</strong> tetraedro (4 triángulos), cubo (6 cuadrados), octaedro (8 triángulos), dodecaedro (12 pentágonos) e icosaedro (20 triángulos).</p>
             </div>
@@ -660,6 +718,53 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
                                 <DLine a={[4, -4, 0]} b={[4, 4, 0]} color="#3b82f6" faded />
                                 <DLine a={[4, 4, 0]} b={[-4, 4, 0]} color="#3b82f6" faded />
                                 <DLine a={[-4, 4, 0]} b={[-4, -4, 0]} color="#3b82f6" faded />
+                            </DihSvg>
+                        ),
+                    },
+                ]}
+            />
+            <StepByStepVisualizer
+                title="Verdadera magnitud de la sección"
+                steps={[
+                    {
+                        title: 'La sección, en proyección',
+                        description: 'Cuando el plano de corte es oblicuo, la sección se ve deformada en las dos vistas. Hay que abatir el plano para verla como es.',
+                        diagram: (
+                            <DihSvg>
+                                <DLine a={[-5, -3, 0]} b={[5, -3, 0]} color="#3b82f6" faded />
+                                <DLine a={[5, -3, 0]} b={[5, 3, 0]} color="#3b82f6" faded />
+                                <DLine a={[-5, 3, 0]} b={[-5, -3, 0]} color="#3b82f6" faded />
+                                <DLine a={[-5, -3, 0]} b={[-5, -3, 6]} color="#3b82f6" faded />
+                                <DLine a={[5, -3, 0]} b={[5, -3, 6]} color="#3b82f6" faded />
+                                <DLine a={[5, 3, 0]} b={[5, 3, 6]} color="#3b82f6" faded />
+                                <DLine a={[-5, 3, 0]} b={[-5, 3, 6]} color="#3b82f6" faded />
+                                <DPoint p={[-5, -3, 2]} label="1" color="#f59e0b" showProjections={false} />
+                                <DPoint p={[5, -3, 4]} label="2" color="#f59e0b" showProjections={false} />
+                                <DPoint p={[5, 3, 6]} label="3" color="#f59e0b" showProjections={false} />
+                                <DPoint p={[-5, 3, 4]} label="4" color="#f59e0b" showProjections={false} />
+                            </DihSvg>
+                        ),
+                    },
+                    {
+                        title: 'Charnela del plano de corte',
+                        description: 'Se toma como charnela la traza horizontal del plano de corte y se abate el plano, igual que en el tema de abatimientos.',
+                        diagram: (
+                            <DihSvg>
+                                <VLine a={[60, 210]} b={[320, 210]} color="#10b981" width={2} />
+                                <VText x={66} y={204} color="#10b981" size={9}>charnela (traza del corte)</VText>
+                                <VLine a={[60, 210]} b={[200, 90]} color="#f59e0b" dashed />
+                                <VText x={150} y={150} color="#f59e0b" size={9}>abatir</VText>
+                            </DihSvg>
+                        ),
+                    },
+                    {
+                        title: 'Sección en VM',
+                        description: 'Sobre el abatimiento, la sección aparece con sus lados reales: ya se puede medir y comparar con la figura que pide el enunciado.',
+                        diagram: (
+                            <DihSvg>
+                                <VLine a={[60, 210]} b={[320, 210]} color="#10b981" width={2} />
+                                <polygon points="120,190 210,150 260,190 170,230" fill="none" stroke="#f59e0b" strokeWidth="3" />
+                                <VText x={190} y={245} color="#f59e0b" bold>sección en VM</VText>
                             </DihSvg>
                         ),
                     },
