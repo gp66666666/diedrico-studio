@@ -299,7 +299,7 @@ export default function MainApp() {
                                                         name: 'A',
                                                         coords: { x: 0, y: 5, z: 5 },
                                                         color: '#f87171',
-                                                    });
+                                                    } as any);
                                                     toast.success('Punto A creado. Prueba la pestaña Diédrico (2D).');
                                                 }}
                                                 className="rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-blue-500"
