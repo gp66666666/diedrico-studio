@@ -29,7 +29,7 @@ export interface ProjectionSystem {
 
 export interface BaseElement {
     id: string;
-    type: 'point' | 'line' | 'segment' | 'plane' | 'group' | 'solid' | 'polygon';
+    type: 'point' | 'line' | 'segment' | 'plane' | 'group' | 'solid' | 'polygon' | 'mesh';
     name: string;
     color: string;
     visible: boolean;
@@ -71,6 +71,20 @@ export interface PolygonElement extends BaseElement {
     opacity?: number;
 }
 
+/**
+ * Malla de intersección entre dos sólidos: vértices y caras en coordenadas del
+ * store. `sources` dice de qué sólido procede cada cara y `seam` son las
+ * aristas de la línea de intersección.
+ */
+export interface MeshElement extends BaseElement {
+    type: 'mesh';
+    vertices: Vector3[];
+    faces: number[][];
+    sources: ('a' | 'b')[];
+    seam: [number, number][];
+    opacity?: number;
+}
+
 export interface GroupElement extends BaseElement {
     type: 'group';
     elements: string[]; // IDs of children
@@ -87,7 +101,7 @@ export interface SolidElement extends BaseElement {
     color: string;
 }
 
-export type GeometryElement = PointElement | LineElement | SegmentElement | PlaneElement | GroupElement | SolidElement | PolygonElement;
+export type GeometryElement = PointElement | LineElement | SegmentElement | PlaneElement | GroupElement | SolidElement | PolygonElement | MeshElement;
 
 // Sketch Types
 export type SketchTool =

@@ -323,6 +323,15 @@ export default function GuidePage() {
                                     </p>
                                 </div>
                                 <div>
+                                    <p className="font-semibold text-white">Sólidos → Intersección de dos sólidos</p>
+                                    <p>
+                                        Elige los dos sólidos y la herramienta calcula su parte común. La{' '}
+                                        <b className="text-white">línea de intersección</b> (las aristas donde se cruzan las
+                                        superficies) queda marcada en planta y en alzado, y en 3D se ve la malla del cuerpo
+                                        común en translúcido. Puedes ocultar los sólidos para verla limpia.
+                                    </p>
+                                </div>
+                                <div>
                                     <p className="font-semibold text-white">Sólidos → Desarrollo del sólido (1 sólido)</p>
                                     <p>
                                         Despliega el sólido en el plano a escala: la tira de caras laterales y las bases donde
@@ -639,6 +648,11 @@ export default function GuidePage() {
                                         h: 'Herramientas › Sólidos › Sección plana',
                                     },
                                     {
+                                        t: 'Intersección de dos sólidos',
+                                        d: 'Parte común de dos cuerpos y línea de intersección entre sus superficies, con el volumen del cuerpo común. Sirve para las penetraciones entre prisma, pirámide, cilindro, cono y esfera.',
+                                        h: 'Herramientas › Sólidos › Intersección de dos sólidos',
+                                    },
+                                    {
                                         t: 'Desarrollos',
                                         d: 'Red del sólido completo a escala (lateral y bases) y desarrollo del cuerpo truncado por un plano: caras cortadas, base y tapa en verdadera magnitud. Se descarga en SVG.',
                                         h: 'Herramientas › Sólidos › Desarrollo del sólido, y panel de Sección',
@@ -653,9 +667,9 @@ export default function GuidePage() {
                             </div>
 
                             <p className="text-xs text-slate-400">
-                                <b className="text-slate-200">Lo que no incluye:</b> la intersección entre dos sólidos y las
-                                sombras (solo entran en algunas comunidades), y la perspectiva axonométrica, que es otro bloque
-                                del temario y no forma parte del sistema diédrico.
+                                <b className="text-slate-200">Lo que no incluye:</b> las sombras (solo entran en algunas
+                                comunidades) y la perspectiva axonométrica, que es otro bloque del temario y no forma parte
+                                del sistema diédrico.
                             </p>
                         </Section>
 

@@ -537,8 +537,15 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         >
                             ✂️ Sección plana (sólido + plano)
                         </button>
-                        <button className={`${getButtonClass('solid-intersection')} opacity-50 cursor-not-allowed`} disabled>
-                            🔗 Intersecciones
+                        <button
+                            className={getButtonClass('solid-intersection')}
+                            onClick={() => {
+                                const next = activeTool === 'solid-intersection' ? 'none' : 'solid-intersection';
+                                setActiveTool(next);
+                                if (next === 'solid-intersection' && viewMode !== '3d') setViewMode('3d');
+                            }}
+                        >
+                            🔗 Intersección de dos sólidos
                         </button>
                         <button
                             className={getButtonClass('solid-development')}

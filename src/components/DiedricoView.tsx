@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { useGeometryStore } from '../store/geometryStore';
 import Polygon2D from './2D/Polygon2D';
+import Mesh2D from './2D/Mesh2D';
 import {
     calculateLineTraces, intersectLinePlane, intersectPlanePlane, intersectLineLine,
     vectorAdd, vectorScale, calculateAbatimiento, calculatePlaneAbatimientoTraces,
@@ -1385,6 +1386,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             case 'plane': return <Plane2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'solid': return <Solid2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'polygon': return <Polygon2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
+                            case 'mesh': return <Mesh2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             default: return null;
                         }
                     })}

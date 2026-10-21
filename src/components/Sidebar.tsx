@@ -31,6 +31,7 @@ import VMReconstructionTool from './tools/VMReconstructionTool';
 import SolidsTool from './tools/SolidsTool';
 import SectionTool from './tools/SectionTool';
 import DevelopmentTool from './tools/DevelopmentTool';
+import SolidIntersectionTool from './tools/SolidIntersectionTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 import { toast } from '../lib/toast';
@@ -104,7 +105,7 @@ export default function Sidebar() {
         }
     }, [activeTool]);
 
-    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'segment' | 'plane' | 'solid' | 'group' | 'polygon'>('point');
+    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'segment' | 'plane' | 'solid' | 'group' | 'polygon' | 'mesh'>('point');
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
     const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -1480,6 +1481,7 @@ export default function Sidebar() {
                                                     {el.type === 'plane' && 'Plano'}
                                                     {el.type === 'group' && 'Grupo'}
                                                     {el.type === 'polygon' && 'Sección'}
+                                                    {el.type === 'mesh' && 'Intersección'}
                                                 </p>
                                             </div>
                                         </div>
@@ -1543,6 +1545,7 @@ export default function Sidebar() {
             <SolidsTool />
             <SectionTool />
             <DevelopmentTool />
+            <SolidIntersectionTool />
 
             {/* Exercise Overlay */}
             <ExerciseOverlay />

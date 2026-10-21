@@ -6,6 +6,7 @@ import LineObject from './3D/LineObject';
 import PlaneObject from './3D/PlaneObject';
 import SolidObject from './3D/SolidObject';
 import PolygonObject from './3D/PolygonObject';
+import MeshObject from './3D/MeshObject';
 import SegmentObject from './3D/SegmentObject';
 import IntersectionsRenderer from './3D/IntersectionsRenderer';
 import SystemPlanes from './3D/SystemPlanes';
@@ -108,6 +109,8 @@ export default function Scene() {
                                 return <SegmentObject key={element.id} element={element as any} />;
                             case 'polygon':
                                 return <PolygonObject key={element.id} element={element as any} />;
+                            case 'mesh':
+                                return <MeshObject key={element.id} element={element as any} />;
                             default:
                                 return null;
                         }
