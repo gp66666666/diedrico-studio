@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
 import { buildSolidMesh } from '../../lib/solidGeometry';
 import { sectionPolygons, trueShape, type TrueShape } from '../../lib/section';
+import { buildTruncatedDevelopment, developmentSvg, type Development } from '../../lib/development';
 import type { PlaneElement, SolidElement, Vector3 } from '../../types';
 import { toast } from '../../lib/toast';
 import { Scissors, X } from 'lucide-react';
@@ -13,6 +14,8 @@ interface SectionResult {
     planeName: string;
     vertices: number;
     shape: TrueShape | null;
+    /** Desarrollo del cuerpo truncado (solo prismas rectos y cilindros). */
+    truncated: Development | null;
 }
 
 /**
@@ -89,13 +92,23 @@ export default function SectionTool() {
             planeName: plane.name,
             vertices: loops[0].length,
             shape,
+            truncated: buildTruncatedDevelopment(
+                solid.subtype,
+                solid.size,
+                solid.position,
+                solid.rotation,
+                plane.normal,
+                plane.constant
+            ),
         });
 
         clearDistanceSelection();
         toast('Sección creada. Se ha añadido al dibujo como un elemento más.');
     }, [isActive, selectedForDistance, elements, addElement, clearDistanceSelection]);
 
-    if (!isActive && !result) return null;
+    // El panel solo se muestra mientras la herramienta está activa (o al cerrarla
+    // con "none" para poder consultar el resultado).
+    if (!isActive && !(result && activeTool === 'none')) return null;
 
     const close = () => {
         setResult(null);
@@ -152,7 +165,7 @@ export default function SectionTool() {
                                     strokeWidth={2}
                                     strokeLinejoin="round"
                                 />
-                                {result.shape.points.map((p, i) => {
+                                {result.shape.points.length <= 12 && result.shape.points.map((p, i) => {
                                     const { x, y } = toSvg(p, result.shape!);
                                     return (
                                         <g key={i}>
@@ -192,6 +205,45 @@ export default function SectionTool() {
                                 El contorno está abatido sobre el plano de corte: eso es la sección en verdadera
                                 magnitud (su desarrollo).
                             </p>
+
+                            {result.truncated && (
+                                <details className="rounded-lg border border-white/10 bg-white/5 p-2">
+                                    <summary className="cursor-pointer text-[11px] font-semibold text-amber-200">
+                                        Desarrollo del cuerpo truncado
+                                    </summary>
+                                    <div
+                                        className="mt-2 [&>svg]:h-auto [&>svg]:w-full"
+                                        dangerouslySetInnerHTML={{
+                                            __html: developmentSvg(result.truncated, 300, 220),
+                                        }}
+                                    />
+                                    <p className="mt-1 text-[11px] text-slate-400">
+                                        Superficie total: <b className="text-white">{result.truncated.area.toFixed(2)} u²</b>
+                                    </p>
+                                    <ul className="mt-1 space-y-0.5 text-[11px] text-slate-400">
+                                        {result.truncated.notes.map((n) => (
+                                            <li key={n}>· {n}</li>
+                                        ))}
+                                    </ul>
+                                    <button
+                                        onClick={() =>
+                                            downloadSvg(
+                                                developmentSvg(result.truncated!, 300, 220),
+                                                `desarrollo-${result.solidName}`
+                                            )
+                                        }
+                                        className="mt-2 w-full rounded-lg border border-white/15 bg-white/5 py-1.5 text-[11px] font-semibold text-slate-200 hover:bg-white/10"
+                                    >
+                                        Descargar SVG
+                                    </button>
+                                </details>
+                            )}
+
+                            {!result.truncated && (
+                                <p className="text-[11px] text-slate-500">
+                                    El desarrollo del cuerpo truncado se calcula en prismas rectos y cilindros.
+                                </p>
+                            )}
                         </>
                     )}
                 </div>
@@ -201,6 +253,16 @@ export default function SectionTool() {
 
     // Portal: así el panel flota sobre el lienzo y no tapa ni bloquea el panel de herramientas
     return createPortal(panel, document.body);
+}
+
+function downloadSvg(svg: string, name: string) {
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name.replace(/\s+/g, '-').toLowerCase()}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 const PAD = 20;

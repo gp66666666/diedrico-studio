@@ -540,8 +540,11 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         <button className={`${getButtonClass('solid-intersection')} opacity-50 cursor-not-allowed`} disabled>
                             🔗 Intersecciones
                         </button>
-                        <button className={`${getButtonClass('solid-development')} opacity-50 cursor-not-allowed`} disabled>
-                            📄 Desarrollos
+                        <button
+                            className={getButtonClass('solid-development')}
+                            onClick={() => setActiveTool(activeTool === 'solid-development' ? 'none' : 'solid-development')}
+                        >
+                            📄 Desarrollo del sólido
                         </button>
 
                     </div>

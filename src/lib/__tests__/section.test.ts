@@ -116,3 +116,69 @@ describe('sección de un sólido por un plano', () => {
         expect(perim).toBeGreaterThan(0);
     });
 });
+
+describe('secciones de todos los sólidos', () => {
+    const subtypes = ['tetrahedron', 'cube', 'octahedron', 'dodecahedron', 'icosahedron', 'prism', 'pyramid', 'cylinder', 'cone', 'sphere'];
+
+    const bounds = (subtype: string) => {
+        const mesh = buildSolidMesh(subtype, { x: 2, y: 4, z: 2 });
+        const xs = mesh.vertices.map((v) => v.x);
+        const ys = mesh.vertices.map((v) => v.y);
+        const zs = mesh.vertices.map((v) => v.z);
+        return {
+            minX: Math.min(...xs), maxX: Math.max(...xs),
+            minY: Math.min(...ys), maxY: Math.max(...ys),
+            minZ: Math.min(...zs), maxZ: Math.max(...zs),
+        };
+    };
+
+    subtypes.forEach((subtype) => {
+        it(`${subtype}: un plano horizontal corta y la sección está sobre el plano y dentro del sólido`, () => {
+            const mesh = buildSolidMesh(subtype, { x: 2, y: 4, z: 2 });
+            const pos = { x: 0, y: 0, z: 0 };
+
+            // Plano horizontal por el centro de la altura (z = 0 corta todos)
+            const loops = sectionPolygons(mesh, pos, undefined, { x: 0, y: 0, z: 1 }, 0);
+            expect(loops.length).toBeGreaterThanOrEqual(1);
+
+            const pts = loops[0];
+            expect(pts.length).toBeGreaterThanOrEqual(3);
+
+            // Todos los vértices están en el plano
+            pts.forEach((p) => expect(Math.abs(p.z)).toBeLessThan(1e-6));
+
+            // Y dentro del cuerpo
+            const b = bounds(subtype);
+            pts.forEach((p) => {
+                expect(p.x).toBeGreaterThanOrEqual(b.minX - 1e-6);
+                expect(p.x).toBeLessThanOrEqual(b.maxX + 1e-6);
+                expect(p.y).toBeGreaterThanOrEqual(b.minY - 1e-6);
+                expect(p.y).toBeLessThanOrEqual(b.maxY + 1e-6);
+            });
+
+            const shape = trueShape(pts, { x: 0, y: 0, z: 1 });
+            expect(shape!.area).toBeGreaterThan(0);
+            expect(shape!.perimeter).toBeGreaterThan(0);
+        });
+    });
+
+    it('esfera: la sección por el centro es un círculo', () => {
+        const mesh = buildSolidMesh('sphere', { x: 2, y: 2, z: 2 });
+        const loops = sectionPolygons(mesh, { x: 0, y: 0, z: 0 }, undefined, { x: 0, y: 0, z: 1 }, 0);
+        const shape = trueShape(loops[0], { x: 0, y: 0, z: 1 });
+        expect(shape!.area).toBeGreaterThan(Math.PI * 4 * 0.95);
+        expect(shape!.area).toBeLessThanOrEqual(Math.PI * 4 * 1.01);
+    });
+
+    it('cono: un plano oblicuo que no pasa por el vértice da una sección cerrada', () => {
+        const mesh = buildSolidMesh('cone', { x: 2, y: 4, z: 2 });
+        const n = { x: 1, y: 1, z: 1 };
+        const d = -1;
+        const loops = sectionPolygons(mesh, { x: 0, y: 0, z: 0 }, undefined, n, d);
+        expect(loops[0].length).toBeGreaterThanOrEqual(3);
+        loops[0].forEach((p) => {
+            const dev = Math.abs((p.x + p.y + p.z + d) / Math.sqrt(3));
+            expect(dev).toBeLessThan(1e-6);
+        });
+    });
+});

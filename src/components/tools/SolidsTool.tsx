@@ -21,9 +21,14 @@ export default function SolidsTool() {
 
     const uniqueId = "solids-tool-ultimate-v6";
 
-    const isSolidTool = activeTool?.startsWith('poliedro-') ||
-        activeTool?.startsWith('solid-') ||
-        activeTool?.startsWith('revolucion-');
+    // Ojo: 'solid-section', 'solid-intersection' y 'solid-development' son
+    // herramientas aparte, no la de crear sólidos.
+    const specialSolidTools = ['solid-section', 'solid-intersection', 'solid-development'];
+    const isSolidTool = Boolean(activeTool) && !specialSolidTools.includes(activeTool as string) && (
+        activeTool!.startsWith('poliedro-') ||
+        activeTool!.startsWith('solid-') ||
+        activeTool!.startsWith('revolucion-')
+    );
 
     // Solid Creation Logic
     useEffect(() => {

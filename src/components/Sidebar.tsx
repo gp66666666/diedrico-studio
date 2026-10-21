@@ -30,6 +30,7 @@ import GroupTool from './tools/GroupTool';
 import VMReconstructionTool from './tools/VMReconstructionTool';
 import SolidsTool from './tools/SolidsTool';
 import SectionTool from './tools/SectionTool';
+import DevelopmentTool from './tools/DevelopmentTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 import { toast } from '../lib/toast';
@@ -1541,6 +1542,7 @@ export default function Sidebar() {
             <VMReconstructionTool />
             <SolidsTool />
             <SectionTool />
+            <DevelopmentTool />
 
             {/* Exercise Overlay */}
             <ExerciseOverlay />

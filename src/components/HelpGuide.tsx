@@ -39,7 +39,9 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                 { name: "Punto 3D", desc: "Introduce coordenadas X, Y, Z para situar puntos en el espacio." },
                 { name: "Recta / Plano", desc: "Define elementos mediante puntos o ecuaciones." },
                 { name: "Plano con 3 clics", desc: "Dibuja un plano directamente sobre el papel: dos clics debajo de la LT (traza horizontal) y uno encima (traza vertical)." },
-                { name: "Sección plana", desc: "Corta un sólido con un plano: la sección se dibuja en planta y alzado y verás su verdadera magnitud, área y perímetro." }
+                { name: "Sección plana", desc: "Corta un sólido con un plano: la sección se dibuja en planta y alzado y verás su verdadera magnitud, área y perímetro." },
+                { name: "Desarrollo del sólido", desc: "Despliega el sólido en el plano a escala (caras laterales y bases) y descárgalo en SVG." },
+                { name: "Cuerpo truncado", desc: "Tras una sección, el panel muestra el desarrollo del cuerpo cortado: caras recortadas, base y tapa en verdadera magnitud." }
             ]
         },
         {

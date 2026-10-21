@@ -87,6 +87,10 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 
 ## Planos con clics y secciones (2026)
 - `plane-click`: el plano se dibuja sobre el papel. Dos clics **debajo** de la LT definen la traza horizontal α₁; uno **encima** fija α₂ (pasa por el vértice). Lógica en `src/lib/planeFromClicks.ts` (con tests).
+- `solid-section`: sólido + plano → polígono `polygon` en el dibujo y panel con la VM (abatimiento), área y perímetro. La sección es válida para **todos** los sólidos (son convexos): `src/lib/section.ts`, tests en `__tests__/section.test.ts` (los 10 subtipos + esfera + cono).
+- `solid-development`: desarrollo (red) del sólido completo: cubo, prisma hexagonal, pirámide, tetraedro, cilindro y cono. `src/lib/development.ts` + `components/tools/DevelopmentTool.tsx`. La esfera no es desarrollable y los poliedros regulares octa/dodeca/icosa no tienen red implementada (se avisa en el panel).
+- Desarrollo del **cuerpo truncado**: en el panel de sección, `buildTruncatedDevelopment` despliega las caras recortadas + base + tapa (VM). Prismas/cubo/cilindro por alturas de arista; pirámide/tetraedro/cono por baricéntricas de cada cara. Tests con áreas exactas (tronco de pirámide a media altura = 28 u²).
+- La cobertura del temario PAU/EBAU está en la guía (`GuidePage`, sección 16).
 - `solid-section`: sólido + plano. Corta la malla por el plano (`src/lib/section.ts`, con tests), añade un elemento `polygon` (render en `2D/Polygon2D.tsx` y `3D/PolygonObject.tsx`) y muestra la **verdadera magnitud** de la sección con área y perímetro (`SectionTool.tsx`).
 - El elemento `polygon` entra en `GeometryElement`; si añades un tipo nuevo, recuerda los switches de `Scene.tsx` y `DiedricoView.tsx`.
 - `isPremium` del `userStore` es derivado: `is_premium && (!premium_until || premium_until > now)`.

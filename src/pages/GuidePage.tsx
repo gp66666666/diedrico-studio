@@ -80,6 +80,7 @@ const TOC = [
     { id: 'cuenta', label: 'Cuenta y plan' },
     { id: 'trucos', label: 'Trucos y atajos' },
     { id: 'faq', label: 'Preguntas frecuentes' },
+    { id: 'temario', label: 'Cobertura PAU/EBAU' },
 ];
 
 export default function GuidePage() {
@@ -319,6 +320,22 @@ export default function GuidePage() {
                                         (en planta y alzado). En el panel verás su <b className="text-white">verdadera magnitud</b>
                                         (el contorno abatido sobre el plano de corte), con el área y el perímetro. Puedes ocultar el
                                         sólido para ver el corte limpio.
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">Sólidos → Desarrollo del sólido (1 sólido)</p>
+                                    <p>
+                                        Despliega el sólido en el plano a escala: la tira de caras laterales y las bases donde
+                                        corresponda, con la superficie total. Se puede descargar en SVG para imprimirla o
+                                        pegarla en la lámina. La esfera no tiene desarrollo porque no es desarrollable.
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">Desarrollo del cuerpo truncado</p>
+                                    <p>
+                                        Después de hacer una sección, el panel ofrece el desarrollo del cuerpo que queda:
+                                        cada cara lateral recortada por el plano, la base y la tapa (la sección en verdadera
+                                        magnitud). Disponible en prismas, cubos, cilindros, pirámides, tetraedros y conos.
                                     </p>
                                 </div>
                                 <div>
@@ -563,6 +580,83 @@ export default function GuidePage() {
                                     </details>
                                 ))}
                             </div>
+                        </Section>
+
+
+                        {/* 16 */}
+                        <Section id="temario" number="16" title="Qué puedes resolver: temario PAU/EBAU" icon={<GraduationCap size={20} />}>
+                            <p>
+                                Todo el bloque de diédrico de <b className="text-white">Dibujo Técnico II</b> se puede dibujar
+                                y comprobar aquí. Esta es la correspondencia entre cada punto del temario y la herramienta que
+                                lo resuelve, para que sepas dónde está cada cosa.
+                            </p>
+
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {[
+                                    {
+                                        t: 'Punto, recta y plano',
+                                        d: 'Proyecciones, trazas, pertenencia y posiciones particulares: rectas de perfil, paralelas o perpendiculares a los planos de proyección, planos de canto y paralelos a la LT.',
+                                        h: 'Añadir · Punto / Recta / Plano, y Plano por 3 puntos',
+                                    },
+                                    {
+                                        t: 'Intersecciones',
+                                        d: 'Recta-recta (incluye rectas que se cruzan), recta-plano, plano-plano, tres planos y combinaciones de dos planos con una recta.',
+                                        h: 'Herramientas › Intersecciones',
+                                    },
+                                    {
+                                        t: 'Paralelismo y perpendicularidad',
+                                        d: 'Recta paralela o perpendicular a plano, plano paralelo o perpendicular a recta o a otro plano, recta perpendicular a recta.',
+                                        h: 'Herramientas › Paralelismo / Perpendicularidad',
+                                    },
+                                    {
+                                        t: 'Distancias',
+                                        d: 'Las seis del temario: punto-punto, punto-recta, punto-plano, recta-recta (también cruzadas), recta-plano y plano-plano.',
+                                        h: 'Herramientas › Distancias',
+                                    },
+                                    {
+                                        t: 'Ángulos',
+                                        d: 'Entre dos rectas, entre recta y plano y entre dos planos, con su medida en grados.',
+                                        h: 'Herramientas › Verdadera magnitud › Ángulos',
+                                    },
+                                    {
+                                        t: 'Giros y cambios de plano',
+                                        d: 'Girar puntos, rectas, segmentos, planos y sólidos alrededor de un eje; poner una recta paralela a la LT; crear un sistema auxiliar con una nueva LT.',
+                                        h: 'Herramientas › Giros y Cambios de plano',
+                                    },
+                                    {
+                                        t: 'Abatimientos y verdaderas magnitudes',
+                                        d: 'Abatir un punto sobre el plano horizontal y medir cualquier segmento o recta en verdadera magnitud. La sección se abate sobre su plano de corte.',
+                                        h: 'Controles de Vista › Abatir, y Herramientas › Verdadera magnitud',
+                                    },
+                                    {
+                                        t: 'Sólidos',
+                                        d: 'Poliedros regulares (tetraedro, cubo, octaedro, dodecaedro, icosaedro), prisma, pirámide, cilindro, cono y esfera, con rotación y traslación.',
+                                        h: 'Añadir › Sólido',
+                                    },
+                                    {
+                                        t: 'Secciones planas de cualquier cuerpo',
+                                        d: 'Con un plano proyectante, oblicuo, paralelo a una cara, que pase por una arista o por tres puntos (o dibujado con tres clics). Se dibuja en planta y alzado, con su verdadera magnitud, área y perímetro. Funciona en todos los sólidos, esfera incluida.',
+                                        h: 'Herramientas › Sólidos › Sección plana',
+                                    },
+                                    {
+                                        t: 'Desarrollos',
+                                        d: 'Red del sólido completo a escala (lateral y bases) y desarrollo del cuerpo truncado por un plano: caras cortadas, base y tapa en verdadera magnitud. Se descarga en SVG.',
+                                        h: 'Herramientas › Sólidos › Desarrollo del sólido, y panel de Sección',
+                                    },
+                                ].map((item) => (
+                                    <div key={item.t} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                                        <p className="text-sm font-semibold text-white">{item.t}</p>
+                                        <p className="mt-1 text-xs leading-relaxed text-slate-300">{item.d}</p>
+                                        <p className="mt-2 text-[11px] font-medium text-blue-300">{item.h}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <p className="text-xs text-slate-400">
+                                <b className="text-slate-200">Lo que no incluye:</b> la intersección entre dos sólidos y las
+                                sombras (solo entran en algunas comunidades), y la perspectiva axonométrica, que es otro bloque
+                                del temario y no forma parte del sistema diédrico.
+                            </p>
                         </Section>
 
                         <div className="mt-10 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-6 text-center">
