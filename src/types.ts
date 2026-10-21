@@ -33,7 +33,7 @@ export interface BaseElement {
     name: string;
     color: string;
     visible: boolean;
-    role?: 'abated';
+    role?: 'abated' | 'shadow-h' | 'shadow-v';
     parentPlaneId?: string;
     sourceElementId?: string;
 }

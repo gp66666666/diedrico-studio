@@ -23,7 +23,10 @@ export default function SolidsTool() {
 
     // Ojo: 'solid-section', 'solid-intersection' y 'solid-development' son
     // herramientas aparte, no la de crear sólidos.
-    const specialSolidTools = ['solid-section', 'solid-intersection', 'solid-development'];
+    const specialSolidTools = [
+        'solid-section', 'solid-intersection', 'solid-development',
+        'line-solid', 'sphere-tangent', 'shadows',
+    ];
     const isSolidTool = Boolean(activeTool) && !specialSolidTools.includes(activeTool as string) && (
         activeTool!.startsWith('poliedro-') ||
         activeTool!.startsWith('solid-') ||

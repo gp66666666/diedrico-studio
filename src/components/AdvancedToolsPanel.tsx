@@ -548,6 +548,36 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                             🔗 Intersección de dos sólidos
                         </button>
                         <button
+                            className={getButtonClass('line-solid')}
+                            onClick={() => {
+                                const next = activeTool === 'line-solid' ? 'none' : 'line-solid';
+                                setActiveTool(next);
+                                if (next === 'line-solid' && viewMode !== '3d') setViewMode('3d');
+                            }}
+                        >
+                            📍 Recta y sólido (penetración)
+                        </button>
+                        <button
+                            className={getButtonClass('sphere-tangent')}
+                            onClick={() => {
+                                const next = activeTool === 'sphere-tangent' ? 'none' : 'sphere-tangent';
+                                setActiveTool(next);
+                                if (next === 'sphere-tangent' && viewMode !== '3d') setViewMode('3d');
+                            }}
+                        >
+                            ⭕ Tangente a la esfera
+                        </button>
+                        <button
+                            className={getButtonClass('shadows')}
+                            onClick={() => {
+                                const next = activeTool === 'shadows' ? 'none' : 'shadows';
+                                setActiveTool(next);
+                                if (next === 'shadows' && viewMode !== '3d') setViewMode('3d');
+                            }}
+                        >
+                            ☀️ Sombras (foco propio/impropio)
+                        </button>
+                        <button
                             className={getButtonClass('solid-development')}
                             onClick={() => setActiveTool(activeTool === 'solid-development' ? 'none' : 'solid-development')}
                         >

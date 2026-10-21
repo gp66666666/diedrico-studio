@@ -9,6 +9,8 @@
  * Todas las piezas van en unidades del sólido; el panel las escala.
  */
 
+import { unfoldPolyhedron } from './unfold';
+
 export interface DevPoint {
     x: number;
     y: number;
@@ -184,6 +186,11 @@ export function buildDevelopment(subtype: string | undefined, size: { x: number;
             return pyramidDevelopment(3, r, h);
         case 'cone':
             return coneDevelopment(r, h);
+        case 'octahedron':
+        case 'dodecahedron':
+        case 'icosahedron':
+            // Se despliegan abatiendo la malla cara a cara (lib/unfold)
+            return unfoldPolyhedron(subtype, size);
         default:
             return null;
     }

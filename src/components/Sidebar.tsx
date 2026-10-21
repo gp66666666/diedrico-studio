@@ -32,6 +32,9 @@ import SolidsTool from './tools/SolidsTool';
 import SectionTool from './tools/SectionTool';
 import DevelopmentTool from './tools/DevelopmentTool';
 import SolidIntersectionTool from './tools/SolidIntersectionTool';
+import LineSolidTool from './tools/LineSolidTool';
+import SphereTangentTool from './tools/SphereTangentTool';
+import ShadowsTool from './tools/ShadowsTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 import { toast } from '../lib/toast';
@@ -1480,7 +1483,11 @@ export default function Sidebar() {
                                                     {el.type === 'segment' && 'Segmento'}
                                                     {el.type === 'plane' && 'Plano'}
                                                     {el.type === 'group' && 'Grupo'}
-                                                    {el.type === 'polygon' && 'Sección'}
+                                                    {el.type === 'polygon' &&
+                                                        (el.role === 'shadow-h' || el.role === 'shadow-v' ? 'Sombra' : 'Sección')}
+                                                    {(el.type === 'point' || el.type === 'segment') &&
+                                                        (el.role === 'shadow-h' || el.role === 'shadow-v') &&
+                                                        'Sombra'}
                                                     {el.type === 'mesh' && 'Intersección'}
                                                 </p>
                                             </div>
@@ -1546,6 +1553,9 @@ export default function Sidebar() {
             <SectionTool />
             <DevelopmentTool />
             <SolidIntersectionTool />
+            <LineSolidTool />
+            <SphereTangentTool />
+            <ShadowsTool />
 
             {/* Exercise Overlay */}
             <ExerciseOverlay />

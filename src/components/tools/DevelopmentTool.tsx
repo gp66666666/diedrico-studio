@@ -54,7 +54,7 @@ export default function DevelopmentTool() {
                 ? null
                 : element.subtype === 'sphere'
                     ? 'La esfera no tiene desarrollo plano: no es una superficie desarrollable.'
-                    : 'Desarrollo no disponible para este poliedro (octaedro, dodecaedro o icosaedro).'
+                    : 'Desarrollo no disponible para este sólido.'
         );
         clearDistanceSelection();
     }, [isActive, selectedForDistance, elements, clearDistanceSelection]);

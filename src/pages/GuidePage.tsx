@@ -332,10 +332,39 @@ export default function GuidePage() {
                                     </p>
                                 </div>
                                 <div>
+                                    <p className="font-semibold text-white">Sólidos → Recta y sólido (penetración)</p>
+                                    <p>
+                                        Elige una recta (o un segmento) y un sólido: la herramienta marca los{' '}
+                                        <b className="text-white">puntos de entrada y salida</b> de la recta en la superficie, con
+                                        sus coordenadas y la cuerda entre ellos. Si la recta es tangente, deja un solo punto. Si no
+                                        lo corta, te lo dice.
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">Sólidos → Tangente a la esfera</p>
+                                    <p>
+                                        Tres casos: un <b className="text-white">punto de la superficie</b> de la esfera (plano
+                                        tangente en él), una <b className="text-white">recta exterior</b> (los dos planos que la
+                                        contienen y son tangentes) o un <b className="text-white">plano</b> (los dos tangentes
+                                        paralelos a él). Los planos se añaden al dibujo con su punto de tangencia.
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">Sólidos → Sombras (foco propio e impropio)</p>
+                                    <p>
+                                        Elige el objeto (sólido, punto o segmento) y la luz: un <b className="text-white">punto</b> es
+                                        foco propio y una <b className="text-white">recta</b> marca la dirección de la luz (foco
+                                        impropio, se toma hacia abajo). La sombra se calcula sobre el horizontal y sobre el vertical,
+                                        cada una en su proyección, y se recorta en la línea de tierra.
+                                    </p>
+                                </div>
+                                <div>
                                     <p className="font-semibold text-white">Sólidos → Desarrollo del sólido (1 sólido)</p>
                                     <p>
                                         Despliega el sólido en el plano a escala: la tira de caras laterales y las bases donde
-                                        corresponda, con la superficie total. Se puede descargar en SVG para imprimirla o
+                                        corresponda, con la superficie total. Cubre cubo, prisma, pirámide, tetraedro, cilindro,
+                                        cono, <b className="text-white">octaedro, dodecaedro e icosaedro</b> (estos tres abatiendo la
+                                        malla cara a cara, con una red sin solapes). Se puede descargar en SVG para imprimirla o
                                         pegarla en la lámina. La esfera no tiene desarrollo porque no es desarrollable.
                                     </p>
                                 </div>
@@ -653,8 +682,23 @@ export default function GuidePage() {
                                         h: 'Herramientas › Sólidos › Intersección de dos sólidos',
                                     },
                                     {
+                                        t: 'Puntos de penetración de una recta en un sólido',
+                                        d: 'Entrada y salida de la recta por la superficie, con sus coordenadas y la cuerda entre ellos. También detecta el caso tangente y el de recta exterior.',
+                                        h: 'Herramientas › Sólidos › Recta y sólido',
+                                    },
+                                    {
+                                        t: 'Planos tangentes a la esfera',
+                                        d: 'Tangente en un punto de la superficie, tangentes que contienen una recta exterior (dos soluciones) y tangentes paralelos a un plano dado.',
+                                        h: 'Herramientas › Sólidos › Tangente a la esfera',
+                                    },
+                                    {
+                                        t: 'Sombras',
+                                        d: 'Sombra de sólidos, puntos y segmentos sobre el horizontal y el vertical, con foco propio (un punto de luz) o impropio (una dirección). Se dibuja en planta y alzado y se recorta en la línea de tierra.',
+                                        h: 'Herramientas › Sólidos › Sombras',
+                                    },
+                                    {
                                         t: 'Desarrollos',
-                                        d: 'Red del sólido completo a escala (lateral y bases) y desarrollo del cuerpo truncado por un plano: caras cortadas, base y tapa en verdadera magnitud. Se descarga en SVG.',
+                                        d: 'Red del sólido completo a escala (lateral y bases) de los diez sólidos: cubo, prisma, pirámide, tetraedro, cilindro, cono, octaedro, dodecaedro e icosaedro. Y desarrollo del cuerpo truncado por un plano: caras cortadas, base y tapa en verdadera magnitud. Se descarga en SVG.',
                                         h: 'Herramientas › Sólidos › Desarrollo del sólido, y panel de Sección',
                                     },
                                 ].map((item) => (
@@ -667,9 +711,9 @@ export default function GuidePage() {
                             </div>
 
                             <p className="text-xs text-slate-400">
-                                <b className="text-slate-200">Lo que no incluye:</b> las sombras (solo entran en algunas
-                                comunidades) y la perspectiva axonométrica, que es otro bloque del temario y no forma parte
-                                del sistema diédrico.
+                                <b className="text-slate-200">Lo que no incluye:</b> los planos tangentes a conos y cilindros
+                                (sí están los de la esfera) y la perspectiva axonométrica, que es otro bloque del temario y no
+                                forma parte del sistema diédrico.
                             </p>
                         </Section>
 

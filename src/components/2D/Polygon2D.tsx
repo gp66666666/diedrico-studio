@@ -25,26 +25,30 @@ export default function Polygon2D({
 
     return (
         <g onClick={onClick} className="cursor-pointer">
-            <polygon
-                points={horizontal}
-                fill={stroke}
-                fillOpacity={0.22}
-                stroke={stroke}
-                strokeWidth={isSelected ? 2.5 : 1.8}
-                strokeLinejoin="round"
-            />
-            <polygon
-                points={vertical}
-                fill={stroke}
-                fillOpacity={0.22}
-                stroke={stroke}
-                strokeWidth={isSelected ? 2.5 : 1.8}
-                strokeLinejoin="round"
-            />
+            {element.role !== 'shadow-v' && (
+                <polygon
+                    points={horizontal}
+                    fill={stroke}
+                    fillOpacity={element.role === 'shadow-h' ? 0.35 : 0.22}
+                    stroke={stroke}
+                    strokeWidth={isSelected ? 2.5 : 1.8}
+                    strokeLinejoin="round"
+                />
+            )}
+            {element.role !== 'shadow-h' && (
+                <polygon
+                    points={vertical}
+                    fill={stroke}
+                    fillOpacity={element.role === 'shadow-v' ? 0.35 : 0.22}
+                    stroke={stroke}
+                    strokeWidth={isSelected ? 2.5 : 1.8}
+                    strokeLinejoin="round"
+                />
+            )}
             {element.points.map((p, i) => (
                 <g key={i}>
-                    <circle cx={p.x * SCALE} cy={p.y * SCALE} r={2.5} fill={stroke} />
-                    <circle cx={p.x * SCALE} cy={-p.z * SCALE} r={2.5} fill={stroke} />
+                    {element.role !== 'shadow-v' && <circle cx={p.x * SCALE} cy={p.y * SCALE} r={2.5} fill={stroke} />}
+                    {element.role !== 'shadow-h' && <circle cx={p.x * SCALE} cy={-p.z * SCALE} r={2.5} fill={stroke} />}
                 </g>
             ))}
         </g>

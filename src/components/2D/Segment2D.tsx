@@ -35,6 +35,19 @@ export default function Segment2D({ element, onClick, isDark = false }: { elemen
 
     const textFill = isDark ? '#ffffff' : '#000000';
 
+    if (element.role === 'shadow-h' || element.role === 'shadow-v') {
+        const onlyH = element.role === 'shadow-h';
+        const x1 = p1.x * SCALE;
+        const x2 = p2.x * SCALE;
+        const y1 = (onlyH ? p1.y : -p1.z) * SCALE;
+        const y2 = (onlyH ? p2.y : -p2.z) * SCALE;
+        return (
+            <g onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="2.5" />
+            </g>
+        );
+    }
+
     if (element.role === 'abated') {
         const x1 = p1.x * SCALE;
         const x2 = p2.x * SCALE;
