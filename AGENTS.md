@@ -84,6 +84,11 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 
 - Config única: `src/config/premium.ts` (features, enlace de Ko-fi, texto de precio).
 - Premium = **Academia** + **Asistente IA**. La nube (guardar proyectos) es gratis.
+
+## Planos con clics y secciones (2026)
+- `plane-click`: el plano se dibuja sobre el papel. Dos clics **debajo** de la LT definen la traza horizontal α₁; uno **encima** fija α₂ (pasa por el vértice). Lógica en `src/lib/planeFromClicks.ts` (con tests).
+- `solid-section`: sólido + plano. Corta la malla por el plano (`src/lib/section.ts`, con tests), añade un elemento `polygon` (render en `2D/Polygon2D.tsx` y `3D/PolygonObject.tsx`) y muestra la **verdadera magnitud** de la sección con área y perímetro (`SectionTool.tsx`).
+- El elemento `polygon` entra en `GeometryElement`; si añades un tipo nuevo, recuerda los switches de `Scene.tsx` y `DiedricoView.tsx`.
 - `isPremium` del `userStore` es derivado: `is_premium && (!premium_until || premium_until > now)`.
 - **No existe vista caballera.** Hubo un prototipo (`features/caballera`) que nunca se conectó a
   la interfaz; se eliminó. Si se retoma, hay que crearlo de verdad (proyección caballera +

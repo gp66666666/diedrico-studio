@@ -10,7 +10,7 @@ interface AdvancedToolsPanelProps {
 }
 
 export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) {
-    const { setActiveTool, activeTool } = useGeometryStore();
+    const { setActiveTool, activeTool, viewMode, setViewMode } = useGeometryStore();
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
         distances: false,
@@ -412,10 +412,21 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                 {expandedSections.planos && (
                     <div className={contentClass}>
                         <button
+                            className={getButtonClass('plane-click')}
+                            onClick={() => {
+                                const next = activeTool === 'plane-click' ? 'none' : 'plane-click';
+                                setActiveTool(next);
+                                // El plano se dibuja sobre el papel: hay que estar en diédrico
+                                if (next === 'plane-click' && viewMode !== '2d') setViewMode('2d');
+                            }}
+                        >
+                            <span className="inline-flex items-center gap-2"><Triangle size={12} /> Dibujar plano con 3 clics</span>
+                        </button>
+                        <button
                             className={getButtonClass('plane-3-points')}
                             onClick={() => setActiveTool(activeTool === 'plane-3-points' ? 'none' : 'plane-3-points')}
                         >
-                            <span className="inline-flex items-center gap-2"><Triangle size={12} /> Plano por 3 puntos</span>
+                            <span className="inline-flex items-center gap-2"><Triangle size={12} /> Plano por 3 puntos existentes</span>
                         </button>
                     </div>
                 )}
@@ -514,10 +525,17 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
 
                         {/* Operaciones */}
                         <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>
-                            Operaciones (Próximamente)
+                            Operaciones
                         </div>
-                        <button className={`${getButtonClass('solid-section')} opacity-50 cursor-not-allowed`} disabled>
-                            ✂️ Sección Plana
+                        <button
+                            className={getButtonClass('solid-section')}
+                            onClick={() => {
+                                const next = activeTool === 'solid-section' ? 'none' : 'solid-section';
+                                setActiveTool(next);
+                                if (next === 'solid-section' && viewMode !== '2d') setViewMode('3d');
+                            }}
+                        >
+                            ✂️ Sección plana (sólido + plano)
                         </button>
                         <button className={`${getButtonClass('solid-intersection')} opacity-50 cursor-not-allowed`} disabled>
                             🔗 Intersecciones

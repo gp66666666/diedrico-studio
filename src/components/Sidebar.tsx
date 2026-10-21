@@ -29,6 +29,7 @@ import SegmentTool from './tools/SegmentTool';
 import GroupTool from './tools/GroupTool';
 import VMReconstructionTool from './tools/VMReconstructionTool';
 import SolidsTool from './tools/SolidsTool';
+import SectionTool from './tools/SectionTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 import { toast } from '../lib/toast';
@@ -102,7 +103,7 @@ export default function Sidebar() {
         }
     }, [activeTool]);
 
-    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'segment' | 'plane' | 'solid' | 'group'>('point');
+    const [geometryType, setGeometryType] = useState<'point' | 'line' | 'segment' | 'plane' | 'solid' | 'group' | 'polygon'>('point');
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
     const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -1477,6 +1478,7 @@ export default function Sidebar() {
                                                     {el.type === 'segment' && 'Segmento'}
                                                     {el.type === 'plane' && 'Plano'}
                                                     {el.type === 'group' && 'Grupo'}
+                                                    {el.type === 'polygon' && 'Sección'}
                                                 </p>
                                             </div>
                                         </div>
@@ -1538,6 +1540,7 @@ export default function Sidebar() {
             <GroupTool />
             <VMReconstructionTool />
             <SolidsTool />
+            <SectionTool />
 
             {/* Exercise Overlay */}
             <ExerciseOverlay />

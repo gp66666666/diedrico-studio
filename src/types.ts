@@ -29,7 +29,7 @@ export interface ProjectionSystem {
 
 export interface BaseElement {
     id: string;
-    type: 'point' | 'line' | 'segment' | 'plane' | 'group' | 'solid';
+    type: 'point' | 'line' | 'segment' | 'plane' | 'group' | 'solid' | 'polygon';
     name: string;
     color: string;
     visible: boolean;
@@ -64,6 +64,13 @@ export interface PlaneElement extends BaseElement {
     constant: number;
 }
 
+export interface PolygonElement extends BaseElement {
+    type: 'polygon';
+    /** Vértices del contorno, en coordenadas del store. */
+    points: Vector3[];
+    opacity?: number;
+}
+
 export interface GroupElement extends BaseElement {
     type: 'group';
     elements: string[]; // IDs of children
@@ -80,7 +87,7 @@ export interface SolidElement extends BaseElement {
     color: string;
 }
 
-export type GeometryElement = PointElement | LineElement | SegmentElement | PlaneElement | GroupElement | SolidElement;
+export type GeometryElement = PointElement | LineElement | SegmentElement | PlaneElement | GroupElement | SolidElement | PolygonElement;
 
 // Sketch Types
 export type SketchTool =

@@ -27,6 +27,8 @@ export function selectionCountForTool(tool: string): number {
     if (tool === 'segment-2-points') return 2;
     if (tool === 'create-group' || tool === 'reconstruct-vm') return 50;
 
+    if (tool === 'solid-section') return 2;
+
     if (tool.startsWith('poliedro-') || tool.startsWith('solid-') || tool.startsWith('revolucion-')) return 1;
     if (tool === 'true-length') return 1;
 

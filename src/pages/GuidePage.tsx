@@ -300,8 +300,26 @@ export default function GuidePage() {
                                     <p>Elige dos puntos que definan la nueva línea de tierra y la herramienta añade el sistema auxiliar, con su nueva LT dibujada.</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Planos → Plano por 3 puntos (3 puntos)</p>
-                                    <p>Construye el plano que contiene a los tres puntos.</p>
+                                    <p className="font-semibold text-white">Planos → Dibujar plano con 3 clics</p>
+                                    <p>
+                                        Sin escribir coordenadas: <b className="text-white">dos clics debajo de la línea de tierra</b> marcan
+                                        la traza horizontal α₁ y <b className="text-white">un tercer clic encima</b> fija la traza vertical α₂,
+                                        que pasa por el vértice. Mientras dibujas ves la traza y el vértice en verde; al tercer clic el plano
+                                        queda creado con sus dos trazas.
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">Planos → Plano por 3 puntos existentes (3 puntos)</p>
+                                    <p>Construye el plano que contiene a tres puntos que ya tengas en el dibujo.</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">Sólidos → Sección plana (1 sólido + 1 plano)</p>
+                                    <p>
+                                        Corta el sólido con el plano que elijas: la sección se añade al dibujo como un polígono
+                                        (en planta y alzado). En el panel verás su <b className="text-white">verdadera magnitud</b>
+                                        (el contorno abatido sobre el plano de corte), con el área y el perímetro. Puedes ocultar el
+                                        sólido para ver el corte limpio.
+                                    </p>
                                 </div>
                                 <div>
                                     <p className="font-semibold text-white">Abatir plano horizontal</p>

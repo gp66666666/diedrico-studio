@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { useGeometryStore } from '../store/geometryStore';
+import Polygon2D from './2D/Polygon2D';
 import {
     calculateLineTraces, intersectLinePlane, intersectPlanePlane, intersectLineLine,
     vectorAdd, vectorScale, calculateAbatimiento, calculatePlaneAbatimientoTraces,
@@ -23,6 +24,8 @@ import Segment2D from './2D/Segment2D';
 import Solid2D from './2D/Solid2D';
 import HelpGuide from './HelpGuide';
 import SketchToolbar from './SketchToolbar';
+import { toast } from '../lib/toast';
+import { paperToPoint, planeFromThreeClicks } from '../lib/planeFromClicks';
 
 const SCALE = 40; // 40 pixels per unit
 
@@ -244,9 +247,69 @@ const AuxSystem = memo(({ system, axisColor, isDark, elements }: { system: impor
     );
 });
 
+
+/**
+ * Vista previa del plano mientras se marca con clics:
+ * la traza horizontal (α₁) y, ya con dos puntos, el vértice sobre la LT
+ * y la traza vertical (α₂) hacia el tercer clic.
+ */
+function PlaneClickPreview({
+    clicks,
+    mouse,
+}: {
+    clicks: { x: number, y: number }[];
+    mouse: { x: number, y: number } | null;
+}) {
+    const a = clicks[0];
+    const b = clicks[1];
+
+    let line: { x1: number, y1: number, x2: number, y2: number, dx: number, dy: number } | null = null;
+    if (a && b) {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const k = 80 / len;
+        line = { x1: a.x - dx * k, y1: a.y - dy * k, x2: a.x + dx * k, y2: a.y + dy * k, dx, dy };
+    }
+
+    const vertexX = line && Math.abs(line.dy) > 0.5 ? a.x - a.y * (line.dx / line.dy) : null;
+
+    return (
+        <g pointerEvents="none">
+            {mouse && (
+                <circle cx={mouse.x} cy={mouse.y} r={6} fill="none" stroke="#22c55e" strokeWidth={1} strokeDasharray="3 3" />
+            )}
+
+            {line && (
+                <line
+                    x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2}
+                    stroke="#22c55e" strokeWidth={1.5} strokeDasharray="7 5" opacity={0.9}
+                />
+            )}
+
+            {clicks.map((p, i) => (
+                <circle key={i} cx={p.x} cy={p.y} r={4} fill="#22c55e" />
+            ))}
+
+            {vertexX !== null && clicks.length >= 2 && (
+                <>
+                    <circle cx={vertexX} cy={0} r={4} fill="#22c55e" stroke="#fff" strokeWidth={1} />
+                    {mouse && clicks.length === 2 && mouse.y < 0 && (
+                        <line
+                            x1={vertexX} y1={0} x2={mouse.x} y2={mouse.y}
+                            stroke="#22c55e" strokeWidth={1.5} strokeDasharray="4 4" opacity={0.8}
+                        />
+                    )}
+                </>
+            )}
+        </g>
+    );
+}
+
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
     const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, distanceResult, selectedForDistance,
         clearDistanceTool, activeTool: activeDistanceTool, selectForDistance,
+        addElement, setActiveTool: setGeometryTool,
         selectElement, cameraStates, setCameraState, measurements, auxSystems,
         vmElements, vmPlaneId, showVMConstruction, toggleVMConstruction,
         showProfile, toggleProfile, showMiniScene, toggleMiniScene
@@ -285,6 +348,11 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
         };
     }, [storageMode, setCameraState]); // Run only on unmount (or mode change)
 
+    // Al salir de la herramienta se descartan los clics a medias
+    useEffect(() => {
+        if (activeDistanceTool !== 'plane-click') setPlaneClicks([]);
+    }, [activeDistanceTool]);
+
     // Touch Helpers
     const getTouchDist = (t1: React.Touch, t2: React.Touch) => {
         return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
@@ -305,6 +373,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     const [p1, setP1] = useState<{ x: number, y: number } | null>(null);
     const [p2, setP2] = useState<{ x: number, y: number } | null>(null);
     const [currentMousePos, setCurrentMousePos] = useState<{ x: number, y: number } | null>(null);
+    // Plano dibujado con 3 clics sobre el papel
+    const [planeClicks, setPlaneClicks] = useState<{ x: number, y: number }[]>([]);
 
     // Modification State (Move, Rotate, Scale)
     const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
@@ -511,9 +581,60 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
         return { x: finalX, y: finalY };
     };
 
+    // --- Plano por 3 clics ---
+    // Cada clic del papel es un punto de uno de los dos planos de proyección:
+    // debajo de la LT, punto del horizontal (alejamiento); encima, del vertical (cota).
+    const clickToPoint = (p: { x: number, y: number }): Vector3 => paperToPoint(p, SCALE);
+
+    const handlePlaneClick = (paper: { x: number, y: number }) => {
+        const step = planeClicks.length;
+
+        if (step < 2 && paper.y < 4) {
+            toast('Este clic va debajo de la línea de tierra: son puntos de la traza horizontal α₁.');
+            return;
+        }
+        if (step === 2 && paper.y > -4) {
+            toast('Este clic va encima de la línea de tierra: es un punto de la traza vertical α₂.');
+            return;
+        }
+
+        const next = [...planeClicks, paper];
+        setPlaneClicks(next);
+
+        if (next.length < 3) return;
+
+        const equation = planeFromThreeClicks(next, SCALE);
+
+        if (!equation) {
+            toast('Esos tres puntos están alineados: no definen un plano. Prueba otra vez.');
+            setPlaneClicks([]);
+            return;
+        }
+
+        const planeCount = elements.filter((el) => el.type === 'plane').length;
+
+        addElement({
+            type: 'plane',
+            name: `Plano ${planeCount + 1}`,
+            normal: equation.normal,
+            constant: equation.constant,
+            color: '#22c55e',
+            visible: true,
+        } as any);
+
+        setPlaneClicks([]);
+        setGeometryTool('none');
+        toast('Plano creado con sus dos trazas.');
+    };
+
     // --- Mouse Handlers ---
     const handleMouseDown = (e: React.MouseEvent) => {
         if ((e.target as HTMLElement).closest('button')) return;
+
+        if (activeDistanceTool === 'plane-click') {
+            handlePlaneClick(getSnapPoint(e.clientX, e.clientY));
+            return;
+        }
         const snapPos = getSnapPoint(e.clientX, e.clientY, p1 || undefined);
 
         if (activeTool === 'select') {
@@ -1007,6 +1128,26 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                 handleMouseUp();
             }}
         >
+            {/* Aviso de la herramienta "plano con 3 clics" */}
+            {activeDistanceTool === 'plane-click' && (
+                <div className="absolute left-1/2 top-3 z-30 flex max-w-[92%] -translate-x-1/2 items-center gap-3 rounded-full border border-emerald-500/40 bg-slate-900/90 px-4 py-2 text-xs text-white shadow-xl">
+                    <span>
+                        {planeClicks.length === 0 && '1/3 · Primer punto de la traza horizontal α₁ (debajo de la línea de tierra)'}
+                        {planeClicks.length === 1 && '2/3 · Segundo punto de α₁: marca la dirección de la traza'}
+                        {planeClicks.length === 2 && '3/3 · Un punto de la traza vertical α₂ (encima de la línea de tierra)'}
+                    </span>
+                    <button
+                        onClick={() => {
+                            setPlaneClicks([]);
+                            setGeometryTool('none');
+                        }}
+                        className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] hover:bg-white/20"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            )}
+
             {/* Grid */}
             <div className="absolute inset-0 opacity-10 pointer-events-none"
                 style={{ backgroundImage: `linear-gradient(${gridColor} 1px, transparent 1px), linear-gradient(90deg, ${gridColor} 1px, transparent 1px)`, backgroundSize: '20px 20px' }}
@@ -1212,6 +1353,11 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         </g>
                     )}
 
+                    {/* Vista previa del plano que se está dibujando */}
+                    {activeDistanceTool === 'plane-click' && (
+                        <PlaneClickPreview clicks={planeClicks} mouse={currentMousePos} />
+                    )}
+
                     {/* 3D Elements Projections (Always Visible) */}
                     {elements.map((el) => {
                         if (!el.visible) return null;
@@ -1222,6 +1368,8 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             if (e.type === 'touchstart') {
                                 // e.preventDefault(); // Removed to allow scrolling if needed, but be careful
                             }
+
+                            if (activeDistanceTool === 'plane-click') return;
 
                             if (activeDistanceTool && activeDistanceTool !== 'none') {
                                 selectForDistance(el.id);
@@ -1236,6 +1384,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             case 'segment': return <Segment2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'plane': return <Plane2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             case 'solid': return <Solid2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
+                            case 'polygon': return <Polygon2D key={el.id} element={el as any} onClick={handleClick} isDark={isDark} />;
                             default: return null;
                         }
                     })}
