@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, FileText } from 'lucide-react';
+import { creditsEnabled } from '../config/credits';
 
 export default function TermsPage() {
     return (
@@ -17,7 +18,7 @@ export default function TermsPage() {
 
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20 space-y-6 text-sm">
                     <p className="text-white/70">
-                        <strong>Última actualización:</strong> Diciembre 2025
+                        <strong>Última actualización:</strong> Octubre 2026
                     </p>
 
                     <section>
@@ -86,17 +87,41 @@ export default function TermsPage() {
                     </section>
 
                     <section>
-                        <h2 className="text-2xl font-semibold mb-3">6. Publicidad y AdSense</h2>
-                        <p className="text-white/80 leading-relaxed mb-3">
-                            Este sitio muestra anuncios mediante Google AdSense:
+                        <h2 className="text-2xl font-semibold mb-3">6. Publicidad</h2>
+                        <p className="text-white/80 leading-relaxed">
+                            Esta web <strong>no muestra anuncios de terceros</strong> y no usa cookies
+                            publicitarias. La analítica es propia y no identifica a los usuarios.
                         </p>
-                        <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
-                            <li>Los anuncios ayudan a mantener el servicio gratuito</li>
-                            <li>No controlamos el contenido de los anuncios de terceros</li>
-                            <li>No somos responsables del contenido de sitios externos vinculados en anuncios</li>
-                            <li>Hacer clic fraudulento en anuncios está estrictamente prohibido</li>
-                        </ul>
                     </section>
+
+                    {creditsEnabled && (
+                        <section>
+                            <h2 className="text-2xl font-semibold mb-3">6 bis. Compras de consultas y reembolsos</h2>
+                            <p className="text-white/80 leading-relaxed mb-3">
+                                El uso de la aplicación es gratuito. Además se pueden comprar <strong>packs de
+                                consultas</strong> para el asistente de IA:
+                            </p>
+                            <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
+                                <li>Es un <strong>pago único</strong>, no una suscripción: no se renueva solo.</li>
+                                <li>Las consultas compradas <strong>no caducan</strong> y se gastan solo cuando ya has
+                                    usado las gratuitas del día.</li>
+                                <li>El cobro lo realiza <strong>Lemon Squeezy</strong> como vendedor: emite la factura
+                                    con el IVA correspondiente y gestiona el pago. Esta web nunca ve los datos de tu
+                                    tarjeta.</li>
+                                <li>Las consultas se acreditan solas en tu cuenta al confirmarse el pago (unos
+                                    segundos). Si en 24 horas no aparecen, escribe y se arregla o se devuelve el
+                                    importe.</li>
+                            </ul>
+                            <p className="text-white/80 leading-relaxed mt-3">
+                                <strong>Derecho de desistimiento:</strong> al comprar aceptas el acceso inmediato
+                                al contenido digital, por lo que el plazo de desistimiento de 14 días no se aplica
+                                una vez utilizado el pack. Si <strong>no has usado ninguna consulta</strong>, puedes
+                                pedir la devolución íntegra en los 14 días siguientes a la compra escribiendo a
+                                <strong> diedrico.studio25@gmail.com</strong>. Los reembolsos se hacen por el mismo
+                                medio de pago.
+                            </p>
+                        </section>
+                    )}
 
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">7. Limitación de Responsabilidad</h2>

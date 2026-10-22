@@ -613,13 +613,15 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     Crear ejercicio
                                 </button>
                             </div>
-                            {user && creditsEnabled && trialLeft === 0 && credits === 0 && (
+                            {user && creditsEnabled && (
                                 <button
                                     type="button"
                                     onClick={() => setShowBuyCredits(true)}
                                     className="w-full mb-2 rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-xs font-medium text-violet-800 transition-colors hover:bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300 dark:hover:bg-violet-500/20"
                                 >
-                                    ¿Necesitas más hoy? Hay packs de consultas
+                                    {trialLeft === 0 && credits === 0
+                                        ? '¿Necesitas más hoy? Hay packs de consultas'
+                                        : 'Comprar consultas (no caducan)'}
                                 </button>
                             )}
                             {user ? (
