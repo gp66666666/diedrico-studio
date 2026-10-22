@@ -13,7 +13,7 @@ interface SupportModalProps {
 
 /**
  * Modal de apoyo. Antes vendía un "Premium" que ya no existe: la web es gratis,
- * el asistente tiene 5 consultas al día y aquí solo se explica cómo ayudar a
+ * el asistente tiene 3 consultas al día y aquí solo se explica cómo ayudar a
  * pagar la factura de la API. Nada de precios ni de promesas.
  */
 export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
@@ -62,7 +62,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                     <p className="text-sm text-gray-700 dark:text-gray-300">
                         El asistente de IA es lo único que cuesta dinero de verdad: cada consulta se
                         paga a un proveedor. Por eso tiene un límite de{' '}
-                        <b>{SUPPORT.freePerDay} consultas al día</b> por cuenta. No es un muro
+                        <b>{SUPPORT.freePerDay} consultas al día</b> con cuenta. Sin cuenta hay 1 de prueba. No es un muro
                         publicitario: es la factura.
                     </p>
 

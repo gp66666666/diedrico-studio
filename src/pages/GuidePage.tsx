@@ -518,7 +518,7 @@ export default function GuidePage() {
                                 </Step>
                             </ol>
                             <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
-                                El asistente es gratis: <b>5 consultas al día</b> por cuenta. Es lo único que
+                                El asistente es gratis: <b>3 consultas al día</b> por cuenta (y 1 de prueba sin cuenta). Es lo único que
                                 cuesta dinero de verdad (cada consulta se paga a un proveedor), así que tiene
                                 ese límite. El resto de la aplicación —3D, 2D, láminas y academia— no tiene
                                 ningún límite.
@@ -569,7 +569,7 @@ export default function GuidePage() {
                             </div>
                             <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
                                 <b className="text-emerald-300">La única excepción es el asistente de IA:</b> cada
-                                consulta se paga a un proveedor, así que hay <b>5 al día</b> por cuenta. No hay nada
+                                consulta se paga a un proveedor, así que hay <b>3 al día</b> por cuenta y 1 sin cuenta. No hay nada
                                 que comprar: mañana tienes 5 más.
                             </p>
                             <p className="text-sm">
@@ -602,7 +602,7 @@ export default function GuidePage() {
                                     },
                                     {
                                         q: '¿Por qué el asistente tiene un límite y el resto no?',
-                                        a: 'Porque es lo único que cuesta dinero de verdad: cada consulta se paga a un proveedor. Tiene 5 al día por cuenta; el resto de la aplicación es gratis y sin límite.',
+                                        a: 'Porque es lo único que cuesta dinero de verdad: cada consulta se paga a un proveedor. Tiene 3 al día por cuenta (1 de prueba sin cuenta); el resto de la aplicación es gratis y sin límite.',
                                     },
                                     {
                                         q: '¿Se pierden mis proyectos si no entro?',

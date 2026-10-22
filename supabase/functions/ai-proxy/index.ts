@@ -65,12 +65,18 @@ const MAX_INPUT_CHARS = 24000;
 const MAX_TOKENS_FREE = 1000;    // prueba y créditos
 const MAX_TOKENS_PREMIUM = 2500; // el cliente pide 2.000 como mucho
 
-// Consultas gratuitas: 5 cada 24 h por cuenta (ventana deslizante).
-// Coste máximo por usuario y día: 5 × 0,0018 € ≈ 0,9 céntimos. Con 100 personas
-// usándolas todas, ~15 €/mes: es el precio de tener la web abierta y gratis.
+// Consultas gratuitas: 3 cada 24 h por cuenta (ventana deslizante).
+// Coste máximo por usuario y día: 3 × 0,0018 € ≈ 0,5 céntimos. Con 100 personas
+// usándolas todas, ~9 €/mes: es el precio de tener la web abierta y gratis.
 // Pon FREE_REQUESTS = 0 para cerrar el asistente sin tocar nada más.
-const FREE_REQUESTS = 5;
+const FREE_REQUESTS = 3;
 const FREE_WINDOW_S = 86400;
+// Sin cuenta: 1 consulta de prueba, contada por IP y sin caducidad práctica
+// (30 días). Al terminarla se ofrece crear cuenta, que da 3 al día.
+// Ojo: en un centro educativo todos salen por la misma IP; si alguien se queja,
+// subir ANON_REQUESTS o bajar ANON_WINDOW_S es cambiar una línea.
+const ANON_REQUESTS = 1;
+const ANON_WINDOW_S = 30 * 86400;
 // Tope global de gasto: 2.000 consultas/día ≈ 3,6 € en el peor caso. Si algún
 // día se hace viral, el asistente dice "vuelve mañana" en vez de arruinarte.
 // Súbelo cuando haya ingresos que lo paguen.
@@ -126,31 +132,36 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  // ---- IP (no se guarda en claro: solo su hash) ----
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() ||
+    req.headers.get("cf-connecting-ip") || "unknown";
+
   // ---- JWT ----
   const authHeader = req.headers.get("Authorization") ?? "";
   const token = authHeader.toLowerCase().startsWith("bearer ")
     ? authHeader.slice(7).trim()
     : "";
-
-  const loginError = json(
-    { error: { code: "login_required", message: "Inicia sesión para usar el asistente." } },
-    401,
-  );
-  if (!token) return loginError;
+  // Sin sesión válida la petición es anónima: no es un error, es el modo prueba.
+  // (El cliente manda la anon key como bearer cuando no hay usuario; también
+  // puede llegar un token caducado. Todo lo que no resuelva a un usuario real
+  // entra por la cuota anónima, que es una sola consulta por IP.)
+  let isAnon = false;
 
   let userId: string | null = null;
-  try {
-    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: { apikey: serviceKey, Authorization: `Bearer ${token}` },
-    });
-    if (userRes.ok) {
-      const user = await userRes.json();
-      userId = user?.id ?? null;
+  if (token) {
+    try {
+      const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+        headers: { apikey: serviceKey, Authorization: `Bearer ${token}` },
+      });
+      if (userRes.ok) {
+        const user = await userRes.json();
+        userId = user?.id ?? null;
+      }
+    } catch (e) {
+      console.error("auth check", e);
     }
-  } catch (e) {
-    console.error("auth check", e);
   }
-  if (!userId) return loginError;
+  isAnon = !userId;
 
   // ---- Tope global de gasto del día ----
   // Protege la tarjeta: si un día entra mucha gente, el asistente descansa.
@@ -181,6 +192,34 @@ Deno.serve(async (req: Request) => {
     console.error("global cap", e);
   }
 
+  // ---- Anónimo: 1 consulta de prueba, sin cuenta ----
+  let anonQuotaKey: string | null = null;
+  if (isAnon) {
+    const key = await sha256Hex(`anon:${ip}`);
+    const quota = await rpc("check_ai_rate_limit", {
+      p_key: key,
+      p_limit: ANON_REQUESTS,
+      p_window_seconds: ANON_WINDOW_S,
+    });
+    if (quota.ok) {
+      const used = Number(quota.value);
+      if (Number.isFinite(used) && used > ANON_REQUESTS) {
+        return json(
+          {
+            error: {
+              code: "anon_limit",
+              message:
+                "Ya has usado tu consulta de prueba. Crea una cuenta gratis (30 segundos) " +
+                "y tendrás 3 consultas al día.",
+            },
+          },
+          401,
+        );
+      }
+      anonQuotaKey = key;
+    }
+  }
+
   // ---- Quién paga este mensaje ----
   let isPremium = false;
   let trialLeft: number | null = null;      // mensajes de prueba que le quedan
@@ -196,6 +235,7 @@ Deno.serve(async (req: Request) => {
   };
 
   try {
+    if (isAnon) throw new Error("anonymous: sin perfil");
     const profRes = await fetch(
       `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=is_premium,premium_until,credits`,
       { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
@@ -253,7 +293,8 @@ Deno.serve(async (req: Request) => {
               error: {
                 code: "daily_limit",
                 message:
-                  "Has usado tus 5 consultas gratis de hoy. Mañana tienes 5 más. " +
+                  `Has usado tus ${FREE_REQUESTS} consultas gratis de hoy. ` +
+                  `Mañana tienes ${FREE_REQUESTS} más. ` +
                   "El resto de la web (3D, 2D, láminas, academia) sigue abierto y sin límite.",
               },
             },
@@ -269,8 +310,10 @@ Deno.serve(async (req: Request) => {
 
     if (premium) trialLeft = null;
   } catch (e) {
-    console.error("plan check", e);
-    return json({ error: { message: "No se pudo comprobar tu plan. Inténtalo de nuevo." } }, 500);
+    if (!isAnon) {
+      console.error("plan check", e);
+      return json({ error: { message: "No se pudo comprobar tu plan. Inténtalo de nuevo." } }, 500);
+    }
   }
 
   /** Devolver lo cobrado si el proveedor no responde como es debido. */
@@ -291,10 +334,15 @@ Deno.serve(async (req: Request) => {
       if (trialLeft !== null) trialLeft = Math.min(FREE_REQUESTS, trialLeft + 1);
       trialkey = null;
     }
+    if (anonQuotaKey) {
+      await rpc("release_ai_quota", { p_key: anonQuotaKey });
+      anonQuotaKey = null;
+    }
   }
 
   // ---- Tope diario por cuenta (protege el margen) ----
   try {
+    if (isAnon) throw new Error("anonymous: sin tope por cuenta");
     const rlUser = await fetch(`${supabaseUrl}/rest/v1/rpc/check_ai_rate_limit`, {
       method: "POST",
       headers: {
@@ -320,13 +368,10 @@ Deno.serve(async (req: Request) => {
       }
     }
   } catch (e) {
-    console.error("user rate limit error", e);
+    if (!isAnon) console.error("user rate limit error", e);
   }
 
   // ---- Rate limit por IP (la IP no se guarda en claro: solo su hash) ----
-  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() ||
-    req.headers.get("cf-connecting-ip") || "unknown";
-
   try {
     const rl = await fetch(`${supabaseUrl}/rest/v1/rpc/check_ai_rate_limit`, {
       method: "POST",

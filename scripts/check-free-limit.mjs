@@ -68,18 +68,18 @@ const main = async () => {
     };
 
     const results = [];
-    for (let i = 1; i <= 6; i++) results.push(await ask(i));
+    for (let i = 1; i <= 5; i++) results.push(await ask(i));
     console.table(results.map(({ n, status, trialLeft, code }) => ({ n, status, trialLeft, code })));
-    console.log('\nMensaje del 6.º:', results[5].message);
+    console.log("\nMensaje del 4.º:", results[3].message);
 
     await admin(`/rest/v1/profiles?id=eq.${userId}`, { method: 'DELETE' });
     await admin(`/auth/v1/admin/users/${userId}`, { method: 'DELETE' });
 
     const ok =
-        results.slice(0, 5).every((r) => r.status === 200) &&
-        results[5].status === 429 &&
-        results[5].code === 'daily_limit';
-    console.log(ok ? '\n✅ LÍMITE CORRECTO (5 gratis y el 6.º bloqueado)' : '\n❌ REVISAR');
+        results.slice(0, 3).every((r) => r.status === 200) &&
+        results[3].status === 429 &&
+        results[3].code === "daily_limit";
+    console.log(ok ? '\n✅ LÍMITE CORRECTO (3 gratis y el 4.º bloqueado)' : '\n❌ REVISAR');
     process.exit(ok ? 0 : 1);
 };
 

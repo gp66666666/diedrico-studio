@@ -6,6 +6,8 @@ import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
 import SupportModal from '../../../components/Auth/SupportModal';
 import { SUPPORT } from '../../../config/support';
+import { creditsEnabled } from '../../../config/credits';
+import BuyCreditsModal from '../../../components/Auth/BuyCreditsModal';
 import { useUserStore } from '../../../store/userStore';
 import { useAIStore } from '../store/aiStore';
 import { useGeometryStore } from '../../../store/geometryStore';
@@ -25,9 +27,10 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     const [isMinimized, setIsMinimized] = useState(true);
     const [isStepsExpanded, setIsStepsExpanded] = useState(false);
     const [showSupportModal, setShowSupportModal] = useState(false);
+    const [showBuyCredits, setShowBuyCredits] = useState(false);
 
     // El asistente es función premium: el panel se ve, pero sin plan no gasta tokens.
-    const { isPremium, profile } = useUserStore();
+    const { isPremium, profile, user } = useUserStore();
     const credits = profile?.credits ?? 0;
     const elements = useGeometryStore((s) => s.elements);
 
@@ -599,18 +602,35 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     Crear ejercicio
                                 </button>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setShowSupportModal(true)}
-                                className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-xs font-medium text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
-                            >
-                                <Sparkles size={13} />
-                                {trialLeft > 0
-                                    ? `Gratis: te quedan ${trialLeft} de ${TRIAL} consultas hoy`
-                                    : credits > 0
-                                        ? `Saldo: ${credits} ${credits === 1 ? 'consulta' : 'consultas'}`
-                                        : 'Has usado tus consultas de hoy · mañana hay más'}
-                            </button>
+                            {user && creditsEnabled && trialLeft === 0 && credits === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowBuyCredits(true)}
+                                    className="w-full mb-2 rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-xs font-medium text-violet-800 transition-colors hover:bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300 dark:hover:bg-violet-500/20"
+                                >
+                                    ¿Necesitas más hoy? Hay packs de consultas
+                                </button>
+                            )}
+                            {user ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowSupportModal(true)}
+                                    className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-xs font-medium text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                                >
+                                    <Sparkles size={13} />
+                                    {trialLeft > 0
+                                        ? `Gratis: te quedan ${trialLeft} de ${TRIAL} consultas hoy`
+                                        : credits > 0
+                                            ? `Saldo: ${credits} ${credits === 1 ? 'consulta' : 'consultas'}`
+                                            : 'Has usado tus consultas de hoy · mañana hay más'}
+                                </button>
+                            ) : (
+                                <div className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-sky-50 dark:bg-sky-900/20 px-3 py-2 text-xs font-medium text-sky-800 dark:text-sky-300">
+                                    <Sparkles size={13} />
+                                    {SUPPORT.freeAnon} consulta de prueba · gratis con cuenta:
+                                    {` ${TRIAL} al día`}
+                                </div>
+                            )}
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -621,7 +641,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                             ? mode === 'generate'
                                                 ? 'Ej: intersección de plano y recta'
                                                 : 'Escribe un ejercicio...'
-                                            : 'Vuelve mañana: 5 consultas cada día'
+                                            : 'Vuelve mañana: 3 consultas cada día'
                                     }
                                     disabled={isProcessing}
                                     className="flex-1 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 text-gray-900 dark:text-white"
@@ -641,6 +661,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                             </div>
                         </form>
                         <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
+                        <BuyCreditsModal isOpen={showBuyCredits} onClose={() => setShowBuyCredits(false)} />
                     </>
                 )}
             </div>

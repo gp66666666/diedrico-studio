@@ -85,7 +85,7 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 
 - **No se vende nada y no hay pasarela de pago.** Todo es gratis: 3D, 2D, láminas,
   Academia (20 temas) y ejercicios. No hay "Premium", ni planes, ni créditos en venta.
-- Lo único limitado es el **asistente IA: 5 consultas cada 24 h por cuenta**
+- Lo único limitado es el **asistente IA: 3 consultas cada 24 h por cuenta**
   (`FREE_REQUESTS` en `ai-proxy`), porque es lo único que cuesta dinero de verdad
   (~0,1 céntimo por consulta). Al agotarlas: 429 `daily_limit` con un mensaje claro;
   no se abre nada de pago porque no hay nada que comprar.
@@ -96,6 +96,19 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - Ko-fi queda **solo para donativos** (`config/support.ts`), sin contraprestación: un
   donativo no es una venta (no lleva IVA y no obliga a alta censal). Ya no hay
   suscripción de Ko-fi ni webhook que la active en el flujo normal.
+- **Tienda preparada pero apagada** (Lemon Squeezy, que actúa como vendedor: cobra el
+  IVA europeo y emite la factura; nosotros solo acreditamos consultas).
+  `supabase/functions/lemonsqueezy-webhook` verifica `X-Signature` (HMAC-SHA256), atiende
+  `order_created`, identifica la cuenta por `meta.custom_data.user_id` y, si no llega, por
+  email, y llama a `add_credits` con `ref = ls:<order_id>` (idempotente: un reintento no
+  duplica). Secretos: `LEMON_SQUEEZY_SIGNING_SECRET` y `LEMON_VARIANT_CREDITS`
+  (`{"<variant_id>": 100}`). **Ahora hay valores de prueba**: hay que sustituirlos por los
+  de la tienda real antes de vender.
+  En el frontend, `src/config/credits.ts` lee `VITE_LEMON_CHECKOUT_100` / `_300`; si están
+  vacías, el modal y el botón de compra **no existen** (nada de prometer lo que no se puede
+  cobrar). Packs: 100 consultas 4,99 € y 300 consultas 11,99 €.
+  Prueba sin tienda real: `scripts/check-lemon-webhook.mjs` (firma, acreditación única, firma
+  falsa y variante desconocida).
 - Decisión tomada por el dueño: no darse de alta como autónomo por un proyecto que aún
   no factura; cuando haya tracción se retomará el pago (mejor Lemon Squeezy/Paddle,
   que actúan como vendedor y se encargan del IVA) y, si el volumen lo exige, Vercel Pro
@@ -118,7 +131,8 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - **No existe vista caballera.** Hubo un prototipo (`features/caballera`) que nunca se conectó a
   la interfaz; se eliminó. Si se retoma, hay que crearlo de verdad (proyección caballera +
   herramientas), no reactivar la pestaña.
-- El panel de IA lo ve todo el mundo. Sin Premium tiene **5 consultas gratis cada 24 h**
+- El panel de IA lo ve todo el mundo. Sin cuenta: **1 consulta de prueba por IP** (`ANON_*`).
+  Con cuenta gratis: **3 consultas cada 24 h**
   (las cuenta el proxy, no el cliente) y al agotarlas responde 429 `daily_limit`; no se abre
   ningún modal de compra porque no hay nada que comprar. Se cierra el asistente con
   `FREE_REQUESTS = 0` (constantes al principio de `ai-proxy`).

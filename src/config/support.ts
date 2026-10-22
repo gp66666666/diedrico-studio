@@ -13,6 +13,9 @@ export const SUPPORT = {
     /** Donativos. No desbloquea nada: no hay nada bloqueado. */
     kofiUrl: 'https://ko-fi.com/eloigperezzds',
 
-    /** Consultas gratuitas al día por cuenta (informativo; manda el servidor). */
-    freePerDay: 5,
+    /** Consultas gratuitas al día con cuenta (informativo; manda el servidor). */
+    freePerDay: 3,
+
+    /** Consultas de prueba sin crear cuenta. */
+    freeAnon: 1,
 } as const;

@@ -12,6 +12,8 @@ export type AnalyticsEvent =
     | 'support_modal_open'
     | 'support_kofi_click'
     | 'ai_daily_limit'
+    | 'credits_modal_open'
+    | 'credits_checkout_click'
     | 'ai_gate'
     | 'ai_message'
     | 'academy_view'
