@@ -9,8 +9,9 @@ import { supabase } from './supabase';
  * Es "fire and forget": si falla, la app sigue como si nada.
  */
 export type AnalyticsEvent =
-    | 'premium_modal_open'
-    | 'premium_kofi_click'
+    | 'support_modal_open'
+    | 'support_kofi_click'
+    | 'ai_daily_limit'
     | 'ai_gate'
     | 'ai_message'
     | 'academy_view'

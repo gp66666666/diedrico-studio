@@ -29,7 +29,7 @@ export default function PrivacyPage() {
                             <li><strong>Cuenta:</strong> tu email y, si inicias sesión con Google, tu nombre y foto de perfil.</li>
                             <li><strong>Tus proyectos:</strong> los elementos geométricos y las láminas que guardas en la nube.</li>
                             <li><strong>Progreso:</strong> los temas y ejercicios de la Academia que marcas como completados.</li>
-                            <li><strong>Plan:</strong> si tienes Premium activo y hasta qué fecha.</li>
+                            <li><strong>Consultas de IA:</strong> un contador anónimo de las que has usado hoy (no se guarda lo que escribes).</li>
                             <li><strong>Preferencias:</strong> tema claro/oscuro y posición del panel del asistente.</li>
                         </ul>
                         <p className="text-white/80 leading-relaxed mt-3">
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
                             <li>Guardar tus proyectos y láminas para que los recuperes en cualquier equipo.</li>
                             <li>Mantener tu sesión iniciada y proteger tu cuenta.</li>
-                            <li>Saber si tu plan Premium está activo.</li>
+                            <li>Contar las consultas gratuitas del día y evitar abusos.</li>
                             <li>Guardar tu progreso en la Academia.</li>
                         </ul>
                     </section>
@@ -60,10 +60,10 @@ export default function PrivacyPage() {
                     <section>
                         <h2 className="text-2xl font-semibold mb-3">4. Pagos</h2>
                         <p className="text-white/80 leading-relaxed">
-                            Las suscripciones Premium se cobran a través de <strong>Ko-fi</strong> (PayPal o Stripe).
-                            Los datos de tu tarjeta los gestiona Ko-fi y su pasarela de pago: Diédrico Studio
-                            <strong> nunca ve ni almacena datos bancarios</strong>. Nosotros solo recibimos el aviso
-                            del pago y el email que hayas usado, para activar tu cuenta.
+                            <strong>No hay pagos.</strong> Diédrico Studio es gratis y no vende planes ni créditos.
+                            Si decides dejar un donativo, se hace fuera de esta web, en <strong>Ko-fi</strong>, con
+                            su propia pasarela: Diédrico Studio <strong>nunca ve ni almacena datos bancarios</strong>
+                            y el donativo no desbloquea ninguna función.
                         </p>
                     </section>
 
@@ -76,8 +76,8 @@ export default function PrivacyPage() {
                         <ul className="list-disc list-inside space-y-2 text-white/80 ml-4">
                             <li><strong>Supabase:</strong> base de datos, login y servidor del asistente (servidores en la UE).</li>
                             <li><strong>Vercel:</strong> alojamiento de la web.</li>
-                            <li><strong>Groq:</strong> procesamiento de las peticiones del asistente IA.</li>
-                            <li><strong>Ko-fi:</strong> gestión de suscripciones y pagos.</li>
+                            <li><strong>DeepSeek / Groq:</strong> procesamiento de las peticiones del asistente IA.</li>
+                            <li><strong>Ko-fi:</strong> solo si decides dejar un donativo (opcional).</li>
                             <li><strong>Google:</strong> solo si eliges iniciar sesión con tu cuenta de Google.</li>
                         </ul>
                     </section>

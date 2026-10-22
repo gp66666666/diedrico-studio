@@ -11,7 +11,7 @@ import type { GeometryElement, PointElement, LineElement, PlaneElement } from '.
 import AdvancedToolsPanel from './AdvancedToolsPanel';
 import { calculatePlaneFromTwoLines } from '../utils/mathUtils';
 import UserMenu from './Auth/UserMenu';
-import PremiumModal from './Auth/PremiumModal';
+import SupportModal from './Auth/SupportModal';
 import { useUserStore } from '../store/userStore';
 import SaveProjectModal from './Cloud/SaveProjectModal';
 import LoadProjectModal from './Cloud/LoadProjectModal';
@@ -114,7 +114,7 @@ export default function Sidebar() {
     const [geometryType, setGeometryType] = useState<'point' | 'line' | 'segment' | 'plane' | 'solid' | 'group' | 'polygon' | 'mesh'>('point');
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
     const [elementColor, setElementColor] = useState('#22c55e');
-    const [showPremiumModal, setShowPremiumModal] = useState(false);
+    const [showSupportModal, setShowSupportModal] = useState(false);
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [showLoadModal, setShowLoadModal] = useState(false);
     const [showViewControls, setShowViewControls] = useState(false);
@@ -679,7 +679,7 @@ export default function Sidebar() {
                         <button
                             onClick={() => navigate('/academy')}
                             className={`p-1.5 rounded-lg transition-colors ${buttonClass} group`}
-                            title="Academia (Premium)"
+                            title="Academia: curso completo de diédrico"
                         >
                             <BookOpen size={16} className="text-purple-500 group-hover:scale-110 transition-transform" />
                         </button>
@@ -853,8 +853,8 @@ export default function Sidebar() {
                 )}
             </div>
 
-            {/* Premium Modal */}
-            <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+            {/* Modal de apoyo (donativos) */}
+            <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
 
             {/* Tabs */}
             <div className="flex p-2 gap-2">

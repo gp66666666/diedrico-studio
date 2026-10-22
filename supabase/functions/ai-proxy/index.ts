@@ -5,11 +5,14 @@
 //
 // Seguridad:
 //  - Exige JWT. Quien puede gastar:
-//      1. Premium activo (is_premium y premium_until) → sin límite de mensajes.
-//      2. Prueba gratuita: 3 mensajes por cuenta y mes (TRIAL_*).
-//      3. Saldo de créditos prepagados (profiles.credits) → 1 crédito por mensaje.
-//    El orden es prueba → saldo, para que el usuario gaste primero lo gratis.
+//      1. Premium activo (cuentas antiguas) → sin límite de mensajes.
+//      2. Consultas gratuitas: 5 cada 24 h por cuenta (FREE_*). No se vende nada,
+//         así que este es el límite normal de todo el mundo.
+//      3. Saldo de créditos (profiles.credits): regalos a profesores, etc.
+//    El orden es gratis → saldo, para que el usuario gaste primero lo gratis.
 //    El bloqueo del navegador es solo interfaz: esto es lo que corta de verdad.
+//  - Tope GLOBAL diario: si un día entra mucha gente, el asistente se cierra
+//    antes de que la factura de DeepSeek se descontrole.
 //  - Rate limit por IP (tabla public.ai_rate_limits + rpc check_ai_rate_limit).
 //  - Tope diario por cuenta (protege el margen de un Premium).
 //  - Lista blanca de modelos y límite de tokens para que no se use como API gratis.
@@ -62,11 +65,16 @@ const MAX_INPUT_CHARS = 24000;
 const MAX_TOKENS_FREE = 1000;    // prueba y créditos
 const MAX_TOKENS_PREMIUM = 2500; // el cliente pide 2.000 como mucho
 
-// Prueba gratuita. Pon TRIAL_REQUESTS = 0 para desactivarla por completo.
-// TRIAL_ONE_TIME = true → los 3 mensajes son para siempre (no se renuevan cada mes).
-const TRIAL_REQUESTS = 3;
-const TRIAL_ONE_TIME = false;
-const TRIAL_WINDOW_S = TRIAL_ONE_TIME ? 3650 * 86400 : 30 * 86400;
+// Consultas gratuitas: 5 cada 24 h por cuenta (ventana deslizante).
+// Coste máximo por usuario y día: 5 × 0,0018 € ≈ 0,9 céntimos. Con 100 personas
+// usándolas todas, ~15 €/mes: es el precio de tener la web abierta y gratis.
+// Pon FREE_REQUESTS = 0 para cerrar el asistente sin tocar nada más.
+const FREE_REQUESTS = 5;
+const FREE_WINDOW_S = 86400;
+// Tope global de gasto: 2.000 consultas/día ≈ 3,6 € en el peor caso. Si algún
+// día se hace viral, el asistente dice "vuelve mañana" en vez de arruinarte.
+// Súbelo cuando haya ingresos que lo paguen.
+const GLOBAL_DAILY_REQUESTS = 2000;
 
 function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
@@ -144,6 +152,35 @@ Deno.serve(async (req: Request) => {
   }
   if (!userId) return loginError;
 
+  // ---- Tope global de gasto del día ----
+  // Protege la tarjeta: si un día entra mucha gente, el asistente descansa.
+  try {
+    const day = new Date().toISOString().slice(0, 10);
+    const rlGlobal = await rpc("check_ai_rate_limit", {
+      p_key: await sha256Hex(`global:${day}`),
+      p_limit: GLOBAL_DAILY_REQUESTS,
+      p_window_seconds: 86400,
+    });
+    if (rlGlobal.ok) {
+      const usedToday = Number(rlGlobal.value);
+      if (Number.isFinite(usedToday) && usedToday > GLOBAL_DAILY_REQUESTS) {
+        return json(
+          {
+            error: {
+              code: "busy",
+              message:
+                "El asistente ha llegado a su límite de hoy. Mañana vuelve a estar disponible.",
+            },
+          },
+          429,
+          { "Retry-After": "3600" },
+        );
+      }
+    }
+  } catch (e) {
+    console.error("global cap", e);
+  }
+
   // ---- Quién paga este mensaje ----
   let isPremium = false;
   let trialLeft: number | null = null;      // mensajes de prueba que le quedan
@@ -173,30 +210,30 @@ Deno.serve(async (req: Request) => {
     creditsLeft = Number.isFinite(balance) ? balance : 0;
 
     if (!premium) {
-      // 1) Prueba gratuita
-      let allowedByTrial = false;
-      if (TRIAL_REQUESTS > 0) {
-        trialkey = await sha256Hex(`trial:${userId}`);
-        const trial = await rpc("check_ai_rate_limit", {
+      // 1) Consultas gratuitas del día
+      let allowedByFree = false;
+      if (FREE_REQUESTS > 0) {
+        trialkey = await sha256Hex(`free:${userId}`);
+        const free = await rpc("check_ai_rate_limit", {
           p_key: trialkey,
-          p_limit: TRIAL_REQUESTS,
-          p_window_seconds: TRIAL_WINDOW_S,
+          p_limit: FREE_REQUESTS,
+          p_window_seconds: FREE_WINDOW_S,
         });
-        if (trial.ok) {
-          const used = Number(trial.value);
-          allowedByTrial = !Number.isFinite(used) || used <= TRIAL_REQUESTS;
-          trialLeft = allowedByTrial ? Math.max(0, TRIAL_REQUESTS - used) : 0;
+        if (free.ok) {
+          const used = Number(free.value);
+          allowedByFree = !Number.isFinite(used) || used <= FREE_REQUESTS;
+          trialLeft = allowedByFree ? Math.max(0, FREE_REQUESTS - used) : 0;
         } else {
           // Si el contador falla, no se bloquea por eso (igual que el rate limit de IP)
-          allowedByTrial = true;
+          allowedByFree = true;
           trialkey = null;
         }
       }
 
-      // 2) Saldo de créditos
-      if (!allowedByTrial) {
-        // La prueba ya está agotada: si el mensaje falla, NO se devuelve la prueba
-        // (si no, se podría recuperar enviando peticiones que el proveedor rechace).
+      // 2) Saldo de créditos (regalos: profesores, colaboradores)
+      if (!allowedByFree) {
+        // Las gratuitas ya están gastadas: si el mensaje falla, NO se devuelven
+        // (si no, se podrían recuperar enviando peticiones que el proveedor rechace).
         trialkey = null;
         const spent = await rpc("spend_credit", {
           p_user: userId,
@@ -214,12 +251,13 @@ Deno.serve(async (req: Request) => {
           return json(
             {
               error: {
-                code: "no_credits",
+                code: "daily_limit",
                 message:
-                  "Has usado tus mensajes de prueba y no te queda saldo. Activa Premium para seguir usando el asistente.",
+                  "Has usado tus 5 consultas gratis de hoy. Mañana tienes 5 más. " +
+                  "El resto de la web (3D, 2D, láminas, academia) sigue abierto y sin límite.",
               },
             },
-            402,
+            429,
             gateHeaders(),
           );
         }
@@ -250,7 +288,7 @@ Deno.serve(async (req: Request) => {
     }
     if (trialkey) {
       await rpc("release_ai_quota", { p_key: trialkey });
-      if (trialLeft !== null) trialLeft = Math.min(TRIAL_REQUESTS, trialLeft + 1);
+      if (trialLeft !== null) trialLeft = Math.min(FREE_REQUESTS, trialLeft + 1);
       trialkey = null;
     }
   }

@@ -24,27 +24,13 @@ export default function SEO({
         "description": description,
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Web Browser",
-        // Hay plan gratuito y plan Premium: no anunciar solo "gratis"
-        "offers": [
-            {
-                "@type": "Offer",
-                "name": "Gratis",
-                "price": "0",
-                "priceCurrency": "EUR"
-            },
-            {
-                "@type": "Offer",
-                "name": "Premium",
-                "price": "4.99",
-                "priceCurrency": "EUR",
-                "priceSpecification": {
-                    "@type": "UnitPriceSpecification",
-                    "price": "4.99",
-                    "priceCurrency": "EUR",
-                    "billingDuration": "P1M"
-                }
-            }
-        ],
+        // Es gratis de verdad: no hay plan de pago que anunciar (ni precio que
+        // Google pueda mostrar mal).
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        },
         "creator": {
             "@type": "Person",
             "name": "Eloi García",

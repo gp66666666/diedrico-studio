@@ -1,10 +1,11 @@
 // AI Chat Panel - Main UI Component - CON ARRASTRE CORREGIDO
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, ChevronRight, Move, Crown, Lock, ClipboardCheck } from 'lucide-react';
+import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, ChevronRight, Move, ClipboardCheck } from 'lucide-react';
 import { useAIAssistant } from '../hooks/useAIAssistant';
 import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
-import PremiumModal from '../../../components/Auth/PremiumModal';
+import SupportModal from '../../../components/Auth/SupportModal';
+import { SUPPORT } from '../../../config/support';
 import { useUserStore } from '../../../store/userStore';
 import { useAIStore } from '../store/aiStore';
 import { useGeometryStore } from '../../../store/geometryStore';
@@ -23,7 +24,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     const [input, setInput] = useState('');
     const [isMinimized, setIsMinimized] = useState(true);
     const [isStepsExpanded, setIsStepsExpanded] = useState(false);
-    const [showPremiumModal, setShowPremiumModal] = useState(false);
+    const [showSupportModal, setShowSupportModal] = useState(false);
 
     // El asistente es función premium: el panel se ve, pero sin plan no gasta tokens.
     const { isPremium, profile } = useUserStore();
@@ -129,22 +130,25 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     // Modo del asistente: resolver un enunciado o inventar uno nuevo.
     const [mode, setMode] = useState<'solve' | 'generate'>('solve');
 
-    // Prueba gratuita (3 mensajes). El servidor es quien manda: esto solo
-    // sirve para mostrar cuántos quedan. Si se desincroniza, el proxy corta.
-    const TRIAL = 3;
+    // Consultas gratuitas al día. El servidor es quien manda y manda cuántas
+    // quedan en cada respuesta (X-AI-Trial-Left); el contador local es solo la
+    // primera estimación antes de hablar con él.
+    const TRIAL = SUPPORT.freePerDay;
     const [trialUsed, setTrialUsed] = useState(() => {
         const raw = Number(localStorage.getItem('aiTrialUsed') || '0');
         return Number.isFinite(raw) ? raw : 0;
     });
-    const trialLeft = Math.max(0, TRIAL - trialUsed);
+    const trialLeft = typeof profile?.trialLeft === 'number'
+        ? profile.trialLeft
+        : Math.max(0, TRIAL - trialUsed);
 
-    // Si el servidor responde 402, se abre el modal de Premium
+    // Límite diario: no hay nada que comprar, así que solo se avisa.
     useEffect(() => {
-        if (error && /premium|prueba/i.test(error)) {
-            trackEvent('ai_gate');
-            setShowPremiumModal(true);
+        if (error && /consultas gratis de hoy|límite de hoy/i.test(error)) {
+            trackEvent('ai_daily_limit');
             setTrialUsed(TRIAL);
             localStorage.setItem('aiTrialUsed', String(TRIAL));
+            useUserStore.getState().setTrialLeft(0);
         }
     }, [error]);
 
@@ -185,10 +189,6 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
 
     /** Desde una tarjeta de enunciado: cambia a resolver y lanza el ejercicio. */
     const handleSolveStatement = async (statement: string) => {
-        if (!isPremium) {
-            setShowPremiumModal(true);
-            return;
-        }
         setMode('solve');
         await sendPrompt(statement);
     };
@@ -599,30 +599,30 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     Crear ejercicio
                                 </button>
                             </div>
-                            {!isPremium && (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPremiumModal(true)}
-                                    className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-xs font-medium text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
-                                >
-                                    <Lock size={13} />
-                                    {trialLeft > 0
-                                        ? `Prueba gratis: te quedan ${trialLeft} de ${TRIAL} mensajes · ver Premium`
-                                        : credits > 0
-                                            ? `Saldo: ${credits} ${credits === 1 ? 'consulta' : 'consultas'} · ver Premium`
-                                            : 'Prueba terminada · ver Premium'}
-                                </button>
-                            )}
+                            <button
+                                type="button"
+                                onClick={() => setShowSupportModal(true)}
+                                className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-xs font-medium text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                            >
+                                <Sparkles size={13} />
+                                {trialLeft > 0
+                                    ? `Gratis: te quedan ${trialLeft} de ${TRIAL} consultas hoy`
+                                    : credits > 0
+                                        ? `Saldo: ${credits} ${credits === 1 ? 'consulta' : 'consultas'}`
+                                        : 'Has usado tus consultas de hoy · mañana hay más'}
+                            </button>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder={!isPremium
-                                        ? (trialLeft > 0 ? 'Escribe y prueba gratis' : credits > 0 ? 'Escribe tu consulta' : 'Prueba terminada')
-                                        : mode === 'generate'
-                                            ? 'Ej: intersección de plano y recta'
-                                            : 'Escribe un ejercicio...'}
+                                    placeholder={
+                                        trialLeft > 0 || credits > 0
+                                            ? mode === 'generate'
+                                                ? 'Ej: intersección de plano y recta'
+                                                : 'Escribe un ejercicio...'
+                                            : 'Vuelve mañana: 5 consultas cada día'
+                                    }
                                     disabled={isProcessing}
                                     className="flex-1 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 text-gray-900 dark:text-white"
                                     onMouseDown={(e) => e.stopPropagation()}
@@ -634,16 +634,13 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-2 rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     onMouseDown={(e) => e.stopPropagation()}
                                     onTouchStart={(e) => e.stopPropagation()}
-                                    aria-label={isPremium || credits > 0 ? 'Enviar' : 'Desbloquear Premium'}
+                                    aria-label="Enviar"
                                 >
-                                    {isPremium || credits > 0 ? <Send size={20} /> : <Crown size={20} />}
+                                    <Send size={20} />
                                 </button>
                             </div>
                         </form>
-                        <PremiumModal
-                            isOpen={showPremiumModal}
-                            onClose={() => setShowPremiumModal(false)}
-                        />
+                        <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
                     </>
                 )}
             </div>

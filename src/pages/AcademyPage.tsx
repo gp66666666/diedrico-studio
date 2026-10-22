@@ -5,7 +5,6 @@ import { useGeometryStore } from '../store/geometryStore';
 import { ACADEMY_CONTENT } from '../data/academyContent';
 import type { AcademyTopic, AcademyExercise } from '../types';
 import { Sun, Moon, ArrowLeft, BookOpen, CheckCircle2, Printer, Play, ChevronUp } from 'lucide-react';
-import PremiumModal from '../components/Auth/PremiumModal';
 import { trackEvent } from '../lib/analytics';
 import { useThemeSync } from '../hooks/useThemeSync';
 
@@ -16,7 +15,6 @@ export default function AcademyPage() {
 
     const { isPremium, markTopicComplete, profile } = user;
 
-    const [showPremiumModal, setShowPremiumModal] = useState(false);
     const [lightboxContent, setLightboxContent] = useState<string | null>(null);
     const [selectedTopic, setSelectedTopic] = useState<AcademyTopic | null>(ACADEMY_CONTENT[0]);
     const [showScrollToTop, setShowScrollToTop] = useState(false);
@@ -26,7 +24,7 @@ export default function AcademyPage() {
     const isDark = geom.theme === 'dark';
 
     useEffect(() => {
-        trackEvent('academy_view', { premium: isPremium });
+        trackEvent('academy_view');
     }, [isPremium]);
 
     // Sincronizar tema usando el hook centralizado
@@ -108,25 +106,6 @@ export default function AcademyPage() {
             setLightboxContent(content);
         }
     };
-
-    useEffect(() => {
-        if (!isPremium) {
-            setShowPremiumModal(true);
-        }
-    }, [isPremium]);
-
-    if (!isPremium) {
-        return (
-            <>
-                {showPremiumModal && (
-                    <PremiumModal
-                        isOpen={true}
-                        onClose={() => nav('/')}
-                    />
-                )}
-            </>
-        );
-    }
 
     const handleDownloadPDF = () => {
         window.print();

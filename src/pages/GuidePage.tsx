@@ -6,7 +6,6 @@ import {
     Brain, GraduationCap, Printer, Eye, Grid3x3, Triangle, Move3d
 } from 'lucide-react';
 import SEO from '../components/SEO';
-import { PREMIUM } from '../config/premium';
 import { trackEvent } from '../lib/analytics';
 
 /* ------------------------------------------------------------------ */
@@ -464,7 +463,7 @@ export default function GuidePage() {
                                 <li>Añade tantas hojas como quieras y escribe el enunciado de cada una.</li>
                                 <li><b className="text-white">Analizar</b>: interpreta el enunciado y dibuja los datos sobre la lámina.</li>
                                 <li><b className="text-white">Cargar en Escena Principal</b>: lleva el ejercicio a la vista 3D para resolverlo con las herramientas.</li>
-                                <li><b className="text-white">Generador de ejercicios (IA)</b>: escribe un tema y crea un enunciado nuevo. Es una función Premium.</li>
+                                <li><b className="text-white">Generador de ejercicios (IA)</b>: escribe un tema y crea un enunciado nuevo. Entra en las consultas gratuitas del día.</li>
                                 <li><b className="text-white">Exportar PDF</b>: saca las hojas listas para imprimir.</li>
                             </ul>
                             <p className="text-sm">
@@ -518,10 +517,11 @@ export default function GuidePage() {
                                     pertenece a una recta).
                                 </Step>
                             </ol>
-                            <p className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-sm">
-                                El asistente es la función Premium principal. Sin plan Premium verás el panel y el botón de mejora de plan,
-                                pero no se gasta ninguna petición.
-                                {PREMIUM.priceLabel ? ` Precio: ${PREMIUM.priceLabel}.` : ''}
+                            <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
+                                El asistente es gratis: <b>5 consultas al día</b> por cuenta. Es lo único que
+                                cuesta dinero de verdad (cada consulta se paga a un proveedor), así que tiene
+                                ese límite. El resto de la aplicación —3D, 2D, láminas y academia— no tiene
+                                ningún límite.
                             </p>
                         </Section>
 
@@ -541,45 +541,41 @@ export default function GuidePage() {
                                 <li><b className="text-white">Imprimir / PDF</b>: cualquier tema se puede imprimir para llevarlo en papel.</li>
                             </ul>
 
-                            <p className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-3 text-sm">
-                                <b className="text-purple-300">La Academia es Premium.</b> Si no tienes plan, verás la portada
-                                del tema y el aviso para activarlo; no se gasta nada.
+                            <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
+                                <b className="text-emerald-300">La Academia está entera abierta.</b> Sin cuenta, sin plan
+                                y sin límite: los 20 temas, los ejercicios resueltos y el PDF.
                             </p>
                         </Section>
 
                         {/* 13 */}
                         <Section id="cuenta" number="13" title="Cuenta y plan" icon={<GraduationCap size={20} />}>
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                                    <p className="font-semibold text-white">Gratis (para siempre)</p>
-                                    <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
-                                        <li>Motor 3D y vista diédrica completos</li>
-                                        <li>Todas las herramientas de geometría</li>
-                                        <li>Sólidos, boceto y láminas</li>
-                                        <li>Guardar proyectos y láminas en la nube</li>
-                                        <li>Exportar imágenes y PDF</li>
-                                        <li>Compartir ejercicios por enlace</li>
-                                        <li>Biblioteca de ejercicios resueltos</li>
-                                        <li>Funciona sin conexión (PWA)</li>
-                                    </ul>
-                                </div>
-                                <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
-                                    <p className="font-semibold text-purple-200">Premium · 4,99 €/mes</p>
-                                    <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
-                                        <li>Asistente IA: resuelve, crea y <b>corrige</b> ejercicios</li>
-                                        <li>Academia completa (20 temas y ejercicios)</li>
-                                        <li>Generador de ejercicios en Láminas</li>
-                                        <li>Sin anuncios</li>
-                                    </ul>
-                                    <p className="mt-3 text-xs text-purple-200/80">
-                                        3 mensajes de prueba gratis antes de decidir.
-                                    </p>
-                                </div>
-                            </div>
                             <p className="text-sm">
-                                El cobro se hace en <b className="text-white">Ko-fi</b> (PayPal o tarjeta), nunca en esta web.
-                                Al pagar se activa sola: usa el <b className="text-white">mismo email</b> que en tu cuenta.
-                                Si un mes no renuevas, el plan caduca solo y vuelve al gratuito; tus proyectos y láminas siguen intactos.
+                                <b className="text-white">No hay planes.</b> Todo lo que hace la aplicación es gratis
+                                y se puede usar sin crear cuenta.
+                            </p>
+                            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                <p className="font-semibold text-white">Gratis, sin límite</p>
+                                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
+                                    <li>Motor 3D y vista diédrica completos</li>
+                                    <li>Todas las herramientas de geometría</li>
+                                    <li>Sólidos, boceto y láminas</li>
+                                    <li>Academia completa (20 temas y ejercicios)</li>
+                                    <li>Guardar proyectos y láminas en la nube</li>
+                                    <li>Exportar imágenes y PDF</li>
+                                    <li>Compartir ejercicios por enlace</li>
+                                    <li>Biblioteca de ejercicios resueltos</li>
+                                    <li>Funciona sin conexión (PWA)</li>
+                                </ul>
+                            </div>
+                            <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
+                                <b className="text-emerald-300">La única excepción es el asistente de IA:</b> cada
+                                consulta se paga a un proveedor, así que hay <b>5 al día</b> por cuenta. No hay nada
+                                que comprar: mañana tienes 5 más.
+                            </p>
+                            <p className="text-sm">
+                                Si quieres ayudar a pagar esa factura, en el pie hay un enlace a
+                                <b className="text-white"> Ko-fi</b> para invitar a un café. Es un donativo: no
+                                desbloquea nada, porque no hay nada bloqueado.
                             </p>
                         </Section>
 
@@ -605,8 +601,8 @@ export default function GuidePage() {
                                         a: 'No debería: las dos vistas usan la misma malla. Si ves algo raro, mándame una captura con el nombre del sólido y los valores de rotación.',
                                     },
                                     {
-                                        q: '¿Por qué el asistente me pide Premium?',
-                                        a: 'El asistente consume API de un modelo de lenguaje. El resto de la aplicación es gratis y no tiene límite de uso.',
+                                        q: '¿Por qué el asistente tiene un límite y el resto no?',
+                                        a: 'Porque es lo único que cuesta dinero de verdad: cada consulta se paga a un proveedor. Tiene 5 al día por cuenta; el resto de la aplicación es gratis y sin límite.',
                                     },
                                     {
                                         q: '¿Se pierden mis proyectos si no entro?',

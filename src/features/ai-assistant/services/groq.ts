@@ -77,6 +77,11 @@ export class GroqService {
                 const left = Number(creditsHeader);
                 if (Number.isFinite(left)) useUserStore.getState().setCredits(left);
             }
+            const trialHeader = response.headers.get('x-ai-trial-left');
+            if (trialHeader !== null) {
+                const left = Number(trialHeader);
+                if (Number.isFinite(left)) useUserStore.getState().setTrialLeft(left);
+            }
 
             const data = await response.json();
             const text = data.choices[0].message.content;

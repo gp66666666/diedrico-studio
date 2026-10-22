@@ -50,7 +50,7 @@ src/
 ├── lib/supabase.ts             cliente Supabase
 ├── lib/database.types.ts       tipos generados desde la DB (no editar a mano)
 ├── config/features.ts          feature flags y proveedor IA
-├── config/premium.ts           qué es premium + enlace Ko-fi (único sitio a tocar)
+├── config/support.ts           enlace de donativos + consultas gratis al día (único sitio a tocar)
 └── utils/                      matemáticas, distancias, etiquetas
 
 scripts/premium.sh              activar/quitar premium a mano (service_role)
@@ -81,10 +81,25 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   completed_exercises text[], created_at)` — RLS por `auth.uid() = id`; un trigger protege
   `is_premium`/`premium_until`/`role`/`email` para que el cliente no pueda escalar privilegios.
 
-## Plan premium
+## Precio (2026-10): nada
 
-- Config única: `src/config/premium.ts` (features, enlace de Ko-fi, texto de precio).
-- Premium = **Academia** + **Asistente IA**. La nube (guardar proyectos) es gratis.
+- **No se vende nada y no hay pasarela de pago.** Todo es gratis: 3D, 2D, láminas,
+  Academia (20 temas) y ejercicios. No hay "Premium", ni planes, ni créditos en venta.
+- Lo único limitado es el **asistente IA: 5 consultas cada 24 h por cuenta**
+  (`FREE_REQUESTS` en `ai-proxy`), porque es lo único que cuesta dinero de verdad
+  (~0,1 céntimo por consulta). Al agotarlas: 429 `daily_limit` con un mensaje claro;
+  no se abre nada de pago porque no hay nada que comprar.
+- **Tope global diario** (`GLOBAL_DAILY_REQUESTS = 2000`): si el asistente se hace
+  viral, se cierra solo antes de que la factura se descontrole. Es el seguro.
+- `profiles.credits` y sus funciones siguen en la base de datos, dormidas: sirven para
+  regalar consultas a un profesor o a un colaborador (`add_credits`), sin cobrar nada.
+- Ko-fi queda **solo para donativos** (`config/support.ts`), sin contraprestación: un
+  donativo no es una venta (no lleva IVA y no obliga a alta censal). Ya no hay
+  suscripción de Ko-fi ni webhook que la active en el flujo normal.
+- Decisión tomada por el dueño: no darse de alta como autónomo por un proyecto que aún
+  no factura; cuando haya tracción se retomará el pago (mejor Lemon Squeezy/Paddle,
+  que actúan como vendedor y se encargan del IVA) y, si el volumen lo exige, Vercel Pro
+  (el plan Hobby no permite uso comercial).
 
 ## Planos con clics y secciones (2026)
 - `plane-click`: el plano se dibuja sobre el papel. Dos clics **debajo** de la LT definen la traza horizontal α₁; uno **encima** fija α₂ (pasa por el vértice). Lógica en `src/lib/planeFromClicks.ts` (con tests).
@@ -103,12 +118,12 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - **No existe vista caballera.** Hubo un prototipo (`features/caballera`) que nunca se conectó a
   la interfaz; se eliminó. Si se retoma, hay que crearlo de verdad (proyección caballera +
   herramientas), no reactivar la pestaña.
-- El panel de IA lo ve todo el mundo. Sin premium tiene **3 mensajes de prueba** por cuenta y
-  mes (los cuenta el proxy, no el cliente). Al agotarlos, 402 y se abre el modal de Premium.
-  La prueba se apaga con `TRIAL_REQUESTS = 0` y se puede hacer de una sola vez con
-  `TRIAL_ONE_TIME = true` (constantes al principio de `ai-proxy`).
-- **Créditos prepago** (`profiles.credits` + `credit_movements`): sin premium ni prueba, cada
-  mensaje cuesta 1 crédito. El orden es prueba → saldo (el usuario gasta primero lo gratis).
+- El panel de IA lo ve todo el mundo. Sin Premium tiene **5 consultas gratis cada 24 h**
+  (las cuenta el proxy, no el cliente) y al agotarlas responde 429 `daily_limit`; no se abre
+  ningún modal de compra porque no hay nada que comprar. Se cierra el asistente con
+  `FREE_REQUESTS = 0` (constantes al principio de `ai-proxy`).
+- **Créditos prepago** (`profiles.credits` + `credit_movements`): hoy están dormidos (no se
+  venden); sirven para regalar consultas. El orden es gratis → saldo (se gasta primero lo gratis).
   `spend_credit` es atómico (`update ... where credits > 0`) y el trigger
   `protect_profile_privileges` restaura `credits` si el cliente intenta cambiarlo. Si el
   proveedor falla, el proxy devuelve el crédito y la consulta de prueba.

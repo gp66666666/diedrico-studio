@@ -10,6 +10,7 @@ interface UserProfile {
     is_premium: boolean;
     premium_until?: string | null; // ISO date; null = sin caducidad
     credits?: number; // Consultas de IA prepagadas (profiles.credits)
+    trialLeft?: number | null; // Consultas gratis que quedan hoy (lo dice el proxy)
     completed_exercises?: string[]; // Array of Exercise IDs
     completed_topics?: string[]; // Array of Topic IDs (Lessons)
     role: 'user' | 'admin';
@@ -34,6 +35,7 @@ interface UserState {
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
     setCredits: (credits: number) => void;
+    setTrialLeft: (trialLeft: number) => void;
     markExerciseComplete: (id: string) => Promise<void>;
     markTopicComplete: (id: string, completed: boolean) => Promise<void>;
 }
@@ -122,6 +124,13 @@ export const useUserStore = create<UserState>((set, get) => ({
         const { profile } = get();
         if (!profile) return;
         set({ profile: { ...profile, credits } });
+    },
+
+    /** Consultas gratis que quedan hoy (cabecera X-AI-Trial-Left). */
+    setTrialLeft: (trialLeft: number) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({ profile: { ...profile, trialLeft } });
     },
 
     markExerciseComplete: async (id: string) => {
