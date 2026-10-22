@@ -197,8 +197,8 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 - El **borrador** del lienzo se guarda en `localStorage['diedricoDraft']` y se restaura al abrir
   si el lienzo está vacío (`useDraftAutosave`).
 - Los **planos en 3D** se pintan por defecto como superficie traslúcida continua (`planeStyle:
-  'solid'` en el store, persistido en `localStorage['planeStyle']`); un botón en la cabecera de
-  la barra lateral alterna a malla (`'mesh'`). Surgió de un comentario de un profesor: la malla
+  'solid'` en el store, persistido en `localStorage['planeStyle']`); la fila "Planos: Relleno /
+  Malla" dentro de Controles de Vista alterna a malla (`'mesh'`). Surgió de un comentario de un profesor: la malla
   "parece un enrejado" y la superficie continua es lo que se ve en el libro.
 - No hay modelo de visión en la cuenta: `scanImage()` lanza un error explicativo.
 - El prompt del asistente (`SYSTEM_PROMPT`) exige **método de Dibujo Técnico**: proyecciones,

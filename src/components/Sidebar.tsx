@@ -694,16 +694,6 @@ export default function Sidebar() {
                             <HelpCircle size={16} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
                         </button>
                         <button
-                            onClick={() => setPlaneStyle(planeStyle === 'solid' ? 'mesh' : 'solid')}
-                            className={`p-1.5 rounded-lg transition-colors ${buttonClass}`}
-                            aria-label={planeStyle === 'solid' ? 'Planos en malla' : 'Planos rellenos'}
-                            title={planeStyle === 'solid' ? 'Planos: relleno continuo (pulsa para malla)' : 'Planos: malla (pulsa para relleno)'}
-                        >
-                            {planeStyle === 'solid'
-                                ? <Square size={16} className="text-cyan-500" />
-                                : <Grid3x3 size={16} className="text-cyan-500" />}
-                        </button>
-                        <button
                             onClick={toggleTheme}
                             className={`p-1.5 rounded-lg transition-colors ${buttonClass}`}
                             aria-label={isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
@@ -771,6 +761,22 @@ export default function Sidebar() {
                                 <ArrowDownToLine size={16} /> Abatir Plano Horizontal
                             </span>
                             {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                        </button>
+
+                        <button
+                            onClick={() => setPlaneStyle(planeStyle === 'solid' ? 'mesh' : 'solid')}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${planeStyle === 'mesh'
+                                ? (isDark ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' : 'bg-cyan-500/15 text-cyan-700 border border-cyan-500/50')
+                                : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
+                                }`}
+                            aria-label={planeStyle === 'solid' ? 'Cambiar planos a malla' : 'Cambiar planos a relleno'}
+                            title="Cómo se pintan los planos en Vista 3D"
+                        >
+                            <span className="flex items-center gap-2">
+                                {planeStyle === 'solid' ? <Square size={16} /> : <Grid3x3 size={16} />}
+                                Planos: {planeStyle === 'solid' ? 'Relleno' : 'Malla'}
+                            </span>
+                            {planeStyle === 'mesh' ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
                     </div>
                 )}
