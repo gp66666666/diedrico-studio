@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
 import {
-    tangentAtPoint,
-    tangentPlanesThroughLine,
-    tangentPlanesParallel,
+    solidTangentAtPoint,
+    solidTangentParallel,
+    solidTangentThroughLine,
     type TangentPlane,
+    type TangentResult,
 } from '../../lib/tangency';
 import type { LineElement, PlaneElement, PointElement, SegmentElement, SolidElement } from '../../types';
 import { toast } from '../../lib/toast';
@@ -17,11 +18,14 @@ interface Result {
     note: string;
 }
 
+const TANGENT_SUBTYPES = ['sphere', 'cone', 'cylinder'];
+
 /**
- * Planos tangentes a una esfera.
+ * Planos tangentes a la esfera, al cono y al cilindro.
  *
- * Tres casos de la PAU: tangente en un punto de la superficie, tangentes que
- * contienen una recta exterior y tangentes paralelos a un plano.
+ * - Un punto de la superficie → el plano tangente en él.
+ * - Una recta exterior → los planos tangentes que la contienen.
+ * - Un plano → los dos tangentes paralelos a él.
  */
 export default function SphereTangentTool() {
     const {
@@ -48,36 +52,31 @@ export default function SphereTangentTool() {
         if (!isActive || selectedForDistance.length !== 2) return;
 
         const picked = selectedForDistance.map((id) => elements.find((e) => e.id === id));
-        const sphere = picked.find((e) => e?.type === 'solid' && (e as SolidElement).subtype === 'sphere') as
-            | SolidElement
-            | undefined;
-        const other = picked.find((e) => e && e.id !== sphere?.id);
+        const solid = picked.find(
+            (e) => e?.type === 'solid' && TANGENT_SUBTYPES.includes((e as SolidElement).subtype)
+        ) as SolidElement | undefined;
+        const other = picked.find((e) => e && e.id !== solid?.id);
 
-        if (!sphere || !other) {
-            setMessage('Elige la esfera y, además, un punto, una recta o un plano.');
+        if (!solid || !other) {
+            setMessage('Elige una esfera, un cono o un cilindro, y además un punto, una recta o un plano.');
             clearDistanceSelection();
             return;
         }
 
-        const center = sphere.position;
-        const radius = sphere.size.x;
-        let planes: TangentPlane[] = [];
-        let note = '';
+        const solidRef = {
+            subtype: solid.subtype,
+            position: solid.position,
+            size: solid.size,
+            rotation: solid.rotation,
+        };
+
+        let found: TangentResult;
         let title = '';
 
         if (other.type === 'point') {
-            const p = (other as PointElement).coords;
-            const plane = tangentAtPoint(center, radius, p);
-            if (!plane) {
-                setMessage(
-                    'Ese punto no está sobre la esfera. Desde un punto exterior hay infinitos planos tangentes (forman un cono): usa una recta que pase por él o un plano director.'
-                );
-                clearDistanceSelection();
-                return;
-            }
-            planes = [plane];
+            // El punto puede no ser exacto por los clics: se ajusta a la superficie
+            found = solidTangentAtPoint(solidRef, (other as PointElement).coords);
             title = `Tangente en ${other.name}`;
-            note = 'El radio hasta el punto de tangencia es perpendicular al plano.';
         } else if (other.type === 'line' || other.type === 'segment') {
             const isSegment = other.type === 'segment';
             const seg = other as SegmentElement;
@@ -87,41 +86,35 @@ export default function SphereTangentTool() {
                       direction: { x: seg.p2.x - seg.p1.x, y: seg.p2.y - seg.p1.y, z: seg.p2.z - seg.p1.z },
                   }
                 : { point: (other as LineElement).point, direction: (other as LineElement).direction };
-
-            planes = tangentPlanesThroughLine(center, radius, line);
+            found = solidTangentThroughLine(solidRef, line);
             title = `Tangentes por ${other.name}`;
-            if (planes.length === 0) {
-                setMessage('La recta corta a la esfera: no hay planos tangentes que la contengan.');
-                clearDistanceSelection();
-                return;
-            }
-            note =
-                planes.length === 1
-                    ? 'La recta es tangente a la esfera: un solo plano.'
-                    : 'Dos planos, uno por cada rama del cono tangente.';
         } else if (other.type === 'plane') {
-            const p = other as PlaneElement;
-            planes = tangentPlanesParallel(center, radius, p.normal);
+            found = solidTangentParallel(solidRef, (other as PlaneElement).normal);
             title = `Tangentes paralelos a ${other.name}`;
-            note = 'Los dos planos son paralelos al dado y están a distancia r del centro.';
         } else {
-            setMessage('Elige un punto, una recta o un plano junto con la esfera.');
+            setMessage('Elige un punto, una recta o un plano junto con el sólido.');
             clearDistanceSelection();
             return;
         }
 
-        planes.forEach((plane, i) => {
+        if (found.planes.length === 0) {
+            setMessage(found.note);
+            clearDistanceSelection();
+            return;
+        }
+
+        found.planes.forEach((plane, i) => {
             addElement({
                 type: 'plane',
-                name: planes.length > 1 ? `${title} (${i + 1})` : title,
+                name: found.planes.length > 1 ? `${title} (${i + 1})` : title,
                 color: '#22d3ee',
                 normal: plane.normal,
                 constant: plane.constant,
             } as never);
         });
 
-        setResult({ title, planes, note });
-        toast(planes.length > 1 ? `${planes.length} planos tangentes añadidos.` : 'Plano tangente añadido.');
+        setResult({ title, planes: found.planes, note: found.note });
+        toast(found.planes.length > 1 ? `${found.planes.length} planos tangentes añadidos.` : 'Plano tangente añadido.');
         clearDistanceSelection();
     }, [isActive, selectedForDistance, elements, addElement, clearDistanceSelection]);
 
@@ -139,7 +132,7 @@ export default function SphereTangentTool() {
             <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
                 <div className="flex items-center gap-2">
                     <Circle size={16} className="text-cyan-400" />
-                    <h3 className="text-xs font-black uppercase tracking-[0.15em]">Tangente a la esfera</h3>
+                    <h3 className="text-xs font-black uppercase tracking-[0.15em]">Plano tangente</h3>
                 </div>
                 <button onClick={close} className="rounded-full p-1 text-gray-400 hover:bg-white/10 hover:text-white" title="Cerrar">
                     <X size={16} />
@@ -152,7 +145,7 @@ export default function SphereTangentTool() {
                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold">
                             {selectedForDistance.length >= 1 ? '✓' : '1'}
                         </span>
-                        Clic en la <b className="text-white">esfera</b>
+                        Clic en la <b className="text-white">esfera, el cono o el cilindro</b>
                     </p>
                     <p className="flex items-center gap-2">
                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold">
@@ -162,8 +155,8 @@ export default function SphereTangentTool() {
                         <b className="text-white">plano</b>
                     </p>
                     <p className="pt-1 text-[11px] text-slate-400">
-                        Punto sobre la esfera → plano tangente en él. Recta exterior → los dos planos que la
-                        contienen. Plano → los dos tangentes paralelos.
+                        Punto de la superficie → tangente en él. Recta exterior → los planos que la contienen.
+                        Plano → los dos tangentes paralelos.
                     </p>
                     {message && <p className="rounded-lg bg-amber-500/15 p-2 text-[11px] text-amber-200">{message}</p>}
                 </div>

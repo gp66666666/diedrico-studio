@@ -565,7 +565,7 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                                 if (next === 'sphere-tangent' && viewMode !== '3d') setViewMode('3d');
                             }}
                         >
-                            ⭕ Tangente a la esfera
+                            ⭕ Plano tangente (esfera, cono, cilindro)
                         </button>
                         <button
                             className={getButtonClass('shadows')}
@@ -575,7 +575,17 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                                 if (next === 'shadows' && viewMode !== '3d') setViewMode('3d');
                             }}
                         >
-                            ☀️ Sombras (foco propio/impropio)
+                            ☀️ Sombras sobre los planos
+                        </button>
+                        <button
+                            className={getButtonClass('cast-shadow')}
+                            onClick={() => {
+                                const next = activeTool === 'cast-shadow' ? 'none' : 'cast-shadow';
+                                setActiveTool(next);
+                                if (next === 'cast-shadow' && viewMode !== '3d') setViewMode('3d');
+                            }}
+                        >
+                            🌗 Sombra arrojada (plano o cuerpo)
                         </button>
                         <button
                             className={getButtonClass('solid-development')}

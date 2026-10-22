@@ -493,3 +493,21 @@ export function applyMat3(m: Mat3, v: Vec3): Vec3 {
         z: m[6] * v.x + m[7] * v.y + m[8] * v.z,
     };
 }
+
+/**
+ * Coordenadas locales de un vector del store (inversa de `rotateStorePoint`).
+ *
+ * La matriz de giro es ortogonal, así que la inversa es su traspuesta: se
+ * proyecta sobre las columnas (los ejes girados).
+ */
+export function inverseRotateStorePoint(v: Vec3, rotation?: Vec3): Vec3 {
+    if (!rotation) return { ...v };
+    const ex = rotateStorePoint({ x: 1, y: 0, z: 0 }, rotation);
+    const ey = rotateStorePoint({ x: 0, y: 1, z: 0 }, rotation);
+    const ez = rotateStorePoint({ x: 0, y: 0, z: 1 }, rotation);
+    return {
+        x: v.x * ex.x + v.y * ex.y + v.z * ex.z,
+        y: v.x * ey.x + v.y * ey.y + v.z * ey.z,
+        z: v.x * ez.x + v.y * ez.y + v.z * ez.z,
+    };
+}

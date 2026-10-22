@@ -35,6 +35,7 @@ import SolidIntersectionTool from './tools/SolidIntersectionTool';
 import LineSolidTool from './tools/LineSolidTool';
 import SphereTangentTool from './tools/SphereTangentTool';
 import ShadowsTool from './tools/ShadowsTool';
+import CastShadowTool from './tools/CastShadowTool';
 import HelpGuide from './HelpGuide';
 import ExerciseOverlay from './Academy/ExerciseOverlay';
 import { toast } from '../lib/toast';
@@ -1556,6 +1557,7 @@ export default function Sidebar() {
             <LineSolidTool />
             <SphereTangentTool />
             <ShadowsTool />
+            <CastShadowTool />
 
             {/* Exercise Overlay */}
             <ExerciseOverlay />

@@ -42,8 +42,9 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                 { name: "Sección plana", desc: "Corta un sólido con un plano: la sección se dibuja en planta y alzado y verás su verdadera magnitud, área y perímetro." },
                 { name: "Intersección de dos sólidos", desc: "Calcula la parte común de dos cuerpos y marca la línea de intersección en planta y alzado." },
                 { name: "Recta y sólido", desc: "Marca los puntos de entrada y salida de una recta en un sólido, con la cuerda entre ellos." },
-                { name: "Tangente a la esfera", desc: "Plano tangente en un punto de la esfera, tangentes que contienen una recta exterior o paralelos a un plano." },
-                { name: "Sombras", desc: "Sombra de sólidos, puntos y segmentos sobre el horizontal y el vertical, con foco propio o impropio." },
+                { name: "Plano tangente", desc: "Tangente a la esfera, al cono o al cilindro: en un punto de la superficie, por una recta exterior o paralelo a un plano." },
+                { name: "Sombras sobre los planos", desc: "Sombra de sólidos, puntos y segmentos sobre el horizontal y el vertical, con foco propio o impropio." },
+                { name: "Sombra arrojada", desc: "Sombra sobre un plano inclinado o sobre otro cuerpo, recortada al receptor." },
                 { name: "Desarrollo del sólido", desc: "Despliega el sólido en el plano a escala (laterales y bases), también octaedro, dodecaedro e icosaedro. Se descarga en SVG." },
                 { name: "Cuerpo truncado", desc: "Tras una sección, el panel muestra el desarrollo del cuerpo cortado: caras recortadas, base y tapa en verdadera magnitud." }
             ]

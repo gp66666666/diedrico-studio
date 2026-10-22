@@ -29,6 +29,7 @@ export function selectionCountForTool(tool: string): number {
 
     if (tool === 'solid-section' || tool === 'solid-intersection') return 2;
     if (tool === 'line-solid' || tool === 'sphere-tangent' || tool === 'shadows') return 2;
+    if (tool === 'cast-shadow') return 3;
 
     if (tool.startsWith('poliedro-') || tool.startsWith('solid-') || tool.startsWith('revolucion-')) return 1;
     if (tool === 'true-length') return 1;

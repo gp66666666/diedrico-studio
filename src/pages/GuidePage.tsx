@@ -341,12 +341,14 @@ export default function GuidePage() {
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Sólidos → Tangente a la esfera</p>
+                                    <p className="font-semibold text-white">Sólidos → Plano tangente (esfera, cono, cilindro)</p>
                                     <p>
-                                        Tres casos: un <b className="text-white">punto de la superficie</b> de la esfera (plano
-                                        tangente en él), una <b className="text-white">recta exterior</b> (los dos planos que la
-                                        contienen y son tangentes) o un <b className="text-white">plano</b> (los dos tangentes
-                                        paralelos a él). Los planos se añaden al dibujo con su punto de tangencia.
+                                        Tres casos con cualquiera de los tres cuerpos: un <b className="text-white">punto de la
+                                        superficie</b> (plano tangente en él: en el cono contiene la generatriz, en el cilindro la
+                                        generatriz perpendicular al radio), una <b className="text-white">recta exterior</b> (los
+                                        planos tangentes que la contienen: dos en la esfera, uno como mucho en el cono y en el
+                                        cilindro) o un <b className="text-white">plano</b> (los dos tangentes paralelos a él). Los
+                                        planos se añaden al dibujo con su punto de tangencia.
                                     </p>
                                 </div>
                                 <div>
@@ -356,6 +358,16 @@ export default function GuidePage() {
                                         foco propio y una <b className="text-white">recta</b> marca la dirección de la luz (foco
                                         impropio, se toma hacia abajo). La sombra se calcula sobre el horizontal y sobre el vertical,
                                         cada una en su proyección, y se recorta en la línea de tierra.
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">Sólidos → Sombra arrojada (plano o cuerpo)</p>
+                                    <p>
+                                        Para cuando la sombra no cae en el suelo ni en el vertical: elige el{' '}
+                                        <b className="text-white">objeto</b>, la <b className="text-white">luz</b> y el{' '}
+                                        <b className="text-white">receptor</b> (un plano inclinado o otro sólido). Sobre un plano
+                                        se dibuja el contorno exacto de la sombra; sobre otro cuerpo se recorta cara a cara y se
+                                        marca solo la silueta, con la superficie en sombra.
                                     </p>
                                 </div>
                                 <div>
@@ -687,14 +699,19 @@ export default function GuidePage() {
                                         h: 'Herramientas › Sólidos › Recta y sólido',
                                     },
                                     {
-                                        t: 'Planos tangentes a la esfera',
-                                        d: 'Tangente en un punto de la superficie, tangentes que contienen una recta exterior (dos soluciones) y tangentes paralelos a un plano dado.',
-                                        h: 'Herramientas › Sólidos › Tangente a la esfera',
+                                        t: 'Planos tangentes: esfera, cono y cilindro',
+                                        d: 'Tangente en un punto de la superficie, tangentes que contienen una recta exterior y tangentes paralelos a un plano dado. En el cono el plano contiene la generatriz; en el cilindro, la generatriz perpendicular al radio.',
+                                        h: 'Herramientas › Sólidos › Plano tangente',
                                     },
                                     {
                                         t: 'Sombras',
                                         d: 'Sombra de sólidos, puntos y segmentos sobre el horizontal y el vertical, con foco propio (un punto de luz) o impropio (una dirección). Se dibuja en planta y alzado y se recorta en la línea de tierra.',
-                                        h: 'Herramientas › Sólidos › Sombras',
+                                        h: 'Herramientas › Sólidos › Sombras sobre los planos',
+                                    },
+                                    {
+                                        t: 'Sombra arrojada sobre un plano inclinado o sobre otro cuerpo',
+                                        d: 'Sombra recortada sobre el receptor: contorno exacto sobre un plano cualquiera y silueta sobre otro sólido, con la superficie en sombra.',
+                                        h: 'Herramientas › Sólidos › Sombra arrojada',
                                     },
                                     {
                                         t: 'Desarrollos',
@@ -711,9 +728,8 @@ export default function GuidePage() {
                             </div>
 
                             <p className="text-xs text-slate-400">
-                                <b className="text-slate-200">Lo que no incluye:</b> los planos tangentes a conos y cilindros
-                                (sí están los de la esfera) y la perspectiva axonométrica, que es otro bloque del temario y no
-                                forma parte del sistema diédrico.
+                                <b className="text-slate-200">Lo que no incluye:</b> la perspectiva axonométrica, que es otro
+                                bloque del temario y no forma parte del sistema diédrico.
                             </p>
                         </Section>
 

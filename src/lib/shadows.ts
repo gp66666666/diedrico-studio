@@ -153,3 +153,33 @@ export function directionLight(from: Vector3): Light {
 }
 
 export const lightDot = dot;
+
+/**
+ * Luz a partir de un elemento del dibujo: un punto es foco propio; una recta
+ * o un segmento dan la dirección (se toma hacia abajo, para que la sombra caiga
+ * en los planos).
+ */
+export function lightFromElement(el: {
+    type: string;
+    coords?: Vector3;
+    point?: Vector3;
+    direction?: Vector3;
+    p1?: Vector3;
+    p2?: Vector3;
+}): Light | null {
+    if (el.type === 'point' && el.coords) return { kind: 'point', position: el.coords };
+
+    let raw: Vector3 | null = null;
+    if (el.type === 'line' && el.direction) raw = el.direction;
+    if (el.type === 'segment' && el.p1 && el.p2)
+        raw = { x: el.p2.x - el.p1.x, y: el.p2.y - el.p1.y, z: el.p2.z - el.p1.z };
+    if (!raw) return null;
+
+    const len = Math.hypot(raw.x, raw.y, raw.z);
+    if (len < 1e-9) return null;
+    const sign = raw.z > 0 ? -1 : 1;
+    return {
+        kind: 'direction',
+        direction: { x: (sign * raw.x) / len, y: (sign * raw.y) / len, z: (sign * raw.z) / len },
+    };
+}
