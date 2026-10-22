@@ -104,8 +104,16 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   herramientas), no reactivar la pestaña.
 - El panel de IA lo ve todo el mundo. Sin premium tiene **3 mensajes de prueba** por cuenta y
   mes (los cuenta el proxy, no el cliente). Al agotarlos, 402 y se abre el modal de Premium.
-- El proxy exige JWT de una cuenta válida y comprueba el plan: 401 sin sesión, 402 sin Premium
-  ni prueba. Además: 60/h por IP, 300/día por cuenta.
+  La prueba se apaga con `TRIAL_REQUESTS = 0` y se puede hacer de una sola vez con
+  `TRIAL_ONE_TIME = true` (constantes al principio de `ai-proxy`).
+- **Créditos prepago** (`profiles.credits` + `credit_movements`): sin premium ni prueba, cada
+  mensaje cuesta 1 crédito. El orden es prueba → saldo (el usuario gasta primero lo gratis).
+  `spend_credit` es atómico (`update ... where credits > 0`) y el trigger
+  `protect_profile_privileges` restaura `credits` si el cliente intenta cambiarlo. Si el
+  proveedor falla, el proxy devuelve el crédito y la consulta de prueba.
+- El proxy exige JWT de una cuenta válida y comprueba el plan: 401 sin sesión, 402 sin Premium,
+  sin prueba ni saldo. Además: 60/h por IP, 300/día por cuenta. Devuelve `X-AI-Credits` y
+  `X-AI-Trial-Left` (CORS los expone) y el panel sincroniza el saldo con esa cabecera.
 - Activación automática: `supabase/functions/kofi-webhook` recibe los pagos de Ko-fi y suma 1 mes
   a `premium_until` por pago (idempotente por `message_id`). Requiere el secret
   `KOFI_VERIFICATION_TOKEN` con el token de Ko-fi.

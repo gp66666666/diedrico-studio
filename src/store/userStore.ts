@@ -9,6 +9,7 @@ interface UserProfile {
     avatar_url?: string;
     is_premium: boolean;
     premium_until?: string | null; // ISO date; null = sin caducidad
+    credits?: number; // Consultas de IA prepagadas (profiles.credits)
     completed_exercises?: string[]; // Array of Exercise IDs
     completed_topics?: string[]; // Array of Topic IDs (Lessons)
     role: 'user' | 'admin';
@@ -32,6 +33,7 @@ interface UserState {
     checkSession: () => Promise<void>;
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
+    setCredits: (credits: number) => void;
     markExerciseComplete: (id: string) => Promise<void>;
     markTopicComplete: (id: string, completed: boolean) => Promise<void>;
 }
@@ -74,6 +76,7 @@ export const useUserStore = create<UserState>((set, get) => ({
                     id: 'guest',
                     email: 'guest@local',
                     is_premium: false,
+                    credits: 0,
                     role: 'user',
                     completed_topics: JSON.parse(localStorage.getItem('guest_completed_topics') || '[]'),
                     completed_exercises: JSON.parse(localStorage.getItem('guest_completed_exercises') || '[]')
@@ -106,11 +109,19 @@ export const useUserStore = create<UserState>((set, get) => ({
             id: 'guest',
             email: 'guest@local',
             is_premium: false,
+            credits: 0,
             role: 'user',
             completed_topics: JSON.parse(localStorage.getItem('guest_completed_topics') || '[]'),
             completed_exercises: JSON.parse(localStorage.getItem('guest_completed_exercises') || '[]')
         };
         set({ user: null, profile: guestProfile });
+    },
+
+    /** Saldo que devuelve el proxy en cada mensaje (cabecera X-AI-Credits). */
+    setCredits: (credits: number) => {
+        const { profile } = get();
+        if (!profile) return;
+        set({ profile: { ...profile, credits } });
     },
 
     markExerciseComplete: async (id: string) => {

@@ -4,6 +4,7 @@ import { rateLimiter } from './rateLimiter';
 import type { AIStep, AIResponse, AIAction } from '../types/ai.types';
 import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
 import { useGeometryStore } from '../../../store/geometryStore';
+import { useUserStore } from '../../../store/userStore';
 import { callAIProxy, AI_PROXY_MODEL } from './aiProxy';
 
 export class GroqService {
@@ -67,6 +68,13 @@ export class GroqService {
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.error?.message || 'Error calling AI proxy');
+            }
+
+            // El proxy devuelve el saldo restante: así el panel no miente.
+            const creditsHeader = response.headers.get('x-ai-credits');
+            if (creditsHeader !== null) {
+                const left = Number(creditsHeader);
+                if (Number.isFinite(left)) useUserStore.getState().setCredits(left);
             }
 
             const data = await response.json();

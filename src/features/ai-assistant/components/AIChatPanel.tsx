@@ -26,7 +26,8 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     const [showPremiumModal, setShowPremiumModal] = useState(false);
 
     // El asistente es función premium: el panel se ve, pero sin plan no gasta tokens.
-    const { isPremium } = useUserStore();
+    const { isPremium, profile } = useUserStore();
+    const credits = profile?.credits ?? 0;
     const elements = useGeometryStore((s) => s.elements);
 
     // Estados para arrastre
@@ -171,7 +172,9 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
             trackEvent('ai_message', { premium: isPremium });
         }
 
-        if (!isPremium && !useAIStore.getState().error) {
+        // Solo se gasta prueba si quedaba: si el mensaje fue con saldo, el saldo
+        // ya lo ha actualizado el proxy (cabecera X-AI-Credits).
+        if (!isPremium && !useAIStore.getState().error && trialLeft > 0) {
             const used = Math.min(TRIAL, trialUsed + 1);
             setTrialUsed(used);
             localStorage.setItem('aiTrialUsed', String(used));
@@ -605,7 +608,9 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     <Lock size={13} />
                                     {trialLeft > 0
                                         ? `Prueba gratis: te quedan ${trialLeft} de ${TRIAL} mensajes · ver Premium`
-                                        : 'Prueba terminada · ver Premium'}
+                                        : credits > 0
+                                            ? `Saldo: ${credits} ${credits === 1 ? 'consulta' : 'consultas'} · ver Premium`
+                                            : 'Prueba terminada · ver Premium'}
                                 </button>
                             )}
                             <div className="flex gap-2">
@@ -614,7 +619,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder={!isPremium
-                                        ? (trialLeft > 0 ? 'Escribe y prueba gratis' : 'Prueba terminada')
+                                        ? (trialLeft > 0 ? 'Escribe y prueba gratis' : credits > 0 ? 'Escribe tu consulta' : 'Prueba terminada')
                                         : mode === 'generate'
                                             ? 'Ej: intersección de plano y recta'
                                             : 'Escribe un ejercicio...'}
@@ -629,9 +634,9 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-2 rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     onMouseDown={(e) => e.stopPropagation()}
                                     onTouchStart={(e) => e.stopPropagation()}
-                                    aria-label={isPremium ? 'Enviar' : 'Desbloquear Premium'}
+                                    aria-label={isPremium || credits > 0 ? 'Enviar' : 'Desbloquear Premium'}
                                 >
-                                    {isPremium ? <Send size={20} /> : <Crown size={20} />}
+                                    {isPremium || credits > 0 ? <Send size={20} /> : <Crown size={20} />}
                                 </button>
                             </div>
                         </form>

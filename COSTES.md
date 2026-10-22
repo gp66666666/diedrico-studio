@@ -53,6 +53,34 @@ Con **4,99 €/mes** por suscriptor, Ko-fi se lleva el 5 % y el procesador ~2,9 
 Recomendación: no subir a planes de pago hasta que el ingreso del mes los cubra. El único que
 conviene adelantar es Vercel Pro en cuanto se cobre, por las condiciones del plan Hobby.
 
+## Créditos de consultas (prepago)
+
+Alternativa al Premium para quien solo quiere el asistente. El saldo vive en
+`profiles.credits` y cada movimiento en `credit_movements` (compra, consumo, devolución,
+ajuste). El panel de IA muestra el saldo cuando es mayor que 0; **no anuncia la compra**
+hasta que exista la pasarela.
+
+Precio propuesto: **100 consultas = 4,99 €** (0,05 € por consulta).
+
+```
+4,99 €  cobro
+−0,32   Stripe (1,5 % + 0,25 €)
+−0,87   IVA 21 % (servicio digital B2C, incluido en el precio)
+─────
+ 3,80 € netos
+−0,30   coste real de 100 consultas (≈0,003 € cada una)
+─────
+ 3,50 € de margen  (≈92 %)
+```
+
+La reserva para la API no hace falta apartarla: los créditos se cobran **antes** de gastarse,
+así que el dinero ya está dentro. Para verlo, `select * from public.credit_snapshot()` (solo
+admin) devuelve vendidos, gastados, saldo vivo, ingresos, reserva y margen.
+
+La prueba gratuita de 3 mensajes cuesta 0 € mientras siga en el plan gratuito de Groq; con
+DeepSeek son ~0,01 € por cuenta y mes. El riesgo real no es el coste, es el abuso: la prueba
+va por cuenta (no por IP) y el tope diario por cuenta es de 300 mensajes.
+
 ## Qué NO se ha metido a propósito
 
 - Almacenamiento de ficheros (Storage) para PDFs o imágenes de usuario.
