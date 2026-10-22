@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2, Plane as PlaneIcon,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen, Share2, ListChecks
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen, Share2, ListChecks, Grid3x3, Square
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../sidebar-theme-protection.css';
@@ -62,6 +62,8 @@ export default function Sidebar() {
         redo,
         theme,
         toggleTheme,
+        planeStyle,
+        setPlaneStyle,
         showHelp,
         toggleHelp,
         clearAll,
@@ -690,6 +692,16 @@ export default function Sidebar() {
                         </button>
                         <button onClick={() => navigate('/guia')} className={`p-1.5 rounded-lg transition-colors ${buttonClass}`} title="Guía de uso">
                             <HelpCircle size={16} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
+                        </button>
+                        <button
+                            onClick={() => setPlaneStyle(planeStyle === 'solid' ? 'mesh' : 'solid')}
+                            className={`p-1.5 rounded-lg transition-colors ${buttonClass}`}
+                            aria-label={planeStyle === 'solid' ? 'Planos en malla' : 'Planos rellenos'}
+                            title={planeStyle === 'solid' ? 'Planos: relleno continuo (pulsa para malla)' : 'Planos: malla (pulsa para relleno)'}
+                        >
+                            {planeStyle === 'solid'
+                                ? <Square size={16} className="text-cyan-500" />
+                                : <Grid3x3 size={16} className="text-cyan-500" />}
                         </button>
                         <button
                             onClick={toggleTheme}

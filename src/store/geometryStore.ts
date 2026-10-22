@@ -60,6 +60,10 @@ interface GeometryState {
     theme: 'dark' | 'light';
     toggleTheme: () => void;
 
+    // Aspecto de los planos en 3D: relleno continuo (libro de texto) o malla.
+    planeStyle: 'solid' | 'mesh';
+    setPlaneStyle: (style: 'solid' | 'mesh') => void;
+
     // View Mode
     viewMode: '3d' | '2d' | 'caballera' | 'sketch' | 'laminas';
     setViewMode: (mode: '3d' | '2d' | 'caballera' | 'sketch' | 'laminas') => void;
@@ -340,6 +344,14 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
     theme: 'dark',
     toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
+
+    // Los planos se dibujan como una superficie traslúcida continua; la malla
+    // ayuda a ver la profundidad, pero a un alumno le parece un enrejado.
+    planeStyle: (typeof localStorage !== 'undefined' && localStorage.getItem('planeStyle') === 'mesh' ? 'mesh' : 'solid'),
+    setPlaneStyle: (style) => {
+        if (typeof localStorage !== 'undefined') localStorage.setItem('planeStyle', style);
+        set({ planeStyle: style });
+    },
 
     viewMode: '3d',
     setViewMode: (mode) => set({ viewMode: mode }),

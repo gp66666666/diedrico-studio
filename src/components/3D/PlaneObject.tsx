@@ -12,7 +12,8 @@ interface Props {
 }
 
 export default function PlaneObject({ element }: Props) {
-    const { selectedElementId, selectElement, isFlattened, activeTool, selectForDistance } = useGeometryStore();
+    const { selectedElementId, selectElement, isFlattened, activeTool, selectForDistance, planeStyle, theme } = useGeometryStore();
+    const isDark = theme === 'dark';
     const isSelected = selectedElementId === element.id;
 
     const groupHRef = useRef<THREE.Group>(null);
@@ -51,6 +52,12 @@ export default function PlaneObject({ element }: Props) {
     const traces = calculatePlaneTraces(normal, constant);
     const traceLength = 20;
 
+    // Contorno del trozo de plano dibujado (20 × 20, en coordenadas locales).
+    const half = 10;
+    const borderPoints: Array<[number, number]> = [
+        [-half, -half], [half, -half], [half, half], [-half, half], [-half, -half],
+    ];
+
     // Calculate Arrow Position for Animation
     let arrowX = 0;
     let arrowY = 0;
@@ -81,21 +88,49 @@ export default function PlaneObject({ element }: Props) {
                 }
             }}
         >
-            {/* --- 3D Plane (Wireframe) --- */}
+            {/* --- Superficie del plano: relleno continuo o malla --- */}
             <group ref={object3DRef}>
-                <Plane
-                    args={[20, 20, 10, 10]} // 10x10 segments for wireframe
-                    position={[position.x, position.y, position.z]}
-                    quaternion={quaternion}
-                >
-                    <meshBasicMaterial
-                        color={isSelected ? '#ffff00' : color}
-                        wireframe={true}
-                        transparent
-                        opacity={0.3} // More subtle
-                    />
-                </Plane>
-                {/* Invisible Hit Plane */}
+                {planeStyle === 'mesh' ? (
+                    <Plane
+                        args={[20, 20, 10, 10]} // 10x10 segmentos para la malla
+                        position={[position.x, position.y, position.z]}
+                        quaternion={quaternion}
+                    >
+                        <meshBasicMaterial
+                            color={isSelected ? '#ffff00' : color}
+                            wireframe={true}
+                            transparent
+                            opacity={0.3}
+                        />
+                    </Plane>
+                ) : (
+                    <Plane
+                        args={[20, 20]}
+                        position={[position.x, position.y, position.z]}
+                        quaternion={quaternion}
+                    >
+                        <meshBasicMaterial
+                            color={isSelected ? '#ffff00' : color}
+                            transparent
+                            // Sobre fondo claro hace falta algo más de cuerpo para que se lea
+                            opacity={isDark ? 0.14 : 0.22}
+                            side={THREE.DoubleSide}
+                            depthWrite={false}
+                        />
+                    </Plane>
+                )}
+                {/* Borde: deja claro dónde acaba el trozo de plano dibujado */}
+                <Line
+                    points={borderPoints.map(([u, v]) => {
+                        const p = new THREE.Vector3(u, v, 0).applyQuaternion(quaternion).add(position);
+                        return [p.x, p.y, p.z] as [number, number, number];
+                    })}
+                    color={isSelected ? '#ffff00' : color}
+                    lineWidth={1}
+                    opacity={isDark ? 0.4 : 0.55}
+                    transparent
+                />
+                {/* Plano invisible de clic */}
                 <Plane
                     args={[20, 20]}
                     position={[position.x, position.y, position.z]}

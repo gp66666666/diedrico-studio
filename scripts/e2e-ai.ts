@@ -8,6 +8,7 @@
  *
  *   ANON_KEY=... SERVICE_KEY=... node /tmp/e2e-ai.mjs
  */
+import { randomBytes } from 'node:crypto';
 import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from '../src/features/ai-assistant/services/prompts';
 import { extractStepsFromText } from '../src/features/ai-assistant/services/parseSteps';
 import { EXERCISES } from '../src/data/exercises';
@@ -77,7 +78,10 @@ function describe(step: any) {
 
 const main = async () => {
     const email = `qa-ai-${Date.now()}@diedrico.test`;
-    const password = 'QaTest2026!';
+    // Contraseña efímera generada en cada ejecución: no se escribe ninguna
+    // credencial en el repositorio (GitGuardian marcaba la anterior, aunque el
+    // usuario QA se borra al terminar la prueba).
+    const password = `Qa-${randomBytes(18).toString('base64url')}Aa1!`;
 
     const created = await admin('/auth/v1/admin/users', {
         method: 'POST',
