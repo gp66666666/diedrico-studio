@@ -96,6 +96,11 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - Ko-fi queda **solo para donativos** (`config/support.ts`), sin contraprestación: un
   donativo no es una venta (no lleva IVA y no obliga a alta censal). Ya no hay
   suscripción de Ko-fi ni webhook que la active en el flujo normal.
+- **Precios decididos** (2026-10): gratis 3 consultas/día (1 sin cuenta); packs 100 → 4,99 €
+  y 300 → 11,99 €; plan mensual 14,99 € «ilimitado» con tope de **1.500/mes**
+  (`PREMIUM_MONTHLY_LIMIT`, unas 50 al día); Pack Profesor 24,99 €/semestre (40 alumnos ×
+  150) y 39,99 €/curso (40 × 300). Los packs de profesor dan **códigos de clase**, no un bote
+  compartido: cada alumno canjea una vez y recibe las consultas en su cuenta.
 - **Tienda preparada pero apagada** (Lemon Squeezy, que actúa como vendedor: cobra el
   IVA europeo y emite la factura; nosotros solo acreditamos consultas).
   `supabase/functions/lemonsqueezy-webhook` verifica `X-Signature` (HMAC-SHA256), atiende
@@ -233,6 +238,14 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
   (`smoothstep(0.35,1,p)`), no al principio. Al terminar, P′ queda **por debajo de la LT**:
   es la explicación de por qué el dibujo en papel se hace así. En dev, `window.__flattenDuration`
   ralentiza la animación para revisarla.
+- **Códigos de clase** (`class_codes` + `class_code_uses` + RPC `redeem_class_code`): el webhook
+  los crea al comprar el pack del profesor (idempotente por `order_ref`), el alumno los canjea en
+  `/clase` y el profesor ve sus códigos, usos y caducidad ahí mismo. Nadie escribe en las tablas
+  desde el navegador. Prueba: `scripts/check-class-codes.mjs`.
+- **`add_credits` se pone a sí misma en contexto `service_role`** mientras toca el saldo: si la
+  llama una función ejecutada por un alumno (`redeem_class_code`), el trigger
+  `protect_profile_privileges` revertía el saldo y la RPC decía «ok» sin acreditar nada. Lo pilló
+  `check-class-codes.mjs` (saldo 0 tras un canje correcto).
 - Los **planos en 3D** se pintan por defecto como superficie traslúcida continua (`planeStyle:
   'solid'` en el store, persistido en `localStorage['planeStyle']`); la fila "Planos: Relleno /
   Malla" dentro de Controles de Vista alterna a malla (`'mesh'`). Surgió de un comentario de un profesor: la malla
