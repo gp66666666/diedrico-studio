@@ -30,7 +30,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     const [showBuyCredits, setShowBuyCredits] = useState(false);
 
     // El asistente es función premium: el panel se ve, pero sin plan no gasta tokens.
-    const { isPremium, profile, user } = useUserStore();
+    const { isPremium, profile, user, checkSession } = useUserStore();
     const credits = profile?.credits ?? 0;
     const elements = useGeometryStore((s) => s.elements);
 
@@ -154,6 +154,17 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
             useUserStore.getState().setTrialLeft(0);
         }
     }, [error]);
+
+    // Al volver de pagar (Lemon Squeezy abre otra pestaña), se refresca el perfil
+    // para que el saldo aparezca sin recargar la página.
+    useEffect(() => {
+        if (!user) return;
+        const onVisible = () => {
+            if (document.visibilityState === 'visible') void checkSession();
+        };
+        document.addEventListener('visibilitychange', onVisible);
+        return () => document.removeEventListener('visibilitychange', onVisible);
+    }, [user, checkSession]);
 
     // Guardar posición al cambiar
     useEffect(() => {
