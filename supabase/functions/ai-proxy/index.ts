@@ -1,6 +1,7 @@
 // Edge Function: ai-proxy
-// Oculta la API key de Groq: el navegador llama aquí y esta función (servidor) llama a Groq.
-// La clave vive en el secreto GROQ_API_KEY del proyecto, nunca en el bundle.
+// Oculta las API keys de los proveedores: el navegador llama aquí y esta función
+// (servidor) llama a DeepSeek (principal) o Groq (respaldo). Las claves viven en
+// los secretos DEEPSEEK_API_KEY y GROQ_API_KEY del proyecto, nunca en el bundle.
 //
 // Seguridad:
 //  - Exige JWT. Quien puede gastar:
@@ -16,7 +17,22 @@
 //  - Se despliega con --no-verify-jwt porque la verificación se hace aquí,
 //    para poder devolver un mensaje claro (401 sin sesión, 402 sin plan ni saldo).
 
+const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+type Provider = "deepseek" | "groq";
+
+// Qué proveedor sirve cada modelo. El cliente pide `AI_PROXY_MODEL` (aiProxy.ts).
+const MODELS: Record<string, { provider: Provider }> = {
+  "deepseek-flash": { provider: "deepseek" },
+  "deepseek-v4-pro": { provider: "deepseek" },
+  "openai/gpt-oss-120b": { provider: "groq" },
+  "openai/gpt-oss-20b": { provider: "groq" },
+  "qwen/qwen3.8-27b": { provider: "groq" },
+};
+const DEFAULT_MODEL = "deepseek-flash";
+// Si DeepSeek no responde (caída, 5xx, 429), se reintenta aquí antes de rendirse.
+const FALLBACK_MODEL = "openai/gpt-oss-120b";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -25,13 +41,6 @@ const CORS = {
   "Access-Control-Expose-Headers": "x-ai-credits, x-ai-trial-left",
 };
 
-// Modelos disponibles en la cuenta de Groq (2026-10). Los Llama 3.x fueron retirados.
-const ALLOWED_MODELS = new Set([
-  "openai/gpt-oss-120b",
-  "openai/gpt-oss-20b",
-  "qwen/qwen3.8-27b",
-]);
-const DEFAULT_MODEL = "openai/gpt-oss-120b";
 const LIMIT_REQUESTS = 60;      // peticiones
 const LIMIT_WINDOW_S = 3600;    // por hora y por IP
 // Tope por cuenta y día: evita que un solo suscriptor queme el margen.
@@ -75,8 +84,11 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: { message: "Method not allowed" } }, 405);
 
-  const apiKey = Deno.env.get("GROQ_API_KEY");
-  if (!apiKey) {
+  // Claves de proveedor (secretos de la Edge Function). DeepSeek es el principal;
+  // Groq queda como respaldo si algún día falla.
+  const deepseekKey = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
+  const groqKey = Deno.env.get("GROQ_API_KEY") ?? "";
+  if (!deepseekKey && !groqKey) {
     return json({ error: { message: "El asistente IA no está configurado en el servidor." } }, 503);
   }
 
@@ -343,31 +355,86 @@ Deno.serve(async (req: Request) => {
     }, 400, gateHeaders());
   }
 
-  const model = ALLOWED_MODELS.has(body?.model) ? body.model : DEFAULT_MODEL;
+  const requested = typeof body?.model === "string" ? body.model : DEFAULT_MODEL;
+  const model = MODELS[requested] ? requested : DEFAULT_MODEL;
+  const provider = MODELS[model].provider;
   const temperature = Math.min(Math.max(Number(body?.temperature ?? 0.1), 0), 1);
   // Sin Premium (prueba o créditos) la respuesta tiene un techo más bajo: es lo que
   // mantiene el coste por mensaje en céntimos.
   const tokenCeiling = isPremium ? MAX_TOKENS_PREMIUM : MAX_TOKENS_FREE;
   const maxTokens = Math.min(Math.max(Number(body?.max_tokens ?? 2000), 1), tokenCeiling);
 
-  // ---- Llamada a Groq ----
-  try {
-    const upstream = await fetch(GROQ_URL, {
+  // ---- Llamada al proveedor ----
+  const keyFor = (p: Provider) => (p === "deepseek" ? deepseekKey : groqKey);
+
+  const callProvider = (p: Provider, modelName: string) =>
+    fetch(p === "deepseek" ? DEEPSEEK_URL : GROQ_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${keyFor(p)}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model,
+        model: modelName,
         messages,
         temperature,
         max_tokens: maxTokens,
-        reasoning_effort: "low", // gpt-oss razona: en "low" responde antes y gasta menos tokens
+        stream: false,
+        // DeepSeek factura el razonamiento como salida y se come `max_tokens`
+        // (con el modo activado la respuesta llegaba vacía): va apagado.
+        // En gpt-oss (Groq) el equivalente es el esfuerzo bajo.
+        ...(p === "deepseek"
+          ? { thinking: { type: "disabled" } }
+          : { reasoning_effort: "low" }),
       }),
     });
 
-    const text = await upstream.text();
+  if (!keyFor(provider)) {
+    await refund();
+    return json(
+      { error: { message: `El modelo ${model} no está disponible ahora mismo.` } },
+      503,
+      gateHeaders(),
+    );
+  }
+
+  try {
+    let upstream = await callProvider(provider, model);
+    let text = await upstream.text();
+
+    // Respaldo: si el fallo es del proveedor (5xx o 429) y hay clave de Groq,
+    // se reintenta con gpt-oss para no dejar al alumno sin respuesta.
+    if (!upstream.ok && (upstream.status >= 500 || upstream.status === 429) &&
+      provider === "deepseek" && groqKey) {
+      console.warn(`deepseek ${upstream.status}: reintento con ${FALLBACK_MODEL}`);
+      try {
+        const retry = await callProvider("groq", FALLBACK_MODEL);
+        const retryText = await retry.text();
+        if (retry.ok) {
+          upstream = retry;
+          text = retryText;
+        } else {
+          console.error("groq fallback", retry.status, retryText.slice(0, 500));
+        }
+      } catch (e) {
+        console.error("groq fallback", e);
+      }
+    }
+
+    // Traza de coste en los logs de la función (modelo y tokens de cada mensaje).
+    try {
+      const parsed = JSON.parse(text);
+      const u = parsed?.usage;
+      if (u) {
+        console.log("ai_usage", JSON.stringify({
+          user: userId,
+          model: parsed?.model ?? model,
+          in: u.prompt_tokens,
+          cached: u.prompt_cache_hit_tokens ?? u.prompt_tokens_details?.cached_tokens ?? 0,
+          out: u.completion_tokens,
+        }));
+      }
+    } catch { /* respuesta no JSON (error del proveedor) */ }
 
     // Si el proveedor falla, el mensaje no se cobra.
     if (!upstream.ok) await refund();
@@ -377,7 +444,7 @@ Deno.serve(async (req: Request) => {
       headers: { ...CORS, "Content-Type": "application/json", ...gateHeaders() },
     });
   } catch (e) {
-    console.error("groq error", e);
+    console.error("provider error", e);
     await refund();
     return json({ error: { message: "No se pudo contactar con el proveedor de IA." } }, 502, gateHeaders());
   }

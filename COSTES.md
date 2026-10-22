@@ -9,7 +9,8 @@ se pague solo. Nada de la app depende de un servicio de pago para funcionar.
 |---|---|---|---|
 | Vercel | hosting del frontend | Hobby | 0 € |
 | Supabase | base de datos, login, Edge Functions | Free | 0 € |
-| Groq | modelo del asistente (solo Premium) | Free tier | 0 € |
+| DeepSeek | modelo del asistente (prueba, créditos y Premium) | pago por uso | ~0,0007 $/mensaje |
+| Groq | respaldo si DeepSeek falla | Free tier | 0 € |
 | Ko-fi | cobro de membresías | Free (5 % + comisión de pago) | 0 € fijo |
 | Dominio | opcional (`*.vercel.app` ya vale) | — | 0 € |
 
@@ -77,16 +78,31 @@ La reserva para la API no hace falta apartarla: los créditos se cobran **antes*
 así que el dinero ya está dentro. Para verlo, `select * from public.credit_snapshot()` (solo
 admin) devuelve vendidos, gastados, saldo vivo, ingresos, reserva y margen.
 
-La prueba gratuita de 3 mensajes cuesta 0 € mientras siga en el plan gratuito de Groq; con
-DeepSeek son ~0,01 € por cuenta y mes. El riesgo real no es el coste, es el abuso: la prueba
+La prueba gratuita de 3 mensajes cuesta **~0,06 céntimos por cuenta** (medido con
+`deepseek-flash`, ver abajo). El riesgo real no es el coste, es el abuso: la prueba
 va por cuenta (no por IP) y el tope diario por cuenta es de 120 mensajes.
 
 Con `deepseek-flash` (0,30 $/M entrada sin caché, 1,20 $/M salida en hora punta) y los topes
 del proxy (24.000 caracteres de entrada y 1.000 tokens de salida sin Premium), el mensaje más
 caro posible cuesta **0,0033 $ ≈ 0,30 céntimos**: los 3 de prueba nunca pasan de ~0,9 céntimos
-por usuario, aunque nadie repita prompt. En uso normal (caché de contexto y respuestas cortas)
-son ~0,2-0,5 céntimos. Si se activa el modo razonamiento de DeepSeek hay que contarlo como
-salida: el proxy pide `max_tokens` bajo a propósito para que no se dispare.
+por usuario, aunque nadie repita prompt. Si se activa el modo razonamiento de DeepSeek hay que
+contarlo como salida: el proxy lo manda apagado a propósito (con él, la respuesta llegaba vacía
+porque los tokens de pensamiento consumían `max_tokens`).
+
+### Medición real (2026-10-22, 11 ejercicios de la biblioteca)
+
+| | Medido |
+|---|---|
+| Entrada | 4.440 tokens (4.224 en caché + 216 nuevos) |
+| Salida | 495-570 tokens |
+| Latencia | 2,7-4,7 s (3,0 s de media) |
+| **Coste** | **0,06-0,18 céntimos por mensaje** (con caché caliente, ~0,07) |
+| 3 mensajes de prueba | ~0,2-0,5 céntimos por cuenta |
+
+El prompt de sistema (4.400 tokens) es lo que domina la entrada, y DeepSeek lo cachea: a partir
+del segundo mensaje de la misma sesión el 95 % de la entrada va por caché (0,006 $/M). El coste
+real de una consulta es, por tanto, **una décima parte** del techo teórico. Los logs de la Edge
+Function imprimen `ai_usage` (modelo, tokens en caché y de salida) para poder cuadrar la factura.
 
 ## Qué NO se ha metido a propósito
 

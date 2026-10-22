@@ -229,7 +229,15 @@ export const useAIStore = create<AIStore>((set, get) => ({
                 set({ currentStep: step.stepNumber });
 
                 step.status = 'executing';
-                await aiExecutor.executeStep(step);
+                try {
+                    await aiExecutor.executeStep(step);
+                } catch (stepError: any) {
+                    // El paso falla y se para: mejor un aviso claro que un dibujo a medias.
+                    step.status = 'error';
+                    step.error = stepError.message;
+                    set({ isProcessing: false, currentStep: null, error: stepError.message });
+                    return;
+                }
                 step.status = 'completed';
 
                 await new Promise((resolve) => setTimeout(resolve, 800));

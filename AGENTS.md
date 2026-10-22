@@ -6,7 +6,7 @@ están en `.env` y en `~/.config/opencode/env`; ver `ACCESOS_Y_DEPLOY.md`, que n
 ## Qué es
 
 App web educativa de geometría 3D y sistema diédrico: visor 3D (Three.js / react-three-fiber),
-vista 2D diédrica, herramientas de medida/exportación (jsPDF, JSZip), asistente IA (Groq),
+vista 2D diédrica, herramientas de medida/exportación (jsPDF, JSZip), asistente IA (DeepSeek),
 auth y guardado en la nube (Supabase). Producción: https://diedrico-studio.vercel.app
 
 ## Stack y comandos
@@ -31,8 +31,9 @@ npm test         # vitest: geometría de sólidos, rotaciones y selección por h
 ⚠️ Todo `VITE_*` acaba en el bundle público: **nunca** metas una `service_role`/`sb_secret_`
 ni una API key de IA.
 
-⚠️ La clave de Groq **no** está en el cliente: vive como secreto `GROQ_API_KEY` de la Edge
-Function `supabase/functions/ai-proxy`. El navegador llama a `/functions/v1/ai-proxy`.
+⚠️ Las claves de IA **no** están en el cliente: viven como secretos `DEEPSEEK_API_KEY` (principal)
+y `GROQ_API_KEY` (respaldo) de la Edge Function `supabase/functions/ai-proxy`. El navegador llama a
+`/functions/v1/ai-proxy`. Si DeepSeek devuelve 5xx/429, el proxy reintenta con `gpt-oss-120b`.
 
 ## Estructura
 
@@ -164,9 +165,29 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 
 ## Hechos conocidos
 
-- La IA va por `supabase/functions/ai-proxy` (secreto `GROQ_API_KEY`, rate limit por IP en
-  `public.ai_rate_limits`). Modelo activo: `openai/gpt-oss-120b`; los Llama 3.x de Groq
-  fueron retirados y la app estuvo devolviendo `model_not_found` hasta el cambio.
+- La IA va por `supabase/functions/ai-proxy` (secretos `DEEPSEEK_API_KEY` y `GROQ_API_KEY`,
+  rate limit por IP en `public.ai_rate_limits`). Modelo activo: **`deepseek-flash`**
+  (`AI_PROXY_MODEL` en `aiProxy.ts`); `MODELS` en el proxy decide qué proveedor sirve cada
+  modelo. El razonamiento de DeepSeek va **apagado** (`thinking: {type:"disabled"}`): se factura
+  como salida y se comía `max_tokens` (la respuesta llegaba vacía).
+- **Contrato de herramientas** (`__tests__/tools.test.ts`): toda herramienta que menciona el
+  prompt existe en `FUNCTION_DEFINITIONS` y toda herramienta declarada está implementada en
+  `executor.ts` o `aiAdvancedTools.ts`. Esto pilló tres bugs reales: `add_line_by_direction` y
+  `add_plane_by_points` (inventadas), `calculate_distance` (no existe: es `calculate_math`) y
+  `draw_arc` (declarada sin implementación).
+- **Un paso que no se puede aplicar ya no se salta en silencio**: el executor lanza error y el
+  panel marca el paso en rojo (antes solo había un `console.warn` y el alumno veía un dibujo a
+  medias). Además, un punto o una recta idénticos a uno existente se reutilizan (alias) en vez
+  de duplicarse: un "punto nuevo" en el mismo sitio con otra etiqueta engaña.
+- **Codificación de planos en el prompt**: `add_plane_by_traces` admite cortes 0 (plano paralelo
+  a un eje) pero nunca inventados; un plano por ecuación se crea con `add_plane_by_normal`
+  (`ax+by+cz+d=0` → normal `(a,b,c)`, constante `d`). Los planos de proyección no existen como
+  elemento: si el ejercicio los necesita, se crean antes.
+- **Límites conocidos del dibujo de la IA** (probados con los 11 ejercicios de la biblioteca):
+  no hay herramienta de cambio de plano ni de arcos; el abatimiento se dibuja poniendo el punto
+  abatido (`add_point`), no girando. En "ángulo entre planos" y en la traza horizontal de un
+  plano oblicuo el método intermedio puede quedar impreciso aunque el resultado sea correcto;
+  el prompt prohíbe afirmar medidas que no estén dibujadas.
 - El parser de la IA exigía `params` pero el prompt enseña `parameters`: el modelo devolvía
   `parameters` y no se ejecutaba **ningún** paso. Ya acepta ambos (y `args`), y quita el JSON
   crudo de la respuesta.
@@ -192,5 +213,5 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 - Auth: Google OAuth + email/contraseña (registro desactivado en el dashboard).
 - `site_url` de Auth debe ser la URL de producción; las URLs locales (`localhost:5173`) están
   permitidas en la allow list.
-- La clave de Groq **ya no se puede extraer del bundle**: se movió a un secreto de la Edge
+- Las claves de IA **no se pueden extraer del bundle**: están en los secretos de la Edge
   Function `ai-proxy` (ver `AGENTS.md`).

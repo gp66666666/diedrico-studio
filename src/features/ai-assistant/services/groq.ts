@@ -6,6 +6,7 @@ import { SYSTEM_PROMPT, FUNCTION_DEFINITIONS } from './prompts';
 import { useGeometryStore } from '../../../store/geometryStore';
 import { useUserStore } from '../../../store/userStore';
 import { callAIProxy, AI_PROXY_MODEL } from './aiProxy';
+import { extractStepsFromText, normalizeStepItem } from './parseSteps';
 
 export class GroqService {
     constructor() {}
@@ -106,83 +107,16 @@ export class GroqService {
     }
 
     private parseResponseToSteps(text: string): AIStep[] {
+        // 1. JSON del prompt (parseSteps.ts, probado con respuestas reales)
+        const raw = extractStepsFromText(text);
+        if (raw.length > 0) {
+            return raw.map((item, i) => this.createStepObject(i + 1, item));
+        }
+
+        // 2. Plan B: texto con "**Paso N**" (modelos que ignoran el formato)
         const steps: AIStep[] = [];
         let stepCount = 0;
 
-        // 1. Try to parse JSON blocks first (Robust method)
-        // STRATEGY 1: Extract from code blocks (Primary)
-        // Matches ```json, ```JSON, or just ```
-        const codeBlockRegex = /```(?:json|JSON)?\s*([\s\S]*?)\s*```/g;
-        let match;
-
-        while ((match = codeBlockRegex.exec(text)) !== null) {
-            try {
-                const rawContent = match[1].trim();
-                // Heuristic: Check if it looks like JSON
-                if (rawContent.startsWith('{') || rawContent.startsWith('[')) {
-                    const parsed = JSON.parse(rawContent);
-                    const items = Array.isArray(parsed) ? parsed : (parsed.steps || parsed.actions || [parsed]);
-
-                    if (Array.isArray(items)) {
-                        for (const item of items) {
-                            const normalized = this.normalizeStepItem(item);
-                            if (normalized) {
-                                stepCount++;
-                                steps.push(this.createStepObject(stepCount, normalized));
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn('Failed to parse code block JSON:', e);
-            }
-        }
-
-        // STRATEGY 2: If no steps found, search for raw JSON arrays/objects in text
-        if (steps.length === 0) {
-            try {
-                // Find potential JSON array or object
-                const firstBracket = text.indexOf('[');
-                const firstBrace = text.indexOf('{');
-
-                let start = -1;
-                // Pick the earliest occurrence
-                if (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) start = firstBracket;
-                else if (firstBrace !== -1) start = firstBrace;
-
-                if (start !== -1) {
-                    // Try to find the matching closing character by balancing
-                    // Simple approach: find last ']' or '}'
-                    const lastBracket = text.lastIndexOf(']');
-                    const lastBrace = text.lastIndexOf('}');
-                    let end = Math.max(lastBracket, lastBrace);
-
-                    if (end > start) {
-                        const candidate = text.substring(start, end + 1);
-                        try {
-                            const parsed = JSON.parse(candidate);
-                            const items = Array.isArray(parsed) ? parsed : (parsed.steps || parsed.actions || [parsed]);
-                            if (Array.isArray(items)) {
-                                for (const item of items) {
-                                    const normalized = this.normalizeStepItem(item);
-                                    if (normalized) {
-                                        stepCount++;
-                                        steps.push(this.createStepObject(stepCount, normalized));
-                                    }
-                                }
-                            }
-                        } catch (e) { /* Ignore partial matches */ }
-                    }
-                }
-            } catch (e) {
-                console.warn('Failed to search raw JSON:', e);
-            }
-        }
-
-        if (steps.length > 0) return steps;
-
-
-        // 2. Fallback to legacy text parsing (Fragile method)
         console.warn('No JSON blocks found, falling back to text parsing');
         const stepRegex = /(?:\*\*Paso (\d+)\*\*|\d+\.\s+\*\*(.+?)\*\*):?\s*(.+?)(?=(?:\*\*Paso \d+\*\*|\d+\.\s+\*\*|$))/gs;
         let stepMatch;
@@ -232,39 +166,6 @@ export class GroqService {
         return this.stripJsonPayloads(text);
     }
 
-    /**
-     * El prompt describe las funciones con la clave `parameters` (esquema tipo OpenAI),
-     * pero aquí se trabaja con `params`. Groq devuelve fielmente `parameters`, así que
-     * sin esto no se reconocía ni un solo paso.
-     */
-    private normalizeStepItem(item: any): { name: string; params: any } | null {
-        if (!item || typeof item !== 'object') return null;
-
-        const name = item.name ?? item.action ?? item.tool ?? item.function;
-        const params = item.params ?? item.parameters ?? item.args ?? item.arguments;
-
-        if (typeof name !== 'string' || !name || !params || typeof params !== 'object') return null;
-
-        return { name, params: this.coerceNumericParams(params) };
-    }
-
-    /** Los modelos a veces mandan "1" en vez de 1; el store necesita números. */
-    private coerceNumericParams(params: Record<string, any>): Record<string, any> {
-        const numericKeys = new Set([
-            'x', 'y', 'z', 'radius', 'angle', 'distance', 'length', 'scale',
-            'a', 'b', 'c', 'd', 'n1', 'n2', 'n3',
-        ]);
-        const out: Record<string, any> = { ...params };
-
-        for (const [key, value] of Object.entries(out)) {
-            if (numericKeys.has(key) && typeof value === 'string' && value.trim() !== '') {
-                const num = Number(value);
-                if (!Number.isNaN(num)) out[key] = num;
-            }
-        }
-        return out;
-    }
-
     /** Quita del texto los bloques ``` y los JSON sueltos que sean payloads de pasos. */
     private stripJsonPayloads(text: string): string {
         let out = text.replace(/```(?:json|JSON)?[\s\S]*?```/g, ' ');
@@ -289,10 +190,10 @@ export class GroqService {
 
     private looksLikeSteps(parsed: any): boolean {
         // Un único objeto también es un paso: {"function": "...", "arguments": {...}}
-        if (this.normalizeStepItem(parsed)) return true;
+        if (normalizeStepItem(parsed)) return true;
 
         const items = Array.isArray(parsed) ? parsed : (parsed?.steps ?? parsed?.actions);
-        return Array.isArray(items) && items.some((i: any) => !!this.normalizeStepItem(i));
+        return Array.isArray(items) && items.some((i: any) => !!normalizeStepItem(i));
     }
 
     private createStepObject(stepCount: number, data: { name: string; params: any }): AIStep {

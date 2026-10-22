@@ -92,7 +92,11 @@ export class AIExecutor {
                     if (advancedResult) {
                         console.log(`[AI] ✓ Advanced tool ${step.action} executed successfully`);
                     } else {
-                        console.warn(`[AI Executor] Unknown action: ${step.action}`);
+                        // Nunca en silencio: si el paso no se puede aplicar, el alumno
+                        // tiene que verlo en vez de quedarse con un dibujo a medias.
+                        throw new Error(
+                            `La herramienta "${step.action}" no se pudo aplicar: faltan datos o los elementos a los que se refiere no existen.`,
+                        );
                     }
             }
             console.log('[AI Executor] ✅ Step completed successfully');
@@ -133,6 +137,21 @@ export class AIExecutor {
             return;
         }
 
+        // Un punto "nuevo" en el mismo sitio que otro no dibuja nada: es el mismo
+        // punto con otra etiqueta y confunde al alumno. Se reutiliza (y se traduce
+        // el nombre en los pasos siguientes).
+        const twin = store.elements.find(
+            (el: any) =>
+                el.type === 'point' &&
+                Math.abs(el.coords.x - x) < 1e-6 &&
+                Math.abs(el.coords.y - y) < 1e-6 &&
+                Math.abs(el.coords.z - z) < 1e-6,
+        );
+        if (twin) {
+            aliases.set(wanted, twin.name);
+            return;
+        }
+
         store.addElement({
             type: 'point',
             coords: { x, y, z },
@@ -142,7 +161,11 @@ export class AIExecutor {
     }
 
     private executeAddLineByPoints(step: AIStep, store: any): void {
-        const { name, point1_name, point2_name, color } = step.params;
+        const { name, color } = step.params;
+        // El esquema pide point1_name/point2_name, pero los modelos a veces
+        // mandan point1/point2: se aceptan las dos formas en vez de fallar.
+        const point1_name = step.params.point1_name ?? step.params.point1;
+        const point2_name = step.params.point2_name ?? step.params.point2;
         const p1Name = resolveName(point1_name);
         const p2Name = resolveName(point2_name);
         console.log('[AI] 🔍 Finding points:', p1Name, 'and', p2Name);
@@ -220,6 +243,32 @@ export class AIExecutor {
         console.log('[AI] 📝 Creating line element...');
 
         // Use same structure as LineCreator - this is proven to work!
+        // Misma recta ya dibujada (por los mismos dos puntos): se reutiliza.
+        const twin = store.elements.find((el: any) => {
+            if (el.type !== 'line' || !el.direction || !el.point) return false;
+            const cross = {
+                x: el.direction.y * direction.z - el.direction.z * direction.y,
+                y: el.direction.z * direction.x - el.direction.x * direction.z,
+                z: el.direction.x * direction.y - el.direction.y * direction.x,
+            };
+            if (Math.hypot(cross.x, cross.y, cross.z) > 1e-6) return false;
+            const v = {
+                x: p1.coords.x - el.point.x,
+                y: p1.coords.y - el.point.y,
+                z: p1.coords.z - el.point.z,
+            };
+            const c2 = {
+                x: v.y * el.direction.z - v.z * el.direction.y,
+                y: v.z * el.direction.x - v.x * el.direction.z,
+                z: v.x * el.direction.y - v.y * el.direction.x,
+            };
+            return Math.hypot(c2.x, c2.y, c2.z) < 1e-6;
+        });
+        if (twin) {
+            aliases.set(name, twin.name);
+            return;
+        }
+
         const lineElement: any = {
             type: 'line',
             name: name || `L${Date.now()}`,
@@ -236,6 +285,10 @@ export class AIExecutor {
     private executeAddPlaneByNormal(step: AIStep, store: any): void {
         const { name, normal_x, normal_y, normal_z, constant, color } = step.params;
 
+        if (!normal_x && !normal_y && !normal_z) {
+            throw new Error('El plano no tiene vector normal: no se puede dibujar.');
+        }
+
         store.addElement({
             type: 'plane',
             normal: { x: normal_x, y: normal_y, z: normal_z },
@@ -250,6 +303,14 @@ export class AIExecutor {
 
         if (x_intercept === undefined || y_intercept === undefined || z_intercept === undefined) {
             throw new Error('Faltan las trazas (x, y, z) para crear el plano');
+        }
+
+        // Tres cortes en cero no definen un plano: saldría una normal nula (basura
+        // en pantalla). Un plano que pasa por el origen se define por su normal.
+        if (x_intercept === 0 && y_intercept === 0 && z_intercept === 0) {
+            throw new Error(
+                'Un plano no puede tener las tres trazas en cero. Defínelo con add_plane_by_normal.',
+            );
         }
 
         // Note: 0 is a valid trace value (plane parallel to an axis)

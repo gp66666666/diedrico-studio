@@ -34,4 +34,6 @@ export async function callAIProxy(payload: AIProxyPayload): Promise<Response> {
     });
 }
 
-export const AI_PROXY_MODEL = 'openai/gpt-oss-120b';
+// DeepSeek es el proveedor activo. El proxy decide con esta cadena qué API se
+// llama (MODELS en supabase/functions/ai-proxy/index.ts).
+export const AI_PROXY_MODEL = 'deepseek-flash';
