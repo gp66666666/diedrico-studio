@@ -81,6 +81,12 @@ const ANON_WINDOW_S = 30 * 86400;
 // día se hace viral, el asistente dice "vuelve mañana" en vez de arruinarte.
 // Súbelo cuando haya ingresos que lo paguen.
 const GLOBAL_DAILY_REQUESTS = 2000;
+// Plan mensual: "ilimitado" con uso razonable. 1.500 al mes (unas 50 al día) es
+// más de lo que usa nadie y pone techo al coste: 1.500 × 0,002 € = 3 €/mes como
+// máximo, frente a los 14,99 € que cuesta. Sin este tope, un abusón con el
+// límite diario (120) se come el margen.
+const PREMIUM_MONTHLY_LIMIT = 1500;
+const PREMIUM_MONTHLY_WINDOW_S = 31 * 86400;
 
 function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
@@ -308,7 +314,31 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    if (premium) trialLeft = null;
+    if (premium) {
+      trialLeft = null;
+      const monthly = await rpc("check_ai_rate_limit", {
+        p_key: await sha256Hex(`monthly:${userId}`),
+        p_limit: PREMIUM_MONTHLY_LIMIT,
+        p_window_seconds: PREMIUM_MONTHLY_WINDOW_S,
+      });
+      if (monthly.ok) {
+        const usedMonth = Number(monthly.value);
+        if (Number.isFinite(usedMonth) && usedMonth > PREMIUM_MONTHLY_LIMIT) {
+          return json(
+            {
+              error: {
+                code: "monthly_limit",
+                message:
+                  `Has llegado al uso razonable del plan mensual (${PREMIUM_MONTHLY_LIMIT} consultas). ` +
+                  "Se renueva solo el mes que viene; si necesitas más ahora, escribe y lo miramos.",
+              },
+            },
+            429,
+            { "Retry-After": "3600" },
+          );
+        }
+      }
+    }
   } catch (e) {
     if (!isAnon) {
       console.error("plan check", e);

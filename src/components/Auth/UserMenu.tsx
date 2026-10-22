@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LogIn, LogOut, Crown, User as UserIcon, ChevronUp, ChevronDown, Info, Mail, Shield, FileText } from 'lucide-react';
+import { LogIn, LogOut, Crown, User as UserIcon, ChevronUp, ChevronDown, Info, Mail, Shield, FileText, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
 
@@ -127,6 +127,14 @@ export default function UserMenu() {
                             </span>
                         </div>
                     </div>
+
+                    <Link
+                        to="/clase"
+                        className="flex items-center justify-center gap-2 w-full p-2 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:hover:bg-emerald-900/30 transition-colors text-xs font-medium"
+                    >
+                        <GraduationCap size={14} />
+                        <span>Mi clase · canjear código</span>
+                    </Link>
 
                     <a
                         href="https://ko-fi.com/eloigperezzds"

@@ -32,12 +32,211 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+          path: string | null
+          props: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+          path?: string | null
+          props?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
+          path?: string | null
+          props?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      class_code_uses: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_code_uses_code_fkey"
+            columns: ["code"]
+            isOneToOne: false
+            referencedRelation: "class_codes"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      class_codes: {
+        Row: {
+          code: string
+          created_at: string
+          credits_per_student: number
+          expires_at: string
+          max_uses: number
+          order_ref: string | null
+          owner_id: string
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          credits_per_student: number
+          expires_at: string
+          max_uses: number
+          order_ref?: string | null
+          owner_id: string
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          credits_per_student?: number
+          expires_at?: string
+          max_uses?: number
+          order_ref?: string | null
+          owner_id?: string
+          uses?: number
+        }
+        Relationships: []
+      }
+      credit_movements: {
+        Row: {
+          balance_after: number
+          created_at: string
+          delta: number
+          id: number
+          reason: string
+          ref: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after: number
+          created_at?: string
+          delta: number
+          id?: number
+          reason: string
+          ref?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number
+          created_at?: string
+          delta?: number
+          id?: number
+          reason?: string
+          ref?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_movements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kofi_events: {
+        Row: {
+          amount: string | null
+          created_at: string
+          currency: string | null
+          email: string | null
+          event_type: string | null
+          id: string
+          matched_profile: string | null
+          message_id: string | null
+          months_added: number | null
+          payload: Json | null
+          status: string
+          tier_name: string | null
+          transaction_id: string | null
+        }
+        Insert: {
+          amount?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          event_type?: string | null
+          id?: string
+          matched_profile?: string | null
+          message_id?: string | null
+          months_added?: number | null
+          payload?: Json | null
+          status?: string
+          tier_name?: string | null
+          transaction_id?: string | null
+        }
+        Update: {
+          amount?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          event_type?: string | null
+          id?: string
+          matched_profile?: string | null
+          message_id?: string | null
+          months_added?: number | null
+          payload?: Json | null
+          status?: string
+          tier_name?: string | null
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kofi_events_matched_profile_fkey"
+            columns: ["matched_profile"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      laminas_docs: {
+        Row: {
+          data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          data: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           completed_exercises: string[]
           completed_topics: string[]
           created_at: string
+          credits: number
           email: string | null
           full_name: string | null
           id: string
@@ -50,6 +249,7 @@ export type Database = {
           completed_exercises?: string[]
           completed_topics?: string[]
           created_at?: string
+          credits?: number
           email?: string | null
           full_name?: string | null
           id: string
@@ -62,6 +262,7 @@ export type Database = {
           completed_exercises?: string[]
           completed_topics?: string[]
           created_at?: string
+          credits?: number
           email?: string | null
           full_name?: string | null
           id?: string
@@ -109,8 +310,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_credits: {
+        Args: {
+          p_amount: number
+          p_reason?: string
+          p_ref?: string
+          p_user: string
+        }
+        Returns: number
+      }
       check_ai_rate_limit: {
         Args: { p_key: string; p_limit?: number; p_window_seconds?: number }
+        Returns: number
+      }
+      credit_snapshot: {
+        Args: { p_cost_per_credit?: number; p_price_per_credit?: number }
+        Returns: {
+          credits_balance: number
+          credits_sold: number
+          credits_spent: number
+          gross_eur: number
+          margin_eur: number
+          reserve_eur: number
+          users_with_credits: number
+        }[]
+      }
+      redeem_class_code: { Args: { p_code: string }; Returns: Json }
+      release_ai_quota: { Args: { p_key: string }; Returns: undefined }
+      spend_credit: {
+        Args: { p_reason?: string; p_ref?: string; p_user: string }
         Returns: number
       }
     }

@@ -16,6 +16,7 @@ const GuidePage = lazy(() => import('./pages/GuidePage'));
 const ExercisesPage = lazy(() => import('./pages/ExercisesPage'));
 const ExerciseDetailPage = lazy(() => import('./pages/ExerciseDetailPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const ClassPage = lazy(() => import('./pages/ClassPage'));
 
 function PageLoader() {
     return (
@@ -41,6 +42,7 @@ function App() {
                 <Route path="/ejercicios/:slug" element={<ExerciseDetailPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
+                <Route path="/clase" element={<ClassPage />} />
                 {/* Cualquier otra URL: antes se quedaba en blanco */}
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
