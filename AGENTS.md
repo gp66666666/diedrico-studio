@@ -111,8 +111,12 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   `spend_credit` es atómico (`update ... where credits > 0`) y el trigger
   `protect_profile_privileges` restaura `credits` si el cliente intenta cambiarlo. Si el
   proveedor falla, el proxy devuelve el crédito y la consulta de prueba.
+- **Techo de gasto por mensaje** (lo que hace segura la prueba gratuita): la consulta no puede
+  pasar de 24.000 caracteres (413) y la respuesta se corta a 1.000 tokens sin Premium y 2.500
+  con Premium. Con `deepseek-flash` en hora punta y sin caché, el mensaje más caro posible
+  cuesta ~0,0033 $, así que los 3 de prueba nunca llegan a 1 céntimo.
 - El proxy exige JWT de una cuenta válida y comprueba el plan: 401 sin sesión, 402 sin Premium,
-  sin prueba ni saldo. Además: 60/h por IP, 300/día por cuenta. Devuelve `X-AI-Credits` y
+  sin prueba ni saldo. Además: 60/h por IP, 120/día por cuenta. Devuelve `X-AI-Credits` y
   `X-AI-Trial-Left` (CORS los expone) y el panel sincroniza el saldo con esa cabecera.
 - Activación automática: `supabase/functions/kofi-webhook` recibe los pagos de Ko-fi y suma 1 mes
   a `premium_until` por pago (idempotente por `message_id`). Requiere el secret

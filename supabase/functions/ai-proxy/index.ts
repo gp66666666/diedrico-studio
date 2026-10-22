@@ -35,9 +35,23 @@ const DEFAULT_MODEL = "openai/gpt-oss-120b";
 const LIMIT_REQUESTS = 60;      // peticiones
 const LIMIT_WINDOW_S = 3600;    // por hora y por IP
 // Tope por cuenta y día: evita que un solo suscriptor queme el margen.
-// 300 llamadas/día cubren de sobra un uso de estudio; el coste real sigue siendo céntimos.
-const USER_LIMIT_REQUESTS = 300;
+// 120 llamadas/día cubren de sobra un uso de estudio (y limitan el caso peor).
+const USER_LIMIT_REQUESTS = 120;
 const USER_LIMIT_WINDOW_S = 86400;
+
+// ---- Techo de gasto por mensaje ----
+// El coste de un mensaje es (tokens de entrada × precio_in) + (tokens de salida × precio_out).
+// La salida cuesta ~4 veces más que la entrada, así que el tope de `max_tokens` es la
+// palanca que de verdad manda. Con estos dos límites, el mensaje más caro posible cuesta
+// ~0,0033 $ con deepseek-flash en hora punta y sin caché:
+//   24.000 caracteres ≈ 6.860 tokens × 0,30 $/M  = 0,00206 $
+//   salida 1.000 tokens × 1,20 $/M               = 0,00120 $
+//   total                                        = 0,00326 $ ≈ 0,30 céntimos
+// Los 3 mensajes de prueba nunca pasan de ~0,9 céntimos, aunque nadie repita prompt.
+// En uso normal (caché de contexto + respuestas cortas) son ~0,2-0,5 céntimos.
+const MAX_INPUT_CHARS = 24000;
+const MAX_TOKENS_FREE = 1000;    // prueba y créditos
+const MAX_TOKENS_PREMIUM = 2500; // el cliente pide 2.000 como mucho
 
 // Prueba gratuita. Pon TRIAL_REQUESTS = 0 para desactivarla por completo.
 // TRIAL_ONE_TIME = true → los 3 mensajes son para siempre (no se renuevan cada mes).
@@ -119,6 +133,7 @@ Deno.serve(async (req: Request) => {
   if (!userId) return loginError;
 
   // ---- Quién paga este mensaje ----
+  let isPremium = false;
   let trialLeft: number | null = null;      // mensajes de prueba que le quedan
   let creditsLeft: number | null = null;    // saldo tras el mensaje (si aplica)
   let paidWithCredit = false;
@@ -138,7 +153,7 @@ Deno.serve(async (req: Request) => {
     );
     const rows = profRes.ok ? await profRes.json() : [];
     const profile = Array.isArray(rows) ? rows[0] : null;
-    const premium =
+    const premium = isPremium =
       !!profile?.is_premium &&
       (!profile.premium_until || new Date(profile.premium_until) > new Date());
 
@@ -306,6 +321,20 @@ Deno.serve(async (req: Request) => {
     return json({ error: { message: "Faltan 'messages'" } }, 400, gateHeaders());
   }
 
+  // Nadie manda 200.000 tokens a tu costa: la consulta tiene un tope de tamaño.
+  if (JSON.stringify(messages).length > MAX_INPUT_CHARS) {
+    await refund();
+    return json(
+      {
+        error: {
+          message: "La consulta es demasiado larga. Resume el enunciado o borra elementos del lienzo.",
+        },
+      },
+      413,
+      gateHeaders(),
+    );
+  }
+
   // La cuenta actual no tiene modelos de visión: mejor un error claro que uno del proveedor.
   if (JSON.stringify(messages).includes("image_url")) {
     await refund();
@@ -316,7 +345,10 @@ Deno.serve(async (req: Request) => {
 
   const model = ALLOWED_MODELS.has(body?.model) ? body.model : DEFAULT_MODEL;
   const temperature = Math.min(Math.max(Number(body?.temperature ?? 0.1), 0), 1);
-  const maxTokens = Math.min(Math.max(Number(body?.max_tokens ?? 2000), 1), 4096);
+  // Sin Premium (prueba o créditos) la respuesta tiene un techo más bajo: es lo que
+  // mantiene el coste por mensaje en céntimos.
+  const tokenCeiling = isPremium ? MAX_TOKENS_PREMIUM : MAX_TOKENS_FREE;
+  const maxTokens = Math.min(Math.max(Number(body?.max_tokens ?? 2000), 1), tokenCeiling);
 
   // ---- Llamada a Groq ----
   try {

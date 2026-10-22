@@ -20,7 +20,7 @@ Límites gratuitos que nos afectan (aproximados, comprobar en cada panel):
 - **Vercel Hobby**: 100 GB de tráfico al mes. **Uso no comercial**: al cobrar suscripciones,
   Vercel pide plan Pro (~20 $/mes). Es la primera factura que aparecerá.
 - **Groq Free**: límite de peticiones por minuto. El asistente es solo Premium y tiene topes
-  (60/h por IP y 300/día por cuenta), así que con decenas de suscriptores sigue siendo gratis.
+  (60/h por IP y 120/día por cuenta), así que con decenas de suscriptores sigue siendo gratis.
   Si se queda corto, el plan de pago se cobra por token y este uso cuesta céntimos.
 
 ## Por qué el diseño aguanta en gratis
@@ -29,7 +29,7 @@ Límites gratuitos que nos afectan (aproximados, comprobar en cada panel):
   1.000 usuarios con láminas ≈ unos pocos MB.
 - Los proyectos usan `jsonb` en la misma base de datos: no hay ficheros ni CDN aparte.
 - El asistente exige sesión y Premium: el coste de IA solo existe cuando ya hay ingresos.
-- Topes: 60 peticiones/hora por IP y 300/día por cuenta. Un suscriptor no puede quemar el margen.
+- Topes: 60 peticiones/hora por IP y 120/día por cuenta. Un suscriptor no puede quemar el margen.
 
 ## Punto de equilibrio
 
@@ -79,7 +79,14 @@ admin) devuelve vendidos, gastados, saldo vivo, ingresos, reserva y margen.
 
 La prueba gratuita de 3 mensajes cuesta 0 € mientras siga en el plan gratuito de Groq; con
 DeepSeek son ~0,01 € por cuenta y mes. El riesgo real no es el coste, es el abuso: la prueba
-va por cuenta (no por IP) y el tope diario por cuenta es de 300 mensajes.
+va por cuenta (no por IP) y el tope diario por cuenta es de 120 mensajes.
+
+Con `deepseek-flash` (0,30 $/M entrada sin caché, 1,20 $/M salida en hora punta) y los topes
+del proxy (24.000 caracteres de entrada y 1.000 tokens de salida sin Premium), el mensaje más
+caro posible cuesta **0,0033 $ ≈ 0,30 céntimos**: los 3 de prueba nunca pasan de ~0,9 céntimos
+por usuario, aunque nadie repita prompt. En uso normal (caché de contexto y respuestas cortas)
+son ~0,2-0,5 céntimos. Si se activa el modo razonamiento de DeepSeek hay que contarlo como
+salida: el proxy pide `max_tokens` bajo a propósito para que no se dispare.
 
 ## Qué NO se ha metido a propósito
 
