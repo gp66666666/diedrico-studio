@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import { Plane, Text, Billboard, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import type { PlaneElement } from '../../types';
 import { useGeometryStore } from '../../store/geometryStore';
+import { useFlattenTransform } from '../../hooks/useFlattenTransform';
 import { calculatePlaneTraces } from '../../utils/mathUtils';
 import AbatimientoArrow from './AbatimientoArrow';
 
@@ -19,19 +19,7 @@ export default function PlaneObject({ element }: Props) {
     const groupHRef = useRef<THREE.Group>(null);
     const object3DRef = useRef<THREE.Group>(null);
 
-    useFrame((state, delta) => {
-        const targetRot = isFlattened ? Math.PI / 2 : 0;
-        const targetScale = isFlattened ? 0 : 1;
-
-        if (groupHRef.current) {
-            groupHRef.current.rotation.x = THREE.MathUtils.lerp(groupHRef.current.rotation.x, targetRot, delta * 4);
-        }
-        if (object3DRef.current) {
-            const currentScale = object3DRef.current.scale.x;
-            const newScale = THREE.MathUtils.lerp(currentScale, targetScale, delta * 4);
-            object3DRef.current.scale.setScalar(newScale);
-        }
-    });
+    useFlattenTransform(groupHRef, object3DRef);
 
     if (!element.visible) return null;
 

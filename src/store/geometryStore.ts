@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { GeometryElement, SketchElement } from '../types';
 import { supabase } from '../lib/supabase';
 import { selectionCountForTool } from '../lib/selection';
+import { startFlattenAnimation } from '../lib/flattenAnimation';
 
 /** Estado que se guarda en cada paso de deshacer/rehacer. */
 type HistorySnapshot = {
@@ -363,7 +364,13 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
     toggleBisectors: () => set((state) => ({ showBisectors: !state.showBisectors })),
 
     isFlattened: false,
-    toggleFlattening: () => set((state) => ({ isFlattened: !state.isFlattened })),
+    toggleFlattening: () => set((state) => {
+        const next = !state.isFlattened;
+        // El giro lo dibuja cada objeto con el reloj compartido; aquí solo se
+        // avisa de hacia dónde va.
+        startFlattenAnimation(next);
+        return { isFlattened: next };
+    }),
 
     selectedElementId: null,
     selectElement: (id) => set({ selectedElementId: id }),

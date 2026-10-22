@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { Box, FileText, PenTool, Menu, X, Layers, Printer, Info, HelpCircle, Share2 } from 'lucide-react';
+import { Box, FileText, PenTool, Menu, X, Layers, Printer, Info, HelpCircle, Share2, RotateCcw } from 'lucide-react';
 // El motor 3D (three.js) es el trozo más pesado: se carga aparte para que la
 // interfaz aparezca antes en móviles.
 const Scene = lazy(() => import('./components/Scene'));
@@ -28,7 +28,7 @@ export default function MainApp() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [shared, setShared] = useState<{ title?: string; count: number } | null>(null);
     const [hintDismissed, setHintDismissed] = useState(() => localStorage.getItem('emptyHintDismissed') === '1');
-    const { theme, viewMode, setViewMode, elements } = useGeometryStore();
+    const { theme, viewMode, setViewMode, elements, isFlattened, toggleFlattening } = useGeometryStore();
     const { isPremium } = useUserStore();
     const { generateExercise } = useAIStore();
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -287,6 +287,38 @@ export default function MainApp() {
                                     >
                                          Crear el mío
                                     </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Aviso del abatimiento: explica el giro mientras ocurre */}
+                        {isFlattened && viewMode === '3d' && (
+                            <div className={`absolute left-1/2 top-20 z-20 w-[min(92vw,460px)] -translate-x-1/2 rounded-xl border px-4 py-3 text-sm shadow-2xl backdrop-blur ${isDark ? 'border-amber-400/40 bg-amber-950/85 text-amber-50' : 'border-amber-300 bg-amber-50/95 text-amber-900'}`}>
+                                <div className="flex items-start gap-3">
+                                    <Layers size={18} className={`mt-0.5 shrink-0 ${isDark ? 'text-amber-300' : 'text-amber-600'}`} />
+                                    <div className="flex-1">
+                                        <p className="font-semibold">Plano horizontal abatido sobre la línea de tierra</p>
+                                        <p className={`text-xs ${isDark ? 'text-amber-100/80' : 'text-amber-800/90'}`}>
+                                            Cada proyección horizontal P′ ha girado sobre la línea de tierra (la bisagra) hasta
+                                            quedarse en el plano vertical. Su distancia a la LT es el alejamiento; la cota no cambia:
+                                            eso es lo que se dibuja en el papel.
+                                        </p>
+                                    </div>
+                                    <div className="flex shrink-0 flex-col gap-1.5">
+                                        <button
+                                            onClick={() => setViewMode('2d')}
+                                            className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${isDark ? 'bg-amber-400/25 text-amber-50 hover:bg-amber-400/35' : 'bg-amber-500/20 text-amber-900 hover:bg-amber-500/30'}`}
+                                            title="Ver el resultado plano, como en el papel"
+                                        >
+                                            Ver en 2D
+                                        </button>
+                                        <button
+                                            onClick={toggleFlattening}
+                                            className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${isDark ? 'bg-amber-400/10 text-amber-100 hover:bg-amber-400/20' : 'bg-amber-500/10 text-amber-900 hover:bg-amber-500/20'}`}
+                                        >
+                                            <RotateCcw size={14} /> Volver a 3D
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}

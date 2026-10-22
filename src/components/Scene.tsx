@@ -1,4 +1,4 @@
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid, GizmoHelper, GizmoViewport, Loader, Line } from '@react-three/drei';
 import { useGeometryStore } from '../store/geometryStore';
 import PointObject from './3D/PointObject';
@@ -11,6 +11,7 @@ import SegmentObject from './3D/SegmentObject';
 import IntersectionsRenderer from './3D/IntersectionsRenderer';
 import SystemPlanes from './3D/SystemPlanes';
 import { useEffect, useRef, Suspense } from 'react';
+import { flattenProgress } from '../lib/flattenAnimation';
 import * as THREE from 'three';
 
 function CameraHandler() {
@@ -52,6 +53,63 @@ function CameraHandler() {
     return null;
 }
 
+
+/**
+ * El suelo (la cuadrícula) es la hoja del sistema: al abatir gira sobre la línea
+ * de tierra hasta pegarse al plano vertical. Es lo que explica por qué en el
+ * papel las proyecciones horizontales quedan por DEBAJO de la línea de tierra.
+ */
+function FoldingGrid({ sectionColor, cellColor }: { sectionColor: string; cellColor: string }) {
+    const ref = useRef<THREE.Group>(null);
+    useFrame(() => {
+        if (ref.current) ref.current.rotation.x = (flattenProgress() * Math.PI) / 2;
+    });
+    return (
+        <group ref={ref}>
+            <Grid
+                infiniteGrid
+                fadeDistance={80}
+                sectionColor={sectionColor}
+                cellColor={cellColor}
+                sectionThickness={1.2}
+                cellThickness={0.6}
+            />
+        </group>
+    );
+}
+
+/** Sonda de desarrollo: deja la escena de three.js accesible desde la consola. */
+function SceneProbe() {
+    const { scene } = useThree();
+    useEffect(() => {
+        (window as any).__threeScene = scene;
+    }, [scene]);
+    return null;
+}
+
+/** La línea de tierra se enciende durante el giro: es la bisagra del abatimiento. */
+function HingeLine() {
+    const groupRef = useRef<THREE.Group>(null);
+    const matRef = useRef<any>(null);
+    useFrame(() => {
+        const p = flattenProgress();
+        if (groupRef.current) groupRef.current.visible = p > 0.002;
+        if (matRef.current) matRef.current.opacity = 0.2 + 0.55 * Math.min(1, p * 3);
+    });
+    return (
+        <group ref={groupRef} visible={false}>
+            <Line
+                ref={matRef}
+                points={[[-24, 0, 0], [24, 0, 0]]}
+                color="#fbbf24"
+                lineWidth={2}
+                transparent
+                opacity={0.2}
+            />
+        </group>
+    );
+}
+
 export default function Scene() {
     const { elements, selectElement, showBisectors, theme, measurements } = useGeometryStore();
 
@@ -81,18 +139,13 @@ export default function Scene() {
                     <pointLight position={[-8, 5, -8]} intensity={0.4} color="#818cf8" />
                     <pointLight position={[8, 5, 8]} intensity={0.4} color="#a78bfa" />
 
-                    {/* Grid */}
-                    <Grid
-                        infiniteGrid
-                        fadeDistance={80}
-                        sectionColor={gridSectionColor}
-                        cellColor={gridCellColor}
-                        sectionThickness={1.2}
-                        cellThickness={0.6}
-                    />
+                    {/* Grid (gira con el abatimiento) */}
+                    <FoldingGrid sectionColor={gridSectionColor} cellColor={gridCellColor} />
 
                     {/* System Planes (Quadrants always visible, Bisectors toggleable) */}
                     <SystemPlanes showBisectors={showBisectors} />
+                    <HingeLine />
+                    {import.meta.env.DEV && <SceneProbe />}
 
                     {/* Render all geometry elements */}
                     {elements.map((element) => {

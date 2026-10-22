@@ -196,6 +196,14 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
   se sube encima de un documento con contenido.
 - El **borrador** del lienzo se guarda en `localStorage['diedricoDraft']` y se restaura al abrir
   si el lienzo está vacío (`useDraftAutosave`).
+- **Abatimiento** (Control de Vista «Abatir Plano Horizontal»): un único reloj en
+  `src/lib/flattenAnimation.ts` (1150 ms, `easeInOutCubic`) mueve todos los objetos a la vez;
+  antes cada uno hacía `lerp(..., delta*4)` por su cuenta y nunca coincidían. Giran el plano
+  horizontal y la cuadrícula con la línea de tierra como bisagra, las proyecciones viajan por
+  un arco con punto guía y la LT se ilumina. Los objetos 3D se retiran en la segunda mitad
+  (`smoothstep(0.35,1,p)`), no al principio. Al terminar, P′ queda **por debajo de la LT**:
+  es la explicación de por qué el dibujo en papel se hace así. En dev, `window.__flattenDuration`
+  ralentiza la animación para revisarla.
 - Los **planos en 3D** se pintan por defecto como superficie traslúcida continua (`planeStyle:
   'solid'` en el store, persistido en `localStorage['planeStyle']`); la fila "Planos: Relleno /
   Malla" dentro de Controles de Vista alterna a malla (`'mesh'`). Surgió de un comentario de un profesor: la malla

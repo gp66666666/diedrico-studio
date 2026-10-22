@@ -1,9 +1,25 @@
+import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { Plane, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useGeometryStore } from '../../store/geometryStore';
+import { flattenProgress } from '../../lib/flattenAnimation';
 
 export default function SystemPlanes({ showBisectors }: { showBisectors: boolean }) {
     const { theme } = useGeometryStore();
+    // El plano horizontal es una hoja: al abatir gira sobre la línea de tierra
+    // hasta pegarse al plano vertical. Si se queda quieto mientras las
+    // proyecciones suben, el alumno ve puntos que se despegan de la nada.
+    const floorRef = useRef<THREE.Group>(null);
+    const labelsRef = useRef<THREE.Group>(null);
+
+    useFrame(() => {
+        const p = flattenProgress();
+        if (floorRef.current) floorRef.current.rotation.x = (p * Math.PI) / 2;
+        // Los nombres de los cuadrantes son una ayuda del espacio 3D: al abatir
+        // sobran y tapan el dibujo.
+        if (labelsRef.current) labelsRef.current.visible = p < 0.02;
+    });
     const isDark = theme === 'dark';
 
     const size = 40;
@@ -23,9 +39,11 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             {/* Already partially covered by grid, but let's make it explicit for negative quadrants */}
             {/* Horizontal Plane (XY) - Ground */}
             {/* Offset slightly to avoid Z-fighting with the grid */}
-            <Plane args={[size, size]} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-                <meshBasicMaterial color={planeColor} transparent opacity={opacity} side={THREE.DoubleSide} depthWrite={false} />
-            </Plane>
+            <group ref={floorRef}>
+                <Plane args={[size, size]} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
+                    <meshBasicMaterial color={planeColor} transparent opacity={opacity} side={THREE.DoubleSide} depthWrite={false} />
+                </Plane>
+            </group>
 
             {/* Vertical Plane (XZ) - Wall */}
             {/* We need to visualize the negative part (below ground) too */}
@@ -66,10 +84,12 @@ export default function SystemPlanes({ showBisectors }: { showBisectors: boolean
             )}
 
             {/* --- Quadrant Labels --- */}
+            <group ref={labelsRef}>
             <Text position={[5, 5, 5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>I Cuadrante</Text>
             <Text position={[5, 5, -5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>II Cuadrante</Text>
             <Text position={[5, -5, -5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>III Cuadrante</Text>
             <Text position={[5, -5, 5]} fontSize={1} color={gridColor} fillOpacity={isDark ? 0.5 : 0.6}>IV Cuadrante</Text>
+            </group>
 
         </group>
     );
