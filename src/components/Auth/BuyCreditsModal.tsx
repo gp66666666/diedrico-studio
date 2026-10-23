@@ -6,6 +6,7 @@ import { useUserStore } from '../../store/userStore';
 import { useModalA11y } from '../../hooks/useModalA11y';
 import { trackEvent } from '../../lib/analytics';
 import { supabase } from '../../lib/supabase';
+import { openPaddleCheckout, paddleReady } from '../../lib/paddlejs';
 
 interface Props {
     isOpen: boolean;
@@ -44,8 +45,20 @@ export default function BuyCreditsModal({ isOpen, onClose }: Props) {
             if (!token) throw new Error('Vuelve a iniciar sesión para comprar.');
 
             trackEvent('credits_checkout_click', { pack: pack.id });
-            const { checkoutUrl } = await startCheckout(pack, { accessToken: token });
-            // Pago alojado por Paddle: aquí nunca se ven los datos de la tarjeta.
+            const { transactionId, checkoutUrl } = await startCheckout(pack, { accessToken: token });
+
+            if (transactionId && paddleReady) {
+                // Overlay de Paddle encima de la app: aquí nunca se ven los
+                // datos de la tarjeta.
+                await openPaddleCheckout(transactionId);
+                setBusy(null);
+                return;
+            }
+            if (checkoutUrl && !paddleReady) {
+                throw new Error(
+                    'Los pagos no están configurados en esta web (falta el token de Paddle).'
+                );
+            }
             window.location.href = checkoutUrl!;
         } catch (err) {
             setError(err instanceof Error ? err.message : 'No se ha podido abrir el pago.');

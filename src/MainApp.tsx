@@ -34,6 +34,23 @@ export default function MainApp() {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const isDark = theme === 'dark';
 
+    // Enlace de pago generado por Paddle (`?_ptxn=txn_...`): abre el overlay.
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const txn = params.get('_ptxn');
+        if (!txn) return;
+        window.history.replaceState({}, '', '/');
+        void (async () => {
+            try {
+                const { openPaddleCheckout } = await import('./lib/paddlejs');
+                await openPaddleCheckout(txn);
+            } catch (err) {
+                console.error('No se ha podido abrir el pago', err);
+                toast.error('No se ha podido abrir la página de pago.');
+            }
+        })();
+    }, []);
+
     // Vuelta de Paddle: el webhook puede tardar unos segundos en acreditar, así
     // que se refresca el perfil varias veces y se avisa de que se está haciendo.
     useEffect(() => {

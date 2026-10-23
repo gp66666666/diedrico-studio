@@ -117,7 +117,10 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
     la clave del pack; nunca el precio. Devuelve `checkoutUrl` (pago alojado por Paddle).
   - Configuración: secreto `PADDLE_CATALOG` (mapa pack → `price_id` + créditos o `class`),
     `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_ENV=sandbox|live`, y en el frontend
-    `VITE_PAYMENTS_ENABLED=true`. Sin esa variable la tienda **no aparece**.
+    `VITE_PAYMENTS_ENABLED=true` y `VITE_PADDLE_CLIENT_TOKEN` (público, `test_…` en
+    sandbox). Sin ambas la tienda **no aparece**. La URL que devuelve Paddle
+    (`?_ptxn=txn_…`) no cobra sola: la abre Paddle.js (`lib/paddlejs.ts`) en
+    overlay; `MainApp` también atiende esos enlaces al cargar.
   - Prueba: `node scripts/check-paddle-webhook.mjs` (firma, firma caducada, reintento, pack
     de profesor, suscripción y devolución). Comprobado en sandbox el 2026-10-23.
   - **Pendiente en el panel de Paddle**: fijar el «default payment link» del Checkout; sin
