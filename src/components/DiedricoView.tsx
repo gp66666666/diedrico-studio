@@ -307,10 +307,13 @@ function PlaneClickPreview({
     );
 }
 
+/** Misma escala que usan los componentes de 2D (Solid2D, Point2D…): 40 px por unidad. */
+const PAPER_SCALE = 40;
+
 export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: DiedricoViewProps) {
     const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, distanceResult, selectedForDistance,
         clearDistanceTool, activeTool: activeDistanceTool, selectForDistance,
-        addElement, setActiveTool: setGeometryTool,
+        addElement, setActiveTool: setGeometryTool, updateElementLive, startGesture, endGesture,
         selectElement, cameraStates, setCameraState, measurements, auxSystems,
         vmElements, vmPlaneId, showVMConstruction, toggleVMConstruction,
         showProfile, toggleProfile, showMiniScene, toggleMiniScene
@@ -325,6 +328,14 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [lastTouchDist, setLastTouchDist] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    /** Arrastre de un sólido en 2D: qué proyección se agarró y de dónde salió. */
+    const solidDragRef = useRef<{
+        id: string;
+        start: { x: number; y: number };
+        plane: 'h' | 'v';
+        position: { x: number; y: number; z: number };
+        moved: boolean;
+    } | null>(null);
 
     // Save state on unmount
     useEffect(() => {
@@ -460,6 +471,16 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
             }
         }
         return null;
+    };
+
+    /** Punto del papel sin imantar (para arrastrar sin saltos). */
+    const getRawPoint = (clientX: number, clientY: number) => {
+        if (!containerRef.current) return { x: 0, y: 0 };
+        const rect = containerRef.current.getBoundingClientRect();
+        return {
+            x: (clientX - rect.left - offset.x) / zoom,
+            y: (clientY - rect.top - offset.y) / zoom,
+        };
     };
 
     // --- Snapping Logic ---
@@ -639,6 +660,25 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
         const snapPos = getSnapPoint(e.clientX, e.clientY, p1 || undefined);
 
         if (activeTool === 'select') {
+            // Arrastrar un sólido: la planta mueve X/Y y el alzado X/Z.
+            const solidId = (e.target as Element).closest('[data-solid-id]')?.getAttribute('data-solid-id');
+            if (solidId) {
+                const el = elements.find((x) => x.id === solidId);
+                if (el && el.type === 'solid') {
+                    const paper = getRawPoint(e.clientX, e.clientY);
+                    solidDragRef.current = {
+                        id: solidId,
+                        start: paper,
+                        plane: paper.y >= 0 ? 'h' : 'v',
+                        position: { ...(el as SolidElement).position },
+                        moved: false,
+                    };
+                    selectElement(solidId);
+                    e.stopPropagation();
+                    return;
+                }
+            }
+
             const hitId = hitTest(snapPos.x, snapPos.y);
             if (hitId) {
                 const el = sketchElements.find(e => e.id === hitId);
@@ -911,6 +951,27 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
+        const drag = solidDragRef.current;
+        if (drag) {
+            const paper = getRawPoint(e.clientX, e.clientY);
+            const dx = (paper.x - drag.start.x) / PAPER_SCALE;
+            const dy = (paper.y - drag.start.y) / PAPER_SCALE;
+            if (!drag.moved && Math.hypot(dx, dy) > 0.05) {
+                startGesture();
+                drag.moved = true;
+            }
+            if (drag.moved) {
+                updateElementLive(drag.id, {
+                    position: {
+                        x: drag.position.x + dx,
+                        y: drag.plane === 'h' ? drag.position.y + dy : drag.position.y,
+                        z: drag.plane === 'v' ? drag.position.z - dy : drag.position.z,
+                    },
+                } as Partial<GeometryElement>);
+            }
+            return;
+        }
+
         const snapPos = getSnapPoint(e.clientX, e.clientY, p1 || undefined);
         setCurrentMousePos(snapPos);
 
@@ -952,6 +1013,13 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     };
 
     const handleMouseUp = () => {
+        if (solidDragRef.current) {
+            const { moved } = solidDragRef.current;
+            solidDragRef.current = null;
+            if (moved) endGesture();
+            return;
+        }
+
         if (activeTool === 'select') {
             setIsDragging(false);
             setSelectedElementId(null);

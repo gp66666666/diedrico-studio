@@ -5,6 +5,9 @@ import { selectionCountForTool } from '../lib/selection';
 import { startFlattenAnimation } from '../lib/flattenAnimation';
 
 /** Estado que se guarda en cada paso de deshacer/rehacer. */
+// Foto previa al gesto en curso (arrastre). Una sola para todo el gesto.
+let pendingSnapshot: HistorySnapshot | null = null;
+
 type HistorySnapshot = {
     elements: GeometryElement[];
     sketchElements: SketchElement[];
@@ -46,9 +49,18 @@ interface GeometryState {
     redo: () => void;
 
     // Actions
-    addElement: (element: Omit<GeometryElement, 'id' | 'visible'>) => void;
+    addElement: (element: Omit<GeometryElement, 'id' | 'visible'>) => string;
     removeElement: (id: string) => void;
     updateElement: (id: string, updates: Partial<GeometryElement>) => void;
+    /**
+     * Arrastrar en vivo (mover con el ratón): actualiza sin apuntar nada en el
+     * historial. Si no, cada píxel del arrastre sería un paso de Deshacer.
+     */
+    updateElementLive: (id: string, updates: Partial<GeometryElement>) => void;
+    /** Abre un gesto (arrastre): guarda una foto del estado anterior. */
+    startGesture: () => void;
+    /** Cierra el gesto y deja UN solo paso de Deshacer. */
+    endGesture: () => void;
     toggleVisibility: (id: string) => void;
     clearAll: () => void;
 
@@ -121,7 +133,7 @@ interface GeometryState {
     toggleMiniScene: () => void;
     miniSceneSize: number;
     setMiniSceneSize: (size: number) => void;
-    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'abatir-traza' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines' | 'cambio-plano-h' | 'cambio-plano-v' | 'desabatir-p-ph' | 'desabatir-p-pv' | 'plane-3-points' | 'poliedro-tetraedro' | 'poliedro-cubo' | 'poliedro-octaedro' | 'poliedro-dodecaedro' | 'poliedro-icosaedro' | 'solid-prisma' | 'solid-piramide' | 'revolucion-cilindro' | 'revolucion-cono' | 'revolucion-esfera' | 'solid-section' | 'solid-intersection' | 'solid-development' | 'create-group' | 'segment-2-points' | 'reconstruct-vm' | 'plane-click' | 'line-solid' | 'sphere-tangent' | 'shadows' | 'cast-shadow';
+    activeTool: 'none' | 'distance-point-point' | 'distance-point-line' | 'distance-point-plane' | 'distance-line-line' | 'distance-line-plane' | 'distance-plane-plane' | 'abatir-ph' | 'abatir-pv' | 'abatir-traza' | 'desabatir' | 'intersection-line-line' | 'intersection-line-plane' | 'intersection-plane-plane' | 'advanced-intersection-3-planes' | 'advanced-intersection-3-lines' | 'advanced-intersection-2planes-1line' | 'advanced-intersection-2lines-1plane' | 'true-length' | 'angle-line-line' | 'angle-line-plane' | 'angle-plane-plane' | 'parallel-line-line' | 'parallel-line-plane' | 'plane-parallel-line' | 'perp-line-line' | 'perp-line-plane' | 'perp-plane-line' | 'rotation-point-axis' | 'rotation-any' | 'rotation-parallel-lt' | 'plane-parallel-plane' | 'plane-perp-2-planes' | 'line-parallel-2-planes' | 'plane-parallel-2-lines' | 'cambio-plano-h' | 'cambio-plano-v' | 'desabatir-p-ph' | 'desabatir-p-pv' | 'plane-3-points' | 'solid-move' | 'poliedro-tetraedro' | 'poliedro-cubo' | 'poliedro-octaedro' | 'poliedro-dodecaedro' | 'poliedro-icosaedro' | 'solid-prisma' | 'solid-piramide' | 'revolucion-cilindro' | 'revolucion-cono' | 'revolucion-esfera' | 'solid-section' | 'solid-intersection' | 'solid-development' | 'create-group' | 'segment-2-points' | 'reconstruct-vm' | 'plane-click' | 'line-solid' | 'sphere-tangent' | 'shadows' | 'cast-shadow';
     setActiveTool: (tool: GeometryState['activeTool']) => void;
     selectedForDistance: string[];  // IDs of selected elements
     distanceResult: {
@@ -262,16 +274,19 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         });
     },
 
-    addElement: (element) => set((state) => {
+    // Devuelve el id real: la escena necesita seleccionar lo que acaba de crear
+    // (antes se generaba dentro y quien llamaba se quedaba con un id inventado).
+    addElement: (element) => {
         const newElement = { ...element, id: Math.random().toString(36).substr(2, 9), visible: true } as GeometryElement;
-        return {
+        set((state) => ({
             elements: [...state.elements, newElement],
             history: {
                 past: [...state.history.past, snapshotOf(state)],
                 future: []
             }
-        };
-    }),
+        }));
+        return newElement.id;
+    },
 
     removeElement: (id) => set((state) => ({
         elements: state.elements.filter((el) => el.id !== id),
@@ -293,6 +308,28 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
             future: []
         }
     })),
+
+    updateElementLive: (id, updates) => set((state) => ({
+        elements: state.elements.map((el) =>
+            el.id === id ? { ...el, ...updates } as GeometryElement : el
+        )
+    })),
+
+    startGesture: () => {
+        pendingSnapshot = snapshotOf(get());
+    },
+
+    endGesture: () => {
+        const snapshot = pendingSnapshot;
+        pendingSnapshot = null;
+        if (!snapshot) return;
+        set((state) => ({
+            history: {
+                past: [...state.history.past, snapshot],
+                future: []
+            }
+        }));
+    },
 
     toggleVisibility: (id) => set((state) => ({
         elements: state.elements.map((el) =>
@@ -486,7 +523,7 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
         const { elements, sketchElements, currentProjectId } = get();
         const { data: { user } } = await supabase.auth.getUser();
 
-        if (!user) throw new Error('Must be logged in to save projects');
+        if (!user) throw new Error('Guarda en la nube necesita una cuenta: entra con Google y vuelve a intentarlo.');
 
         const projectData = {
             user_id: user.id,

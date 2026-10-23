@@ -946,9 +946,20 @@ export default function Sidebar() {
                                 <div>
                                     <label className={`block text-xs font-medium mb-2 ${labelClass}`}>Coordenadas</label>
                                     <div className="grid grid-cols-3 gap-2">
-                                        <input type="number" placeholder="X" value={pointCoords.x} onChange={(e) => setPointCoords({ ...pointCoords, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Y" value={pointCoords.y} onChange={(e) => setPointCoords({ ...pointCoords, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                        <input type="number" placeholder="Z" value={pointCoords.z} onChange={(e) => setPointCoords({ ...pointCoords, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                        <label className="block">
+                                            <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>
+                                                Coordenada X<br /><span className="opacity-70">(lateralidad)</span>
+                                            </span>
+                                            <input type="number" step="0.1" value={pointCoords.x} onChange={(e) => setPointCoords({ ...pointCoords, x: e.target.value })} className={`w-full px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                        </label>
+                                        <label className="block">
+                                            <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>Y<br /><span className="opacity-70">(alejamiento)</span></span>
+                                            <input type="number" step="0.1" value={pointCoords.y} onChange={(e) => setPointCoords({ ...pointCoords, y: e.target.value })} className={`w-full px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                        </label>
+                                        <label className="block">
+                                            <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>Z<br /><span className="opacity-70">(cota)</span></span>
+                                            <input type="number" step="0.1" value={pointCoords.z} onChange={(e) => setPointCoords({ ...pointCoords, z: e.target.value })} className={`w-full px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                        </label>
                                     </div>
                                 </div>
                                 <button onClick={handleAddPoint} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>

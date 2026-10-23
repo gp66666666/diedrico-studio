@@ -181,11 +181,11 @@ export default function GuidePage() {
                                 caption="Recta genérica definida por dos puntos. También puedes definirla por un punto y una dirección."
                             />
                             <ul className="space-y-3 text-sm">
-                                <li><b className="text-white">Punto</b>: introduces <b>X</b> (paralela a la línea de tierra), <b>Y</b> (alejamiento) y <b>Z</b> (cota). El nombre es opcional; si lo dejas vacío se numera solo.</li>
+                                <li><b className="text-white">Punto</b>: introduces la <b>coordenada X</b> (lateralidad: a lo largo de la línea de tierra), la <b>Y</b> (alejamiento) y la <b>Z</b> (cota). El nombre es opcional; si lo dejas vacío se numera solo.</li>
                                 <li><b className="text-white">Recta</b>: por <b>2 puntos</b> o por <b>punto + dirección</b>. Si dejas un punto vacío, la recta es infinita.</li>
                                 <li><b className="text-white">Segmento</b>: elige dos puntos ya existentes en el lienzo.</li>
-                                <li><b className="text-white">Plano</b>: por <b>trazas</b> o por <b>punto y normal</b>. También puedes construirlo con 3 puntos desde <i>Herramientas → Planos</i>.</li>
-                                <li><b className="text-white">Sólido</b>: se coloca sobre un punto (ver el apartado siguiente).</li>
+                                <li><b className="text-white">Plano</b>: por <b>trazas</b> o por <b>punto y normal</b>. También puedes construirlo con 3 puntos, o <b>dibujarlo con el ratón</b> desde <i>Herramientas → Planos → Dibujar plano con 3 clics</i>.</li>
+                                <li><b className="text-white">Sólido</b>: con un clic en el suelo de la vista 3D queda apoyado en el PH (ver el apartado siguiente).</li>
                             </ul>
                             <p className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3 text-sm">
                                 <b className="text-blue-300">Truco</b>: haz clic en cualquier elemento del lienzo o de la lista para seleccionarlo;
@@ -196,8 +196,13 @@ export default function GuidePage() {
                         {/* 3 */}
                         <Section id="solidos" number="03" title="Sólidos: la misma geometría en 3D y en 2D" icon={<Box size={20} />}>
                             <p>
-                                Crear un sólido: <i>Herramientas → Sólidos</i>, elige la figura y haz clic sobre un punto del lienzo.
-                                El sólido queda centrado en ese punto.
+                                Crear un sólido: <i>Herramientas → Sólidos</i>, elige la figura y <b className="text-white">haz clic en el suelo</b> de
+                                la vista 3D. Aparece en ese punto y <b className="text-white">apoyado en el plano horizontal</b> (su cara inferior
+                                toca el papel, no queda medio enterrado ni flotando).
+                            </p>
+                            <p className="text-sm">
+                                Si prefieres partir de un punto que ya tienes dibujado, haz clic sobre él: entonces el sólido queda
+                                <b className="text-white"> centrado</b> en ese punto. Las dos formas crean el mismo tipo de sólido.
                             </p>
                             <Figure
                                 src={IMG('12-solidos-3d.jpg')}
@@ -206,8 +211,25 @@ export default function GuidePage() {
                             />
 
                             <p className="text-sm">
-                                Al seleccionar un sólido aparece su panel con dos deslizadores: <b className="text-white">tamaño</b> y <b className="text-white">rotación</b> en
-                                los ejes X, Y y Z. La rotación se mide en grados.
+                                Al seleccionar un sólido aparece su panel, donde puedes <b className="text-white">escribir los números a mano</b>:
+                            </p>
+                            <ul className="space-y-1.5 text-sm">
+                                <li><b className="text-white">Posición</b>: coordenada X (lateralidad), Y (alejamiento) y Z (cota) del centro.</li>
+                                <li><b className="text-white">Medidas</b>: tamaño (lado o radio) y altura en los cuerpos que la tienen.</li>
+                                <li><b className="text-white">Giro</b>: los tres ángulos en grados, con atajos de +90°.</li>
+                            </ul>
+                            <p className="text-sm">
+                                También puedes <b className="text-white">arrastrarlo con el ratón</b>. En la vista 3D se desliza
+                                manteniendo su cota, así que si estaba apoyado en el PH sigue apoyado. En el diédrico, arrastra
+                                su <b className="text-white">planta</b> para moverlo en X y alejamiento, o su{' '}
+                                <b className="text-white">alzado</b> para moverlo en X y cota. Cada arrastre es un solo paso de
+                                Deshacer.
+                            </p>
+                            <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
+                                <b className="text-emerald-300">Apoyar en el PH</b> y <b className="text-emerald-300">Apoyar en el PV</b>:
+                                colocan el sólido tocando el plano horizontal (cota 0) o el vertical (alejamiento 0), sin escribir
+                                números. El panel te avisa en verde si está apoyado, y en rojo cuánto le falta (o cuánto se ha metido
+                                detrás del plano). Al girar un sólido inclinado, vuelve a pulsarlo: ahora apoya en otra cara o arista.
                             </p>
 
                             <div className="my-6 grid gap-4 sm:grid-cols-2">

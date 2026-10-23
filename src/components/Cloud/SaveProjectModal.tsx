@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { X, Save, Loader } from 'lucide-react';
+import { X, Save, Loader, LogIn, Cloud, HardDrive } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
+import { useUserStore } from '../../store/userStore';
 import { captureThumbnail } from '../../lib/thumbnail';
 import { useModalA11y } from '../../hooks/useModalA11y';
 import { trackEvent } from '../../lib/analytics';
@@ -19,6 +20,7 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
     const [error, setError] = useState('');
 
     const { saveProject, currentProjectId, currentProjectTitle } = useGeometryStore();
+    const { user, signInWithGoogle } = useUserStore();
     const panelRef = useModalA11y(isOpen, onClose);
 
     // Al abrir, si ya hay un proyecto en curso, se precarga para actualizarlo
@@ -81,7 +83,31 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
                     </button>
                 </div>
 
-                {/* Content */}
+                {/* Sin cuenta: no se pide un título para luego fallar al guardar */}
+                {!user ? (
+                    <div className="space-y-4 p-4">
+                        <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
+                            <Cloud size={20} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                            <p className="text-sm text-gray-700 dark:text-gray-200">
+                                Guardar en la nube necesita una cuenta: es lo que te deja abrir el dibujo en
+                                otro ordenador o en el móvil.
+                            </p>
+                        </div>
+                        <div className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/40">
+                            <HardDrive size={20} className="mt-0.5 shrink-0 text-gray-500 dark:text-gray-400" />
+                            <p className="text-sm text-gray-700 dark:text-gray-200">
+                                Mientras tanto <b>no pierdes nada</b>: el lienzo se guarda solo en este
+                                navegador y lo recuperas al volver.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => { trackEvent('login_prompt', { from: 'save_project' }); void signInWithGoogle(); }}
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-blue-700"
+                        >
+                            <LogIn size={16} /> Entrar con Google
+                        </button>
+                    </div>
+                ) : (
                 <div className="p-4 space-y-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                         {currentProjectId
@@ -122,6 +148,7 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
                         </div>
                     )}
                 </div>
+                )}
 
                 {/* Footer */}
                 <div className="flex gap-2 p-4 border-t border-gray-200 dark:border-gray-700">
@@ -130,25 +157,27 @@ export default function SaveProjectModal({ isOpen, onClose }: SaveProjectModalPr
                         className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
                         disabled={isSaving}
                     >
-                        Cancelar
+                        {user ? 'Cancelar' : 'Seguir dibujando'}
                     </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={isSaving || !title.trim()}
-                        className="flex-1 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                        {isSaving ? (
-                            <>
-                                <Loader size={16} className="animate-spin" />
-                                Guardando...
-                            </>
-                        ) : (
-                            <>
-                                <Save size={16} />
-                                {currentProjectId ? 'Actualizar' : 'Guardar'}
-                            </>
-                        )}
-                    </button>
+                    {user && (
+                        <button
+                            onClick={handleSave}
+                            disabled={isSaving || !title.trim()}
+                            className="flex-1 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            {isSaving ? (
+                                <>
+                                    <Loader size={16} className="animate-spin" />
+                                    Guardando...
+                                </>
+                            ) : (
+                                <>
+                                    <Save size={16} />
+                                    {currentProjectId ? 'Actualizar' : 'Guardar'}
+                                </>
+                            )}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>,

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, FolderOpen, Loader, Trash2, Calendar, Edit2, Box } from 'lucide-react';
+import { X, FolderOpen, Loader, Trash2, Calendar, Edit2, Box, LogIn, HardDrive } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
+import { useUserStore } from '../../store/userStore';
 import { useModalA11y } from '../../hooks/useModalA11y';
 import { toast } from '../../lib/toast';
 
@@ -16,13 +17,14 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
     const [error, setError] = useState('');
 
     const { loadProject, getUserProjects, deleteProject, renameProject } = useGeometryStore();
+    const { user, signInWithGoogle } = useUserStore();
     const panelRef = useModalA11y(isOpen, onClose);
 
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && user) {
             fetchProjects();
         }
-    }, [isOpen]);
+    }, [isOpen, user]);
 
     const fetchProjects = async () => {
         setIsLoading(true);
@@ -93,7 +95,29 @@ export default function LoadProjectModal({ isOpen, onClose }: LoadProjectModalPr
 
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-4">
-                    {isLoading ? (
+                    {!user ? (
+                        <div className="space-y-4 py-2">
+                            <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
+                                <FolderOpen size={20} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                                <p className="text-sm text-gray-700 dark:text-gray-200">
+                                    Tus proyectos guardados están en tu cuenta, así que los ves en
+                                    cualquier ordenador al entrar.
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/40">
+                                <HardDrive size={20} className="mt-0.5 shrink-0 text-gray-500 dark:text-gray-400" />
+                                <p className="text-sm text-gray-700 dark:text-gray-200">
+                                    El último dibujo de este navegador se abre solo al volver, sin cuenta.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => void signInWithGoogle()}
+                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-blue-700"
+                            >
+                                <LogIn size={16} /> Entrar con Google
+                            </button>
+                        </div>
+                    ) : isLoading ? (
                         <div className="flex items-center justify-center py-12">
                             <Loader size={32} className="animate-spin text-blue-600" />
                         </div>

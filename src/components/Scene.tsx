@@ -12,6 +12,8 @@ import IntersectionsRenderer from './3D/IntersectionsRenderer';
 import SystemPlanes from './3D/SystemPlanes';
 import { useEffect, useRef, Suspense } from 'react';
 import { flattenProgress } from '../lib/flattenAnimation';
+import { makeSolid, isSolidCreationTool } from '../lib/solidFactory';
+import { restOnHorizontalPlane } from '../lib/solidPlacement';
 import * as THREE from 'three';
 
 function CameraHandler() {
@@ -80,10 +82,20 @@ function FoldingGrid({ sectionColor, cellColor }: { sectionColor: string; cellCo
 
 /** Sonda de desarrollo: deja la escena de three.js accesible desde la consola. */
 function SceneProbe() {
-    const { scene } = useThree();
+    const { scene, camera, gl } = useThree();
     useEffect(() => {
         (window as any).__threeScene = scene;
-    }, [scene]);
+        // Proyecta una coordenada del store (x, y, z) a píxeles de pantalla.
+        // Sirve para comprobar clics y arrastres desde los tests sin adivinar.
+        (window as any).__project = (p: { x: number; y: number; z: number }) => {
+            const v = new THREE.Vector3(p.x, p.z, p.y).project(camera);
+            const rect = gl.domElement.getBoundingClientRect();
+            return {
+                x: rect.left + ((v.x + 1) / 2) * rect.width,
+                y: rect.top + ((1 - v.y) / 2) * rect.height,
+            };
+        };
+    }, [scene, camera, gl]);
     return null;
 }
 
@@ -113,6 +125,77 @@ function HingeLine() {
 export default function Scene() {
     const { elements, selectElement, showBisectors, theme, measurements } = useGeometryStore();
 
+    // Estado de three.js (cámara, canvas) para poder lanzar un rayo desde un clic
+    const r3f = useRef<any>(null);
+    const pointerDown = useRef<{ x: number; y: number } | null>(null);
+
+    /**
+     * Clic en zona vacía del 3D.
+     *
+     * Si hay una herramienta de sólido activa, el clic se proyecta sobre el
+     * plano horizontal (cota 0) y el sólido aparece APOYADO ahí: ni flotando ni
+     * medio enterrado. Sin herramienta, solo se quita la selección.
+     */
+    const handlePointerMissed = (event: MouseEvent) => {
+        const state = useGeometryStore.getState();
+        const moving = state.activeTool === 'solid-move';
+
+        if (!isSolidCreationTool(state.activeTool) && !moving) {
+            selectElement(null);
+            return;
+        }
+
+        // Un arrastre para girar la cámara no es un clic: no coloca nada
+        const start = pointerDown.current;
+        if (!start || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 6) return;
+
+        const three = r3f.current;
+        if (!three) return;
+
+        const rect = three.gl.domElement.getBoundingClientRect();
+        const ndc = new THREE.Vector2(
+            ((event.clientX - rect.left) / rect.width) * 2 - 1,
+            -((event.clientY - rect.top) / rect.height) * 2 + 1
+        );
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(ndc, three.camera);
+
+        const hit = new THREE.Vector3();
+        const floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        if (!raycaster.ray.intersectPlane(floor, hit)) return;
+
+        // three (X, Y arriba, Z) → store (x, y alejamiento, z cota)
+        const onFloor = { x: hit.x, y: hit.z, z: 0 };
+        if (Math.abs(onFloor.x) > 60 || Math.abs(onFloor.y) > 60) return;
+
+        // Mover el sólido seleccionado: conserva su cota, solo cambia x e y
+        if (moving) {
+            const current = state.elements.find((e) => e.id === state.selectedElementId);
+            if (current?.type === 'solid') {
+                state.updateElement(current.id, {
+                    position: { ...current.position, x: onFloor.x, y: onFloor.y },
+                });
+                state.setActiveTool('none');
+            }
+            return;
+        }
+
+        const count = state.elements.filter((e) => e.type === 'solid').length;
+        const solid = makeSolid(state.activeTool!, onFloor, count);
+        if (!solid) return;
+
+        solid.position = restOnHorizontalPlane(
+            solid.subtype,
+            solid.size,
+            solid.rotation,
+            onFloor
+        );
+
+        const newId = state.addElement(solid);
+        state.selectElement(newId);
+        state.setActiveTool('none');
+    };
+
     const isDark = theme === 'dark';
     const bgColor = isDark ? '#0a0e1a' : '#f3f4f6';
     const gridSectionColor = isDark ? '#4b5563' : '#94a3b8';
@@ -122,11 +205,19 @@ export default function Scene() {
     const distanceMeasurements = measurements.filter(m => m.visualLine);
 
     return (
-        <div className="w-full h-full relative">
+        <div
+            className="w-full h-full relative"
+            onPointerDownCapture={(e) => {
+                pointerDown.current = { x: e.clientX, y: e.clientY };
+            }}
+        >
             <Canvas
                 camera={{ position: [-30, 25, 30], fov: 50 }}
                 shadows
-                onPointerMissed={() => selectElement(null)}
+                onCreated={(three) => {
+                    r3f.current = three;
+                }}
+                onPointerMissed={handlePointerMissed}
                 gl={{ preserveDrawingBuffer: true }}
             >
                 <Suspense fallback={null}>

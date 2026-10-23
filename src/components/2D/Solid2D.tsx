@@ -32,7 +32,8 @@ export default function Solid2D({ element, isDark, onClick }: Solid2DProps) {
     const center = project({ x: 0, y: 0, z: 0 });
 
     return (
-        <g onClick={onClick} className="cursor-pointer hover:opacity-80">
+        <g onClick={onClick} data-solid-id={id} className="cursor-move hover:opacity-80">
+            <title>{name}: arrastra para mover (planta: X/Y · alzado: X/Z)</title>
             {edges.map((edge, idx) => {
                 const p1 = project(edge.a);
                 const p2 = project(edge.b);

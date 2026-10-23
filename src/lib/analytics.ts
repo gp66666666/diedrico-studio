@@ -20,6 +20,7 @@ export type AnalyticsEvent =
     | 'guide_view'
     | 'project_saved'
     | 'lamina_saved'
+    | 'login_prompt'
     | 'premium_page_view';
 
 export function trackEvent(event: AnalyticsEvent, props?: Record<string, string | number | boolean>) {
