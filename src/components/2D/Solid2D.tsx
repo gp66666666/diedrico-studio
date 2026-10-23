@@ -22,9 +22,9 @@ export default function Solid2D({ element, isDark, onClick }: Solid2DProps) {
 
     // Misma malla que el 3D (lib/solidGeometry): proyección coherente por construcción
     const edges = useMemo(() => {
-        const mesh = buildSolidMesh(subtype, size);
+        const mesh = buildSolidMesh(subtype, size, element.custom);
         return getProjectedEdges(mesh, rotation);
-    }, [subtype, size.x, size.y, size.z, rotation?.x, rotation?.y, rotation?.z]);
+    }, [subtype, size.x, size.y, size.z, element.custom, rotation?.x, rotation?.y, rotation?.z]);
 
     const project = (p: { x: number; y: number; z: number }) => ({
         h: { x: (position.x + p.x) * SCALE, y: (position.y + p.y) * SCALE },

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
-import { buildSolidMesh } from '../../lib/solidGeometry';
+import { solidMesh } from '../../lib/solidGeometry';
 import {
     shadowOfSolid,
     shadowOfPoint,
@@ -111,7 +111,7 @@ export default function ShadowsTool() {
 
             if (objectEl.type === 'solid') {
                 const outline = shadowOfSolid(
-                    buildSolidMesh(objectEl.subtype, objectEl.size),
+                    solidMesh(objectEl),
                     objectEl.position,
                     objectEl.rotation,
                     light,

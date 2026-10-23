@@ -93,12 +93,18 @@ export interface GroupElement extends BaseElement {
 export interface SolidElement extends BaseElement {
     type: 'solid';
     // ... rest same
-    subtype: 'tetrahedron' | 'cube' | 'octahedron' | 'dodecahedron' | 'icosahedron' | 'prism' | 'pyramid' | 'cylinder' | 'cone' | 'sphere';
+    subtype: 'tetrahedron' | 'cube' | 'octahedron' | 'dodecahedron' | 'icosahedron' | 'prism' | 'pyramid' | 'cylinder' | 'cone' | 'sphere' | 'polyhedron';
     position: Vector3;
     size: Vector3; // For most, x=radius/sidelength, y=height
     rotation?: Vector3;
     opacity?: number;
     color: string;
+    /**
+     * Solo para `subtype: 'polyhedron'` (poliedro libre por vértices).
+     * Vértices en coordenadas locales (centro del cuerpo en el origen) y caras
+     * como índices ordenados. El casco convexo se calcula al crearlo.
+     */
+    custom?: { vertices: Vector3[]; faces: number[][] };
 }
 
 export type GeometryElement = PointElement | LineElement | SegmentElement | PlaneElement | GroupElement | SolidElement | PolygonElement | MeshElement;

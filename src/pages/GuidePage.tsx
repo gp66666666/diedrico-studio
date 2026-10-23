@@ -185,7 +185,7 @@ export default function GuidePage() {
                                 <li><b className="text-white">Recta</b>: por <b>2 puntos</b> o por <b>punto + dirección</b>. Si dejas un punto vacío, la recta es infinita.</li>
                                 <li><b className="text-white">Segmento</b>: elige dos puntos ya existentes en el lienzo.</li>
                                 <li><b className="text-white">Plano</b>: por <b>trazas</b> o por <b>punto y normal</b>. También puedes construirlo con 3 puntos, o <b>dibujarlo con el ratón</b> desde <i>Herramientas → Planos → Dibujar plano con 3 clics</i>.</li>
-                                <li><b className="text-white">Sólido</b>: a mano (en el origen), con un punto como centro, con dos puntos como arista, o con un clic en el suelo de la vista 3D (ver el apartado siguiente).</li>
+                                <li><b className="text-white">Sólido</b>: a mano (en el origen), con un punto como centro, con dos puntos como arista, por sus vértices (poliedro libre) o con un clic en el suelo de la vista 3D (ver el apartado siguiente).</li>
                             </ul>
                             <p className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3 text-sm">
                                 <b className="text-blue-300">Truco</b>: haz clic en cualquier elemento del lienzo o de la lista para seleccionarlo;
@@ -214,6 +214,16 @@ export default function GuidePage() {
                                     de un punto que ya tengas— y esa arista cae <b className="text-white">exactamente de P a Q</b>.
                                     En la esfera, el cilindro y el cono los dos puntos son un <b className="text-white">diámetro</b>;
                                     el tetraedro se crea <b className="text-white">regular</b>.
+                                </li>
+                                <li>
+                                    <b className="text-white">4 · Por sus vértices (poliedro libre)</b>: para cuerpos que no
+                                    son regulares —un tetraedro irregular, un prisma oblicuo, un tronco—. Escribes
+                                    <b className="text-white"> solo los vértices</b>, uno por línea («x y z» o el nombre de un
+                                    punto del dibujo) y el programa calcula las caras y las aristas: une cada pareja de
+                                    vértices que comparte una cara y no las demás. Un cubo son 8 vértices y de ahí salen
+                                    sus <b className="text-white">12 aristas y 6 caras</b>; no hay que decir qué va con qué.
+                                    Antes de crear verás el recuento (vértices · aristas · caras · volumen) y, si los puntos
+                                    están en un mismo plano, el aviso de por qué no cierra el cuerpo.
                                 </li>
                             </ul>
                             <p className="text-sm">

@@ -1,9 +1,12 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
-import { Box, Maximize2, X, ArrowDownToLine, ArrowLeftToLine, Move3d, Hand, ChevronDown, ChevronUp, Crosshair, Ruler } from 'lucide-react';
+import { Box, Maximize2, X, ArrowDownToLine, ArrowLeftToLine, Move3d, Hand, ChevronDown, ChevronUp, Crosshair, Ruler, Shapes } from 'lucide-react';
 import type { SolidElement, PointElement } from '../../types';
-import { makeSolid, isSolidCreationTool } from '../../lib/solidFactory';
+import { makeSolid, isSolidCreationTool, makePolyhedron } from '../../lib/solidFactory';
+import { parseVertexInput } from '../../lib/parseVertices';
+import { countEdges, polyhedronFromPoints } from '../../lib/freePolyhedron';
+import { meshVolume, solidMesh } from '../../lib/solidGeometry';
 import { solidFromEdge } from '../../lib/solidFromEdge';
 import { toast } from '../../lib/toast';
 import { lowestLocalZ, lowestLocalY, restOnHorizontalPlane, restOnVerticalPlane } from '../../lib/solidPlacement';
@@ -107,23 +110,42 @@ export default function SolidsTool() {
     const uniqueId = "solids-tool-ultimate-v6";
 
     const isSolidTool = isSolidCreationTool(activeTool);
-    const [mode, setMode] = useState<'center' | 'edge'>('center');
+    // `poliedro-libre` no tiene medidas por defecto: solo el formulario de vértices.
+    const isFreeTool = activeTool === 'poliedro-libre';
+    const [mode, setMode] = useState<'center' | 'edge' | 'vertices'>('center');
+
+    // Vértices del poliedro libre, tal cual los escribe el alumno.
+    const [vertexText, setVertexText] = useState('');
+
+    /** Un clic sobre un punto del dibujo añade su nombre a la lista. */
+    const addVertexLine = (name: string) => {
+        setVertexText((prev) => {
+            const lines = prev.split('\n').map((l) => l.trim()).filter(Boolean);
+            if (lines.some((l) => l.toUpperCase() === name.trim().toUpperCase())) return prev;
+            return [...lines, name.trim()].join('\n');
+        });
+    };
 
     // Crear con un clic sobre un punto existente (la otra vía es el suelo del 3D)
     useEffect(() => {
         if (!isSolidTool) return;
-        if (mode === 'edge') return; // en modo arista manda el formulario
+        if (mode === 'edge' && !isFreeTool) return; // en modo arista manda el formulario
         if (selectedForDistance.length === 1) {
             const pId = selectedForDistance[0];
             const p = elements.find(e => e.id === pId);
             if (p && p.type === 'point') {
                 const pt = p as import('../../types').PointElement;
+                if (isFreeTool) {
+                    addVertexLine(pt.name);
+                    clearDistanceSelection();
+                    return;
+                }
                 createSolidAt(pt.coords);
                 clearDistanceSelection();
                 setActiveTool('none');
             }
         }
-    }, [selectedForDistance, isSolidTool, mode, elements, clearDistanceSelection, setActiveTool]);
+    }, [selectedForDistance, isSolidTool, isFreeTool, mode, elements, clearDistanceSelection, setActiveTool]);
 
     const createSolidAt = (center: { x: number, y: number, z: number }) => {
         if (!activeTool) return;
@@ -201,7 +223,7 @@ export default function SolidsTool() {
     const [edgeQ, setEdgeQ] = useState({ x: '4', y: '0', z: '0' });
 
     useEffect(() => {
-        setMode('center');
+        setMode(activeTool === 'poliedro-libre' ? 'vertices' : 'center');
     }, [activeTool]);
 
     const num = (raw: string): number | null => {
@@ -228,7 +250,7 @@ export default function SolidsTool() {
         if (!activeTool) return;
         const solid = makeSolid(activeTool, { x: 0, y: 0, z: 0 }, solidCount());
         if (!solid) return;
-        solid.position = restOnHorizontalPlane(solid.subtype, solid.size, solid.rotation, { x: 0, y: 0, z: 0 });
+        solid.position = restOnHorizontalPlane(solid.subtype, solid.size, solid.rotation, { x: 0, y: 0, z: 0 }, solid.custom);
         spawn(solid);
     };
 
@@ -283,6 +305,73 @@ export default function SolidsTool() {
     };
 
     const points = elements.filter((e): e is PointElement => e.type === 'point');
+
+    /**
+     * Vértices escritos → cuerpo.
+     *
+     * Se calcula en cada tecla para poder avisar ANTES de crear: cuántas
+     * aristas y caras salen, o qué falla. Así el alumno ve que las uniones las
+     * resuelve el programa y no tiene que escribirlas.
+     */
+    const vertexCheck = useMemo(() => {
+        const parsed = parseVertexInput(
+            vertexText,
+            points.map((p) => ({ name: p.name, coords: p.coords }))
+        );
+        const poly =
+            parsed.errors.length === 0 && parsed.vertices.length >= 4
+                ? polyhedronFromPoints(parsed.vertices)
+                : null;
+        return { parsed, poly };
+    }, [vertexText, points]);
+
+    const vertexPreview = useMemo(() => {
+        const { parsed, poly } = vertexCheck;
+        if (!vertexText.trim()) {
+            return { text: 'Escribe un vértice por línea y aquí saldrá el recuento.', cls: 'text-white/50' };
+        }
+        if (parsed.errors.length > 0) {
+            return { text: `✕ ${parsed.errors[0]}`, cls: 'status-bad' };
+        }
+        if (parsed.vertices.length < 4) {
+            return {
+                text: `${parsed.vertices.length} vértice(s): un cuerpo necesita al menos 4.`,
+                cls: 'status-mid',
+            };
+        }
+        if (!poly) {
+            return {
+                text: '✕ Esos puntos no cierran un cuerpo: están alineados o todos en el mismo plano.',
+                cls: 'status-bad',
+            };
+        }
+        const inside = poly.dropped > 0 ? ` · ${poly.dropped} por dentro` : '';
+        return {
+            text: `✓ ${poly.vertices.length} vértices · ${countEdges(poly.faces)} aristas · ${poly.faces.length} caras · ${poly.volume.toFixed(2)} u³${inside}`,
+            cls: 'status-ok',
+        };
+    }, [vertexCheck, vertexText]);
+
+    /** Botón 4: crea el cuerpo a partir de los vértices escritos. */
+    const createPolyhedron = () => {
+        const { parsed, poly } = vertexCheck;
+        if (parsed.errors.length > 0) {
+            toast.error(parsed.errors[0]);
+            return;
+        }
+        if (parsed.vertices.length < 4) {
+            toast.error('Hacen falta al menos 4 vértices: el cuerpo más pequeño es el tetraedro.');
+            return;
+        }
+        if (!poly) {
+            toast.error('Esos puntos no forman un cuerpo: mira que no estén alineados ni todos en el mismo plano.');
+            return;
+        }
+        if (poly.dropped > 0) {
+            toast(`Hay ${poly.dropped} punto(s) dentro del cuerpo: no forman cara y se descartan.`);
+        }
+        spawn(makePolyhedron(poly, solidCount()));
+    };
 
     /**
      * Vuelca el sólido en el formulario.
@@ -341,7 +430,7 @@ export default function SolidsTool() {
     const restOnFloor = (toOrigin = false) => {
         if (!solid) return;
         const base = { x: toOrigin ? 0 : solid.position.x, y: toOrigin ? 0 : solid.position.y, z: 0 };
-        const position = restOnHorizontalPlane(solid.subtype, solid.size, solid.rotation, base);
+        const position = restOnHorizontalPlane(solid.subtype, solid.size, solid.rotation, base, solid.custom);
         updateElement(solid.id, { position });
         setPane(prev => (prev ? { ...prev, px: fmt(position.x), py: fmt(position.y), pz: fmt(position.z) } : prev));
     };
@@ -349,7 +438,7 @@ export default function SolidsTool() {
     /** Pega la parte de atrás del sólido al plano vertical (y = 0). */
     const restOnWall = () => {
         if (!solid) return;
-        const position = restOnVerticalPlane(solid.subtype, solid.size, solid.rotation, solid.position);
+        const position = restOnVerticalPlane(solid.subtype, solid.size, solid.rotation, solid.position, solid.custom);
         updateElement(solid.id, { position });
         setPane(prev => (prev ? { ...prev, py: fmt(position.y) } : prev));
     };
@@ -366,13 +455,13 @@ export default function SolidsTool() {
 
     // Cota del punto más bajo: sirve para avisar si está enterrado o flotando
     const gap = solid
-        ? solid.position.z + lowestLocalZ(solid.subtype, solid.size, solid.rotation)
+        ? solid.position.z + lowestLocalZ(solid.subtype, solid.size, solid.rotation, solid.custom)
         : 0;
     const resting = Math.abs(gap) < 0.005;
 
     // Distancia al plano vertical: 0 = pegado, positivo = separado hacia delante
     const wallGap = solid
-        ? solid.position.y + lowestLocalY(solid.subtype, solid.size, solid.rotation)
+        ? solid.position.y + lowestLocalY(solid.subtype, solid.size, solid.rotation, solid.custom)
         : 0;
     const againstWall = Math.abs(wallGap) < 0.005;
 
@@ -433,7 +522,11 @@ export default function SolidsTool() {
                     <div className="flex items-center gap-2">
                         <Box className="text-blue-400" size={18} />
                         <h3 className="text-sm font-black uppercase tracking-[0.2em] m-0">
-                            {solid ? `Editar ${solidName}` : `Crear ${activeTool?.split('-')[1] || ''}`}
+                            {solid
+                                ? `Editar ${solidName}`
+                                : isFreeTool
+                                    ? 'Poliedro libre (vértices)'
+                                    : `Crear ${activeTool?.split('-')[1] || ''}`}
                         </h3>
                     </div>
                     <button
@@ -521,6 +614,23 @@ export default function SolidsTool() {
                         </section>
 
                         {/* Medidas */}
+                        {solid.subtype === 'polyhedron' ? (
+                            <section className="space-y-2">
+                                <span className="label-text block">Geometría</span>
+                                <div className="rounded-xl bg-white/5 p-2 text-[11px] leading-relaxed">
+                                    <p>
+                                        <b>{solid.custom?.vertices.length ?? 0} vértices</b> ·{' '}
+                                        <b>{countEdges(solid.custom?.faces ?? [])} aristas</b> ·{' '}
+                                        <b>{solid.custom?.faces.length ?? 0} caras</b> ·{' '}
+                                        <b>{meshVolume(solidMesh(solid)).toFixed(2)} u³</b>
+                                    </p>
+                                    <p className="mt-1 text-white/60">
+                                        Las caras se calcularon al crearlo. Para cambiar un vértice,
+                                        deshaz y vuelve a escribir la lista.
+                                    </p>
+                                </div>
+                            </section>
+                        ) : (
                         <section className="space-y-2">
                             <span className="label-text block">Medidas</span>
                             <div className={`grid gap-2 ${HAS_HEIGHT.includes(solid.subtype) ? 'grid-cols-2' : 'grid-cols-1'}`}>
@@ -547,6 +657,7 @@ export default function SolidsTool() {
                                 )}
                             </div>
                         </section>
+                        )}
 
                         {/* Giro */}
                         <section className="space-y-2">
@@ -588,10 +699,22 @@ export default function SolidsTool() {
                 ) : (
                     <div className="space-y-3">
                         <p className="text-[11px] leading-snug text-white/70">
-                            Elige cómo colocarlo. También puedes <b>hacer clic en el suelo</b> del 3D:
-                            aparece apoyado en el PH, en ese punto.
+                            {isFreeTool ? (
+                                <>
+                                    Escribe un vértice por línea y pulsa <b>Crear</b>: las caras se
+                                    calculan solas. También vale ir haciendo clic en los puntos del
+                                    dibujo y se añaden a la lista.
+                                </>
+                            ) : (
+                                <>
+                                    Elige cómo colocarlo. También puedes <b>hacer clic en el suelo</b> del 3D:
+                                    aparece apoyado en el PH, en ese punto.
+                                </>
+                            )}
                         </p>
 
+                        {!isFreeTool && (
+                        <>
                         {/* 1 · a mano */}
                         <div className="space-y-1">
                             <button
@@ -672,6 +795,55 @@ export default function SolidsTool() {
                                         La arista elegida cae exactamente de P a Q. En la esfera, el
                                         cilindro y el cono los dos puntos son un diámetro. El tetraedro
                                         se crea regular.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        </>
+                        )}
+
+                        {/* 4 · por sus vértices (poliedro libre) */}
+                        <div className="space-y-1">
+                            {!isFreeTool && (
+                                <button
+                                    onClick={() => setMode('vertices')}
+                                    className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold transition-colors ${mode === 'vertices' ? 'bg-teal-500/80' : 'bg-white/10 hover:bg-white/20'}`}
+                                >
+                                    <Shapes size={16} />
+                                    <span className="flex-1">4 · Por sus vértices (poliedro libre)</span>
+                                    {mode === 'vertices' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                </button>
+                            )}
+                            {(isFreeTool || mode === 'vertices') && (
+                                <div className="space-y-2 rounded-xl bg-white/5 p-2">
+                                    <div className="rounded-lg bg-teal-500/10 p-2 text-[10px] leading-snug text-white/80">
+                                        <b className="text-teal-300">Solo los vértices.</b> El programa
+                                        mira qué parejas comparten cara y dibuja esas aristas: en un
+                                        cubo escribes sus 8 vértices y salen sus 12 aristas y 6 caras.
+                                        No hay que decir «A va con B y no con C».
+                                    </div>
+                                    <span className="label-text block">Vértices (uno por línea)</span>
+                                    <textarea
+                                        value={vertexText}
+                                        onChange={(e) => setVertexText(e.target.value)}
+                                        rows={6}
+                                        spellCheck={false}
+                                        placeholder={'0 0 0\n4 0 0\n0 6 0\n0 0 3'}
+                                        className="w-full rounded-lg border border-white/15 bg-white/5 px-2 py-1.5 font-mono text-[11px] leading-relaxed"
+                                    />
+                                    <div className={`rounded-lg bg-black/20 px-2 py-1 text-[10px] font-semibold leading-snug ${vertexPreview.cls}`}>
+                                        {vertexPreview.text}
+                                    </div>
+                                    <button
+                                        onClick={createPolyhedron}
+                                        className="w-full rounded-lg bg-teal-500 px-2 py-1.5 text-xs font-semibold hover:bg-teal-400"
+                                    >
+                                        Crear el cuerpo con esos vértices
+                                    </button>
+                                    <p className="text-[10px] leading-snug text-white/50">
+                                        Vale para cuerpos convexos (tetraedro irregular, prisma
+                                        oblicuo, tronco…). Cada línea es «x y z» o el nombre de un
+                                        punto ya dibujado.
                                     </p>
                                 </div>
                             )}

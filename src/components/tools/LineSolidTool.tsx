@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
-import { buildSolidMesh } from '../../lib/solidGeometry';
+import { solidMesh } from '../../lib/solidGeometry';
 import { intersectLineSolid } from '../../lib/lineSolid';
 import type { LineElement, SegmentElement, SolidElement, Vector3 } from '../../types';
 import { toast } from '../../lib/toast';
@@ -64,7 +64,7 @@ export default function LineSolidTool() {
             : { point: (line as LineElement).point, direction: (line as LineElement).direction };
 
         const found = intersectLineSolid(
-            buildSolidMesh(solid.subtype, solid.size),
+            solidMesh(solid),
             solid.position,
             solid.rotation,
             ray,

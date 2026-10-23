@@ -38,7 +38,7 @@ export default function SolidObject({ element }: SolidObjectProps) {
 
     // Malla compartida con la vista 2D (coordenadas locales del store)
     const geometry = useMemo(() => {
-        const mesh = buildSolidMesh(subtype, size);
+        const mesh = buildSolidMesh(subtype, size, element.custom);
         const positions: number[] = [];
 
         mesh.faces.forEach((face) => {

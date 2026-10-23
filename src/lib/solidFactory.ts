@@ -74,3 +74,30 @@ export function makeSolid(
         opacity: 0.8,
     } as SolidElement;
 }
+
+/**
+ * Poliedro libre: el alumno ha escrito sus vértices y el casco convexo ya viene
+ * calculado (lib/freePolyhedron). Las caras y los vértices se guardan en el
+ * propio elemento, así el 3D, el 2D y las herramientas usan la misma geometría.
+ */
+export function makePolyhedron(
+    poly: { position: Vec3; size: Vec3; vertices: Vec3[]; faces: number[][] },
+    solidCount: number
+): SolidElement {
+    return {
+        type: 'solid',
+        id: Math.random().toString(36).substr(2, 9),
+        name: `Poliedro ${solidCount + 1}`,
+        subtype: 'polyhedron',
+        position: { ...poly.position },
+        size: { ...poly.size },
+        rotation: { x: 0, y: 0, z: 0 },
+        color: '#14b8a6',
+        visible: true,
+        opacity: 0.8,
+        custom: {
+            vertices: poly.vertices.map((v) => ({ ...v })),
+            faces: poly.faces.map((f) => [...f]),
+        },
+    } as SolidElement;
+}

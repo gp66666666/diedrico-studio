@@ -482,6 +482,13 @@ export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) 
                         >
                             🔷 Icosaedro
                         </button>
+                        <button
+                            className={getButtonClass('poliedro-libre')}
+                            onClick={() => setActiveTool(activeTool === 'poliedro-libre' ? 'none' : 'poliedro-libre')}
+                            title="Tetraedro irregular, prisma oblicuo, tronco… escribes sus vértices y se calculan las caras"
+                        >
+                            🧩 Poliedro libre (vértices)
+                        </button>
 
                         {/* Prismáticos */}
                         <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>

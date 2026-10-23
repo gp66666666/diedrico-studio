@@ -9,7 +9,7 @@
  * analítica cerrada).
  */
 
-import { buildSolidMesh, type SolidMesh } from './solidGeometry';
+import { buildSolidMesh, type CustomMesh, type SolidMesh } from './solidGeometry';
 import { convexHull2D } from './shadows';
 import type { Vector3 } from '../types';
 import type { DevPiece, Development } from './development';
@@ -94,8 +94,12 @@ function overlaps(a: { x: number; y: number }[], b: { x: number; y: number }[]) 
  * Despliega un poliedro completo. Devuelve `null` si no encuentra una red sin
  * solapes.
  */
-export function unfoldPolyhedron(subtype: string, size: { x: number; y: number; z: number }): Development | null {
-    const mesh: SolidMesh = buildSolidMesh(subtype, size);
+export function unfoldPolyhedron(
+    subtype: string,
+    size: { x: number; y: number; z: number },
+    custom?: CustomMesh
+): Development | null {
+    const mesh: SolidMesh = buildSolidMesh(subtype, size, custom);
     const vertices = mesh.vertices;
     const faces = mesh.faces;
 

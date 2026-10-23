@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
-import { buildSolidMesh } from '../../lib/solidGeometry';
+import { solidMesh } from '../../lib/solidGeometry';
 import { intersectSolids } from '../../lib/solidIntersection';
 import type { SolidElement } from '../../types';
 import { toast } from '../../lib/toast';
@@ -57,10 +57,10 @@ export default function SolidIntersectionTool() {
 
         const [a, b] = picked;
         const found = intersectSolids(
-            buildSolidMesh(a.subtype, a.size),
+            solidMesh(a),
             a.position,
             a.rotation,
-            buildSolidMesh(b.subtype, b.size),
+            solidMesh(b),
             b.position,
             b.rotation
         );

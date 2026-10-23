@@ -1399,6 +1399,13 @@ export default function Sidebar() {
                                             </button>
                                         ))}
                                     </div>
+                                    <button
+                                        onClick={() => setActiveTool('poliedro-libre')}
+                                        className={`mt-2 w-full py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === 'poliedro-libre' ? 'bg-teal-600 border-teal-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                        title="Tetraedro irregular, prisma oblicuo, tronco… escribes sus vértices y se calculan las caras"
+                                    >
+                                        Poliedro libre (por vértices)
+                                    </button>
                                 </div>
 
                                 <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-xl">

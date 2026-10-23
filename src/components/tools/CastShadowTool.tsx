@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
-import { buildSolidMesh } from '../../lib/solidGeometry';
+import { solidMesh } from '../../lib/solidGeometry';
 import { lightFromElement } from '../../lib/shadows';
 import { shadowOfSolidOnPlane, shadowOnSolid, projectPointOnPlane } from '../../lib/castShadow';
 import type { PlaneElement, PointElement, SegmentElement, SolidElement } from '../../types';
@@ -75,7 +75,7 @@ export default function CastShadowTool() {
             if (obj.type === 'solid') {
                 const solid = obj as SolidElement;
                 const poly = shadowOfSolidOnPlane(
-                    buildSolidMesh(solid.subtype, solid.size),
+                    solidMesh(solid),
                     solid.position,
                     solid.rotation,
                     light,
@@ -171,11 +171,11 @@ export default function CastShadowTool() {
             const a = obj as SolidElement;
             const b = receptor as SolidElement;
             const found = shadowOnSolid(
-                buildSolidMesh(a.subtype, a.size),
+                solidMesh(a),
                 a.position,
                 a.rotation,
                 light,
-                buildSolidMesh(b.subtype, b.size),
+                solidMesh(b),
                 b.position,
                 b.rotation
             );

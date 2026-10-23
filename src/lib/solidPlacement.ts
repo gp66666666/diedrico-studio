@@ -1,4 +1,4 @@
-import { buildSolidMesh, rotateStorePoint, type Vec3 } from './solidGeometry';
+import { buildSolidMesh, rotateStorePoint, type CustomMesh, type Vec3 } from './solidGeometry';
 import type { SolidElement } from '../types';
 
 /**
@@ -19,9 +19,10 @@ import type { SolidElement } from '../types';
 export function lowestLocalZ(
     subtype: SolidElement['subtype'],
     size: Vec3,
-    rotation?: Vec3
+    rotation?: Vec3,
+    custom?: CustomMesh
 ): number {
-    const mesh = buildSolidMesh(subtype, size);
+    const mesh = buildSolidMesh(subtype, size, custom);
     let min = Infinity;
     for (const vertex of mesh.vertices) {
         const p = rotateStorePoint(vertex, rotation);
@@ -34,9 +35,10 @@ export function lowestLocalZ(
 export function lowestLocalY(
     subtype: SolidElement['subtype'],
     size: Vec3,
-    rotation?: Vec3
+    rotation?: Vec3,
+    custom?: CustomMesh
 ): number {
-    const mesh = buildSolidMesh(subtype, size);
+    const mesh = buildSolidMesh(subtype, size, custom);
     let min = Infinity;
     for (const vertex of mesh.vertices) {
         const p = rotateStorePoint(vertex, rotation);
@@ -49,18 +51,20 @@ export function lowestLocalY(
 export function restingCenterY(
     subtype: SolidElement['subtype'],
     size: Vec3,
-    rotation?: Vec3
+    rotation?: Vec3,
+    custom?: CustomMesh
 ): number {
-    return -lowestLocalY(subtype, size, rotation);
+    return -lowestLocalY(subtype, size, rotation, custom);
 }
 
 /** Cota que debe tener el centro para que el punto más bajo quede en z = 0. */
 export function restingCenterZ(
     subtype: SolidElement['subtype'],
     size: Vec3,
-    rotation?: Vec3
+    rotation?: Vec3,
+    custom?: CustomMesh
 ): number {
-    return -lowestLocalZ(subtype, size, rotation);
+    return -lowestLocalZ(subtype, size, rotation, custom);
 }
 
 /**
@@ -71,9 +75,10 @@ export function restOnVerticalPlane(
     subtype: SolidElement['subtype'],
     size: Vec3,
     rotation: Vec3 | undefined,
-    position: Vec3
+    position: Vec3,
+    custom?: CustomMesh
 ): Vec3 {
-    return { ...position, y: restingCenterY(subtype, size, rotation) };
+    return { ...position, y: restingCenterY(subtype, size, rotation, custom) };
 }
 
 /** Devuelve la posición con la cota corregida para apoyar en el PH. */
@@ -81,7 +86,8 @@ export function restOnHorizontalPlane(
     subtype: SolidElement['subtype'],
     size: Vec3,
     rotation: Vec3 | undefined,
-    position: Vec3
+    position: Vec3,
+    custom?: CustomMesh
 ): Vec3 {
-    return { ...position, z: restingCenterZ(subtype, size, rotation) };
+    return { ...position, z: restingCenterZ(subtype, size, rotation, custom) };
 }

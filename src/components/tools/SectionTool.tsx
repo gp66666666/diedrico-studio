@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
-import { buildSolidMesh } from '../../lib/solidGeometry';
+import { solidMesh } from '../../lib/solidGeometry';
 import { sectionPolygons, trueShape, type TrueShape } from '../../lib/section';
 import { buildTruncatedDevelopment, developmentSvg, type Development } from '../../lib/development';
 import type { PlaneElement, SolidElement, Vector3 } from '../../types';
@@ -62,7 +62,7 @@ export default function SectionTool() {
             return;
         }
 
-        const mesh = buildSolidMesh(solid.subtype, solid.size);
+        const mesh = solidMesh(solid);
         const loops = sectionPolygons(mesh, solid.position, solid.rotation, plane.normal, plane.constant);
 
         if (loops.length === 0) {
@@ -98,7 +98,8 @@ export default function SectionTool() {
                 solid.position,
                 solid.rotation,
                 plane.normal,
-                plane.constant
+                plane.constant,
+                solid.custom
             ),
         });
 

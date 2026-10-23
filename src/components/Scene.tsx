@@ -188,7 +188,8 @@ export default function Scene() {
             solid.subtype,
             solid.size,
             solid.rotation,
-            onFloor
+            onFloor,
+            solid.custom
         );
 
         const newId = state.addElement(solid);

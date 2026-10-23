@@ -39,6 +39,7 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                 { name: "Punto 3D", desc: "Introduce coordenadas X, Y, Z para situar puntos en el espacio." },
                 { name: "Recta / Plano", desc: "Define elementos mediante puntos o ecuaciones." },
                 { name: "Plano con 3 clics", desc: "Dibuja un plano directamente sobre el papel: dos clics debajo de la LT (traza horizontal) y uno encima (traza vertical)." },
+                { name: "Poliedro libre (vértices)", desc: "Para cuerpos no regulares: escribes solo sus vértices (o haces clic en los puntos del dibujo) y el programa calcula caras y aristas. Antes de crear verás cuántos vértices, aristas, caras y volumen sale." },
                 { name: "Sección plana", desc: "Corta un sólido con un plano: la sección se dibuja en planta y alzado y verás su verdadera magnitud, área y perímetro." },
                 { name: "Intersección de dos sólidos", desc: "Calcula la parte común de dos cuerpos y marca la línea de intersección en planta y alzado." },
                 { name: "Recta y sólido", desc: "Marca los puntos de entrada y salida de una recta en un sólido, con la cuerda entre ellos." },

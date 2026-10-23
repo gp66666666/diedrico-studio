@@ -23,6 +23,12 @@ export interface SolidMesh {
     faces: number[][];
 }
 
+/** Malla propia de un poliedro libre (vértices y caras ya calculados). */
+export interface CustomMesh {
+    vertices: Vec3[];
+    faces: number[][];
+}
+
 const PHI = (1 + Math.sqrt(5)) / 2;
 
 const sub = (a: Vec3, b: Vec3): Vec3 => ({ x: a.x - b.x, y: a.y - b.y, z: a.z - b.z });
@@ -196,8 +202,19 @@ function sphereMesh(r: number, segments = 36, rings = 18): SolidMesh {
  */
 export function buildSolidMesh(
     subtype: string | undefined,
-    size: { x: number; y: number; z: number }
+    size: { x: number; y: number; z: number },
+    custom?: CustomMesh
 ): SolidMesh {
+    if (subtype === 'polyhedron') {
+        // Poliedro libre: los vértices son los que ha escrito el alumno. Se
+        // copian para que nadie modifique la malla del elemento por accidente.
+        if (!custom) return { vertices: [], faces: [] };
+        return {
+            vertices: custom.vertices.map((v) => ({ x: v.x, y: v.y, z: v.z })),
+            faces: custom.faces.map((f) => [...f]),
+        };
+    }
+
     const r = Math.max(size.x, 0.01);
     const h = Math.max(size.y || size.x, 0.01);
 
@@ -273,6 +290,21 @@ export function buildSolidMesh(
 }
 
 /**
+ * Malla local de un elemento sólido.
+ *
+ * Es el único punto que hay que usar en 3D, en 2D y en las herramientas: así el
+ * poliedro libre (que trae sus propios vértices) se comporta igual que el resto
+ * y no hay dos geometrías distintas para el mismo elemento.
+ */
+export function solidMesh(solid: {
+    subtype?: string;
+    size: { x: number; y: number; z: number };
+    custom?: CustomMesh;
+}): SolidMesh {
+    return buildSolidMesh(solid.subtype, solid.size, solid.custom);
+}
+
+/**
  * Rotación del store (rx, ry, rz) con el MISMO orden que usa Three.js.
  *
  * En 3D el grupo se monta con `rotation={[rx, rz, ry]}` y orden Euler XYZ,
@@ -329,6 +361,31 @@ export function transformVertex(vertex: Vec3, position: Vec3, rotation?: Vec3): 
 export interface SolidFaceInfo {
     indices: number[];
     normal: Vec3;
+}
+
+/**
+ * Volumen de una malla cerrada con caras convexas y orientadas hacia fuera.
+ *
+ * Se usa para enseñar el volumen del poliedro libre en su panel: si el alumno
+ * ha escrito bien los vértices, el número cuadra con lo que ve dibujado.
+ */
+export function meshVolume(mesh: SolidMesh): number {
+    let total = 0;
+    for (const face of mesh.faces) {
+        const a = mesh.vertices[face[0]];
+        if (!a) continue;
+        for (let i = 1; i < face.length - 1; i++) {
+            const b = mesh.vertices[face[i]];
+            const c = mesh.vertices[face[i + 1]];
+            if (!b || !c) continue;
+            total +=
+                (a.x * (b.y * c.z - b.z * c.y) -
+                    a.y * (b.x * c.z - b.z * c.x) +
+                    a.z * (b.x * c.y - b.y * c.x)) /
+                6;
+        }
+    }
+    return Math.abs(total);
 }
 
 /** Caras con normal orientada hacia fuera (centro del sólido en el origen). */

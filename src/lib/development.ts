@@ -167,7 +167,11 @@ function coneDevelopment(radius: number, height: number): Development {
  * Devuelve `null` para la esfera (no es desarrollable) y para octaedro,
  * dodecaedro e icosaedro (redes no contempladas).
  */
-export function buildDevelopment(subtype: string | undefined, size: { x: number; y: number; z: number }): Development | null {
+export function buildDevelopment(
+    subtype: string | undefined,
+    size: { x: number; y: number; z: number },
+    custom?: CustomMesh
+): Development | null {
     const r = Math.max(size.x, 0.01);
     const h = Math.max(size.y || size.x, 0.01);
 
@@ -189,8 +193,9 @@ export function buildDevelopment(subtype: string | undefined, size: { x: number;
         case 'octahedron':
         case 'dodecahedron':
         case 'icosahedron':
+        case 'polyhedron':
             // Se despliegan abatiendo la malla cara a cara (lib/unfold)
-            return unfoldPolyhedron(subtype, size);
+            return unfoldPolyhedron(subtype, size, custom);
         default:
             return null;
     }
@@ -211,7 +216,7 @@ export function developmentBounds(pieces: DevPiece[]) {
  * Desarrollo del cuerpo truncado (prisma recto / cilindro)
  * ------------------------------------------------------------------ */
 
-import { buildSolidMesh, transformVertex } from './solidGeometry';
+import { buildSolidMesh, transformVertex, type CustomMesh } from './solidGeometry';
 import { sectionPolygons, trueShape } from './section';
 import type { Vector3 } from '../types';
 
@@ -232,7 +237,8 @@ export function buildTruncatedDevelopment(
     position: Vector3,
     rotation: Vector3 | undefined,
     normal: Vector3,
-    constant: number
+    constant: number,
+    custom?: CustomMesh
 ): Development | null {
     if (!subtype) return null;
     if (['pyramid', 'tetrahedron', 'cone'].includes(subtype)) {
@@ -321,7 +327,7 @@ export function buildTruncatedDevelopment(
     });
 
     // Tapa: la sección en verdadera magnitud, colocada a la derecha
-    const mesh = buildSolidMesh(subtype, size);
+    const mesh = buildSolidMesh(subtype, size, custom);
     const loops = sectionPolygons(mesh, position, rotation, normal, constant);
     const shape = loops.length ? trueShape(loops[0], n) : null;
 

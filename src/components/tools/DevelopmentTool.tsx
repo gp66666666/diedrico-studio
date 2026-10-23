@@ -45,7 +45,7 @@ export default function DevelopmentTool() {
         }
 
         const element = picked as SolidElement;
-        const development = buildDevelopment(element.subtype, element.size);
+        const development = buildDevelopment(element.subtype, element.size, element.custom);
 
         setSolid(element);
         setDev(development);
