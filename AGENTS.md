@@ -101,8 +101,28 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   (`PREMIUM_MONTHLY_LIMIT`, unas 50 al día); Pack Profesor 24,99 €/semestre (40 alumnos ×
   150) y 39,99 €/curso (40 × 300). Los packs de profesor dan **códigos de clase**, no un bote
   compartido: cada alumno canjea una vez y recibe las consultas en su cuenta.
-- **Tienda preparada pero apagada** (Lemon Squeezy, que actúa como vendedor: cobra el
-  IVA europeo y emite la factura; nosotros solo acreditamos consultas).
+- **Tienda: Paddle** (elegido 2026-10; `lemonsqueezy-webhook` queda en el repo como
+  histórico y se puede borrar cuando Paddle esté en live). Paddle es el vendedor: cobra el
+  IVA europeo y emite la factura; nosotros solo acreditamos consultas.
+  - Catálogo: `node scripts/paddle-catalog.mjs` (idempotente por `custom_data.catalog_key`;
+    `PADDLE_ENV=live` para producción). Deja los IDs en `scripts/paddle-catalog-<env>.json`.
+  - `supabase/functions/paddle-webhook` (`--no-verify-jwt`): verifica
+    `Paddle-Signature: ts=...;h1=...` (HMAC-SHA256 de `ts:cuerpo`, rechaza `ts` de más de
+    5 min), atiende `transaction.completed`, `adjustment.created` (devoluciones) y
+    `subscription.*`, identifica la cuenta por `custom_data.user_id` → `paddle_customer_id`
+    → email, y es idempotente (`add_credits` con `ref=paddle:<txn>`, `class_codes.order_ref`,
+    `refund_credits` con `ref=paddle-refund:<adj>`). Guarda cada aviso en `paddle_events`.
+  - `supabase/functions/paddle-checkout`: crea la transacción **en el servidor** con el
+    `price_id` del catálogo y `custom_data.user_id` sacado del JWT. El navegador solo manda
+    la clave del pack; nunca el precio. Devuelve `checkoutUrl` (pago alojado por Paddle).
+  - Configuración: secreto `PADDLE_CATALOG` (mapa pack → `price_id` + créditos o `class`),
+    `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_ENV=sandbox|live`, y en el frontend
+    `VITE_PAYMENTS_ENABLED=true`. Sin esa variable la tienda **no aparece**.
+  - Prueba: `node scripts/check-paddle-webhook.mjs` (firma, firma caducada, reintento, pack
+    de profesor, suscripción y devolución). Comprobado en sandbox el 2026-10-23.
+  - **Pendiente en el panel de Paddle**: fijar el «default payment link» del Checkout; sin
+    él Paddle no crea transacciones (`transaction_default_checkout_url_not_set`).
+- **Tienda antigua (histórica)**: Lemon Squeezy.
   `supabase/functions/lemonsqueezy-webhook` verifica `X-Signature` (HMAC-SHA256), atiende
   `order_created`, identifica la cuenta por `meta.custom_data.user_id` y, si no llega, por
   email, y llama a `add_credits` con `ref = ls:<order_id>` (idempotente: un reintento no

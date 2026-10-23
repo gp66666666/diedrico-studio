@@ -1,0 +1,59 @@
+{
+  "environment": "sandbox",
+  "createdAt": "2026-10-23T16:26:35.317Z",
+  "prices": [
+    {
+      "key": "pack100",
+      "productId": "pro_01m5msbma41d5pwjea8as91a78",
+      "priceId": "pri_01m5msbmdwszxtm5xh803qj4yr",
+      "amount": "499",
+      "currency": "EUR",
+      "taxMode": "internal",
+      "recurring": null,
+      "note": "100 consultas"
+    },
+    {
+      "key": "pack300",
+      "productId": "pro_01m5msbmkp33k9ay817yqvjsfr",
+      "priceId": "pri_01m5msbmqpf5yhemymerfdg6bk",
+      "amount": "1199",
+      "currency": "EUR",
+      "taxMode": "internal",
+      "recurring": null,
+      "note": "300 consultas"
+    },
+    {
+      "key": "monthly",
+      "productId": "pro_01m5msbmxjz3da67mg1fae1235",
+      "priceId": "pri_01m5msbn1mxjtbpwk4ftf1gnwv",
+      "amount": "1499",
+      "currency": "EUR",
+      "taxMode": "internal",
+      "recurring": {
+        "interval": "month",
+        "frequency": 1
+      },
+      "note": "cada mes"
+    },
+    {
+      "key": "profe-semestre",
+      "productId": "pro_01m5msbn6vm10yba0v4qf38nqc",
+      "priceId": "pri_01m5msbnam4mhxncvv808w99sb",
+      "amount": "2499",
+      "currency": "EUR",
+      "taxMode": "internal",
+      "recurring": null,
+      "note": "6 meses"
+    },
+    {
+      "key": "profe-curso",
+      "productId": "pro_01m5msbnfkjqcekscyz945tkxq",
+      "priceId": "pri_01m5msbnkb5ctsx0bx4d07gjrf",
+      "amount": "3999",
+      "currency": "EUR",
+      "taxMode": "internal",
+      "recurring": null,
+      "note": "12 meses"
+    }
+  ]
+}

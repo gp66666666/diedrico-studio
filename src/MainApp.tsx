@@ -34,6 +34,25 @@ export default function MainApp() {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const isDark = theme === 'dark';
 
+    // Vuelta de Paddle: el webhook puede tardar unos segundos en acreditar, así
+    // que se refresca el perfil varias veces y se avisa de que se está haciendo.
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const pago = params.get('pago');
+        if (!pago) return;
+        window.history.replaceState({}, '', '/');
+        if (pago !== 'ok') return;
+
+        toast('Pago completado. Estamos actualizando tu saldo…');
+        let intentos = 0;
+        const tick = async () => {
+            intentos += 1;
+            await useUserStore.getState().checkSession();
+            if (intentos < 3) setTimeout(() => void tick(), 2500);
+        };
+        void tick();
+    }, []);
+
     // Ejercicio compartido por enlace: ?e=<datos comprimidos>
     useEffect(() => {
         const param = new URLSearchParams(window.location.search).get('e');

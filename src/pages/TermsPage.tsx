@@ -105,7 +105,7 @@ export default function TermsPage() {
                                 <li>Es un <strong>pago único</strong>, no una suscripción: no se renueva solo.</li>
                                 <li>Las consultas compradas <strong>no caducan</strong> y se gastan solo cuando ya has
                                     usado las gratuitas del día.</li>
-                                <li>El cobro lo realiza <strong>Lemon Squeezy</strong> como vendedor: emite la factura
+                                <li>El cobro lo realiza <strong>Paddle</strong> como vendedor: emite la factura
                                     con el IVA correspondiente y gestiona el pago. Esta web nunca ve los datos de tu
                                     tarjeta.</li>
                                 <li>Las consultas se acreditan solas en tu cuenta al confirmarse el pago (unos

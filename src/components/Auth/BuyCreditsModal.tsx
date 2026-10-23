@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
-import { X, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Sparkles, ExternalLink, ShieldCheck, Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { CREDIT_PACKS, checkoutUrl, creditsEnabled } from '../../config/credits';
+import { CREDIT_PACKS, creditsEnabled, startCheckout, type CreditPack } from '../../config/credits';
 import { useUserStore } from '../../store/userStore';
 import { useModalA11y } from '../../hooks/useModalA11y';
 import { trackEvent } from '../../lib/analytics';
+import { supabase } from '../../lib/supabase';
 
 interface Props {
     isOpen: boolean;
@@ -14,15 +15,43 @@ interface Props {
 /**
  * Compra de consultas. Solo se muestra si hay tienda configurada (si no, el
  * botón que abre este modal ni siquiera existe) y siempre explica que el cobro
- * lo hace Lemon Squeezy, no esta web.
+ * lo hace Paddle, no esta web.
+ *
+ * El precio y los créditos no viajan desde aquí: se piden a `paddle-checkout`,
+ * que los resuelve con su catálogo. Esta pantalla solo manda qué pack quiere.
  */
 export default function BuyCreditsModal({ isOpen, onClose }: Props) {
     const { user, profile } = useUserStore();
     const panelRef = useModalA11y(isOpen, onClose);
+    const [busy, setBusy] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen) trackEvent('credits_modal_open');
+        else {
+            setBusy(null);
+            setError(null);
+        }
     }, [isOpen]);
+
+    const buy = async (pack: CreditPack) => {
+        if (!user) return;
+        setBusy(pack.id);
+        setError(null);
+        try {
+            const { data } = await supabase.auth.getSession();
+            const token = data.session?.access_token;
+            if (!token) throw new Error('Vuelve a iniciar sesión para comprar.');
+
+            trackEvent('credits_checkout_click', { pack: pack.id });
+            const { checkoutUrl } = await startCheckout(pack, { accessToken: token });
+            // Pago alojado por Paddle: aquí nunca se ven los datos de la tarjeta.
+            window.location.href = checkoutUrl!;
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'No se ha podido abrir el pago.');
+            setBusy(null);
+        }
+    };
 
     if (!isOpen || !creditsEnabled) return null;
 
@@ -61,17 +90,13 @@ export default function BuyCreditsModal({ isOpen, onClose }: Props) {
                     </div>
 
                     {CREDIT_PACKS.map((pack) => (
-                        <a
+                        <button
                             key={pack.id}
-                            href={user ? checkoutUrl(pack, { userId: user.id, email: user.email ?? undefined }) : '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => {
-                                if (!user) return;
-                                trackEvent('credits_checkout_click', { pack: pack.id });
-                            }}
-                            className={`flex items-center justify-between rounded-xl border px-4 py-3 transition-colors ${user
-                                ? 'border-violet-300 bg-violet-50 hover:bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/10 dark:hover:bg-violet-500/20'
+                            type="button"
+                            disabled={!user || busy !== null}
+                            onClick={() => void buy(pack)}
+                            className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors ${user
+                                ? 'border-violet-300 bg-violet-50 hover:bg-violet-100 disabled:opacity-60 dark:border-violet-500/40 dark:bg-violet-500/10 dark:hover:bg-violet-500/20'
                                 : 'pointer-events-none border-gray-200 bg-gray-50 opacity-60 dark:border-gray-700 dark:bg-gray-900/40'
                                 }`}
                         >
@@ -84,10 +109,24 @@ export default function BuyCreditsModal({ isOpen, onClose }: Props) {
                                 </span>
                             </span>
                             <span className="flex items-center gap-2 text-sm font-bold text-violet-700 dark:text-violet-300">
-                                {pack.priceLabel} <ExternalLink size={14} />
+                                {busy === pack.id ? (
+                                    <>
+                                        Abriendo pago… <Loader2 size={14} className="animate-spin" />
+                                    </>
+                                ) : (
+                                    <>
+                                        {pack.priceLabel} <ExternalLink size={14} />
+                                    </>
+                                )}
                             </span>
-                        </a>
+                        </button>
                     ))}
+
+                    {error && (
+                        <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-500/10 dark:text-amber-200">
+                            {error}
+                        </p>
+                    )}
 
                     {!user && (
                         <p className="text-xs text-amber-700 dark:text-amber-300">
@@ -98,8 +137,9 @@ export default function BuyCreditsModal({ isOpen, onClose }: Props) {
 
                     <p className="flex items-start gap-2 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
                         <ShieldCheck size={14} className="mt-0.5 shrink-0" />
-                        El cobro lo hace Lemon Squeezy (tarjeta o PayPal). Emite la factura con IVA y
-                        gestiona el pago; esta web nunca ve los datos de tu tarjeta.
+                        El cobro lo hace Paddle (tarjeta o PayPal). Emite la factura con IVA y
+                        gestiona el pago; esta web nunca ve los datos de tu tarjeta. Al terminar
+                        vuelves aquí y el saldo aparece en unos segundos.
                     </p>
 
                     <button
