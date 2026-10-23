@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Book, Pencil, Box, RotateCw, Ruler, MousePointer2 } from 'lucide-react';
+import { X, Book, Pencil, Box, RotateCw, Ruler, MousePointer2, Palette } from 'lucide-react';
 import { useModalA11y } from '../hooks/useModalA11y';
 
 interface HelpGuideProps {
@@ -142,6 +142,18 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                     <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
                                         • <b>Boceto:</b> Dibuja libremente en 2D.<br />
                                         • <b>Diédrico:</b> Construye en el espacio 3D con proyección automática.
+                                    </p>
+                                </div>
+                                <div className={`p-4 rounded-lg border md:col-span-2 ${headerClass} space-y-2`}>
+                                    <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                                        <Palette size={18} /> Colores por proyección
+                                    </h3>
+                                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
+                                        En <b>Diédrico</b>, el botón de los tres puntos (barra de la derecha) pinta la
+                                        planta (<b>a'</b>) en <span className={isDark ? 'text-yellow-400 font-bold' : 'text-amber-700 font-bold'}>amarillo</span> y
+                                        el alzado (<b>a''</b>) en <span className={isDark ? 'text-cyan-400 font-bold' : 'text-cyan-700 font-bold'}>cian</span>.
+                                        Donde se pisan una planta y un alzado, el trazo se ve <span className="text-green-500 font-bold">verde</span>:
+                                        ahí hay de las dos. Las etiquetas también cogen el color de su proyección.
                                     </p>
                                 </div>
                             </div>

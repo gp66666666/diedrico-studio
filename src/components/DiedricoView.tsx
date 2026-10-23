@@ -26,6 +26,7 @@ import Solid2D from './2D/Solid2D';
 import HelpGuide from './HelpGuide';
 import SketchToolbar from './SketchToolbar';
 import { toast } from '../lib/toast';
+import { projectionPalette } from '../lib/projectionColors';
 import { paperToPoint, planeFromThreeClicks } from '../lib/planeFromClicks';
 
 const SCALE = 40; // 40 pixels per unit
@@ -314,6 +315,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, distanceResult, selectedForDistance,
         clearDistanceTool, activeTool: activeDistanceTool, selectForDistance,
         addElement, setActiveTool: setGeometryTool, updateElementLive, startGesture, endGesture,
+        projectionColors, toggleProjectionColors,
         selectElement, cameraStates, setCameraState, measurements, auxSystems,
         vmElements, vmPlaneId, showVMConstruction, toggleVMConstruction,
         showProfile, toggleProfile, showMiniScene, toggleMiniScene
@@ -1237,6 +1239,19 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
 
             {/* View Controls */}
             <div className={`absolute ${mode === 'sketch' ? 'bottom-24 md:bottom-4' : 'bottom-4'} right-4 hidden md:flex flex-col gap-2 p-2 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg}`}>
+                <button
+                    onClick={toggleProjectionColors}
+                    className={`p-2 rounded ${projectionColors ? 'bg-white/15 ring-1 ring-white/30' : iconHover} ${iconColor}`}
+                    title={"Colores por proyección: planta (') en amarillo y alzado ('') en cian. Donde se solapan se ve verde."}
+                    aria-pressed={projectionColors}
+                >
+                    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                        <circle cx="5" cy="10" r="3.2" fill="#facc15" />
+                        <circle cx="10" cy="10" r="3.2" fill="#22c55e" />
+                        <circle cx="15" cy="10" r="3.2" fill="#22d3ee" />
+                    </svg>
+                </button>
+                <div className={`w-full h-px ${isDark ? 'bg-white/10' : 'bg-black/10'}`} />
                 <button onClick={() => setZoom(z => Math.min(z * 1.2, 5))} className={`p-2 rounded ${iconHover} ${iconColor}`} title="Zoom In"><ZoomIn size={20} /></button>
                 <button onClick={() => setZoom(1)} className={`p-2 rounded ${iconHover} ${iconColor}`} title="Reset View"><Move size={20} /></button>
                 <button onClick={() => setZoom(z => Math.max(z / 1.2, 0.2))} className={`p-2 rounded ${iconHover} ${iconColor}`} title="Zoom Out"><ZoomOut size={20} /></button>
@@ -1428,6 +1443,10 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                     )}
 
                     {/* 3D Elements Projections (Always Visible) */}
+                    {/* Con el modo de colores se aísla el grupo: así el alzado (cian)
+                        solo se mezcla con la planta (amarillo) y el cruce sale
+                        verde, sin oscurecerse contra el fondo del lienzo. */}
+                    <g style={projectionColors ? { isolation: 'isolate' } : undefined}>
                     {elements.map((el) => {
                         if (!el.visible) return null;
 
@@ -1458,6 +1477,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             default: return null;
                         }
                     })}
+                    </g>
 
                     {/* Intersections (Always Visible) */}
                     <Intersections2D elements={elements} showIntersections={showIntersections} />
@@ -1896,20 +1916,32 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                                 }
                             });
 
+                            // Con el modo de colores, cada etiqueta toma el color de SU
+                            // proyección: a'' en cian, a' en amarillo.
+                            const palette = projectionPalette(theme === 'dark');
+                            const labels = projectionColors
+                                ? allLabels.map((l) => {
+                                      const text = l.main.trim();
+                                      if (text.endsWith("''")) return { ...l, color: palette.v };
+                                      if (text.endsWith("'")) return { ...l, color: palette.h };
+                                      return l;
+                                  })
+                                : allLabels;
+
                             // Merge coincident labels
                             const PROXIMITY_THRESHOLD = 15;
                             const mergedLabels: Array<{ x: number, y: number, items: LabelData[] }> = [];
                             const processed = new Set<number>();
 
-                            for (let i = 0; i < allLabels.length; i++) {
+                            for (let i = 0; i < labels.length; i++) {
                                 if (processed.has(i)) continue;
 
-                                const current = allLabels[i];
+                                const current = labels[i];
                                 const group = [current];
 
-                                for (let j = i + 1; j < allLabels.length; j++) {
+                                for (let j = i + 1; j < labels.length; j++) {
                                     if (processed.has(j)) continue;
-                                    const other = allLabels[j];
+                                    const other = labels[j];
                                     const distance = Math.sqrt(
                                         Math.pow(current.x - other.x, 2) + Math.pow(current.y - other.y, 2)
                                     );

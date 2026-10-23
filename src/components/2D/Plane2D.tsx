@@ -1,10 +1,12 @@
 import type { PlaneElement } from '../../types';
+import { useProjectionColors } from '../../lib/projectionColors';
 
 const SCALE = 40;
 const DRAW_RANGE = 15; // Draw lines long enough but keep labels visible
 
 export default function Plane2D({ element, onClick, isDark = false }: { element: PlaneElement, onClick?: (e: React.MouseEvent) => void, isDark?: boolean }) {
     const { normal, constant, color, name } = element;
+    const { on, h: hColor, v: vColor, blend } = useProjectionColors(color);
     const { x: A, y: B, z: C } = normal;
     const D = constant;
 
@@ -15,6 +17,7 @@ export default function Plane2D({ element, onClick, isDark = false }: { element:
         getVal: (x: number) => number,
         isVerticalTrace: boolean
     ) => {
+        const traceColor = isVerticalTrace ? vColor : hColor;
         // Find intersection with LT (where val = 0)
         // val = (-D - A*x) / Coeff
         // 0 = -D - A*x => Ax = -D => x = -D/A
@@ -51,9 +54,10 @@ export default function Plane2D({ element, onClick, isDark = false }: { element:
                     key="full"
                     x1={xLeft * SCALE} y1={isVerticalTrace ? -valLeft * SCALE : valLeft * SCALE}
                     x2={xRight * SCALE} y2={isVerticalTrace ? -valRight * SCALE : valRight * SCALE}
-                    stroke={color}
+                    stroke={traceColor}
                     strokeWidth={visible ? "2" : "1"}
                     strokeDasharray={visible ? "0" : "5 5"}
+                    style={blend}
                 />
             );
         } else {
@@ -65,9 +69,10 @@ export default function Plane2D({ element, onClick, isDark = false }: { element:
                     key="left"
                     x1={xLeft * SCALE} y1={isVerticalTrace ? -valLeft * SCALE : valLeft * SCALE}
                     x2={xCross * SCALE} y2={0}
-                    stroke={color}
+                    stroke={traceColor}
                     strokeWidth={visLeft ? "2" : "1"}
                     strokeDasharray={visLeft ? "0" : "5 5"}
+                    style={blend}
                 />
             );
 
@@ -78,9 +83,10 @@ export default function Plane2D({ element, onClick, isDark = false }: { element:
                     key="right"
                     x1={xCross * SCALE} y1={0}
                     x2={xRight * SCALE} y2={isVerticalTrace ? -valRight * SCALE : valRight * SCALE}
-                    stroke={color}
+                    stroke={traceColor}
                     strokeWidth={visRight ? "2" : "1"}
                     strokeDasharray={visRight ? "0" : "5 5"}
+                    style={blend}
                 />
             );
         }
@@ -122,12 +128,12 @@ export default function Plane2D({ element, onClick, isDark = false }: { element:
                         <line
                             x1={(-D / A) * SCALE} y1={0}
                             x2={(-D / A) * SCALE} y2={-DRAW_RANGE * SCALE}
-                            stroke={color} strokeWidth="2"
+                            stroke={vColor} strokeWidth="2" style={blend}
                         />
                         <line
                             x1={(-D / A) * SCALE} y1={0}
                             x2={(-D / A) * SCALE} y2={DRAW_RANGE * SCALE}
-                            stroke={color} strokeWidth="1" strokeDasharray="5 5"
+                            stroke={vColor} strokeWidth="1" strokeDasharray="5 5" style={blend}
                         />
                     </g>
                 )
@@ -147,12 +153,12 @@ export default function Plane2D({ element, onClick, isDark = false }: { element:
                         <line
                             x1={(-D / A) * SCALE} y1={0}
                             x2={(-D / A) * SCALE} y2={DRAW_RANGE * SCALE}
-                            stroke={color} strokeWidth="2"
+                            stroke={hColor} strokeWidth="2" style={blend}
                         />
                         <line
                             x1={(-D / A) * SCALE} y1={0}
                             x2={(-D / A) * SCALE} y2={-DRAW_RANGE * SCALE}
-                            stroke={color} strokeWidth="1" strokeDasharray="5 5"
+                            stroke={hColor} strokeWidth="1" strokeDasharray="5 5" style={blend}
                         />
                     </g>
                 )

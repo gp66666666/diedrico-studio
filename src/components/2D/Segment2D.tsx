@@ -1,9 +1,11 @@
 import type { SegmentElement } from '../../types';
+import { useProjectionColors } from '../../lib/projectionColors';
 
 const SCALE = 40;
 
 export default function Segment2D({ element, onClick, isDark = false }: { element: SegmentElement, onClick?: (e: React.MouseEvent) => void, isDark?: boolean }) {
     const { p1, p2, color } = element;
+    const { on, h: hColor, v: vColor, blend } = useProjectionColors(color);
 
     const renderSegment = (proj: 'h' | 'v') => {
         const x1 = p1.x * SCALE;
@@ -26,14 +28,17 @@ export default function Segment2D({ element, onClick, isDark = false }: { elemen
         return (
             <line
                 x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke={color}
+                stroke={proj === 'v' ? vColor : hColor}
                 strokeWidth="2.5"
                 strokeDasharray={isVisible ? undefined : "5 5"}
+                style={blend}
             />
         );
     };
 
     const textFill = isDark ? '#ffffff' : '#000000';
+    const labelH = on ? hColor : textFill;
+    const labelV = on ? vColor : textFill;
 
     if (element.role === 'shadow-h' || element.role === 'shadow-v') {
         const onlyH = element.role === 'shadow-h';
@@ -83,24 +88,24 @@ export default function Segment2D({ element, onClick, isDark = false }: { elemen
 
             {/* Endpoints Labels - Point 1 */}
             <g>
-                <circle cx={p1.x * SCALE} cy={-p1.z * SCALE} r="2.5" fill={color} />
-                <text x={p1.x * SCALE + 5} y={-p1.z * SCALE - 5} fontSize="10" fill={textFill} className="select-none font-bold">1''</text>
+                <circle cx={p1.x * SCALE} cy={-p1.z * SCALE} r="2.5" fill={vColor} style={blend} />
+                <text x={p1.x * SCALE + 5} y={-p1.z * SCALE - 5} fontSize="10" fill={labelV} className="select-none font-bold">1''</text>
 
-                <circle cx={p1.x * SCALE} cy={p1.y * SCALE} r="2.5" fill={color} />
-                <text x={p1.x * SCALE + 5} y={p1.y * SCALE + 12} fontSize="10" fill={textFill} className="select-none font-bold">1'</text>
+                <circle cx={p1.x * SCALE} cy={p1.y * SCALE} r="2.5" fill={hColor} style={blend} />
+                <text x={p1.x * SCALE + 5} y={p1.y * SCALE + 12} fontSize="10" fill={labelH} className="select-none font-bold">1'</text>
 
-                <line x1={p1.x * SCALE} y1={-p1.z * SCALE} x2={p1.x * SCALE} y2={p1.y * SCALE} stroke={color} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.4" />
+                <line x1={p1.x * SCALE} y1={-p1.z * SCALE} x2={p1.x * SCALE} y2={p1.y * SCALE} stroke={on ? '#94a3b8' : color} strokeWidth="0.5" strokeDasharray="2 2" opacity={on ? 0.3 : 0.4} />
             </g>
 
             {/* Endpoints Labels - Point 2 */}
             <g>
-                <circle cx={p2.x * SCALE} cy={-p2.z * SCALE} r="2.5" fill={color} />
-                <text x={p2.x * SCALE + 5} y={-p2.z * SCALE - 5} fontSize="10" fill={textFill} className="select-none font-bold">2''</text>
+                <circle cx={p2.x * SCALE} cy={-p2.z * SCALE} r="2.5" fill={vColor} style={blend} />
+                <text x={p2.x * SCALE + 5} y={-p2.z * SCALE - 5} fontSize="10" fill={labelV} className="select-none font-bold">2''</text>
 
-                <circle cx={p2.x * SCALE} cy={p2.y * SCALE} r="2.5" fill={color} />
-                <text x={p2.x * SCALE + 5} y={p2.y * SCALE + 12} fontSize="10" fill={textFill} className="select-none font-bold">2'</text>
+                <circle cx={p2.x * SCALE} cy={p2.y * SCALE} r="2.5" fill={hColor} style={blend} />
+                <text x={p2.x * SCALE + 5} y={p2.y * SCALE + 12} fontSize="10" fill={labelH} className="select-none font-bold">2'</text>
 
-                <line x1={p2.x * SCALE} y1={-p2.z * SCALE} x2={p2.x * SCALE} y2={p2.y * SCALE} stroke={color} strokeWidth="0.5" strokeDasharray="2 2" opacity="0.4" />
+                <line x1={p2.x * SCALE} y1={-p2.z * SCALE} x2={p2.x * SCALE} y2={p2.y * SCALE} stroke={on ? '#94a3b8' : color} strokeWidth="0.5" strokeDasharray="2 2" opacity={on ? 0.3 : 0.4} />
             </g>
         </g>
     );

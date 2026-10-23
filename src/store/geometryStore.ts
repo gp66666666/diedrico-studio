@@ -96,6 +96,9 @@ interface GeometryState {
     // Selection
     selectedElementId: string | null;
     selectElement: (id: string | null) => void;
+    /** Pinta la planta y el alzado con colores distintos para ver solapes. */
+    projectionColors: boolean;
+    toggleProjectionColors: () => void;
     // Help
     showHelp: boolean;
     toggleHelp: () => void;
@@ -411,6 +414,8 @@ export const useGeometryStore = create<GeometryState>((set, get) => ({
 
     selectedElementId: null,
     selectElement: (id) => set({ selectedElementId: id }),
+    projectionColors: false,
+    toggleProjectionColors: () => set((state) => ({ projectionColors: !state.projectionColors })),
 
     showHelp: false,
     toggleHelp: () => set((state) => ({ showHelp: !state.showHelp })),

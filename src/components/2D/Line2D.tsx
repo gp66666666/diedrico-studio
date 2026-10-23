@@ -1,9 +1,12 @@
 import type { LineElement } from '../../types';
 import { calculateLineTraces } from '../../utils/mathUtils';
+import { useProjectionColors } from '../../lib/projectionColors';
 
 const SCALE = 40;
 
 export default function Line2D({ element, onClick, isDark = false }: { element: LineElement, onClick?: (e: React.MouseEvent) => void, isDark?: boolean }) {
+    const { on, h: hColor, v: vColor, blend } = useProjectionColors(element.color);
+
     // Calculate two points on the line to draw it
     const t1 = -15;
     const t2 = 15;
@@ -101,9 +104,10 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
             <line
                 key={`${projection}-${index}-${ta.toFixed(4)}`}
                 x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke={element.color}
+                stroke={projection === 'v' ? vColor : hColor}
                 strokeWidth="2"
                 strokeDasharray={isVisible ? undefined : "5 5"}
+                style={blend}
             />
         );
     };
@@ -148,11 +152,11 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                     <line
                         x1={p1.x * SCALE} y1={-p1.z * SCALE}
                         x2={p1.x * SCALE} y2={0}
-                        stroke={element.color}
+                        stroke={vColor}
                         strokeWidth="1"
                         strokeDasharray="4 4"
                     />
-                    <circle cx={p1.x * SCALE} cy={-p1.z * SCALE} r="4" fill={element.color} />
+                    <circle cx={p1.x * SCALE} cy={-p1.z * SCALE} r="4" fill={vColor} style={blend} />
                 </g>
             ) : (
                 <g>
@@ -167,11 +171,11 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                     <line
                         x1={p1.x * SCALE} y1={p1.y * SCALE}
                         x2={p1.x * SCALE} y2={0}
-                        stroke={element.color}
+                        stroke={hColor}
                         strokeWidth="1"
                         strokeDasharray="4 4"
                     />
-                    <circle cx={p1.x * SCALE} cy={p1.y * SCALE} r="4" fill={element.color} />
+                    <circle cx={p1.x * SCALE} cy={p1.y * SCALE} r="4" fill={hColor} style={blend} />
                 </g>
             ) : (
                 <g>
@@ -184,20 +188,20 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                 <g>
                     {/* h' (Horizontal Projection of Trace) - X marker */}
                     <g>
-                        <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE - 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE + 4} stroke={element.color} strokeWidth="2" />
-                        <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE + 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE - 4} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE - 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE + 4} stroke={hColor} strokeWidth="2" style={blend} />
+                        <line x1={traces.hTrace.x * SCALE - 4} y1={traces.hTrace.y * SCALE + 4} x2={traces.hTrace.x * SCALE + 4} y2={traces.hTrace.y * SCALE - 4} stroke={hColor} strokeWidth="2" style={blend} />
                     </g>
 
                     {/* h'' (Vertical Projection of Trace on LT) */}
                     <line
                         x1={traces.hTrace.x * SCALE} y1={traces.hTrace.y * SCALE}
                         x2={traces.hTrace.x * SCALE} y2={0}
-                        stroke={element.color} strokeWidth="1" strokeDasharray="2 2"
+                        stroke={hColor} strokeWidth="1" strokeDasharray="2 2"
                     />
                     {/* h'' marker on LT - X */}
                     <g>
-                        <line x1={traces.hTrace.x * SCALE - 3} y1={-3} x2={traces.hTrace.x * SCALE + 3} y2={3} stroke={element.color} strokeWidth="2" />
-                        <line x1={traces.hTrace.x * SCALE - 3} y1={3} x2={traces.hTrace.x * SCALE + 3} y2={-3} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.hTrace.x * SCALE - 3} y1={-3} x2={traces.hTrace.x * SCALE + 3} y2={3} stroke={hColor} strokeWidth="2" style={blend} />
+                        <line x1={traces.hTrace.x * SCALE - 3} y1={3} x2={traces.hTrace.x * SCALE + 3} y2={-3} stroke={hColor} strokeWidth="2" style={blend} />
                     </g>
                 </g>
             )}
@@ -205,20 +209,20 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                 <g>
                     {/* v'' (Vertical Projection of Trace) - X marker */}
                     <g>
-                        <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE - 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE + 4} stroke={element.color} strokeWidth="2" />
-                        <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE + 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE - 4} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE - 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE + 4} stroke={vColor} strokeWidth="2" style={blend} />
+                        <line x1={traces.vTrace.x * SCALE - 4} y1={-traces.vTrace.z * SCALE + 4} x2={traces.vTrace.x * SCALE + 4} y2={-traces.vTrace.z * SCALE - 4} stroke={vColor} strokeWidth="2" style={blend} />
                     </g>
 
                     {/* v' (Horizontal Projection of Trace on LT) */}
                     <line
                         x1={traces.vTrace.x * SCALE} y1={-traces.vTrace.z * SCALE}
                         x2={traces.vTrace.x * SCALE} y2={0}
-                        stroke={element.color} strokeWidth="1" strokeDasharray="2 2"
+                        stroke={vColor} strokeWidth="1" strokeDasharray="2 2"
                     />
                     {/* v' marker on LT - X */}
                     <g>
-                        <line x1={traces.vTrace.x * SCALE - 3} y1={-3} x2={traces.vTrace.x * SCALE + 3} y2={3} stroke={element.color} strokeWidth="2" />
-                        <line x1={traces.vTrace.x * SCALE - 3} y1={3} x2={traces.vTrace.x * SCALE + 3} y2={-3} stroke={element.color} strokeWidth="2" />
+                        <line x1={traces.vTrace.x * SCALE - 3} y1={-3} x2={traces.vTrace.x * SCALE + 3} y2={3} stroke={vColor} strokeWidth="2" style={blend} />
+                        <line x1={traces.vTrace.x * SCALE - 3} y1={3} x2={traces.vTrace.x * SCALE + 3} y2={-3} stroke={vColor} strokeWidth="2" style={blend} />
                     </g>
                 </g>
             )}
@@ -227,7 +231,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
             {element.p2 && (
                 <g>
                     {/* Point 1 */}
-                    <circle cx={element.point.x * SCALE} cy={-element.point.z * SCALE} r="2.5" fill={element.color} />
+                    <circle cx={element.point.x * SCALE} cy={-element.point.z * SCALE} r="2.5" fill={vColor} style={blend} />
                     <text
                         x={element.point.x * SCALE}
                         y={-element.point.z * SCALE}
@@ -240,7 +244,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                         a''
                     </text>
 
-                    <circle cx={element.point.x * SCALE} cy={element.point.y * SCALE} r="2.5" fill={element.color} />
+                    <circle cx={element.point.x * SCALE} cy={element.point.y * SCALE} r="2.5" fill={hColor} style={blend} />
                     <text
                         x={element.point.x * SCALE}
                         y={element.point.y * SCALE}
@@ -259,7 +263,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                     />
 
                     {/* Point 2 */}
-                    <circle cx={element.p2.x * SCALE} cy={-element.p2.z * SCALE} r="2.5" fill={element.color} />
+                    <circle cx={element.p2.x * SCALE} cy={-element.p2.z * SCALE} r="2.5" fill={vColor} style={blend} />
                     <text
                         x={element.p2.x * SCALE}
                         y={-element.p2.z * SCALE}
@@ -272,7 +276,7 @@ export default function Line2D({ element, onClick, isDark = false }: { element: 
                         b''
                     </text>
 
-                    <circle cx={element.p2.x * SCALE} cy={element.p2.y * SCALE} r="2.5" fill={element.color} />
+                    <circle cx={element.p2.x * SCALE} cy={element.p2.y * SCALE} r="2.5" fill={hColor} style={blend} />
                     <text
                         x={element.p2.x * SCALE}
                         y={element.p2.y * SCALE}

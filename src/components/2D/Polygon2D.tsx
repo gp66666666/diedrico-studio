@@ -1,5 +1,6 @@
 import type { PolygonElement } from '../../types';
 import { useGeometryStore } from '../../store/geometryStore';
+import { useProjectionColors } from '../../lib/projectionColors';
 
 const SCALE = 40;
 
@@ -18,7 +19,9 @@ export default function Polygon2D({
 }) {
     const { selectedElementId } = useGeometryStore();
     const isSelected = selectedElementId === element.id;
-    const stroke = isSelected ? '#3b82f6' : element.color || (isDark ? '#e2e8f0' : '#1e293b');
+    const base = isSelected ? '#3b82f6' : element.color || (isDark ? '#e2e8f0' : '#1e293b');
+    const { on, h, v, blend } = useProjectionColors(base);
+    const stroke = on ? h : base;
 
     const horizontal = element.points.map((p) => `${p.x * SCALE},${p.y * SCALE}`).join(' ');
     const vertical = element.points.map((p) => `${p.x * SCALE},${-p.z * SCALE}`).join(' ');
@@ -33,22 +36,24 @@ export default function Polygon2D({
                     stroke={stroke}
                     strokeWidth={isSelected ? 2.5 : 1.8}
                     strokeLinejoin="round"
+                    style={blend}
                 />
             )}
             {element.role !== 'shadow-h' && (
                 <polygon
                     points={vertical}
-                    fill={stroke}
+                    fill={on ? v : stroke}
                     fillOpacity={element.role === 'shadow-v' ? 0.35 : 0.22}
-                    stroke={stroke}
+                    stroke={on ? v : stroke}
                     strokeWidth={isSelected ? 2.5 : 1.8}
                     strokeLinejoin="round"
+                    style={blend}
                 />
             )}
             {element.points.map((p, i) => (
                 <g key={i}>
-                    {element.role !== 'shadow-v' && <circle cx={p.x * SCALE} cy={p.y * SCALE} r={2.5} fill={stroke} />}
-                    {element.role !== 'shadow-h' && <circle cx={p.x * SCALE} cy={-p.z * SCALE} r={2.5} fill={stroke} />}
+                    {element.role !== 'shadow-v' && <circle cx={p.x * SCALE} cy={p.y * SCALE} r={2.5} fill={stroke} style={blend} />}
+                    {element.role !== 'shadow-h' && <circle cx={p.x * SCALE} cy={-p.z * SCALE} r={2.5} fill={on ? v : stroke} style={blend} />}
                 </g>
             ))}
         </g>

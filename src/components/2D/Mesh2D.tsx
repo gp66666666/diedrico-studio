@@ -1,5 +1,6 @@
 import type { MeshElement } from '../../types';
 import { useGeometryStore } from '../../store/geometryStore';
+import { useProjectionColors } from '../../lib/projectionColors';
 
 const SCALE = 40;
 
@@ -21,7 +22,8 @@ export default function Mesh2D({
 }) {
     const { selectedElementId } = useGeometryStore();
     const isSelected = selectedElementId === element.id;
-    const stroke = isSelected ? '#3b82f6' : element.color || (isDark ? '#e2e8f0' : '#1e293b');
+    const base = isSelected ? '#3b82f6' : element.color || (isDark ? '#e2e8f0' : '#1e293b');
+    const { on, h, v, blend } = useProjectionColors(base);
 
     const edges = element.seam.length
         ? element.seam
@@ -40,18 +42,20 @@ export default function Mesh2D({
                             y1={a.y * SCALE}
                             x2={b.x * SCALE}
                             y2={b.y * SCALE}
-                            stroke={stroke}
+                            stroke={on ? h : base}
                             strokeWidth={isSelected ? 3 : 2.2}
                             strokeLinecap="round"
+                            style={blend}
                         />
                         <line
                             x1={a.x * SCALE}
                             y1={-a.z * SCALE}
                             x2={b.x * SCALE}
                             y2={-b.z * SCALE}
-                            stroke={stroke}
+                            stroke={on ? v : base}
                             strokeWidth={isSelected ? 3 : 2.2}
                             strokeLinecap="round"
+                            style={blend}
                         />
                     </g>
                 );

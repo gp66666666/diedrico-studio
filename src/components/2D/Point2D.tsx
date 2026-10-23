@@ -1,4 +1,5 @@
 import type { PointElement } from '../../types';
+import { useProjectionColors } from '../../lib/projectionColors';
 
 const SCALE = 40;
 
@@ -9,6 +10,7 @@ export default function Point2D({ element, onClick, isDark = false }: { element:
 
     // Use theme-aware fill color for horizontal projection
     const horizontalFill = isDark ? '#1f2937' : '#ffffff';
+    const { on, h: hColor, v: vColor, blend } = useProjectionColors(element.color);
 
     if (element.role === 'shadow-h' || element.role === 'shadow-v') {
         const onlyH = element.role === 'shadow-h';
@@ -37,13 +39,21 @@ export default function Point2D({ element, onClick, isDark = false }: { element:
             {/* Geometry (rendered first) */}
             <g className="point-geometry" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
                 {/* Vertical Projection (z) */}
-                <circle cx={px} cy={py_v} r="4" fill={element.color} />
+                <circle cx={px} cy={py_v} r="4" fill={vColor} style={blend} />
 
                 {/* Horizontal Projection (y) */}
-                <circle cx={px} cy={py_h} r="4" fill={horizontalFill} stroke={element.color} strokeWidth="2" />
+                <circle
+                    cx={px}
+                    cy={py_h}
+                    r="4"
+                    fill={on ? 'none' : horizontalFill}
+                    stroke={hColor}
+                    strokeWidth="2"
+                    style={blend}
+                />
 
                 {/* Connection Line */}
-                <line x1={px} y1={py_v} x2={px} y2={py_h} stroke={element.color} strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+                <line x1={px} y1={py_v} x2={px} y2={py_h} stroke={on ? '#94a3b8' : element.color} strokeWidth="1" strokeDasharray="4 4" opacity={on ? 0.35 : 0.5} />
             </g>
 
             {/* Text labels (hidden - rendered in merged layer in DiedricoView) */}
