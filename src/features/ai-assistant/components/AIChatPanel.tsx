@@ -4,7 +4,6 @@ import { Sparkles, Send, PlayCircle, StepForward, RotateCcw, X, ChevronDown, Che
 import { useAIAssistant } from '../hooks/useAIAssistant';
 import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
-import SupportModal from '../../../components/Auth/SupportModal';
 import { SUPPORT } from '../../../config/support';
 import { creditsEnabled } from '../../../config/credits';
 import BuyCreditsModal from '../../../components/Auth/BuyCreditsModal';
@@ -26,7 +25,6 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     const [input, setInput] = useState('');
     const [isMinimized, setIsMinimized] = useState(true);
     const [isStepsExpanded, setIsStepsExpanded] = useState(false);
-    const [showSupportModal, setShowSupportModal] = useState(false);
     const [showBuyCredits, setShowBuyCredits] = useState(false);
 
     // El asistente es función premium: el panel se ve, pero sin plan no gasta tokens.
@@ -613,30 +611,28 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                     Crear ejercicio
                                 </button>
                             </div>
-                            {user && creditsEnabled && (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowBuyCredits(true)}
-                                    className="w-full mb-2 rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-xs font-medium text-violet-800 transition-colors hover:bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300 dark:hover:bg-violet-500/20"
-                                >
-                                    {trialLeft === 0 && credits === 0
-                                        ? '¿Necesitas más hoy? Hay packs de consultas'
-                                        : 'Comprar consultas (no caducan)'}
-                                </button>
-                            )}
                             {user ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowSupportModal(true)}
-                                    className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 text-xs font-medium text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
-                                >
-                                    <Sparkles size={13} />
-                                    {trialLeft > 0
-                                        ? `Gratis: te quedan ${trialLeft} de ${TRIAL} consultas hoy`
-                                        : credits > 0
-                                            ? `Saldo: ${credits} ${credits === 1 ? 'consulta' : 'consultas'}`
-                                            : 'Has usado tus consultas de hoy · mañana hay más'}
-                                </button>
+                                <div className="mb-2 flex items-center justify-between gap-2 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs dark:bg-emerald-900/20">
+                                    <span className="flex items-center gap-1.5 font-medium text-emerald-800 dark:text-emerald-300">
+                                        <Sparkles size={13} />
+                                        {trialLeft > 0
+                                            ? `Gratis hoy: ${trialLeft} de ${TRIAL}`
+                                            : 'Gratis hoy: gastadas'}
+                                        <span className="text-emerald-700/50 dark:text-emerald-300/40">·</span>
+                                        <b>
+                                            {credits} {credits === 1 ? 'consulta' : 'consultas'} de saldo
+                                        </b>
+                                    </span>
+                                    {creditsEnabled && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowBuyCredits(true)}
+                                            className="shrink-0 rounded-md bg-violet-600 px-2 py-1 text-[11px] font-bold text-white transition-colors hover:bg-violet-500"
+                                        >
+                                            Comprar más
+                                        </button>
+                                    )}
+                                </div>
                             ) : (
                                 <div className="w-full mb-2 flex items-center justify-center gap-2 rounded-lg bg-sky-50 dark:bg-sky-900/20 px-3 py-2 text-xs font-medium text-sky-800 dark:text-sky-300">
                                     <Sparkles size={13} />
@@ -673,7 +669,6 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                 </button>
                             </div>
                         </form>
-                        <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
                         <BuyCreditsModal isOpen={showBuyCredits} onClose={() => setShowBuyCredits(false)} />
                     </>
                 )}

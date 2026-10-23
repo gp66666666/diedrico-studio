@@ -51,6 +51,22 @@ export default function MainApp() {
         })();
     }, []);
 
+    // Pago terminado en el overlay: refrescar el saldo sin recargar la página.
+    useEffect(() => {
+        const onPaid = () => {
+            toast('Pago completado. Estamos actualizando tu saldo…');
+            let intentos = 0;
+            const tick = async () => {
+                intentos += 1;
+                await useUserStore.getState().checkSession();
+                if (intentos < 3) setTimeout(() => void tick(), 2000);
+            };
+            void tick();
+        };
+        window.addEventListener('paddle:completed', onPaid);
+        return () => window.removeEventListener('paddle:completed', onPaid);
+    }, []);
+
     // Vuelta de Paddle: el webhook puede tardar unos segundos en acreditar, así
     // que se refresca el perfil varias veces y se avisa de que se está haciendo.
     useEffect(() => {

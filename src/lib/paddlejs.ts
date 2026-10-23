@@ -58,6 +58,12 @@ export async function getPaddle(): Promise<NonNullable<Window['Paddle']>> {
             if (PADDLE_ENV === 'sandbox') paddle.Environment.set('sandbox');
             paddle.Initialize({
                 token: CLIENT_TOKEN,
+                // Aviso al resto de la app: al terminar, que refresque el saldo.
+                eventCallback: (event: { name?: string }) => {
+                    if (event?.name === 'checkout.completed') {
+                        window.dispatchEvent(new CustomEvent('paddle:completed'));
+                    }
+                },
                 checkout: {
                     settings: {
                         displayMode: 'overlay',
