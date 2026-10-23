@@ -315,7 +315,7 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     const { elements, showIntersections, theme, sketchElements, addSketchElement, removeSketchElement, updateSketchElement, showHelp, toggleHelp, distanceResult, selectedForDistance,
         clearDistanceTool, activeTool: activeDistanceTool, selectForDistance,
         addElement, setActiveTool: setGeometryTool, updateElementLive, startGesture, endGesture,
-        projectionColors, toggleProjectionColors,
+        projectionColors,
         selectElement, cameraStates, setCameraState, measurements, auxSystems,
         vmElements, vmPlaneId, showVMConstruction, toggleVMConstruction,
         showProfile, toggleProfile, showMiniScene, toggleMiniScene
@@ -1239,37 +1239,10 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
 
             {/* View Controls */}
             <div className={`absolute ${mode === 'sketch' ? 'bottom-24 md:bottom-4' : 'bottom-4'} right-4 hidden md:flex flex-col gap-2 p-2 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg}`}>
-                <button
-                    onClick={toggleProjectionColors}
-                    className={`p-2 rounded ${projectionColors ? 'bg-white/15 ring-1 ring-white/30' : iconHover} ${iconColor}`}
-                    title={"Colores por proyección: planta (') en amarillo y alzado ('') en cian. Donde se solapan se ve verde."}
-                    aria-pressed={projectionColors}
-                >
-                    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                        <circle cx="5" cy="10" r="3.2" fill="#facc15" />
-                        <circle cx="10" cy="10" r="3.2" fill="#22c55e" />
-                        <circle cx="15" cy="10" r="3.2" fill="#22d3ee" />
-                    </svg>
-                </button>
-                <div className={`w-full h-px ${isDark ? 'bg-white/10' : 'bg-black/10'}`} />
                 <button onClick={() => setZoom(z => Math.min(z * 1.2, 5))} className={`p-2 rounded ${iconHover} ${iconColor}`} title="Zoom In"><ZoomIn size={20} /></button>
                 <button onClick={() => setZoom(1)} className={`p-2 rounded ${iconHover} ${iconColor}`} title="Reset View"><Move size={20} /></button>
                 <button onClick={() => setZoom(z => Math.max(z / 1.2, 0.2))} className={`p-2 rounded ${iconHover} ${iconColor}`} title="Zoom Out"><ZoomOut size={20} /></button>
             </div>
-
-            {/* Mismo botón de colores en móvil (la barra de zoom está oculta) */}
-            <button
-                onClick={toggleProjectionColors}
-                className={`absolute top-20 right-3 md:hidden p-2.5 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg} ${projectionColors ? 'ring-1 ring-white/40' : ''} ${iconColor}`}
-                title="Colores por proyección (') / ('')"
-                aria-pressed={projectionColors}
-            >
-                <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                    <circle cx="5" cy="10" r="3.2" fill="#facc15" />
-                    <circle cx="10" cy="10" r="3.2" fill="#22c55e" />
-                    <circle cx="15" cy="10" r="3.2" fill="#22d3ee" />
-                </svg>
-            </button>
 
             {/* LT Toggle & Magnetism (Sketch Mode Only) */}
             {mode === 'sketch' && (

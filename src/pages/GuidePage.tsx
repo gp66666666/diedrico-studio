@@ -185,7 +185,7 @@ export default function GuidePage() {
                                 <li><b className="text-white">Recta</b>: por <b>2 puntos</b> o por <b>punto + dirección</b>. Si dejas un punto vacío, la recta es infinita.</li>
                                 <li><b className="text-white">Segmento</b>: elige dos puntos ya existentes en el lienzo.</li>
                                 <li><b className="text-white">Plano</b>: por <b>trazas</b> o por <b>punto y normal</b>. También puedes construirlo con 3 puntos, o <b>dibujarlo con el ratón</b> desde <i>Herramientas → Planos → Dibujar plano con 3 clics</i>.</li>
-                                <li><b className="text-white">Sólido</b>: con un clic en el suelo de la vista 3D queda apoyado en el PH (ver el apartado siguiente).</li>
+                                <li><b className="text-white">Sólido</b>: a mano (en el origen), con un punto como centro, con dos puntos como arista, o con un clic en el suelo de la vista 3D (ver el apartado siguiente).</li>
                             </ul>
                             <p className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3 text-sm">
                                 <b className="text-blue-300">Truco</b>: haz clic en cualquier elemento del lienzo o de la lista para seleccionarlo;
@@ -196,13 +196,30 @@ export default function GuidePage() {
                         {/* 3 */}
                         <Section id="solidos" number="03" title="Sólidos: la misma geometría en 3D y en 2D" icon={<Box size={20} />}>
                             <p>
-                                Crear un sólido: <i>Herramientas → Sólidos</i>, elige la figura y <b className="text-white">haz clic en el suelo</b> de
-                                la vista 3D. Aparece en ese punto y <b className="text-white">apoyado en el plano horizontal</b> (su cara inferior
-                                toca el papel, no queda medio enterrado ni flotando).
+                                Crear un sólido: <i>Herramientas → Sólidos</i> y elige la figura. El panel ofrece tres formas
+                                de colocarlo:
                             </p>
+                            <ul className="space-y-1 pl-5 text-sm">
+                                <li>
+                                    <b className="text-white">1 · Crear y ajustar a mano</b>: aparece en el origen
+                                    (0, 0, 0), <b className="text-white">apoyado en el plano horizontal</b> y con sus medidas
+                                    por defecto. Después lo cambias todo en su panel: posición, medidas y giro.
+                                </li>
+                                <li>
+                                    <b className="text-white">2 · Centro en un punto</b>: escribes las coordenadas (o haces
+                                    clic en un punto del dibujo) y el sólido queda <b className="text-white">centrado</b> ahí.
+                                </li>
+                                <li>
+                                    <b className="text-white">3 · Por dos puntos (arista)</b>: escribes P y Q —o copias los
+                                    de un punto que ya tengas— y esa arista cae <b className="text-white">exactamente de P a Q</b>.
+                                    En la esfera, el cilindro y el cono los dos puntos son un <b className="text-white">diámetro</b>;
+                                    el tetraedro se crea <b className="text-white">regular</b>.
+                                </li>
+                            </ul>
                             <p className="text-sm">
-                                Si prefieres partir de un punto que ya tienes dibujado, haz clic sobre él: entonces el sólido queda
-                                <b className="text-white"> centrado</b> en ese punto. Las dos formas crean el mismo tipo de sólido.
+                                El atajo de siempre sigue: <b className="text-white">un clic en el suelo</b> de la vista 3D
+                                y el sólido aparece apoyado en el PH en ese punto (su cara inferior toca el papel, no queda
+                                medio enterrado ni flotando).
                             </p>
                             <Figure
                                 src={IMG('12-solidos-3d.jpg')}

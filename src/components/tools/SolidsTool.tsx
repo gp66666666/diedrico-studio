@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
-import { Box, Maximize2, X, ArrowDownToLine, ArrowLeftToLine, Move3d } from 'lucide-react';
-import type { SolidElement } from '../../types';
+import { Box, Maximize2, X, ArrowDownToLine, ArrowLeftToLine, Move3d, Hand, ChevronDown, ChevronUp, Crosshair, Ruler } from 'lucide-react';
+import type { SolidElement, PointElement } from '../../types';
 import { makeSolid, isSolidCreationTool } from '../../lib/solidFactory';
+import { solidFromEdge } from '../../lib/solidFromEdge';
+import { toast } from '../../lib/toast';
 import { lowestLocalZ, lowestLocalY, restOnHorizontalPlane, restOnVerticalPlane } from '../../lib/solidPlacement';
 
 type Pane = {
@@ -13,6 +15,60 @@ type Pane = {
 };
 
 const fmt = (value: number) => String(Math.round(value * 100) / 100);
+
+/** Tres campos X/Y/Z; los valores se guardan como texto para no comerse «1,5». */
+function VecInput({
+    value, onChange,
+}: {
+    value: { x: string; y: string; z: string };
+    onChange: (next: { x: string; y: string; z: string }) => void;
+}) {
+    return (
+        <div className="grid grid-cols-3 gap-2">
+            {(['x', 'y', 'z'] as const).map((axis) => (
+                <label key={axis} className="block">
+                    <span className="label-text mb-1 block">
+                        {axis === 'x' ? 'X lateral' : axis === 'y' ? 'Y alej.' : 'Z cota'}
+                    </span>
+                    <input
+                        type="number"
+                        step="0.1"
+                        inputMode="decimal"
+                        value={value[axis]}
+                        onChange={(e) => onChange({ ...value, [axis]: e.target.value })}
+                        className="w-full rounded-lg px-2 py-1.5 text-sm"
+                    />
+                </label>
+            ))}
+        </div>
+    );
+}
+
+/** Lista de puntos del dibujo para copiar sus coordenadas. */
+function PointPicker({
+    points, onPick,
+}: {
+    points: PointElement[];
+    onPick: (id: string) => void;
+}) {
+    return (
+        <select
+            value=""
+            onChange={(e) => {
+                if (e.target.value) onPick(e.target.value);
+            }}
+            className="w-full rounded-lg border border-white/15 bg-white/5 px-2 py-1 text-[11px]"
+            title="Copia las coordenadas de un punto que ya está en el dibujo"
+        >
+            <option value="">Usar un punto del dibujo…</option>
+            {points.map((p) => (
+                <option key={p.id} value={p.id}>
+                    {p.name} ({fmt(p.coords.x)}, {fmt(p.coords.y)}, {fmt(p.coords.z)})
+                </option>
+            ))}
+        </select>
+    );
+}
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const toDeg = (rad: number) => (rad * 180) / Math.PI;
 
@@ -51,10 +107,12 @@ export default function SolidsTool() {
     const uniqueId = "solids-tool-ultimate-v6";
 
     const isSolidTool = isSolidCreationTool(activeTool);
+    const [mode, setMode] = useState<'center' | 'edge'>('center');
 
     // Crear con un clic sobre un punto existente (la otra vía es el suelo del 3D)
     useEffect(() => {
         if (!isSolidTool) return;
+        if (mode === 'edge') return; // en modo arista manda el formulario
         if (selectedForDistance.length === 1) {
             const pId = selectedForDistance[0];
             const p = elements.find(e => e.id === pId);
@@ -65,7 +123,7 @@ export default function SolidsTool() {
                 setActiveTool('none');
             }
         }
-    }, [selectedForDistance, isSolidTool, elements, clearDistanceSelection, setActiveTool]);
+    }, [selectedForDistance, isSolidTool, mode, elements, clearDistanceSelection, setActiveTool]);
 
     const createSolidAt = (center: { x: number, y: number, z: number }) => {
         if (!activeTool) return;
@@ -131,6 +189,100 @@ export default function SolidsTool() {
     // Valores del formulario como texto: así se puede escribir «1,5» sin que el
     // campo se coma el decimal a medio escribir.
     const [pane, setPane] = useState<Pane | null>(null);
+
+    /**
+     * Cómo se coloca el sólido al crearlo:
+     * - `center`: un punto es su centro.
+     * - `edge`:   dos puntos son una arista (un diámetro si el cuerpo es redondo).
+     * El modo «a mano» no tiene formulario: crea en el origen y abre el editor.
+     */
+    const [center, setCenter] = useState({ x: '0', y: '0', z: '0' });
+    const [edgeP, setEdgeP] = useState({ x: '0', y: '0', z: '0' });
+    const [edgeQ, setEdgeQ] = useState({ x: '4', y: '0', z: '0' });
+
+    useEffect(() => {
+        setMode('center');
+    }, [activeTool]);
+
+    const num = (raw: string): number | null => {
+        const value = parseFloat(raw.replace(',', '.'));
+        return Number.isFinite(value) ? value : null;
+    };
+
+    /** Añade el sólido, lo selecciona (se abre su editor) y apaga la herramienta. */
+    const spawn = (element: SolidElement) => {
+        const newId = addElement(element);
+        if (!newId) {
+            toast.error('No se ha podido crear el sólido');
+            return;
+        }
+        selectElement(newId);
+        setActiveTool('none');
+        clearDistanceSelection();
+    };
+
+    const solidCount = () => elements.filter(e => e.type === 'solid').length;
+
+    /** Botón 1: en el origen, apoyado en el PH y con las medidas por defecto. */
+    const createManual = () => {
+        if (!activeTool) return;
+        const solid = makeSolid(activeTool, { x: 0, y: 0, z: 0 }, solidCount());
+        if (!solid) return;
+        solid.position = restOnHorizontalPlane(solid.subtype, solid.size, solid.rotation, { x: 0, y: 0, z: 0 });
+        spawn(solid);
+    };
+
+    /** Botón 2: el punto escrito es el centro del sólido. */
+    const createAtCenter = () => {
+        if (!activeTool) return;
+        const x = num(center.x);
+        const y = num(center.y);
+        const z = num(center.z);
+        if (x === null || y === null || z === null) {
+            toast.error('Escribe las tres coordenadas del centro');
+            return;
+        }
+        const solid = makeSolid(activeTool, { x, y, z }, solidCount());
+        if (!solid) return;
+        spawn(solid);
+    };
+
+    /** Botón 3: los dos puntos son una arista (diámetro en esfera, cilindro y cono). */
+    const createFromEdge = () => {
+        if (!activeTool) return;
+        const p = { x: num(edgeP.x), y: num(edgeP.y), z: num(edgeP.z) };
+        const q = { x: num(edgeQ.x), y: num(edgeQ.y), z: num(edgeQ.z) };
+        if (p.x === null || p.y === null || p.z === null || q.x === null || q.y === null || q.z === null) {
+            toast.error('Escribe las coordenadas de los dos puntos');
+            return;
+        }
+        const P = { x: p.x, y: p.y, z: p.z };
+        const Q = { x: q.x, y: q.y, z: q.z };
+        if (Math.hypot(P.x - Q.x, P.y - Q.y, P.z - Q.z) < 1e-6) {
+            toast.error('Los dos puntos no pueden ser el mismo');
+            return;
+        }
+        const solid = makeSolid(activeTool, { x: 0, y: 0, z: 0 }, solidCount());
+        if (!solid) return;
+        const placement = solidFromEdge(solid.subtype, solid.size, P, Q);
+        if (!placement) {
+            toast.error('No se ha podido colocar el sólido con esa arista');
+            return;
+        }
+        solid.size = placement.size;
+        solid.position = placement.position;
+        solid.rotation = placement.rotation;
+        spawn(solid);
+    };
+
+    /** Rellena un trío de campos con un punto del dibujo. */
+    const fillFromPoint = (id: string, set: (v: { x: string; y: string; z: string }) => void) => {
+        const point = elements.find(e => e.id === id && e.type === 'point') as PointElement | undefined;
+        if (!point) return;
+        set({ x: String(point.coords.x), y: String(point.coords.y), z: String(point.coords.z) });
+    };
+
+    const points = elements.filter((e): e is PointElement => e.type === 'point');
 
     /**
      * Vuelca el sólido en el formulario.
@@ -259,6 +411,10 @@ export default function SolidsTool() {
         #${uniqueId} input[type="number"]:focus {
             outline: none !important;
             border-color: #60a5fa !important;
+        }
+        #${uniqueId} select option {
+            background: #111827 !important;
+            color: #ffffff !important;
         }
     `;
 
@@ -430,16 +586,96 @@ export default function SolidsTool() {
                         </section>
                     </div>
                 ) : (
-                    <div className="space-y-2">
-                        <p className="text-xs">
-                            <b>Haz clic en el suelo</b> del 3D y el sólido aparece apoyado en el PH, en ese punto.
+                    <div className="space-y-3">
+                        <p className="text-[11px] leading-snug text-white/70">
+                            Elige cómo colocarlo. También puedes <b>hacer clic en el suelo</b> del 3D:
+                            aparece apoyado en el PH, en ese punto.
                         </p>
-                        <p className="text-[11px] text-white/70">
-                            También puedes hacer clic sobre un punto: entonces queda centrado en él.
-                        </p>
-                        <p className="text-[10px] italic text-white/50">
-                            Después puedes escribir su posición, medidas y giro a mano.
-                        </p>
+
+                        {/* 1 · a mano */}
+                        <div className="space-y-1">
+                            <button
+                                onClick={createManual}
+                                className="w-full flex items-center gap-2 rounded-xl bg-emerald-500/90 px-3 py-2 text-left text-xs font-bold hover:bg-emerald-400"
+                            >
+                                <Hand size={16} />
+                                <span className="flex-1">1 · Crear y ajustar a mano</span>
+                                <span className="text-[10px] font-normal opacity-80">origen</span>
+                            </button>
+                            <p className="text-[10px] leading-snug text-white/50">
+                                Se crea en (0, 0, 0), apoyado en el PH y con sus medidas por defecto.
+                                Después lo cambias todo en su panel.
+                            </p>
+                        </div>
+
+                        {/* 2 · centro en un punto */}
+                        <div className="space-y-1">
+                            <button
+                                onClick={() => setMode('center')}
+                                className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold transition-colors ${mode === 'center' ? 'bg-blue-500/80' : 'bg-white/10 hover:bg-white/20'}`}
+                            >
+                                <Crosshair size={16} />
+                                <span className="flex-1">2 · Centro en un punto</span>
+                                {mode === 'center' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                            </button>
+                            {mode === 'center' && (
+                                <div className="space-y-2 rounded-xl bg-white/5 p-2">
+                                    <VecInput value={center} onChange={setCenter} />
+                                    <button
+                                        onClick={createAtCenter}
+                                        className="w-full rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-semibold hover:bg-blue-400"
+                                    >
+                                        Crear con el centro ahí
+                                    </button>
+                                    <p className="text-[10px] leading-snug text-white/50">
+                                        O haz clic en un punto del dibujo y se crea centrado en él.
+                                        Si el punto está a cota 0, quedará medio enterrado: usa
+                                        «Apoyar en el PH» en su panel.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 3 · por dos puntos (arista / diámetro) */}
+                        <div className="space-y-1">
+                            <button
+                                onClick={() => setMode('edge')}
+                                className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold transition-colors ${mode === 'edge' ? 'bg-blue-500/80' : 'bg-white/10 hover:bg-white/20'}`}
+                            >
+                                <Ruler size={16} />
+                                <span className="flex-1">3 · Por dos puntos (arista)</span>
+                                {mode === 'edge' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                            </button>
+                            {mode === 'edge' && (
+                                <div className="space-y-2 rounded-xl bg-white/5 p-2">
+                                    <div className="space-y-1">
+                                        <span className="label-text block">Punto P</span>
+                                        <VecInput value={edgeP} onChange={setEdgeP} />
+                                        {points.length > 0 && (
+                                            <PointPicker points={points} onPick={(id) => fillFromPoint(id, setEdgeP)} />
+                                        )}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <span className="label-text block">Punto Q</span>
+                                        <VecInput value={edgeQ} onChange={setEdgeQ} />
+                                        {points.length > 0 && (
+                                            <PointPicker points={points} onPick={(id) => fillFromPoint(id, setEdgeQ)} />
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={createFromEdge}
+                                        className="w-full rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-semibold hover:bg-blue-400"
+                                    >
+                                        Crear con esa arista
+                                    </button>
+                                    <p className="text-[10px] leading-snug text-white/50">
+                                        La arista elegida cae exactamente de P a Q. En la esfera, el
+                                        cilindro y el cono los dos puntos son un diámetro. El tetraedro
+                                        se crea regular.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 

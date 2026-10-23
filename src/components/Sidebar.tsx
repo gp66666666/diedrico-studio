@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     Box, Layers, Eye, EyeOff, Plus, Trash2, Plane as PlaneIcon,
-    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen, Share2, ListChecks, Grid3x3, Square
+    Sun, Moon, Undo, Redo, ToggleLeft, ToggleRight, ArrowDownToLine, HelpCircle, Settings, Download, ChevronUp, ChevronDown, BookOpen, Share2, ListChecks, Grid3x3, Square, Palette
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../sidebar-theme-protection.css';
@@ -64,6 +64,8 @@ export default function Sidebar() {
         toggleTheme,
         planeStyle,
         setPlaneStyle,
+        projectionColors,
+        toggleProjectionColors,
         showHelp,
         toggleHelp,
         clearAll,
@@ -761,6 +763,21 @@ export default function Sidebar() {
                                 <ArrowDownToLine size={16} /> Abatir Plano Horizontal
                             </span>
                             {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                        </button>
+
+                        <button
+                            onClick={toggleProjectionColors}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${projectionColors
+                                ? (isDark ? 'bg-amber-500/15 text-amber-300 border border-amber-500/40' : 'bg-amber-500/15 text-amber-700 border border-amber-500/40')
+                                : `${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`
+                                }`}
+                            title="Planta (') en amarillo, alzado ('') en cian. Donde se solapan se ve verde."
+                            aria-pressed={projectionColors}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Palette size={16} /> Colores por proyección
+                            </span>
+                            {projectionColors ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
 
                         <button

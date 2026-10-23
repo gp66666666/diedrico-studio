@@ -149,7 +149,8 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
                                         <Palette size={18} /> Colores por proyección
                                     </h3>
                                     <p className={`text-sm ${isDark ? 'text-gray-300' : 'opacity-70'}`}>
-                                        En <b>Diédrico</b>, el botón de los tres puntos (barra de la derecha) pinta la
+                                        En <b>Diédrico</b>, la fila <i>Colores por proyección</i> de
+                                        <b> Controles de Vista</b> (barra lateral) pinta la
                                         planta (<b>a'</b>) en <span className={isDark ? 'text-yellow-400 font-bold' : 'text-amber-700 font-bold'}>amarillo</span> y
                                         el alzado (<b>a''</b>) en <span className={isDark ? 'text-cyan-400 font-bold' : 'text-cyan-700 font-bold'}>cian</span>.
                                         Donde se pisan una planta y un alzado, el trazo se ve <span className="text-green-500 font-bold">verde</span>:
