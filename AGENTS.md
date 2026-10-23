@@ -119,6 +119,21 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   que actúan como vendedor y se encargan del IVA) y, si el volumen lo exige, Vercel Pro
   (el plan Hobby no permite uso comercial).
 
+## Crear sólidos (2026)
+
+- El panel de creación (`components/tools/SolidsTool.tsx`) da **tres caminos**:
+  «1 · Crear y ajustar a mano» (origen, apoyado en el PH, medidas por defecto), «2 · Centro en un
+  punto» (coordenadas escritas o clic en un punto del dibujo) y «3 · Por dos puntos (arista)».
+  Además sigue el atajo de un clic en el suelo del 3D.
+- El tercero vive en `src/lib/solidFromEdge.ts` (con tests): toma una **arista de referencia** de la
+  malla local (la de la base, la más paralela a la LT y orientada hacia +X), escala el radio para
+  que mida |PQ| y coloca el sólido resolviendo `posición + R·A = P`, `posición + R·B = Q`. El giro
+  se saca de un marco con la vertical como pista y se normaliza a los ángulos más pequeños (nada de
+  «180 / −180»). En esfera, cilindro y cono los dos puntos son un **diámetro**; el **tetraedro** se
+  crea **regular** (altura √2 · radio), porque «tetraedro de arista AB» es el regular.
+- Los **colores por proyección** (planta amarilla, alzado cian, solape verde) se encienden en
+  *Controles de Vista* de la barra lateral; ya no hay botón flotante en la vista 2D.
+
 ## Planos con clics y secciones (2026)
 - `plane-click`: el plano se dibuja sobre el papel. Dos clics **debajo** de la LT definen la traza horizontal α₁; uno **encima** fija α₂ (pasa por el vértice). Lógica en `src/lib/planeFromClicks.ts` (con tests).
 - `solid-section`: sólido + plano → polígono `polygon` en el dibujo y panel con la VM (abatimiento), área y perímetro. La sección es válida para **todos** los sólidos (son convexos): `src/lib/section.ts`, tests en `__tests__/section.test.ts` (los 10 subtipos + esfera + cono).
