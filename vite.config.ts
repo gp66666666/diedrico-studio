@@ -32,6 +32,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         globIgnores: ['guia/**', 'og-image.jpg', 'Laminas_automaticas.html'],
         navigateFallback: '/index.html',
+        // OJO: sin esta lista, el service worker responde CUALQUIER navegación
+        // (incluido el iframe de las láminas) con el index de la app, y la
+        // pestaña Láminas mostraba el 404 de React. Los .html se piden a la red.
+        navigateFallbackDenylist: [/\.html$/],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
