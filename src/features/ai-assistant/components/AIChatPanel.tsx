@@ -6,6 +6,7 @@ import AIMessageBubble from './AIMessageBubble';
 import AIStepsList from './AIStepsList';
 import { SUPPORT } from '../../../config/support';
 import { creditsEnabled } from '../../../config/credits';
+import { FEATURES } from '../../../config/features';
 import BuyCreditsModal from '../../../components/Auth/BuyCreditsModal';
 import { useUserStore } from '../../../store/userStore';
 import { useAIStore } from '../store/aiStore';
@@ -174,6 +175,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (!FEATURES.AI_ENABLED) return;
         if (!input.trim() || isProcessing) return;
 
         // Sin Premium se deja intentar: los 3 primeros mensajes son gratis.
@@ -493,7 +495,16 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
 
                         {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ maxHeight: isMobile ? '50vh' : '400px' }}>
-                            {messages.length === 0 ? (
+                            {messages.length === 0 && !FEATURES.AI_ENABLED ? (
+                                <div className="px-1 py-6 text-center text-gray-500 dark:text-gray-400">
+                                    <Sparkles size={40} className="mx-auto mb-3 opacity-40" />
+                                    <p className="text-xs leading-relaxed">
+                                        El asistente vuelve en cuanto esté configurado el pago de
+                                        consultas. No hay nada que puedas romper: los botones están
+                                        desactivados a propósito.
+                                    </p>
+                                </div>
+                            ) : messages.length === 0 ? (
                                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                                     <Sparkles size={48} className="mx-auto mb-4 opacity-50" />
                                     <p className="text-sm">
@@ -575,7 +586,28 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                         )}
 
                         {/* Input Area */}
-                        <form onSubmit={handleSubmit} className="border-t border-gray-200 dark:border-gray-700 p-4">
+                        {!FEATURES.AI_ENABLED && (
+                            <div className="border-t border-gray-200 p-4 dark:border-gray-700">
+                                <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-500/30 dark:bg-amber-500/10">
+                                    <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                                        El asistente está en pausa
+                                    </p>
+                                    <p className="mt-1 text-xs leading-relaxed text-amber-800 dark:text-amber-200/90">
+                                        Estamos terminando de configurar los pagos para que las consultas
+                                        funcionen bien y se pueda comprar saldo sin líos. Volverá en cuanto
+                                        esté cerrado; no queremos darte una prueba que luego cambie.
+                                    </p>
+                                    <p className="mt-2 text-xs leading-relaxed text-amber-800/80 dark:text-amber-200/70">
+                                        Mientras tanto sigue todo lo demás: dibujo en diédrico, sólidos,
+                                        láminas, ejercicios y Academia.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                        <form
+                            onSubmit={handleSubmit}
+                            className={`border-t border-gray-200 p-4 dark:border-gray-700 ${FEATURES.AI_ENABLED ? '' : 'hidden'}`}
+                        >
                             {elements.length > 0 && (
                                 <button
                                     type="button"

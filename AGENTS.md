@@ -123,7 +123,12 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
     overlay; `MainApp` también atiende esos enlaces al cargar.
   - Prueba: `node scripts/check-paddle-webhook.mjs` (firma, firma caducada, reintento, pack
     de profesor, suscripción y devolución). Comprobado en sandbox el 2026-10-23.
-  - **Estado (2026-10-23)**: probado en sandbox de punta a punta con pagos de prueba
+  - **Asistente en pausa (2026-10-23)**: hasta que Paddle live esté verificado, el chat se
+  queda cerrado para no regalar consultas. Doble interruptor: `VITE_AI_ENABLED=false` en
+  Vercel (panel con aviso, sin campo de texto) y el secreto `AI_ENABLED=false` en Supabase
+  (`ai-proxy` devuelve 503 `assistant_paused` aunque se llame por API). Para reactivarlo hay
+  que quitar los dos (Vercel + `supabase secrets set AI_ENABLED=true`).
+- **Estado (2026-10-23)**: probado en sandbox de punta a punta con pagos de prueba
     (pack 100/300, mensual, Pack Profesor y devolución total, todo con tarjeta 4242).
     En live ya está creado el catálogo (5 precios activos, IVA incluido), el webhook con su
     secreto y las funciones apuntando a live (`PADDLE_ENV=live`). La tienda está **apagada**

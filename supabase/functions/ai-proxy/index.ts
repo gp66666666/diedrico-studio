@@ -17,6 +17,7 @@
 //  - Tope diario por cuenta (protege el margen de un Premium).
 //  - Lista blanca de modelos y límite de tokens para que no se use como API gratis.
 //  - Si la llamada al proveedor falla, se devuelve el crédito y la consulta de prueba.
+//  - Interruptor: AI_ENABLED=false deja el asistente en pausa para todos.
 //  - Se despliega con --no-verify-jwt porque la verificación se hace aquí,
 //    para poder devolver un mensaje claro (401 sin sesión, 402 sin plan ni saldo).
 
@@ -103,6 +104,21 @@ async function sha256Hex(input: string): Promise<string> {
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: { message: "Method not allowed" } }, 405);
+
+  // Interruptor del asistente. `AI_ENABLED=false` lo deja en pausa para todos
+  // (también por API): el aviso del navegador es solo interfaz, esto es lo que
+  // corta de verdad mientras se termina de configurar la tienda.
+  if ((Deno.env.get("AI_ENABLED") ?? "true") === "false") {
+    return json(
+      {
+        error: {
+          code: "assistant_paused",
+          message: "El asistente está en pausa mientras terminamos de configurar los pagos. Volverá en cuanto esté cerrado.",
+        },
+      },
+      503,
+    );
+  }
 
   // Claves de proveedor (secretos de la Edge Function). DeepSeek es el principal;
   // Groq queda como respaldo si algún día falla.

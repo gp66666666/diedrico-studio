@@ -1,7 +1,10 @@
 // Feature Flags Configuration
 export const FEATURES = {
-    AI_ASSISTANT: true, // Force enabled for now
-    // AI_ASSISTANT: import.meta.env.VITE_ENABLE_AI === 'true',
+    // El panel existe siempre (así se puede explicar qué pasa), pero el
+    // asistente se puede pausar: `VITE_AI_ENABLED=false` lo deja en aviso y el
+    // servidor (ai-proxy, secreto AI_ENABLED) es quien corta de verdad.
+    AI_ASSISTANT: true,
+    AI_ENABLED: (import.meta.env.VITE_AI_ENABLED ?? 'true') === 'true',
 } as const;
 
 export const AI_CONFIG = {
