@@ -123,8 +123,16 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
     overlay; `MainApp` también atiende esos enlaces al cargar.
   - Prueba: `node scripts/check-paddle-webhook.mjs` (firma, firma caducada, reintento, pack
     de profesor, suscripción y devolución). Comprobado en sandbox el 2026-10-23.
-  - **Pendiente en el panel de Paddle**: fijar el «default payment link» del Checkout; sin
-    él Paddle no crea transacciones (`transaction_default_checkout_url_not_set`).
+  - **Estado (2026-10-23)**: probado en sandbox de punta a punta con pagos de prueba
+    (pack 100/300, mensual, Pack Profesor y devolución total, todo con tarjeta 4242).
+    En live ya está creado el catálogo (5 precios activos, IVA incluido), el webhook con su
+    secreto y las funciones apuntando a live (`PADDLE_ENV=live`). La tienda está **apagada**
+    en producción: `node scripts/paddle-shop.mjs off|on|status` (bandera
+    `VITE_PAYMENTS_ENABLED` en Vercel + redespliegue).
+  - **Bloqueo actual**: Paddle live responde `Checkouts aren't enabled for this account` →
+    falta terminar el *onboarding* en el panel live (datos de empresa/fiscales, verificación,
+    payout y aprobación del dominio). Hasta eso, no se puede comprobar un cobro real; por eso
+    la bandera sigue en `false`. El sandbox queda inactivo mientras los secretos sean de live.
 - **Tienda antigua (histórica)**: Lemon Squeezy.
   `supabase/functions/lemonsqueezy-webhook` verifica `X-Signature` (HMAC-SHA256), atiende
   `order_created`, identifica la cuenta por `meta.custom_data.user_id` y, si no llega, por
