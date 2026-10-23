@@ -1257,6 +1257,20 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                 <button onClick={() => setZoom(z => Math.max(z / 1.2, 0.2))} className={`p-2 rounded ${iconHover} ${iconColor}`} title="Zoom Out"><ZoomOut size={20} /></button>
             </div>
 
+            {/* Mismo botón de colores en móvil (la barra de zoom está oculta) */}
+            <button
+                onClick={toggleProjectionColors}
+                className={`absolute top-20 right-3 md:hidden p-2.5 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg} ${projectionColors ? 'ring-1 ring-white/40' : ''} ${iconColor}`}
+                title="Colores por proyección (') / ('')"
+                aria-pressed={projectionColors}
+            >
+                <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <circle cx="5" cy="10" r="3.2" fill="#facc15" />
+                    <circle cx="10" cy="10" r="3.2" fill="#22c55e" />
+                    <circle cx="15" cy="10" r="3.2" fill="#22d3ee" />
+                </svg>
+            </button>
+
             {/* LT Toggle & Magnetism (Sketch Mode Only) */}
             {mode === 'sketch' && (
                 <div className={`absolute bottom-32 md:bottom-4 left-4 flex gap-2 p-2 rounded-lg shadow-lg border z-10 transition-colors ${toolbarBg}`}>
