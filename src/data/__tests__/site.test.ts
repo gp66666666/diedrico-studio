@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EXERCISES } from '../exercises';
-import { PAGE_META, SITE_URL, exerciseDescription, pageSeo } from '../site';
+import { PAGE_META, SITE_URL, exerciseDescription, exercisePageTitle, pageSeo } from '../site';
 
 /**
  * El HTML estático (scripts/seo.mjs) se genera desde estos datos. Si algo se
@@ -47,7 +47,7 @@ describe('metadatos de las páginas', () => {
 describe('descripciones de los ejercicios', () => {
     const exercisePages = EXERCISES.map((e) => ({
         slug: e.slug,
-        title: `${e.title} · ejercicio resuelto de diédrico`,
+        title: exercisePageTitle(e.title),
         description: exerciseDescription(e.statement),
     }));
 
@@ -56,6 +56,12 @@ describe('descripciones de los ejercicios', () => {
             expect(page.description.length, page.slug).toBeLessThanOrEqual(160);
             expect(page.description.length, page.slug).toBeGreaterThanOrEqual(40);
             expect(page.description.endsWith(' '), page.slug).toBe(false);
+        }
+    });
+
+    it('los títulos de ejercicio caben en una pestaña (≤ 65 caracteres)', () => {
+        for (const page of exercisePages) {
+            expect(page.title.length, `${page.slug}: "${page.title}"`).toBeLessThanOrEqual(65);
         }
     });
 

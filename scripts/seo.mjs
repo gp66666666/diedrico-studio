@@ -21,7 +21,7 @@
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { EXERCISES } from '../src/data/exercises.ts';
-import { CONTACT_EMAIL, PAGE_META, SITE_URL, SITE_NAME, exerciseDescription } from '../src/data/site.ts';
+import { CONTACT_EMAIL, PAGE_META, SITE_URL, SITE_NAME, exerciseDescription, exercisePageTitle } from '../src/data/site.ts';
 
 const DIST = path.resolve('dist');
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -339,7 +339,7 @@ for (const exercise of EXERCISES) {
         route: `/ejercicios/${exercise.slug}`,
         meta: {
             path: `/ejercicios/${exercise.slug}`,
-            title: `${exercise.title} · ejercicio resuelto de diédrico`,
+            title: exercisePageTitle(exercise.title),
             description: exerciseDescription(exercise.statement),
             keywords: `${exercise.title}, ${exercise.topic}, sistema diédrico, ejercicio resuelto, dibujo técnico`,
         },

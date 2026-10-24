@@ -107,6 +107,18 @@ export function pageSeo(page: PageMeta) {
     };
 }
 
+/**
+ * Título de la pestaña para un ejercicio. Google corta sobre los 60 caracteres,
+ * así que los títulos largos se quedan con un sufijo corto.
+ */
+export function exercisePageTitle(title: string): string {
+    const full = ' · ejercicio resuelto de diédrico';
+    const mid = ' · ejercicio resuelto';
+    if (title.length + full.length <= 65) return `${title}${full}`;
+    if (title.length + mid.length <= 65) return `${title}${mid}`;
+    return `${title} · diédrico`;
+}
+
 /** Descripción de un ejercicio, recortada por palabras para no cortar a mitad. */
 export function exerciseDescription(statement: string, max = 155): string {
     const clean = statement.replace(/\s+/g, ' ').trim();
