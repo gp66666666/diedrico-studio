@@ -84,6 +84,17 @@ const TOC = [
 ];
 
 export default function GuidePage() {
+    // Enlaces del tipo /guia#solidos (los usa el índice estático y se pueden
+    // compartir): al montar, bajar hasta la sección.
+    useEffect(() => {
+        const id = window.location.hash.slice(1);
+        if (!id) return;
+        const timer = window.setTimeout(() => {
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+        return () => window.clearTimeout(timer);
+    }, []);
+
     useEffect(() => {
         trackEvent('guide_view');
     }, []);

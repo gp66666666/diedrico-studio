@@ -44,6 +44,7 @@ html{background:#070d18}
 #seo-fallback *{box-sizing:border-box}
 #seo-fallback h1{color:#fff;font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.2;margin:0 0 .7rem}
 #seo-fallback h2{color:#fff;font-size:1.12rem;margin:1.7rem 0 .5rem}
+#seo-fallback h3{color:#e2e8f0;font-size:.98rem;margin:1.1rem 0 .3rem}
 #seo-fallback p{margin:.7rem 0}
 #seo-fallback a{color:#60a5fa;text-decoration:none}
 #seo-fallback a:hover{text-decoration:underline}
@@ -154,8 +155,11 @@ ${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Guía', route: '/guia' }]
 <p>Todo lo que puedes hacer en la aplicación, explicado por partes: crear puntos, rectas, planos y sólidos, leer el alzado y la planta, medir distancias, abatir, girar, exportar e imprimir láminas.</p>
 <h2>Índice</h2>
 <ol>${sections
-        .map((s) => `<li><a href="/guia#${esc(s.id)}">${esc(s.title)}</a></li>`)
+        .map((s) => `<li><a href="/guia#${esc(s.id)}">${esc(s.number)}. ${esc(s.title)}</a></li>`)
         .join('')}</ol>
+<h2>Contenido</h2>
+<p class="note">La guía completa, con capturas reales de cada herramienta, se ve dentro de la aplicación.</p>
+${sections.map((s) => `<h3 id="${esc(s.id)}">${esc(s.number)}. ${esc(s.title)}</h3>`).join('\n')}
 <p><a class="cta" href="/">Abrir Diédrico Studio</a></p>
 </div>`;
 }
@@ -238,9 +242,10 @@ ${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Términos', route: '/term
 /** Lee el índice de la guía del propio fuente, para que no se desfase nunca. */
 async function guideSections() {
     const source = await readFile(path.resolve('src/pages/GuidePage.tsx'), 'utf8');
-    return [...source.matchAll(/id="([a-z0-9-]+)"\s+number="[0-9]+"\s+title="([^"]+)"/g)].map((m) => ({
+    return [...source.matchAll(/id="([a-z0-9-]+)"\s+number="([0-9]+)"\s+title="([^"]+)"/g)].map((m) => ({
         id: m[1],
-        title: m[2],
+        number: m[2],
+        title: m[3],
     }));
 }
 
@@ -372,7 +377,7 @@ for (const exercise of EXERCISES) {
 /* Generación                                                          */
 /* ------------------------------------------------------------------ */
 
-function renderPage(template, page, chunkUrl) {
+async function renderPage(template, page, chunkUrl) {
     const url = abs(page.route);
     const { title, description, keywords, noindex = false } = page.meta;
 
@@ -400,7 +405,7 @@ function renderPage(template, page, chunkUrl) {
     html = replaceOnce(html, '<!--seo:extra-->', `${preload}\n<style>${STYLE}</style>\n${page.extra ?? ''}`, 'el hueco <!--seo:extra-->');
 
     if (page.content) {
-        const body = page.content();
+        const body = await page.content();
         html = replaceOnce(html, '<div id="root"></div>', `<div id="root">${body}</div>`, 'el div #root');
     }
 
@@ -417,7 +422,7 @@ async function main() {
     let home = null;
     for (const page of PAGES) {
         const chunkUrl = page.chunk ? chunks.get(page.chunk) : null;
-        const html = renderPage(template, page, chunkUrl);
+        const html = await renderPage(template, page, chunkUrl);
 
         if (page.route === '/') {
             home = html;
@@ -431,7 +436,7 @@ async function main() {
     await writeFile(path.join(DIST, 'index.html'), home, 'utf8');
 
     // 404 propio: Vercel lo sirve con estado 404 (no un 200 con la app dentro).
-    const notFound = renderPage(
+    const notFound = await renderPage(
         template,
         {
             route: '/404',

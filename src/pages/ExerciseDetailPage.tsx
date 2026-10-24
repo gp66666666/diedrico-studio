@@ -21,6 +21,12 @@ export default function ExerciseDetailPage() {
     if (!exercise) {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center bg-[#070d18] px-6 text-center text-slate-200">
+                <SEO
+                    title="Ejercicio no encontrado · Diédrico Studio"
+                    description="Ese ejercicio no existe o ha cambiado de nombre. Mira la lista completa de ejercicios resueltos de sistema diédrico."
+                    canonicalUrl={`${SITE_URL}/ejercicios/${slug}`}
+                    noindex
+                />
                 <h1 className="text-2xl font-bold text-white">Ejercicio no encontrado</h1>
                 <Link to="/ejercicios" className="mt-4 text-sm text-blue-400 hover:text-blue-300">
                     Ver todos los ejercicios

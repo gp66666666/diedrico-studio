@@ -248,6 +248,35 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 - Textos de UI y comentarios en español; nombres de código en inglés.
 - Commit style del repo: `feat:`, `fix:`, `chore:`, `docs:`.
 
+## SEO (2026-10)
+
+Es una SPA, así que sin un paso extra **todas las URLs devuelven el mismo HTML**: el título y la
+descripción de la portada. Eso rompe los enlaces compartidos (WhatsApp, Telegram, LinkedIn) y lo
+que ven los rastreadores que no ejecutan JavaScript (los de IA, por ejemplo).
+
+- `scripts/seo.mjs` corre al final de `npm run build` y escribe en `dist/` un `index.html` por
+  ruta: metadatos propios, canonical, Open Graph, JSON-LD (LearningResource + BreadcrumbList en
+  los ejercicios, ItemList en la lista) y contenido legible dentro de `#root`. React lo sustituye
+  al arrancar; si el JS no llega, queda una página decente.
+- **Fuente única de metadatos**: `src/data/site.ts` (`PAGE_META`). Las páginas hacen
+  `<SEO {...pageSeo(PAGE_META.about)} />`; el generador lee lo mismo. Si cambias un título, cambia
+  en los dos sitios a la vez (hay tests de longitud y de rutas en `src/data/__tests__/site.test.ts`).
+- Los ejercicios no se listan a mano: salen de `src/data/exercises.ts`. **Añadir un ejercicio =
+  añadirlo al array**; el HTML, el sitemap y los enlaces relacionados se generan solos.
+- `dist/sitemap.xml` se genera desde la misma lista (ya no hay `public/sitemap.xml`).
+- `vercel.json` usa `rewrites` explícitos: cada ruta conocida sirve su HTML y lo desconocido da
+  **404 de verdad** (`dist/404.html`, con `noindex`), no un 200 con la app dentro.
+- `/clase` y el 404 llevan `noindex`. El resto, `index, follow`.
+- El service worker no precachea los HTML por ruta (`globIgnores` en `vite.config.ts`): son para
+  los rastreadores y para la primera visita; el usuario que vuelve navega con el shell cacheado.
+
+Comprobar tras desplegar:
+
+```bash
+curl -s https://diedrico-studio.vercel.app/ejercicios/trazas-de-una-recta | grep '<title>'
+curl -s -o /dev/null -w '%{http_code}\n' https://diedrico-studio.vercel.app/ejercicios/no-existe   # 404
+```
+
 ## Hechos conocidos
 
 - La IA va por `supabase/functions/ai-proxy` (secretos `DEEPSEEK_API_KEY` y `GROQ_API_KEY`,
