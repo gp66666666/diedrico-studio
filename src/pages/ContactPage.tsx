@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, MessageSquare, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
+import SEO from '../components/SEO';
+import { PAGE_META, pageSeo } from '../data/site';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -53,6 +55,7 @@ export default function ContactPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950 text-white p-8">
+            <SEO {...pageSeo(PAGE_META.contact)} />
             <div className="max-w-4xl mx-auto">
                 <Link to="/" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-8">
                     <ArrowLeft size={20} />

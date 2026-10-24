@@ -4,6 +4,8 @@ import { ArrowLeft, GraduationCap, Copy, Check, KeyRound, Users, CalendarClock }
 import { supabase } from '../lib/supabase';
 import { useUserStore } from '../store/userStore';
 import { toast } from '../lib/toast';
+import SEO from '../components/SEO';
+import { PAGE_META, pageSeo } from '../data/site';
 
 interface ClassCode {
     code: string;
@@ -84,6 +86,7 @@ export default function ClassPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950 p-6 text-white md:p-8">
+            <SEO {...pageSeo(PAGE_META.classroom)} />
             <div className="mx-auto max-w-3xl">
                 <Link to="/" className="mb-8 inline-flex items-center gap-2 text-blue-400 hover:text-blue-300">
                     <ArrowLeft size={20} /> Volver a la aplicación

@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Compass, GraduationCap } from 'lucide-react';
 import SEO from '../components/SEO';
+import { SITE_URL } from '../data/site';
 
 export default function NotFoundPage() {
     return (
         <>
             <SEO
-                title="Página no encontrada - Diédrico Studio"
+                title="Página no encontrada · Diédrico Studio"
                 description="La página que buscas no existe. Vuelve a Diédrico Studio para seguir practicando sistema diédrico."
-                canonicalUrl="https://diedrico-studio.vercel.app/"
+                canonicalUrl={`${SITE_URL}/`}
+                noindex
             />
             <div className="flex min-h-screen flex-col items-center justify-center bg-[#070d18] px-6 text-center text-slate-200">
                 <p className="text-6xl font-black text-blue-500/30">404</p>

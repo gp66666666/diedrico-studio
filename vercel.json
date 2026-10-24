@@ -1,20 +1,15 @@
 {
-  "routes": [
-    {
-      "src": "/ads.txt",
-      "dest": "/ads.txt"
-    },
-    {
-      "src": "/sitemap.xml",
-      "dest": "/sitemap.xml"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/robots.txt"
-    },
-    {
-      "src": "/[^.]+",
-      "dest": "/index.html"
-    }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/ejercicios", "destination": "/ejercicios/index.html" },
+    { "source": "/ejercicios/:slug", "destination": "/ejercicios/:slug/index.html" },
+    { "source": "/guia", "destination": "/guia/index.html" },
+    { "source": "/academy", "destination": "/academy/index.html" },
+    { "source": "/about", "destination": "/about/index.html" },
+    { "source": "/contact", "destination": "/contact/index.html" },
+    { "source": "/privacy", "destination": "/privacy/index.html" },
+    { "source": "/terms", "destination": "/terms/index.html" },
+    { "source": "/clase", "destination": "/clase/index.html" }
   ]
 }

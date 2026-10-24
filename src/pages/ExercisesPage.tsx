@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, Filter } from 'lucide-react';
 import SEO from '../components/SEO';
 import { EXERCISES, EXERCISE_TOPICS, type ExerciseLevel } from '../data/exercises';
+import { PAGE_META, pageSeo } from '../data/site';
 
 const LEVELS: Array<ExerciseLevel | 'Todos'> = ['Todos', 'Básico', 'Medio', 'Avanzado'];
 
@@ -26,12 +27,7 @@ export default function ExercisesPage() {
 
     return (
         <>
-            <SEO
-                title="Ejercicios resueltos de sistema diédrico - Diédrico Studio"
-                description="Ejercicios de sistema diédrico resueltos paso a paso: trazas, intersecciones, distancias, paralelismo, abatimientos y ángulos. Ábrelos en el editor 3D."
-                keywords="ejercicios sistema diédrico resueltos, geometría descriptiva, dibujo técnico, PAU, bachillerato, intersecciones, abatimientos"
-                canonicalUrl="https://diedrico-studio.vercel.app/ejercicios"
-            />
+            <SEO {...pageSeo(PAGE_META.exercises)} />
 
             <div className="min-h-screen bg-[#070d18] text-slate-200">
                 <header className="border-b border-white/10 bg-gradient-to-br from-blue-950/60 via-[#070d18] to-indigo-950/40">

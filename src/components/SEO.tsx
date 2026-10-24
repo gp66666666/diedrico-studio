@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { OG_IMAGE, PAGE_META, SITE_NAME, SITE_URL, pageSeo } from '../data/site';
 
 interface SEOProps {
     title?: string;
@@ -7,77 +8,50 @@ interface SEOProps {
     ogImage?: string;
     canonicalUrl?: string;
     type?: 'website' | 'article';
+    /** Páginas privadas o de error: no deben indexarse. */
+    noindex?: boolean;
 }
 
-export default function SEO({
-    title = 'Diédrico Studio - Herramienta Educativa de Sistema Diédrico',
-    description = 'Aprende sistema diédrico de forma interactiva con visualización 3D en tiempo real. Herramientas de geometría descriptiva, proyecciones diédricas automáticas y asistente AI. Gratis y educativo.',
-    keywords = 'sistema diédrico, geometría descriptiva, dibujo técnico, visualización 3D, educación, ingeniería, arquitectura, proyecciones diédricas, alzado, planta, perfil',
-    ogImage = 'https://diedrico-studio.vercel.app/og-image.jpg',
-    canonicalUrl = 'https://diedrico-studio.vercel.app/',
-    type = 'website'
-}: SEOProps) {
-    const structuredData = {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Diédrico Studio",
-        "description": description,
-        "applicationCategory": "EducationalApplication",
-        "operatingSystem": "Web Browser",
-        // Es gratis de verdad: no hay plan de pago que anunciar (ni precio que
-        // Google pueda mostrar mal).
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "EUR"
-        },
-        "creator": {
-            "@type": "Person",
-            "name": "Eloi García",
-            "email": "diedrico.studio25@gmail.com",
-            "url": "https://github.com/gp66666666"
-        },
-        "inLanguage": "es",
-        "url": canonicalUrl,
-        "screenshot": ogImage,
-        "featureList": [
-            "Visualización 3D interactiva",
-            "Proyecciones diédricas automáticas",
-            "Herramientas de geometría descriptiva",
-            "Asistente AI",
-            "Gratuito"
-        ]
-    };
+const HOME = pageSeo(PAGE_META.home);
 
+/**
+ * Metadatos de la página activa.
+ *
+ * Ojo: los buscadores y las redes sociales leen el HTML del servidor, y ahí
+ * manda lo que genera `scripts/seo.mjs` en el build (título, descripción,
+ * canonical, Open Graph y datos estructurados ya escritos). Este componente
+ * mantiene todo coherente cuando se navega dentro de la app sin recargar.
+ */
+export default function SEO({
+    title = HOME.title,
+    description = HOME.description,
+    keywords = HOME.keywords,
+    ogImage = OG_IMAGE,
+    canonicalUrl = SITE_URL + '/',
+    type = 'website',
+    noindex = false,
+}: SEOProps) {
     return (
         <Helmet>
-            {/* Primary Meta Tags */}
             <title>{title}</title>
-            <meta name="title" content={title} />
             <meta name="description" content={description} />
             <meta name="keywords" content={keywords} />
             <link rel="canonical" href={canonicalUrl} />
+            {noindex && <meta name="robots" content="noindex, follow" />}
 
-            {/* Open Graph / Facebook */}
             <meta property="og:type" content={type} />
             <meta property="og:url" content={canonicalUrl} />
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={ogImage} />
-            <meta property="og:site_name" content="Diédrico Studio" />
+            <meta property="og:site_name" content={SITE_NAME} />
             <meta property="og:locale" content="es_ES" />
 
-            {/* Twitter */}
-            <meta property="twitter:card" content="summary_large_image" />
-            <meta property="twitter:url" content={canonicalUrl} />
-            <meta property="twitter:title" content={title} />
-            <meta property="twitter:description" content={description} />
-            <meta property="twitter:image" content={ogImage} />
-
-            {/* Structured Data */}
-            <script type="application/ld+json">
-                {JSON.stringify(structuredData)}
-            </script>
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:url" content={canonicalUrl} />
+            <meta name="twitter:title" content={title} />
+            <meta name="twitter:description" content={description} />
+            <meta name="twitter:image" content={ogImage} />
         </Helmet>
     );
 }

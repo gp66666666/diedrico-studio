@@ -5,6 +5,7 @@ import SEO from '../components/SEO';
 import { EXERCISES, findExercise } from '../data/exercises';
 import { buildShareUrl, encodeScene } from '../lib/shareScene';
 import { toast } from '../lib/toast';
+import { SITE_URL, exerciseDescription } from '../data/site';
 
 const LEVEL_STYLE: Record<string, string> = {
     Básico: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
@@ -30,6 +31,7 @@ export default function ExerciseDetailPage() {
 
     const index = EXERCISES.findIndex((e) => e.slug === exercise.slug);
     const next = EXERCISES[(index + 1) % EXERCISES.length];
+    const related = EXERCISES.filter((e) => e.topic === exercise.topic && e.slug !== exercise.slug).slice(0, 4);
 
     const openInEditor = async () => {
         setOpening(true);
@@ -59,10 +61,11 @@ export default function ExerciseDetailPage() {
     return (
         <>
             <SEO
-                title={`${exercise.title} - Ejercicio resuelto de diédrico`}
-                description={`${exercise.statement.slice(0, 150)} Ejercicio resuelto paso a paso con el dibujo en 3D.`}
+                title={`${exercise.title} · ejercicio resuelto de diédrico`}
+                description={exerciseDescription(exercise.statement)}
                 keywords={`${exercise.title}, ${exercise.topic}, sistema diédrico, ejercicio resuelto, dibujo técnico`}
-                canonicalUrl={`https://diedrico-studio.vercel.app/ejercicios/${exercise.slug}`}
+                canonicalUrl={`${SITE_URL}/ejercicios/${exercise.slug}`}
+                type="article"
             />
 
             <div className="min-h-screen bg-[#070d18] text-slate-200">
@@ -128,6 +131,37 @@ export default function ExerciseDetailPage() {
                             <p className="text-sm text-slate-300">{exercise.tip}</p>
                         </div>
                     )}
+
+                    {related.length > 0 && (
+                        <section className="mt-10">
+                            <h2 className="text-lg font-bold text-white">Más de {exercise.topic.toLowerCase()}</h2>
+                            <ul className="mt-3 space-y-2">
+                                {related.map((e) => (
+                                    <li key={e.slug}>
+                                        <Link
+                                            to={`/ejercicios/${e.slug}`}
+                                            className="text-sm text-blue-400 hover:text-blue-300"
+                                        >
+                                            {e.title}
+                                        </Link>
+                                        <span className="ml-2 text-xs text-slate-500">{e.level}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    )}
+
+                    <p className="mt-8 text-xs text-slate-500">
+                        ¿Es la primera vez que abres el editor?{' '}
+                        <Link to="/guia" className="text-blue-400 hover:text-blue-300">
+                            Mira la guía
+                        </Link>{' '}
+                        o practica con la{' '}
+                        <Link to="/academy" className="text-blue-400 hover:text-blue-300">
+                            teoría de la Academia
+                        </Link>
+                        .
+                    </p>
 
                     <div className="mt-10 flex items-center justify-between border-t border-white/10 pt-6">
                         <Link to="/ejercicios" className="text-sm text-slate-400 hover:text-white">

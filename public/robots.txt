@@ -9,6 +9,8 @@ Disallow: /node_modules/
 Disallow: /src/
 Disallow: /*.json
 Disallow: /*.config.*
+# Panel privado de clase (códigos de profesor)
+Disallow: /clase
 
 # Permitir bots de búsqueda principales
 User-agent: Googlebot

@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { creditsEnabled } from '../config/credits';
+import SEO from '../components/SEO';
+import { PAGE_META, pageSeo } from '../data/site';
 
 export default function TermsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950 text-white p-8">
+            <SEO {...pageSeo(PAGE_META.terms)} />
             <div className="max-w-4xl mx-auto">
                 <Link to="/" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-8">
                     <ArrowLeft size={20} />

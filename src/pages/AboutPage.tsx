@@ -1,16 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Github, Mail } from 'lucide-react';
 import SEO from '../components/SEO';
+import { PAGE_META, pageSeo } from '../data/site';
 
 export default function AboutPage() {
     return (
         <>
-            <SEO
-                title="Quiénes Somos - Diédrico Studio"
-                description="Conoce más sobre Diédrico Studio, la herramienta educativa gratuita para aprender sistema diédrico con visualización 3D. Proyecto creado por Eloi García."
-                keywords="sobre Diédrico Studio, equipo, proyecto educativo, geometría descriptiva online, herramienta educativa"
-                canonicalUrl="https://diedrico-studio.vercel.app/about"
-            />
+            <SEO {...pageSeo(PAGE_META.about)} />
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-950 text-white p-8">
                 <div className="max-w-4xl mx-auto">
                     <Link to="/" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-8">

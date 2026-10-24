@@ -4,6 +4,8 @@ import { useUserStore } from '../store/userStore';
 import { useGeometryStore } from '../store/geometryStore';
 import { ACADEMY_CONTENT } from '../data/academyContent';
 import type { AcademyTopic, AcademyExercise } from '../types';
+import SEO from '../components/SEO';
+import { PAGE_META, pageSeo } from '../data/site';
 import { Sun, Moon, ArrowLeft, BookOpen, CheckCircle2, Printer, Play, ChevronUp } from 'lucide-react';
 import { trackEvent } from '../lib/analytics';
 import { useThemeSync } from '../hooks/useThemeSync';
@@ -151,6 +153,7 @@ export default function AcademyPage() {
 
     return (
         <div className={`academy-page min-h-screen ${bgPrimary} ${textPrimary} flex flex-col md:flex-row print:bg-white print:text-black transition-colors duration-300`}>
+            <SEO {...pageSeo(PAGE_META.academy)} />
             {/* Sidebar */}
             <div className={`w-full md:w-80 border-r ${borderPrimary} ${bgSidebar} p-6 flex flex-col print:hidden shadow-sm z-10 transition-colors duration-300 backdrop-blur-sm`}>
                 <div className="flex items-center gap-3 mb-8">

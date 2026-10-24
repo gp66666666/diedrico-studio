@@ -8,29 +8,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="ZEGCkZX9boX0WN59Hky_AMtb3pEqDHcVsiTWiovZvDE" />
   <meta name="theme-color" content="#070d18" />
+  <meta name="author" content="Eloi García" />
+  <meta name="robots" content="index, follow" />
   <link rel="preconnect" href="https://zrfmltqfunizhudkekdc.supabase.co" crossorigin />
-  <title>Diédrico Studio - Herramienta Educativa de Sistema Diédrico y Geometría Descriptiva</title>
-  <meta name="description"
-    content="Aprende sistema diédrico y geometría descriptiva de forma interactiva con visualización 3D en tiempo real. Herramientas de proyecciones, alzado, planta y perfil. Gratis." />
 
-  <!-- SEO / Open Graph -->
+  <title>Diédrico Studio · sistema diédrico interactivo en 3D</title>
+  <meta name="description" content="Dibuja puntos, rectas, planos y sólidos en diédrico con vista 3D en tiempo real. Proyecciones, abatimientos, giros, ejercicios resueltos y láminas." />
+  <meta name="keywords" content="sistema diédrico, geometría descriptiva, dibujo técnico, ejercicios resueltos, PAU, bachillerato, visualización 3D" />
+  <link rel="canonical" href="https://diedrico-studio.vercel.app/" />
+
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://diedrico-studio.vercel.app/" />
-  <meta property="og:title" content="Diédrico Studio - Sistema Diédrico Interactivo" />
-  <meta property="og:description"
-    content="Aprende geometría descriptiva con visualización 3D en tiempo real. La herramienta definitiva para estudiantes y profesores." />
+  <meta property="og:title" content="Diédrico Studio · sistema diédrico interactivo en 3D" />
+  <meta property="og:description" content="Dibuja puntos, rectas, planos y sólidos en diédrico con vista 3D en tiempo real. Proyecciones, abatimientos, giros, ejercicios resueltos y láminas." />
   <meta property="og:image" content="https://diedrico-studio.vercel.app/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Diédrico Studio: sólido en 3D con sus proyecciones diédricas" />
+  <meta property="og:site_name" content="Diédrico Studio" />
+  <meta property="og:locale" content="es_ES" />
 
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://diedrico-studio.vercel.app/" />
-  <meta property="twitter:title" content="Diédrico Studio - Sistema Diédrico Interactivo" />
-  <meta property="twitter:description" content="Aprende geometría descriptiva con visualización 3D en tiempo real." />
-  <meta property="twitter:image" content="https://diedrico-studio.vercel.app/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://diedrico-studio.vercel.app/" />
+  <meta name="twitter:title" content="Diédrico Studio · sistema diédrico interactivo en 3D" />
+  <meta name="twitter:description" content="Dibuja puntos, rectas, planos y sólidos en diédrico con vista 3D en tiempo real. Proyecciones, abatimientos, giros, ejercicios resueltos y láminas." />
+  <meta name="twitter:image" content="https://diedrico-studio.vercel.app/og-image.jpg" />
 
-  <!-- Schema.org for Google -->
+  <!-- Schema.org: la app y el sitio -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -38,7 +44,8 @@
       "name": "Diédrico Studio",
       "url": "https://diedrico-studio.vercel.app/",
       "logo": "https://diedrico-studio.vercel.app/logo-128.png",
-      "sameAs": []
+      "email": "diedrico.studio25@gmail.com",
+      "founder": { "@type": "Person", "name": "Eloi García" }
     }
   </script>
   <script type="application/ld+json">
@@ -46,10 +53,37 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Diédrico Studio",
-      "url": "https://diedrico-studio.vercel.app/"
+      "url": "https://diedrico-studio.vercel.app/",
+      "inLanguage": "es"
     }
   </script>
-
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Diédrico Studio",
+      "url": "https://diedrico-studio.vercel.app/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "es",
+      "description": "Herramienta educativa de sistema diédrico: dibujo 3D, proyecciones, abatimientos, giros, sólidos y ejercicios resueltos.",
+      "creator": {
+        "@type": "Person",
+        "name": "Eloi García",
+        "url": "https://github.com/gp66666666"
+      },
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "featureList": [
+        "Visualización 3D interactiva",
+        "Proyecciones diédricas automáticas",
+        "Abatimientos, giros y cambios de plano",
+        "Sólidos y secciones",
+        "Ejercicios resueltos",
+        "Láminas para imprimir"
+      ]
+    }
+  </script>
+  <!--seo:extra-->
 </head>
 
 <body>
@@ -63,54 +97,6 @@
       }
     })();
   </script>
-
-  <!-- Static content for SEO crawlers (visible before React mounts, then hidden by React) -->
-  <noscript>
-    <div style="max-width: 800px; margin: 0 auto; padding: 40px 20px; font-family: system-ui, sans-serif;">
-      <h1>Diédrico Studio – Herramienta Educativa de Sistema Diédrico Online</h1>
-      <p>Diédrico Studio es una aplicación web educativa gratuita para aprender <strong>sistema diédrico</strong>,
-        <strong>geometría descriptiva</strong> y <strong>dibujo técnico</strong> con visualización 3D interactiva en
-        tiempo real.
-      </p>
-
-      <h2>¿Qué es el Sistema Diédrico?</h2>
-      <p>El Sistema Diédrico es un método de representación geométrica que permite representar objetos tridimensionales
-        en un plano bidimensional. Utiliza dos proyecciones ortogonales: el <strong>alzado</strong> (vista frontal) y la
-        <strong>planta</strong> (vista superior), separadas por la <strong>Línea de Tierra (LT)</strong>.
-      </p>
-
-      <h2>Conceptos Clave</h2>
-      <ul>
-        <li><strong>Cota</strong>: Altura del punto sobre el Plano Horizontal de Proyección.</li>
-        <li><strong>Alejamiento</strong>: Distancia del punto al Plano Vertical de Proyección.</li>
-        <li><strong>Proyección Vertical (Alzado)</strong>: Vista desde el frente, se dibuja arriba de la LT.</li>
-        <li><strong>Proyección Horizontal (Planta)</strong>: Vista desde arriba, se dibuja debajo de la LT.</li>
-        <li><strong>Trazas</strong>: Intersecciones de rectas y planos con los planos de proyección.</li>
-      </ul>
-
-      <h2>Funcionalidades</h2>
-      <ul>
-        <li>Visualización 3D interactiva en tiempo real</li>
-        <li>Proyecciones diédricas automáticas (alzado, planta y perfil)</li>
-        <li>Cálculo de intersecciones entre rectas y planos</li>
-        <li>Cálculo de distancias y verdaderas magnitudes</li>
-        <li>Abatimientos, cambios de plano y giros</li>
-        <li>Generador automático de láminas de ejercicios para practicar</li>
-        <li>Modo boceto para dibujo libre con herramientas de compás y regla</li>
-      </ul>
-
-      <h2>¿Para quién es?</h2>
-      <p>Estudiantes de bachillerato, ingeniería, arquitectura y formación técnica. Profesores de geometría descriptiva
-        y dibujo técnico. Cualquier persona interesada en aprender sistema diédrico de forma visual e interactiva.</p>
-
-      <p><em>Para usar la aplicación interactiva, por favor habilita JavaScript en tu navegador.</em></p>
-
-      <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 14px; color: #666;">
-        <p>© 2026 Diédrico Studio — Creado por Eloi García | <a href="/about">Quiénes Somos</a> | <a
-            href="/contact">Contacto</a> | <a href="/privacy">Privacidad</a> | <a href="/terms">Términos</a></p>
-      </footer>
-    </div>
-  </noscript>
 
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>

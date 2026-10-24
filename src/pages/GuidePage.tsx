@@ -6,6 +6,7 @@ import {
     Brain, GraduationCap, Printer, Eye, Grid3x3, Triangle, Move3d
 } from 'lucide-react';
 import SEO from '../components/SEO';
+import { PAGE_META, pageSeo } from '../data/site';
 import { trackEvent } from '../lib/analytics';
 
 /* ------------------------------------------------------------------ */
@@ -89,12 +90,7 @@ export default function GuidePage() {
 
     return (
         <>
-            <SEO
-                title="Guía completa - Diédrico Studio"
-                description="Tutorial con imágenes de todas las herramientas de Diédrico Studio: crear puntos, rectas y planos, sólidos, vista diédrica, giros, distancias, láminas y asistente IA."
-                keywords="guía sistema diédrico, tutorial geometría descriptiva, diédrico studio, cómo usar, sólidos, proyecciones"
-                canonicalUrl="https://diedrico-studio.vercel.app/guia"
-            />
+            <SEO {...pageSeo(PAGE_META.guide)} />
 
             <div className="min-h-screen bg-[#070d18] text-slate-200">
                 {/* Cabecera */}

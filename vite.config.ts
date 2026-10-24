@@ -30,7 +30,10 @@ export default defineConfig({
         // Se cachea el núcleo de la app; las capturas de la guía se dejan fuera
         // para no engordar la instalación.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        globIgnores: ['guia/**', 'og-image.jpg', 'Laminas_automaticas.html'],
+        // El HTML por ruta que genera scripts/seo.mjs NO se precachea: se sirve
+        // desde la red y, sin conexión, el service worker ya responde con el
+        // index de la app (la ruta la resuelve React).
+        globIgnores: ['guia/**', 'og-image.jpg', 'Laminas_automaticas.html', '*/index.html', 'ejercicios/**'],
         navigateFallback: '/index.html',
         // OJO: sin esta lista, el service worker responde CUALQUIER navegación
         // (incluido el iframe de las láminas) con el index de la app, y la
