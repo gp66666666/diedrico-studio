@@ -89,7 +89,7 @@ export default function AboutPage() {
                                             <Mail size={20} />
                                             diedrico.studio25@gmail.com
                                         </a>
-                                        <p className="text-xs text-white/50 mt-1 ml-7">
+                                        <p className="text-xs text-white/70 mt-1 ml-7">
                                             Contacto, soporte y sugerencias
                                         </p>
                                     </div>
