@@ -81,6 +81,39 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                     </div>
                 </section>
                 
+                <!-- ALFABETO DEL PUNTO -->
+                <section>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2 font-serif">El alfabeto del punto</h3>
+                    <p class="mb-4 text-lg text-slate-700">La cota (Z) dice si el punto está por encima o por debajo del PH; el alejamiento (Y), si está delante o detrás del PV. Con esos dos signos se nombran los cuatro cuadrantes:</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100">
+                                    <th class="border border-slate-200 px-3 py-2 text-left">Cuadrante</th>
+                                    <th class="border border-slate-200 px-3 py-2 text-left">Cota</th>
+                                    <th class="border border-slate-200 px-3 py-2 text-left">Alejamiento</th>
+                                    <th class="border border-slate-200 px-3 py-2 text-left">Cómo se ven las proyecciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="border border-slate-200 px-3 py-2">I</td><td class="border border-slate-200 px-3 py-2">+</td><td class="border border-slate-200 px-3 py-2">+</td><td class="border border-slate-200 px-3 py-2">a distinto lado de la LT: P′ debajo y P″ encima</td></tr>
+                                <tr><td class="border border-slate-200 px-3 py-2">II</td><td class="border border-slate-200 px-3 py-2">+</td><td class="border border-slate-200 px-3 py-2">−</td><td class="border border-slate-200 px-3 py-2">las dos por encima de la LT</td></tr>
+                                <tr><td class="border border-slate-200 px-3 py-2">III</td><td class="border border-slate-200 px-3 py-2">−</td><td class="border border-slate-200 px-3 py-2">−</td><td class="border border-slate-200 px-3 py-2">a distinto lado: P′ encima y P″ debajo</td></tr>
+                                <tr><td class="border border-slate-200 px-3 py-2">IV</td><td class="border border-slate-200 px-3 py-2">−</td><td class="border border-slate-200 px-3 py-2">+</td><td class="border border-slate-200 px-3 py-2">las dos por debajo de la LT</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mt-4">
+                        <p class="text-sm text-slate-700 mb-2"><strong>Casos particulares:</strong></p>
+                        <ul class="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                            <li>Sobre el PH (cota 0): P″ cae en la LT y P′ es el propio punto.</li>
+                            <li>Sobre el PV (alejamiento 0): P′ cae en la LT y P″ es el propio punto.</li>
+                            <li>Sobre la LT (cota 0 y alejamiento 0): las dos proyecciones coinciden con el punto.</li>
+                            <li>En un bisector: el valor absoluto de la cota es igual al del alejamiento.</li>
+                        </ul>
+                    </div>
+                </section>
+
                 <!-- COORDENADAS -->
                 <section>
                      <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2 font-serif">
@@ -121,6 +154,18 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                 <h3 class="text-2xl font-bold text-slate-900 mb-4 font-serif">1. Definición de la Recta</h3>
                 <p>Para definir una recta necesitamos 2 Puntos. En diédrico, unimos sus proyecciones homónimas.</p>
                 
+                <h3 class="text-2xl font-bold text-slate-900 mt-8 mb-4 font-serif">Cómo se hallan las trazas</h3>
+                <p class="mb-4">Las trazas son los puntos donde la recta corta a los planos de proyección. No hace falta calcular: se leen de las proyecciones.</p>
+                <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200">
+                    <ul class="list-disc pl-5 space-y-3 text-slate-700">
+                        <li><strong>Traza horizontal H</strong>: donde r″ corta a la LT se baja una perpendicular hasta r′. Ese punto es H′ (que es el propio H, porque está en el PH). Su proyección vertical H″ cae en la LT, en la misma vertical: H′ y H″ no son el mismo punto.</li>
+                        <li><strong>Traza vertical V</strong>: donde r′ corta a la LT se sube una perpendicular hasta r″. Ese punto es V″ (el propio V). Su proyección horizontal V′ cae en la LT.</li>
+                        <li>Una recta paralela a un plano no tiene traza con ese plano: una recta horizontal no corta al PH y una frontal no corta al PV.</li>
+                        <li>Una recta de perfil necesita la tercera vista para localizar sus trazas sin ambigüedad.</li>
+                    </ul>
+                    <p class="mt-4 text-sm text-slate-700"><strong>Ejemplo verificado:</strong> A(20, 10, 30) y B(60, 40, 10). Traza horizontal H(80, 55, 0); traza vertical V(6,67; 0; 36,67).</p>
+                </div>
+
                 <h3 class="text-2xl font-bold text-slate-900 mt-8 mb-4 font-serif">2. Clasificación Completa - 7 Tipos de Rectas</h3>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     
@@ -266,6 +311,24 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                 <h3 class="text-2xl font-bold text-slate-900 mb-4 font-serif">2. Trazas del Plano</h3>
                 <p>Las trazas (<strong>α₁</strong>, <strong>α₂</strong>) son las rectas de intersección del plano con el PH y el PV.</p>
                 
+                <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 mt-6">
+                    <h4 class="font-bold text-amber-900 text-lg mb-2">Los dos planos que la lista suele olvidar</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-slate-700">
+                        <li><strong>Plano horizontal</strong> (paralelo al PH): no tiene traza horizontal, está en el infinito; su traza vertical α₂ es paralela a la LT. Se ve en verdadera magnitud en la planta.</li>
+                        <li><strong>Plano frontal</strong> (paralelo al PV): no tiene traza vertical; su traza horizontal α₁ es paralela a la LT. Se ve en verdadera magnitud en el alzado.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200 mt-6">
+                    <h4 class="font-bold text-emerald-900 text-lg mb-2">Rectas notables del plano</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-slate-700">
+                        <li><strong>Horizontal</strong>: paralela al PH; su alzado es paralelo a la LT.</li>
+                        <li><strong>Frontal</strong>: paralela al PV; su planta es paralela a la LT.</li>
+                        <li><strong>Máxima pendiente</strong>: perpendicular a la traza horizontal α₁; mide el ángulo del plano con el PH.</li>
+                        <li><strong>Máxima inclinación</strong>: perpendicular a la traza vertical α₂; mide el ángulo con el PV.</li>
+                    </ul>
+                </div>
+
                  <h3 class="text-2xl font-bold text-slate-900 mt-8 mb-4 font-serif">3. Clasificación Completa</h3>
                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Oblicuo -->
@@ -622,6 +685,16 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         }
                     ]}
                 />
+
+            <div className="bg-amber-50 dark:bg-amber-900/20 p-6 rounded-xl border border-amber-200 dark:border-amber-800">
+                <h3 className="text-lg font-bold text-amber-900 dark:text-amber-200 mb-2">Casos especiales</h3>
+                <ul className="list-disc pl-5 space-y-2 text-slate-700 dark:text-slate-200">
+                    <li>Si las trazas homónimas son paralelas (α₁ ∥ β₁ y α₂ ∥ β₂), los planos son paralelos y no hay intersección.</li>
+                    <li>Si solo se cortan las trazas verticales (α₁ ∥ β₁), la intersección es una recta paralela al PH.</li>
+                    <li>Si solo se cortan las trazas horizontales (α₂ ∥ β₂), la intersección es una recta paralela al PV.</li>
+                    <li>Si la recta es paralela al plano, no hay punto de intersección: se comprueba con una recta auxiliar del plano.</li>
+                </ul>
+            </div>
             </div>
         ),
         exercises: []
@@ -1090,7 +1163,19 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                         }
                     ]}
                 />
-            </div >
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800">
+                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-200 mb-2">Resumen de condiciones</h3>
+                <ul className="list-disc pl-5 space-y-2 text-slate-700 dark:text-slate-200">
+                    <li><strong>Recta ∥ plano</strong>: la recta es paralela a alguna recta del plano.</li>
+                    <li><strong>Plano ∥ plano</strong>: dos rectas que se cortan de uno son paralelas a dos del otro (o las trazas homónimas son paralelas).</li>
+                    <li><strong>Recta ⊥ plano</strong>: r′ ⊥ α₁ y r″ ⊥ α₂.</li>
+                    <li><strong>Plano ⊥ recta</strong>: α₁ ⊥ r′ y α₂ ⊥ r″.</li>
+                    <li><strong>Plano ⊥ plano</strong>: uno contiene una recta perpendicular al otro.</li>
+                    <li><strong>Recta ⊥ recta</strong>: si una es paralela a un plano de proyección, la perpendicularidad se ve en esa vista; si no, se abate o se usa el plano perpendicular.</li>
+                </ul>
+            </div>
+            </div>
         ),
         exercises: []
     },

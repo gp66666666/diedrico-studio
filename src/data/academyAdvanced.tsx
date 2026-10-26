@@ -41,6 +41,16 @@ const tip = (texto: string) => (
     </div>
 );
 
+const cajaLista = (titulo: string, intro: string, items: string[]) => (
+    <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border-l-4 border-blue-500">
+        <h3 className="text-xl font-bold text-blue-900 dark:text-blue-200 mb-2">{titulo}</h3>
+        {intro ? <p className="text-blue-800 dark:text-blue-100">{intro}</p> : null}
+        <ul className="mt-2 list-disc pl-5 space-y-1 text-blue-800 dark:text-blue-100">
+            {items.map((i) => <li key={i}>{i}</li>)}
+        </ul>
+    </div>
+);
+
 const traza = (y: number, color = '#10b981') => (
     <VLine a={[CX + y * SCALE, LT_Y - 70]} b={[CX + y * SCALE, LT_Y + 70]} color={color} width={2} />
 );
@@ -303,6 +313,12 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
             <div className="space-y-10 text-slate-700 dark:text-slate-300">
                 {caja('La esfera', 'Se proyecta como una circunferencia del radio de la esfera en las dos vistas, con el centro en la misma vertical. Cualquier sección plana es una circunferencia.')}
 
+                {cajaLista("Secciones de la esfera", "Toda sección plana es una circunferencia, y su radio cumple r² = R² - d², con d la distancia del centro al plano:", [
+                    "Plano por el centro (d = 0): círculo máximo, de radio R. Se ve en VM en la planta si el plano es horizontal.",
+                    "Plano horizontal: en la planta se ve como un círculo de radio r; en el alzado, como un segmento.",
+                    "Plano proyectante: se ve como un segmento en la vista de canto y como una elipse en la otra.",
+                ])}
+
                 <StepByStepVisualizer
                     title="Sección e intersección con una recta"
                     steps={[
@@ -405,9 +421,11 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-5">
                     <h3 className="font-bold text-slate-900 dark:text-white mb-2">Fuera de esta Academia</h3>
                     <p className="text-sm">
-                        El bloque de diédrico está completo. La asignatura incluye además sistema axonométrico,
-                        planos acotados, perspectiva cónica y normalización (cortes, secciones, acotación):
-                        no están en la app todavía.
+                        Estos 19 temas cubren el bloque de diédrico de la EBAU: punto y recta, plano,
+                        intersecciones, paralelismo y perpendicularidad, distancias, ángulos, abatimientos,
+                        giros, cambios de plano, poliedros, superficies, secciones y desarrollos. La asignatura
+                        incluye además sistema axonométrico, planos acotados, perspectiva cónica y normalización
+                        (cortes, secciones, acotación): no están en la app todavía.
                     </p>
                 </div>
             </div>

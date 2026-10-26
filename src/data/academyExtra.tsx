@@ -102,6 +102,16 @@ const caja = (titulo: string, texto: string) => (
     </div>
 );
 
+const cajaLista = (titulo: string, intro: string, items: string[]) => (
+    <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border-l-4 border-blue-500">
+        <h3 className="text-xl font-bold text-blue-900 dark:text-blue-200 mb-2">{titulo}</h3>
+        {intro ? <p className="text-blue-800 dark:text-blue-100">{intro}</p> : null}
+        <ul className="mt-2 list-disc pl-5 space-y-1 text-blue-800 dark:text-blue-100">
+            {items.map((i) => <li key={i}>{i}</li>)}
+        </ul>
+    </div>
+);
+
 export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
     /* ------------------------------ 6. DISTANCIAS ------------------------------ */
     'theory-6-distances': (
@@ -192,6 +202,14 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
             <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
                 <p className="text-slate-700 dark:text-slate-200"><strong>Truco:</strong> si el plano o la recta son proyectantes, la distancia se ve directamente en la vista donde se ven de canto. Solo hay que construir cuando no lo son.</p>
             </div>
+            {cajaLista("Los casos que faltan", "Además del punto a plano y del punto a recta, la EBAU pide:", [
+                "Recta a plano (paralelos): se toma un punto cualquiera de la recta y se mide su distancia al plano.",
+                "Entre dos planos paralelos: se traza una perpendicular común y se mide el segmento entre los dos planos.",
+                "Entre dos rectas que se cruzan: se traza el plano que contiene a una y es paralelo a la otra; la distancia es la de un punto de la segunda a ese plano.",
+                "Punto a recta (caso general): por el punto se traza el plano perpendicular a la recta, se halla el pie I y se mide PI en verdadera magnitud.",
+            ])}
+
+            {caja("Lo que no se ve directamente", "Si ni el plano ni la recta son proyectantes, la perpendicular no aparece en VM en ninguna vista: hay que medir el segmento con un abatimiento o un cambio de plano. Ese es el paso que más se olvida en los exámenes.")}
         </div>
     ),
 
@@ -280,6 +298,11 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
                     },
                 ]}
             />
+            {cajaLista("El caso que falta: recta y plano", "El ángulo entre una recta y un plano es el que forma con su proyección sobre ese plano:", [
+                "Si el plano es proyectante, la recta y su proyección se ven en VM en la vista donde el plano se ve de canto.",
+                "Si no lo es: por un punto de la recta se traza la perpendicular al plano; el plano formado por la recta y esa perpendicular corta al plano dado según la proyección de la recta. Se abate ese plano y se mide el ángulo.",
+                "Atajo: el ángulo entre recta y plano es el complementario del ángulo entre la recta y la normal al plano.",
+            ])}
         </div>
     ),
 
@@ -347,6 +370,11 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
             <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
                 <p className="text-slate-700 dark:text-slate-200"><strong>Para qué sirve:</strong> para medir distancias y ángulos en VM, y para dibujar la forma real de una sección. Todo lo que se abate se escribe entre paréntesis: (A), (r), (α).</p>
             </div>
+            {cajaLista("Qué se abate en cada caso", "El abatimiento siempre se hace sobre una charnela, que es una traza del plano:", [
+                "Un punto: perpendicular a la charnela, pie, y radio igual a la hipotenusa de la distancia al pie y la cota.",
+                "Una recta: se abaten dos de sus puntos y se unen. Si la recta corta a la charnela, basta abatir un punto y unirlo con el punto de corte, que no se mueve.",
+                "Un plano: se abate una recta de máxima pendiente; el ángulo que forma con la charnela es el ángulo del plano con el PH.",
+            ])}
         </div>
     ),
 
@@ -436,6 +464,11 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
                     },
                 ]}
             />
+            {cajaLista("Los otros ejes", "El eje vertical es el más frecuente, pero también aparecen:", [
+                "Eje de punta (perpendicular al PV): el punto conserva su alejamiento. Gira en un plano paralelo al PV: en el alzado describe una circunferencia y en la planta se desplaza sobre una paralela a la LT.",
+                "Eje paralelo a la LT: el punto gira en un plano de perfil, perpendicular a la LT. Hay que resolverlo en la tercera proyección o con un cambio de plano.",
+                "Eje oblicuo: se evita; se sustituye por un cambio de plano que lo deje vertical o de punta.",
+            ])}
         </div>
     ),
 
@@ -492,6 +525,12 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
             <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
                 <p className="text-slate-700 dark:text-slate-200"><strong>Regla de oro:</strong> la coordenada del plano que se queda se conserva; la del plano que se sustituye se cambia por la nueva. Por eso se llevan perpendiculares a la nueva LT.</p>
             </div>
+            {cajaLista("Cuándo hace falta cambiar de plano", "Reglas prácticas:", [
+                "Para ver una recta en VM: un solo cambio, con la nueva LT paralela a una de sus proyecciones.",
+                "Para ver un plano de canto: un cambio, con la nueva LT perpendicular a su traza horizontal (o a la vertical).",
+                "Para ver un plano en VM: dos cambios consecutivos; el primero lo deja de canto.",
+                "La coordenada que se conserva es siempre la del plano que no se sustituye.",
+            ])}
         </div>
     ),
 
@@ -616,6 +655,13 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
             <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
                 <p className="text-slate-700 dark:text-slate-200"><strong>Los cinco regulares:</strong> tetraedro (4 triángulos), cubo (6 cuadrados), octaedro (8 triángulos), dodecaedro (12 pentágonos) e icosaedro (20 triángulos).</p>
             </div>
+            {cajaLista("Los cinco regulares, en números", "Conviene memorizar caras, aristas y vértices (cumplen V - A + C = 2):", [
+                "Tetraedro: 4 caras triangulares, 6 aristas, 4 vértices. Altura = a·√(2/3) ≈ 0,8165·a.",
+                "Cubo: 6 caras cuadradas, 12 aristas, 8 vértices. Diagonal = a·√3.",
+                "Octaedro: 8 caras triangulares, 12 aristas, 6 vértices.",
+                "Dodecaedro: 12 caras pentagonales, 30 aristas, 20 vértices.",
+                "Icosaedro: 20 caras triangulares, 30 aristas, 12 vértices.",
+            ])}
         </div>
     ),
 
@@ -664,6 +710,11 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
                     },
                 ]}
             />
+            {cajaLista("Cono y esfera", "Los otros dos cuerpos de revolución:", [
+                "Cono recto: en la planta es una circunferencia y en el alzado un triángulo isósceles. El vértice se proyecta en el centro de la base; las generatrices extremas son el contorno.",
+                "Esfera: se proyecta como dos circunferencias del mismo radio, con los centros en la misma vertical. El contorno aparente es el ecuador en la planta y el meridiano paralelo al PV en el alzado.",
+                "En los tres cuerpos, el contorno aparente va con línea continua; las generatrices interiores, con línea fina.",
+            ])}
         </div>
     ),
 
@@ -770,6 +821,12 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
                     },
                 ]}
             />
+            {cajaLista("Método general de secciones", "Cuando el plano de corte no es proyectante:", [
+                "Se cambia el plano de proyección para ver el plano de corte de canto: la nueva LT es perpendicular a su traza.",
+                "En esa vista la sección se ve como un segmento: se marcan los puntos donde corta a las aristas del sólido.",
+                "Se llevan los puntos a las otras vistas con las líneas de referencia y se unen en orden.",
+                "Para ver la sección en VM se abate el plano de corte, o se hace un segundo cambio de plano paralelo a él.",
+            ])}
         </div>
     ),
 
@@ -827,6 +884,11 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
             <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
                 <p className="text-slate-700 dark:text-slate-200"><strong>Comprobación:</strong> el ancho del desarrollo lateral debe coincidir con el perímetro de la base. Si no cuadra, has redondeado mal o te falta una cara.</p>
             </div>
+            {cajaLista("Desarrollos que caen", "Además del prisma recto:", [
+                "Pirámide recta: un polígono central (la base) y tantos triángulos isósceles como caras laterales, con la apotema de la pirámide en VM.",
+                "Cono recto: un sector circular de radio igual a la generatriz g. El arco mide 2·π·r, así que el ángulo del sector es 360°·r/g.",
+                "Cilindro recto: un rectángulo de base 2·π·r y altura h, más dos círculos.",
+            ])}
         </div>
     ),
 };
