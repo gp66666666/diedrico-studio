@@ -282,6 +282,10 @@ que ven los rastreadores que no ejecutan JavaScript (los de IA, por ejemplo).
 - Los ejercicios no se listan a mano: salen de `src/data/exercises.ts`. **Añadir un ejercicio =
   añadirlo al array**; el HTML, el sitemap y los enlaces relacionados se generan solos.
 - `dist/sitemap.xml` se genera desde la misma lista (ya no hay `public/sitemap.xml`).
+- **Tarjetas Open Graph**: una por ejercicio y por página principal en `public/og/`
+  (1200×630 PNG), asignadas en `ogImageForPath()` (`src/data/site.ts`). Se regeneran con
+  `python3 scripts/og-images.py` (Playwright) cuando cambie un título; los PNG se commitean y
+  el build no los toca. Un test comprueba que no falte ninguna.
 - `vercel.json` usa `rewrites` explícitos: cada ruta conocida sirve su HTML y lo desconocido da
   **404 de verdad** (`dist/404.html`, con `noindex`), no un 200 con la app dentro.
 - `/clase` y el 404 llevan `noindex`. El resto, `index, follow`.

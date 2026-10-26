@@ -21,7 +21,7 @@
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { EXERCISES, EXERCISE_TOPICS } from '../src/data/exercises.ts';
-import { CONTACT_EMAIL, PAGE_META, SITE_URL, SITE_NAME, exerciseDescription, exercisePageTitle } from '../src/data/site.ts';
+import { CONTACT_EMAIL, PAGE_META, SITE_URL, SITE_NAME, exerciseDescription, exercisePageTitle, ogImageForPath } from '../src/data/site.ts';
 
 const DIST = path.resolve('dist');
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -465,6 +465,10 @@ async function renderPage(template, page, chunkUrl) {
     html = replaceOnce(html, /<meta property="og:url" content="[^"]*" \/>/, `<meta property="og:url" content="${url}" />`, 'og:url');
     html = replaceOnce(html, /<meta property="og:title" content="[^"]*" \/>/, `<meta property="og:title" content="${esc(title)}" />`, 'og:title');
     html = replaceOnce(html, /<meta property="og:description" content="[^"]*" \/>/, `<meta property="og:description" content="${esc(description)}" />`, 'og:description');
+    const image = ogImageForPath(page.route);
+    html = replaceOnce(html, /<meta property="og:image" content="[^"]*" \/>/, `<meta property="og:image" content="${image}" />`, 'og:image');
+    html = replaceOnce(html, /<meta property="og:image:alt" content="[^"]*" \/>/, `<meta property="og:image:alt" content="${esc(title)}" />`, 'og:image:alt');
+    html = replaceOnce(html, /<meta name="twitter:image" content="[^"]*" \/>/, `<meta name="twitter:image" content="${image}" />`, 'twitter:image');
     html = replaceOnce(html, /<meta name="twitter:url" content="[^"]*" \/>/, `<meta name="twitter:url" content="${url}" />`, 'twitter:url');
     html = replaceOnce(html, /<meta name="twitter:title" content="[^"]*" \/>/, `<meta name="twitter:title" content="${esc(title)}" />`, 'twitter:title');
     html = replaceOnce(html, /<meta name="twitter:description" content="[^"]*" \/>/, `<meta name="twitter:description" content="${esc(description)}" />`, 'twitter:description');

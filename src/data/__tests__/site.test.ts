@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { EXERCISES } from '../exercises';
 import { PAGE_META, SITE_URL, exerciseDescription, exercisePageTitle, pageSeo } from '../site';
 
@@ -41,6 +43,26 @@ describe('metadatos de las páginas', () => {
 
     it('solo las páginas privadas llevan noindex', () => {
         expect(PAGES.filter((p) => p.noindex).map((p) => p.path)).toEqual(['/clase']);
+    });
+
+    it('cada página con tarjeta propia apunta a su PNG', () => {
+        for (const page of PAGES) {
+            const seo = pageSeo(page);
+            expect(seo.ogImage.startsWith(`${SITE_URL}/`), page.path).toBe(true);
+        }
+    });
+});
+
+describe('tarjetas Open Graph', () => {
+    it('existe un PNG por ejercicio (1200x630) y por página principal', () => {
+        for (const slug of EXERCISES.map((e) => e.slug)) {
+            const file = path.resolve(__dirname, '../../../public/og/ejercicios', `${slug}.png`);
+            expect(existsSync(file), `falta la tarjeta de ${slug}`).toBe(true);
+        }
+        for (const name of ['ejercicios', 'temario', 'para-profesores', 'guia', 'academia']) {
+            const file = path.resolve(__dirname, '../../../public/og', `${name}.png`);
+            expect(existsSync(file), `falta la tarjeta ${name}`).toBe(true);
+        }
     });
 });
 

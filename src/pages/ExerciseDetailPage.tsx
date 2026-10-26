@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 import { EXERCISES, findExercise } from '../data/exercises';
 import { buildShareUrl, encodeScene } from '../lib/shareScene';
 import { toast } from '../lib/toast';
-import { SITE_URL, exerciseDescription, exercisePageTitle } from '../data/site';
+import { SITE_URL, exerciseDescription, exercisePageTitle, ogImageForPath } from '../data/site';
 
 const LEVEL_STYLE: Record<string, string> = {
     Básico: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
@@ -71,6 +71,7 @@ export default function ExerciseDetailPage() {
                 description={exerciseDescription(exercise.statement)}
                 keywords={`${exercise.title}, ${exercise.topic}, sistema diédrico, ejercicio resuelto, dibujo técnico`}
                 canonicalUrl={`${SITE_URL}/ejercicios/${exercise.slug}`}
+                ogImage={ogImageForPath(`/ejercicios/${exercise.slug}`)}
                 type="article"
             />
 

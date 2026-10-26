@@ -12,6 +12,27 @@ export const SITE_NAME = 'Diédrico Studio';
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 export const CONTACT_EMAIL = 'diedrico.studio25@gmail.com';
 
+/**
+ * Tarjeta Open Graph de cada ruta. Las imágenes se generan con
+ * `scripts/og-images.py` y viven en `public/og/`. Si una ruta no tiene
+ * tarjeta propia se usa la de la portada.
+ */
+const OG_BY_PATH: Record<string, string> = {
+    '/ejercicios': '/og/ejercicios.png',
+    '/temario': '/og/temario.png',
+    '/para-profesores': '/og/para-profesores.png',
+    '/guia': '/og/guia.png',
+    '/academy': '/og/academia.png',
+};
+
+export function ogImageForPath(path: string): string {
+    const own = OG_BY_PATH[path];
+    if (own) return `${SITE_URL}${own}`;
+    const exercise = path.match(/^\/ejercicios\/([^/]+)$/);
+    if (exercise) return `${SITE_URL}/og/ejercicios/${exercise[1]}.png`;
+    return OG_IMAGE;
+}
+
 export interface PageMeta {
     /** Ruta pública, siempre con barra inicial. */
     path: string;
@@ -119,6 +140,7 @@ export function pageSeo(page: PageMeta) {
         description: page.description,
         keywords: page.keywords,
         canonicalUrl: `${SITE_URL}${page.path}`,
+        ogImage: ogImageForPath(page.path),
         noindex: page.noindex,
     };
 }
