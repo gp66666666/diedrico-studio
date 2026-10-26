@@ -661,6 +661,11 @@ export default function Sidebar() {
     const headerBorder = isDark ? 'border-white/10' : 'border-gray-200/50';
     const inputClass = isDark ? 'bg-black/20 border-white/10 text-white placeholder-gray-500 focus:border-blue-500/50 focus:bg-black/30' : 'bg-white/50 border-gray-200/50 text-gray-900 placeholder-gray-400 focus:border-blue-500/50 focus:bg-white/80';
     const labelClass = isDark ? 'text-gray-300' : 'text-gray-700';
+    // Botones de opción dentro del panel «Añadir»: en claro no pueden ir con
+    // texto gris claro sobre blanco (quedaban a 1.7:1).
+    const idleChip = isDark
+        ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100';
     const buttonClass = isDark ? 'hover:bg-white/10 active:bg-white/20' : 'hover:bg-white/60 hover:shadow-sm active:bg-white/80';
 
     return (
@@ -712,14 +717,14 @@ export default function Sidebar() {
                 <button
                     onClick={undo}
                     disabled={history.past.length === 0}
-                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.past.length === 0 ? 'opacity-45 cursor-not-allowed' : ''} ${buttonClass}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.past.length === 0 ? 'opacity-50 cursor-not-allowed' : ''} ${buttonClass}`}
                 >
                     <Undo size={14} /> Deshacer
                 </button>
                 <button
                     onClick={redo}
                     disabled={history.future.length === 0}
-                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.future.length === 0 ? 'opacity-45 cursor-not-allowed' : ''} ${buttonClass}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.future.length === 0 ? 'opacity-50 cursor-not-allowed' : ''} ${buttonClass}`}
                 >
                     <Redo size={14} /> Rehacer
                 </button>
@@ -917,8 +922,12 @@ export default function Sidebar() {
                                         if (type.id !== 'segment' && activeTool === 'segment-2-points') setActiveTool('none');
                                     }}
                                     className={`flex-1 min-w-[28%] items-center justify-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${geometryType === type.id
-                                        ? 'bg-blue-600/20 text-blue-400 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
-                                        : 'text-gray-500 hover:text-gray-300 hover:bg-white/5 border-transparent'
+                                        ? (isDark
+                                            ? 'bg-blue-600/20 text-blue-400 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
+                                            : 'bg-blue-100 text-blue-800 border-blue-400')
+                                        : (isDark
+                                            ? 'text-gray-500 hover:text-gray-300 hover:bg-white/5 border-transparent'
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 border-transparent')
                                         }`}
                                 >
                                     {type.label}
@@ -929,7 +938,9 @@ export default function Sidebar() {
                         <div className="mb-4">
                             <button
                                 onClick={() => setActiveTool('create-group')}
-                                className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg border-2 border-dashed transition-all ${activeTool === 'create-group' ? 'bg-blue-600/20 border-blue-500 text-blue-400' : `${buttonClass} ${isDark ? 'border-white/10 text-gray-400' : 'border-gray-200 text-gray-600'}`}`}
+                                className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg border-2 border-dashed transition-all ${activeTool === 'create-group'
+                                    ? (isDark ? 'bg-blue-600/20 border-blue-500 text-blue-400' : 'bg-blue-100 border-blue-400 text-blue-800')
+                                    : `${buttonClass} ${isDark ? 'border-white/10 text-gray-400' : 'border-gray-200 text-gray-600'}`}`}
                             >
                                 <Plus size={16} /> <span className="text-xs font-bold uppercase tracking-wider">Crear Grupo</span>
                             </button>
@@ -965,16 +976,16 @@ export default function Sidebar() {
                                     <div className="grid grid-cols-3 gap-2">
                                         <label className="block">
                                             <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>
-                                                Coordenada X<br /><span className="opacity-70">(lateralidad)</span>
+                                                Coordenada X<br /><span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>(lateralidad)</span>
                                             </span>
                                             <input type="number" step="0.1" value={pointCoords.x} onChange={(e) => setPointCoords({ ...pointCoords, x: e.target.value })} className={`w-full px-2 py-2 border rounded text-sm ${inputClass}`} />
                                         </label>
                                         <label className="block">
-                                            <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>Y<br /><span className="opacity-70">(alejamiento)</span></span>
+                                            <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>Y<br /><span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>(alejamiento)</span></span>
                                             <input type="number" step="0.1" value={pointCoords.y} onChange={(e) => setPointCoords({ ...pointCoords, y: e.target.value })} className={`w-full px-2 py-2 border rounded text-sm ${inputClass}`} />
                                         </label>
                                         <label className="block">
-                                            <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>Z<br /><span className="opacity-70">(cota)</span></span>
+                                            <span className={`mb-1 block text-[10px] leading-tight ${labelClass}`}>Z<br /><span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>(cota)</span></span>
                                             <input type="number" step="0.1" value={pointCoords.z} onChange={(e) => setPointCoords({ ...pointCoords, z: e.target.value })} className={`w-full px-2 py-2 border rounded text-sm ${inputClass}`} />
                                         </label>
                                     </div>
@@ -1381,7 +1392,7 @@ export default function Sidebar() {
                         {geometryType === 'solid' && (
                             <div className="space-y-4">
                                 <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3">Poliedros Regulares</p>
+                                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? 'text-blue-400' : 'text-blue-700'}`}>Poliedros Regulares</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {[
                                             { id: 'tetraedro', label: 'Tetraedro' },
@@ -1393,7 +1404,7 @@ export default function Sidebar() {
                                             <button
                                                 key={s.id}
                                                 onClick={() => setActiveTool(`poliedro-${s.id}` as any)}
-                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `poliedro-${s.id}` ? 'bg-blue-600 border-blue-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `poliedro-${s.id}` ? 'bg-blue-600 border-blue-500 text-white' : idleChip}`}
                                             >
                                                 {s.label}
                                             </button>
@@ -1401,7 +1412,7 @@ export default function Sidebar() {
                                     </div>
                                     <button
                                         onClick={() => setActiveTool('poliedro-libre')}
-                                        className={`mt-2 w-full py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === 'poliedro-libre' ? 'bg-teal-600 border-teal-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                        className={`mt-2 w-full py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === 'poliedro-libre' ? 'bg-teal-600 border-teal-500 text-white' : idleChip}`}
                                         title="Tetraedro irregular, prisma oblicuo, tronco… escribes sus vértices y se calculan las caras"
                                     >
                                         Poliedro libre (por vértices)
@@ -1409,7 +1420,7 @@ export default function Sidebar() {
                                 </div>
 
                                 <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-xl">
-                                    <p className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-3">Prismas y Pirámides</p>
+                                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? 'text-purple-400' : 'text-purple-700'}`}>Prismas y Pirámides</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {[
                                             { id: 'prisma', label: 'Prisma' },
@@ -1418,7 +1429,7 @@ export default function Sidebar() {
                                             <button
                                                 key={s.id}
                                                 onClick={() => setActiveTool(`solid-${s.id}` as any)}
-                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `solid-${s.id}` ? 'bg-purple-600 border-purple-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `solid-${s.id}` ? 'bg-purple-600 border-purple-500 text-white' : idleChip}`}
                                             >
                                                 {s.label}
                                             </button>
@@ -1427,7 +1438,7 @@ export default function Sidebar() {
                                 </div>
 
                                 <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
-                                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Cuerpos de Revolución</p>
+                                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>Cuerpos de Revolución</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {[
                                             { id: 'cilindro', label: 'Cilindro' },
@@ -1437,7 +1448,7 @@ export default function Sidebar() {
                                             <button
                                                 key={s.id}
                                                 onClick={() => setActiveTool(`revolucion-${s.id}` as any)}
-                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `revolucion-${s.id}` ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                                className={`py-2 px-3 rounded-lg border transition-all text-[11px] font-medium ${activeTool === `revolucion-${s.id}` ? 'bg-emerald-600 border-emerald-500 text-white' : idleChip}`}
                                             >
                                                 {s.label}
                                             </button>
@@ -1496,7 +1507,7 @@ export default function Sidebar() {
                 ) : (
                     <div className="space-y-2">
                         {elements.length === 0 ? (
-                            <div className="text-center py-10 text-gray-400">
+                            <div className={`text-center py-10 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                 <p>No hay elementos creados.</p>
                             </div>
                         ) : (

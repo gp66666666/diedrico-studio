@@ -379,20 +379,20 @@ export default function MainApp() {
                         <div key={viewMode} className="flex-1 relative w-full h-full animate-fade-in">
                             {elements.length === 0 && viewMode === '3d' && !hintDismissed && (
                                 <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">
-                                    <div className="relative max-w-xs rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-center backdrop-blur-sm">
+                                    <div className={`relative max-w-xs rounded-2xl border px-5 py-4 text-center backdrop-blur-sm ${isDark ? 'border-white/10 bg-black/35' : 'border-gray-200 bg-white/90 shadow-lg'}`}>
                                         <button
                                             onClick={() => {
                                                 setHintDismissed(true);
                                                 localStorage.setItem('emptyHintDismissed', '1');
                                             }}
-                                            className="pointer-events-auto absolute right-2 top-2 rounded p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
+                                            className={`pointer-events-auto absolute right-2 top-2 rounded p-1 transition-colors ${isDark ? 'text-white/40 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
                                             aria-label="Ocultar este aviso"
                                             title="No volver a mostrar"
                                         >
                                             <X size={14} />
                                         </button>
-                                        <p className="text-sm font-semibold text-white">Tu lienzo está vacío</p>
-                                        <p className="mt-1 text-xs leading-relaxed text-white/70">
+                                        <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Tu lienzo está vacío</p>
+                                        <p className={`mt-1 text-xs leading-relaxed ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
                                             <span className="md:hidden">Pulsa ☰ y añade tu primer punto.</span>
                                             <span className="hidden md:inline">Añade tu primer punto en el panel de la izquierda.</span>
                                         </p>
@@ -413,7 +413,7 @@ export default function MainApp() {
                                             </button>
                                             <a
                                                 href="/ejercicios"
-                                                className="text-[11px] font-semibold text-blue-300 underline underline-offset-2 hover:text-blue-200"
+                                                className={`text-[11px] font-semibold underline underline-offset-2 ${isDark ? 'text-blue-300 hover:text-blue-200' : 'text-blue-700 hover:text-blue-800'}`}
                                             >
                                                 o abre un ejercicio resuelto
                                             </a>
@@ -457,7 +457,7 @@ export default function MainApp() {
                     {FEATURES.AI_ASSISTANT && viewMode !== 'caballera' && viewMode !== 'laminas' && <AIChatPanel isSidebarOpen={isSidebarOpen} />}
 
                     {/* Watermark */}
-                    <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium opacity-50 pointer-events-none z-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium pointer-events-none z-50 ${isDark ? 'text-white/60' : 'text-gray-700'}`}>
                         Hecho por Eloi García
                     </div>
                 </div>

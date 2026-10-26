@@ -597,7 +597,7 @@ export default function AIChatPanel({ isSidebarOpen = false }: AIChatPanelProps)
                                         funcionen bien y se pueda comprar saldo sin líos. Volverá en cuanto
                                         esté cerrado; no queremos darte una prueba que luego cambie.
                                     </p>
-                                    <p className="mt-2 text-xs leading-relaxed text-amber-800/80 dark:text-amber-200/70">
+                                    <p className="mt-2 text-xs leading-relaxed text-amber-800 dark:text-amber-200">
                                         Mientras tanto sigue todo lo demás: dibujo en diédrico, sólidos,
                                         láminas, ejercicios y Academia.
                                     </p>
