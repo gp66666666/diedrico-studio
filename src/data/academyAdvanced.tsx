@@ -128,7 +128,7 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                     steps={[
                         {
                             title: 'Recta y su proyección',
-                            description: 'La recta r y su proyección horizontal r′ forman un plano proyectante vertical. El ángulo que buscamos está en ese plano.',
+                            description: 'La recta r y su proyección horizontal r′ están en un plano perpendicular al PH (proyectante horizontal): contiene a las verticales que unen cada punto con su proyección. El ángulo que buscamos está en ese plano.',
                             diagram: (
                                 <DihSvg>
                                     <DLine a={[-4, 2, 6]} b={[6, 2, 1]} color="#ef4444" />
@@ -161,7 +161,7 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                 level: 'Difícil',
                 statement: 'Halla el ángulo que forma la recta r (por A(0, 3, 6) y B(8, 3, 0)) con el plano horizontal.',
                 setup: [p('A', 0, 3, 6), p('B', 8, 3, 0), l('r', [0, 3, 6], [8, 0, -6])],
-                solutionHint: 'Abate el plano proyectante que contiene a r y a r′: el ángulo con r′ es el pedido (34,7° en este caso).',
+                solutionHint: 'Abate el plano proyectante que contiene a r y a r′: el ángulo con r′ es el pedido (36,87° en este caso: es un triángulo 6-8-10).',
             },
         ],
     },
@@ -199,17 +199,17 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                         },
                         {
                             title: 'Apoyado en una arista',
-                            description: 'La diagonal de una cara queda vertical. En la planta, la arista de apoyo se ve como un punto y el cubo se proyecta como un rectángulo girado 45°.',
+                            description: 'El cubo gira 45° sobre la arista de apoyo. La sección perpendicular a esa arista es un cuadrado girado 45° y su diagonal vertical mide a√2: esa es la altura. En la planta, la arista se ve en verdadera magnitud y el cubo se proyecta como un rectángulo de a × a√2 (girado si la arista no es paralela a la LT).',
                             diagram: (
                                 <DihSvg>
-                                    <polygon points={`${CX - 40},${LT_Y + 20} ${CX},${LT_Y + 60} ${CX + 40},${LT_Y + 20} ${CX},${LT_Y - 20}`} fill="none" stroke="#3b82f6" strokeWidth="2" />
-                                    <VText x={CX + 46} y={LT_Y + 56} color="#3b82f6" size={9}>planta girada 45°</VText>
+                                    <polygon points={`${CX - 5.9},${LT_Y + 74.2} ${CX + 34.2},${LT_Y + 34.1} ${CX + 5.9},${LT_Y + 5.8} ${CX - 34.2},${LT_Y + 45.9}`} fill="none" stroke="#3b82f6" strokeWidth="2" />
+                                    <VText x={CX + 40} y={LT_Y + 30} color="#3b82f6" size={9}>planta girada 45°</VText>
                                 </DihSvg>
                             ),
                         },
                         {
                             title: 'Apoyado en un vértice',
-                            description: 'La diagonal del cubo es vertical. La planta es un hexágono regular y el alzado, un rombo. Es la posición más difícil de deducir.',
+                            description: 'La diagonal del cubo es vertical. En la planta se ve un hexágono regular; en el alzado, otro hexágono con un vértice arriba y otro abajo. La altura total es la diagonal del cubo: a√3. Es la posición más difícil de deducir.',
                             diagram: (
                                 <DihSvg>
                                     <polygon
@@ -222,7 +222,7 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                         },
                     ]}
                 />
-                {tip('Regla práctica: la altura del poliedro en cada posición es una diagonal conocida (arista, diagonal de cara o diagonal principal). Calcula esa altura antes de empezar.')}
+                {tip('Regla práctica: la altura del poliedro en cada posición es una longitud conocida: la arista a (apoyado en una cara), la diagonal de una cara a√2 (apoyado en una arista) o la diagonal del cubo a√3 (apoyado en un vértice). Calcula esa altura antes de empezar.')}
             </div>
         ),
         exercises: [

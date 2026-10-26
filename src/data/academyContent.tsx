@@ -696,7 +696,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                     steps={[
                         {
                             title: 'Concepto Clave',
-                            description: 'Una recta es paralela a un plano si es paralela a CUALQUIER recta contenida en ese plano. Para trazar r por P paralela a Alpha, basta con dibujar una recta auxiliar s en Alpha y hacer r || s.',
+                            description: 'Una recta es paralela a un plano si es paralela a ALGUNA recta contenida en ese plano (no a todas). Para trazar r por P paralela a Alpha, basta con dibujar una recta auxiliar s en Alpha y hacer r || s.',
                             diagram: (
                                 <svg width="100%" height="250" viewBox="0 0 300 250">
                                     <line x1="20" y1="200" x2="280" y2="200" className="stroke-black dark:stroke-white" strokeWidth="2" />
@@ -795,7 +795,7 @@ export const ACADEMY_CONTENT: AcademyTopic[] = [
                     steps={[
                         {
                             title: 'Teoría',
-                            description: 'Un plano es paralelo a una recta si contiene una recta paralela a la dada. Si nos piden trazar un plano por P paralelo a r, buscamos una recta auxiliar s // r que pase por P. El plano definido por s será paralelo a r.',
+                            description: 'Un plano es paralelo a una recta si contiene una recta paralela a la dada. Si nos piden trazar un plano por P paralelo a r, buscamos una recta auxiliar s // r que pase por P. Cualquier plano que contenga a s (y no contenga a r) es paralelo a r: una recta sola no define el plano, hay que elegir una segunda dirección.',
                             diagram: (
                                 <svg width="100%" height="250" viewBox="0 0 300 250">
                                     <line x1="-50" y1="125" x2="350" y2="125" className="stroke-black dark:stroke-white" strokeWidth="2" />

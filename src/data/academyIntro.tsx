@@ -77,7 +77,7 @@ export const ACADEMY_INTRO_STEPS: Record<string, React.ReactNode> = {
                     },
                     {
                         title: 'Traza horizontal H',
-                        description: 'H es el punto donde la recta corta al PH (z = 0). Se ve donde r″ cruza la LT: se baja la perpendicular hasta r′ y ahí está H′ = H″.',
+                        description: 'H es el punto donde la recta corta al PH (z = 0). Se ve donde r″ cruza la LT: por ahí se baja la perpendicular hasta r′ y esa es H′ (que es el propio H, por estar en el PH). Su proyección vertical H″ cae en la LT, en la misma vertical, no en el mismo punto.',
                         diagram: (
                             <DihSvg>
                                 <DLine a={[0, 6, 5]} b={[10, 2, -3]} color="#3b82f6" faded />
@@ -208,7 +208,7 @@ export const ACADEMY_MORE_EXERCISES: Record<string, AcademyExercise[]> = {
             level: 'Medio',
             statement: 'Sitúa B(5, 3, −4) e indica en qué diedro está y cómo son sus dos proyecciones.',
             setup: [p('B', 5, 3, -4, '#a78bfa')],
-            solutionHint: 'Cota negativa y alejamiento positivo: segundo diedro. B′ queda debajo de la LT y B″ por debajo de ella también.',
+            solutionHint: 'Cota negativa y alejamiento positivo: cuarto diedro. B′ queda debajo de la LT y B″ por debajo de ella también.',
         },
     ],
     'theory-2-line': [

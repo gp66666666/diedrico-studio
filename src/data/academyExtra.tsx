@@ -825,7 +825,7 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
             />
 
             <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
-                <p className="text-slate-700 dark:text-slate-200"><strong>Comprobación:</strong> el perímetro del desarrollo debe coincidir con el de la base. Si no cuadra, has redondeado mal o te falta una cara.</p>
+                <p className="text-slate-700 dark:text-slate-200"><strong>Comprobación:</strong> el ancho del desarrollo lateral debe coincidir con el perímetro de la base. Si no cuadra, has redondeado mal o te falta una cara.</p>
             </div>
         </div>
     ),
@@ -863,8 +863,8 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             title: 'Los cuatro cuadrantes',
             level: 'Medio',
             statement: 'Dibuja un punto en cada uno de los cuatro cuadrantes y explica qué signo tiene su cota y su alejamiento.',
-            setup: [p('A', 2, 3, 4), p('B', 8, 3, -4, '#a78bfa'), p('C', 12, -3, 4, '#f59e0b'), p('D', 5, -3, -4, '#34d399')],
-            solutionHint: 'I: cota +, alejamiento +. II: cota −, alejamiento +. III: cota −, alejamiento −. IV: cota +, alejamiento −.',
+            setup: [p('A', 2, 3, 4), p('B', 8, -3, 4, '#a78bfa'), p('C', 12, -3, -4, '#f59e0b'), p('D', 5, 3, -4, '#34d399')],
+            solutionHint: 'I: cota +, alejamiento +. II: cota +, alejamiento −. III: cota −, alejamiento −. IV: cota −, alejamiento +.',
         },
     ],
     'theory-2-line': [
