@@ -44,8 +44,8 @@ export default function AcademyPage() {
 
     const textPrimary = isDark ? 'text-slate-100' : 'text-slate-900';
     const textSecondary = isDark ? 'text-slate-300' : 'text-slate-600';
-    const textMuted = isDark ? 'text-slate-400' : 'text-slate-500';
-    const textSubtle = isDark ? 'text-slate-500' : 'text-slate-400';
+    const textMuted = isDark ? 'text-slate-300' : 'text-slate-600';
+    const textSubtle = isDark ? 'text-slate-400' : 'text-slate-600';
 
     const borderPrimary = isDark ? 'border-slate-700/80' : 'border-slate-200';
     const borderSecondary = isDark ? 'border-slate-600/50' : 'border-slate-100';
@@ -194,8 +194,8 @@ export default function AcademyPage() {
                                     )}
                                 </div>
                                 <p className={`text-sm line-clamp-2 pr-4 ${isSelected
-                                    ? (isDark ? 'text-blue-300/90' : 'text-blue-600/90')
-                                    : (isDark ? 'text-slate-400 group-hover:text-slate-300' : 'text-slate-500 group-hover:text-slate-600')}`}>
+                                    ? (isDark ? 'text-blue-300' : 'text-blue-700')
+                                    : (isDark ? 'text-slate-400 group-hover:text-slate-300' : 'text-slate-600 group-hover:text-slate-700')}`}>
                                     {topic.description}
                                 </p>
                             </button>
@@ -406,7 +406,7 @@ export default function AcademyPage() {
                                                         {ex.level}
                                                     </span>
                                                     {isCompleted && (
-                                                        <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-500">
+                                                        <span className={`flex items-center gap-1.5 text-xs font-semibold ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
                                                             <CheckCircle2 size={12} /> Completado
                                                         </span>
                                                     )}

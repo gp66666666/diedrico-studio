@@ -32,7 +32,7 @@ export default function NotFoundPage() {
                     </Link>
                 </div>
 
-                <Link to="/" className="mt-8 inline-flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300">
+                <Link to="/" className="mt-8 inline-flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200">
                     <ArrowLeft size={14} /> Volver al inicio
                 </Link>
             </div>

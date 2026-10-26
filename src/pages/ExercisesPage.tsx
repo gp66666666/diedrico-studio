@@ -53,7 +53,7 @@ export default function ExercisesPage() {
 
                 <div className="mx-auto max-w-5xl px-5 py-8">
                     <div className="flex flex-wrap items-center gap-2">
-                        <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-slate-500">
+                        <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-slate-400">
                             <Filter size={13} /> Nivel
                         </span>
                         {LEVELS.map((l) => (
@@ -71,7 +71,7 @@ export default function ExercisesPage() {
                     </div>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">Tema</span>
+                        <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Tema</span>
                         {['Todos', ...EXERCISE_TOPICS].map((t) => (
                             <button
                                 key={t}
@@ -97,7 +97,7 @@ export default function ExercisesPage() {
                                     <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${LEVEL_STYLE[exercise.level]}`}>
                                         {exercise.level}
                                     </span>
-                                    <span className="text-[11px] text-slate-500">{exercise.topic}</span>
+                                    <span className="text-[11px] text-slate-400">{exercise.topic}</span>
                                 </div>
                                 <h2 className="mt-2 text-lg font-semibold text-white">{exercise.title}</h2>
                                 <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-slate-400">{exercise.statement}</p>
@@ -109,7 +109,7 @@ export default function ExercisesPage() {
                     </div>
 
                     {list.length === 0 && (
-                        <p className="mt-10 text-center text-sm text-slate-500">
+                        <p className="mt-10 text-center text-sm text-slate-400">
                             No hay ejercicios con esos filtros.
                         </p>
                     )}

@@ -150,14 +150,14 @@ export default function ExerciseDetailPage() {
                                         >
                                             {e.title}
                                         </Link>
-                                        <span className="ml-2 text-xs text-slate-500">{e.level}</span>
+                                        <span className="ml-2 text-xs text-slate-400">{e.level}</span>
                                     </li>
                                 ))}
                             </ul>
                         </section>
                     )}
 
-                    <p className="mt-8 text-xs text-slate-500">
+                    <p className="mt-8 text-xs text-slate-400">
                         ¿Es la primera vez que abres el editor?{' '}
                         <Link to="/guia" className="text-blue-400 hover:text-blue-300">
                             Mira la guía

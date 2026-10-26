@@ -38,7 +38,7 @@ export default function TemarioPage() {
                                                 className="block rounded-lg px-2 py-1.5 text-sm text-blue-300 transition-colors hover:bg-white/5 hover:text-blue-200"
                                             >
                                                 <span className="font-medium">{e.title}</span>
-                                                <span className="ml-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                                                <span className="ml-2 text-[10px] font-bold uppercase tracking-wide text-slate-400">
                                                     · {e.level}
                                                 </span>
                                             </Link>

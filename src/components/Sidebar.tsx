@@ -712,14 +712,14 @@ export default function Sidebar() {
                 <button
                     onClick={undo}
                     disabled={history.past.length === 0}
-                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.past.length === 0 ? 'opacity-30 cursor-not-allowed' : ''} ${buttonClass}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.past.length === 0 ? 'opacity-45 cursor-not-allowed' : ''} ${buttonClass}`}
                 >
                     <Undo size={14} /> Deshacer
                 </button>
                 <button
                     onClick={redo}
                     disabled={history.future.length === 0}
-                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.future.length === 0 ? 'opacity-30 cursor-not-allowed' : ''} ${buttonClass}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded text-xs font-medium transition-all ${history.future.length === 0 ? 'opacity-45 cursor-not-allowed' : ''} ${buttonClass}`}
                 >
                     <Redo size={14} /> Rehacer
                 </button>

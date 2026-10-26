@@ -139,7 +139,7 @@ export default function GuidePage() {
                     {/* Índice */}
                     <nav className="hidden lg:block">
                         <div className="sticky top-8">
-                            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500">Índice</p>
+                            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">Índice</p>
                             <ul className="space-y-1 text-sm">
                                 {TOC.map((item) => (
                                     <li key={item.id}>

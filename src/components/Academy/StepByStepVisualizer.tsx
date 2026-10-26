@@ -31,7 +31,7 @@ export const StepByStepVisualizer: React.FC<StepByStepVisualizerProps> = ({ step
             {title && (
                 <div className="bg-white dark:bg-slate-950 px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <h4 className="font-bold text-slate-800 dark:text-slate-100">{title}</h4>
-                    <span className="text-xs font-mono text-slate-400 dark:text-slate-500">
+                    <span className="text-xs font-mono text-slate-600 dark:text-slate-400">
                         PASO {currentStep + 1} / {steps.length}
                     </span>
                 </div>

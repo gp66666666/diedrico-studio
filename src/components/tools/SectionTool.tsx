@@ -241,7 +241,7 @@ export default function SectionTool() {
                             )}
 
                             {!result.truncated && (
-                                <p className="text-[11px] text-slate-500">
+                                <p className="text-[11px] text-slate-400">
                                     El desarrollo del cuerpo truncado se calcula en prismas rectos y cilindros.
                                 </p>
                             )}

@@ -248,6 +248,24 @@ Conexión: el host `db.<ref>.supabase.co` es solo IPv6; usar el pooler
 - Textos de UI y comentarios en español; nombres de código en inglés.
 - Commit style del repo: `feat:`, `fix:`, `chore:`, `docs:`.
 
+## Contraste (2026-10)
+
+Todo texto visible debe llegar a **4.5:1** (3:1 si es grande o está deshabilitado). Nada de
+reglas `!important` que pinten "todo de un color": rompen los botones y esconden el texto.
+
+- `src/academy-dark-theme.css` es el **único** sitio donde se traduce la paleta clara del
+  contenido de teoría (`bg-white`, `text-slate-900`...) al modo oscuro. `index.css` no toca
+  colores de la Academia.
+- En las páginas de fondo fijo (`/ejercicios`, `/guia`, `/temario`, `/para-profesores`...) el
+  mínimo para texto secundario es `text-slate-400`. `text-slate-500` sobre `#070d18` da 4.09:1
+  y no vale.
+- En la Academia (que sí cambia de tema), los grises secundarios son `text-slate-300` en oscuro
+  y `text-slate-600` en claro.
+- Auditoría reproducible (Playwright, mide el color renderizado contra el fondo efectivo,
+  incluidos fondos translúcidos y degradados): `python3 /tmp/opencode/contrast_audit.py` con
+  `npm run build` servido en `http://localhost:4190`. Debe terminar en **0 fallos**, igual que
+  `contrast_audit_app.py` (paneles, herramientas y chat).
+
 ## SEO (2026-10)
 
 Es una SPA, así que sin un paso extra **todas las URLs devuelven el mismo HTML**: el título y la

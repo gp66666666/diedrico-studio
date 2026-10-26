@@ -1,180 +1,216 @@
-/* 
- * Academy Dark Theme Overrides - VERSIÓN ESPECÍFICA
- * Solo afecta al contenido de la Academia, no al resto de la aplicación
+/*
+ * Academia: un solo mapa de color para el contenido de teoría.
+ *
+ * El contenido (src/data/academy*.tsx) está escrito con la paleta de modo
+ * claro (bg-white, text-slate-900, ...). Aquí se traduce a oscuro y se sube
+ * el contraste mínimo en claro. No hay reglas "nucleares" que pinten todo de
+ * un color: cada clase se traduce una vez y el resto se hereda, así que un
+ * botón azul con texto blanco sigue siendo blanco.
  */
 
-/* ========== 1. NÚCLEO PRINCIPAL ========== */
-.dark .academy-content .text-slate-900,
-.dark .academy-content .text-slate-800 {
-    color: #FFD700 !important;
-    /* AMARILLO ORO */
+/* ==========================================================================
+   Modo claro: lo que no llega a 4.5:1 se oscurece un escalón
+   ========================================================================== */
+
+.academy-content .text-slate-400,
+.academy-content .text-slate-500,
+.academy-page .text-slate-400,
+.academy-page .text-slate-500 {
+    color: #475569;
+    /* slate-600 */
 }
 
-.dark .academy-content h1,
-.dark .academy-content h2,
-.dark .academy-content h3,
-.dark .academy-content h4,
-.dark .academy-content h5,
-.dark .academy-content h6 {
-    color: #FFD700 !important;
-    /* AMARILLO ORO */
+.academy-content .text-amber-600,
+.academy-page .text-amber-600 {
+    color: #b45309;
+    /* amber-700 */
 }
 
-.dark .academy-content strong,
-.dark .academy-content b {
-    color: #FFA500 !important;
-    /* NARANJA */
+.academy-content .text-emerald-600,
+.academy-page .text-emerald-600 {
+    color: #047857;
+    /* emerald-700 */
 }
 
-/* ========== 2. PARA TEXTOS ESPECÍFICOS DENTRO ========== */
-.dark .academy-content .text-slate-900 strong,
-.dark .academy-content .text-slate-900 b {
-    color: #FF8C00 !important;
-    /* NARANJA MÁS FUERTE */
+/* ==========================================================================
+   Modo oscuro: traducción de la paleta clara
+   ========================================================================== */
+
+html.dark .academy-content,
+html.dark .academy-page {
+    color: #e2e8f0;
 }
 
-/* ========== 3. REGLAS DE SEGURIDAD ========== */
-/* Solo para contenido de la Academia */
-.dark .academy-page .text-slate-900,
-.dark .academy-page .text-slate-800 {
-    color: #FFD700 !important;
+/* Títulos y texto principal */
+html.dark .academy-content h1,
+html.dark .academy-content h2,
+html.dark .academy-content h3,
+html.dark .academy-content h4,
+html.dark .academy-content h5,
+html.dark .academy-content h6,
+html.dark .academy-page h1,
+html.dark .academy-page h2,
+html.dark .academy-page h3,
+html.dark .academy-page h4,
+html.dark .academy-page h5,
+html.dark .academy-page h6,
+html.dark .academy-content .text-slate-900,
+html.dark .academy-content .text-slate-800,
+html.dark .academy-page .text-slate-900,
+html.dark .academy-page .text-slate-800 {
+    color: #f8fafc;
 }
 
-/* REGLA NUCLEAR RESTRINGIDA - Solo afecta dentro de academy-content */
-.dark .academy-content [class*="slate-900"] {
-    color: #FFD700 !important;
-    /* AMARILLO ORO */
+html.dark .academy-content p,
+html.dark .academy-content li,
+html.dark .academy-content td,
+html.dark .academy-page p,
+html.dark .academy-page li,
+html.dark .academy-page td {
+    color: #e2e8f0;
 }
 
-/* ========== 5. FONDOS BÁSICOS ========== */
-.dark .academy-content .bg-white {
-    background-color: rgba(15, 23, 42, 0.95) !important;
+html.dark .academy-content .text-slate-700,
+html.dark .academy-content .text-slate-600,
+html.dark .academy-content .text-gray-700,
+html.dark .academy-content .text-gray-600,
+html.dark .academy-page .text-slate-700,
+html.dark .academy-page .text-slate-600,
+html.dark .academy-page .text-gray-700,
+html.dark .academy-page .text-gray-600 {
+    color: #cbd5e1;
 }
 
-.dark .academy-content .bg-slate-50,
-.dark .academy-content .bg-gray-50 {
-    background-color: rgba(15, 23, 42, 0.7) !important;
+html.dark .academy-content .text-slate-500,
+html.dark .academy-content .text-slate-400,
+html.dark .academy-content .text-gray-500,
+html.dark .academy-content .text-gray-400,
+html.dark .academy-page .text-slate-500,
+html.dark .academy-page .text-slate-400,
+html.dark .academy-page .text-gray-500,
+html.dark .academy-page .text-gray-400 {
+    color: #a9b8cc;
 }
 
-.dark .academy-content .bg-blue-50 {
-    background-color: rgba(30, 58, 138, 0.4) !important;
+/* Acentos: los -700/-900 de claro pasan a -300 en oscuro */
+html.dark .academy-content .text-blue-900,
+html.dark .academy-content .text-blue-800,
+html.dark .academy-content .text-blue-700,
+html.dark .academy-content .text-blue-600,
+html.dark .academy-page .text-blue-900,
+html.dark .academy-page .text-blue-800,
+html.dark .academy-page .text-blue-700,
+html.dark .academy-page .text-blue-600 {
+    color: #93c5fd;
 }
 
-.dark .academy-content .bg-emerald-50 {
-    background-color: rgba(6, 78, 59, 0.4) !important;
+html.dark .academy-content .text-emerald-900,
+html.dark .academy-content .text-emerald-800,
+html.dark .academy-content .text-emerald-700,
+html.dark .academy-content .text-emerald-600,
+html.dark .academy-page .text-emerald-900,
+html.dark .academy-page .text-emerald-800,
+html.dark .academy-page .text-emerald-700,
+html.dark .academy-page .text-emerald-600 {
+    color: #6ee7b7;
 }
 
-/* ========== 6. TEXTOS BÁSICOS ========== */
-.dark .academy-content p,
-.dark .academy-content li,
-.dark .academy-content td {
-    color: #e2e8f0 !important;
+html.dark .academy-content .text-amber-700,
+html.dark .academy-content .text-amber-600,
+html.dark .academy-page .text-amber-700,
+html.dark .academy-page .text-amber-600 {
+    color: #fcd34d;
 }
 
-.dark .academy-content .text-slate-700,
-.dark .academy-content .text-slate-600,
-.dark .academy-content .text-gray-700,
-.dark .academy-content .text-gray-600 {
-    color: #cbd5e1 !important;
+html.dark .academy-content .text-yellow-700,
+html.dark .academy-page .text-yellow-700 {
+    color: #fde047;
 }
 
-/* ========== 7. BORDES ========== */
-.dark .academy-content .border-slate-200,
-.dark .academy-content .border-gray-200 {
-    border-color: rgba(148, 163, 184, 0.5) !important;
+html.dark .academy-content .text-orange-700,
+html.dark .academy-page .text-orange-700 {
+    color: #fdba74;
 }
 
-.dark .academy-content .border-slate-100,
-.dark .academy-content .border-gray-100 {
-    border-color: rgba(148, 163, 184, 0.3) !important;
+html.dark .academy-content .text-red-700,
+html.dark .academy-page .text-red-700 {
+    color: #fca5a5;
 }
 
-/* ========== 8. OTRAS CLASES COMUNES ========== */
-.dark .academy-content .text-blue-900,
-.dark .academy-content .text-blue-800 {
-    color: #60a5fa !important;
+html.dark .academy-content .text-indigo-700,
+html.dark .academy-content .text-indigo-600,
+html.dark .academy-page .text-indigo-700,
+html.dark .academy-page .text-indigo-600 {
+    color: #a5b4fc;
 }
 
-.dark .academy-content .text-emerald-900,
-.dark .academy-content .text-emerald-800 {
-    color: #34d399 !important;
+html.dark .academy-content .text-purple-700,
+html.dark .academy-page .text-purple-700 {
+    color: #d8b4fe;
 }
 
-.dark .academy-content .text-amber-600 {
-    color: #fbbf24 !important;
+/* Fondos de las tarjetas de teoría */
+html.dark .academy-content .bg-white,
+html.dark .academy-page .bg-white {
+    background-color: #0f172a;
 }
 
-.dark .academy-content .text-red-700 {
-    color: #f87171 !important;
+html.dark .academy-content .bg-slate-50,
+html.dark .academy-content .bg-slate-100,
+html.dark .academy-content .bg-gray-50,
+html.dark .academy-content .bg-gray-100,
+html.dark .academy-page .bg-slate-50,
+html.dark .academy-page .bg-slate-100,
+html.dark .academy-page .bg-gray-50,
+html.dark .academy-page .bg-gray-100 {
+    background-color: #16233a;
 }
 
-/* ========== 9. REGLA FINAL DE SEGURIDAD ========== */
-/* Para cualquier contenido futuro que se añada a la Academia */
-.dark .academy-content *,
-.dark .academy-page * {
-    color: inherit !important;
+html.dark .academy-content .bg-blue-50,
+html.dark .academy-page .bg-blue-50 {
+    background-color: #12284a;
 }
 
-/* NOTA: aquí había reglas `.dark .fixed *` y `.dark [class*="z-50"] *` con
-   `color: initial !important` para "excluir" el chat y la barra lateral. Como
-   esas reglas se aplican a CUALQUIER elemento fijo (modales, chat, avisos),
-   pintaban el texto de negro sobre fondos oscuros. La barra lateral ya tiene su
-   protección en index.css y el chat define sus propios colores, así que se han
-   eliminado. Las reglas de la academia están limitadas a .academy-content. */
-
-/* ===========================================
-   REGLA NUCLEAR ABSOLUTA - SOBREESCRIBE TODO
-   =========================================== */
-
-/* ESTO SOBREESCRIBE TODAS LAS REGLAS DEL UNIVERSO */
-.dark h3.text-2xl.font-bold.text-slate-900.mb-6.border-b.border-slate-200.pb-2.font-serif {
-    color: #FFD700 !important;
-    font-weight: 800 !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+html.dark .academy-content .bg-emerald-50,
+html.dark .academy-page .bg-emerald-50 {
+    background-color: #0c2f27;
 }
 
-/* Y para el strong dentro */
-.dark .mb-6.text-lg strong.text-slate-900 {
-    color: #FFA500 !important;
-    font-weight: 800 !important;
+html.dark .academy-content .bg-amber-50,
+html.dark .academy-content .bg-yellow-50,
+html.dark .academy-page .bg-amber-50,
+html.dark .academy-page .bg-yellow-50 {
+    background-color: #33240c;
 }
 
-/* NUCLEAR: selecciona POR TEXTO (si todo falla) */
-.dark h3:contains("Los Planos de Proyección") {
-    color: #FFD700 !important;
-}
-/* ===========================================
-   CONTRASTE EN MODO OSCURO (contenido de teoría)
-   =========================================== */
-/* Los temas 1-5 se escribieron como HTML con clases de modo claro
-   (bg-white, text-slate-700...). En oscuro quedaban ilegibles: fondo blanco
-   con texto claro, o texto oscuro sobre fondo oscuro. Se fuerzan aquí. */
-.dark .academy-page .bg-white,
-.dark .academy-page .bg-slate-50,
-.dark .academy-page .bg-slate-100,
-.dark .academy-page .bg-indigo-50,
-.dark .academy-page .bg-blue-50,
-.dark .academy-page .bg-amber-50,
-.dark .academy-page .bg-emerald-50,
-.dark .academy-page .bg-purple-50 {
-    background-color: #1e293b !important;
+html.dark .academy-content .bg-red-50,
+html.dark .academy-page .bg-red-50 {
+    background-color: #3a1618;
 }
 
-.dark .academy-page .text-slate-900,
-.dark .academy-page .text-slate-800,
-.dark .academy-page .text-slate-700,
-.dark .academy-page .text-slate-600,
-.dark .academy-page .text-gray-900,
-.dark .academy-page .text-gray-800,
-.dark .academy-page .text-gray-700,
-.dark .academy-page .text-gray-600 {
-    color: #e2e8f0 !important;
+html.dark .academy-content .bg-indigo-50,
+html.dark .academy-content .bg-purple-50,
+html.dark .academy-content .bg-orange-50,
+html.dark .academy-page .bg-indigo-50,
+html.dark .academy-page .bg-purple-50,
+html.dark .academy-page .bg-orange-50 {
+    background-color: #1c2440;
 }
 
-.dark .academy-page .border-slate-200,
-.dark .academy-page .border-slate-100,
-.dark .academy-page .border-indigo-100,
-.dark .academy-page .border-blue-100,
-.dark .academy-page .border-amber-100 {
-    border-color: rgba(148, 163, 184, 0.35) !important;
+/* Bordes */
+html.dark .academy-content .border-slate-200,
+html.dark .academy-content .border-gray-200,
+html.dark .academy-page .border-slate-200,
+html.dark .academy-page .border-gray-200,
+html.dark .academy-page .border-indigo-100,
+html.dark .academy-page .border-blue-100,
+html.dark .academy-page .border-amber-100 {
+    border-color: rgba(148, 163, 184, 0.45);
+}
+
+html.dark .academy-content .border-slate-100,
+html.dark .academy-content .border-gray-100,
+html.dark .academy-page .border-slate-100,
+html.dark .academy-page .border-gray-100 {
+    border-color: rgba(148, 163, 184, 0.28);
 }
