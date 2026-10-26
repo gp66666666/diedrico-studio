@@ -40,6 +40,14 @@ export default function ExercisesPage() {
                             Ejercicios del temario de Dibujo Técnico, con los pasos y el dibujo ya montado.
                             Ábrelos en el editor para girarlos, medirlos y comprobar la solución en 3D.
                         </p>
+                        <div className="mt-4 flex flex-wrap gap-2 text-sm">
+                            <Link to="/temario" className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-slate-200 hover:bg-white/10">
+                                Ver el temario por bloques
+                            </Link>
+                            <Link to="/para-profesores" className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-slate-200 hover:bg-white/10">
+                                Soy profesor
+                            </Link>
+                        </div>
                     </div>
                 </header>
 

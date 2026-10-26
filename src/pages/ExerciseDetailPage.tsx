@@ -91,7 +91,7 @@ export default function ExerciseDetailPage() {
                         </div>
 
                         <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl">{exercise.title}</h1>
-                        <p className="mt-3 text-base leading-relaxed text-slate-300">{exercise.statement}</p>
+                        <p className="mt-3 text-base leading-relaxed text-slate-200">{exercise.statement}</p>
 
                         <div className="mt-6 flex flex-wrap gap-2">
                             <button
@@ -168,6 +168,21 @@ export default function ExerciseDetailPage() {
                         </Link>
                         .
                     </p>
+
+                    <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+                        <h3 className="text-base font-semibold text-blue-300">Usa esto en clase</h3>
+                        <p className="mt-1 text-sm text-slate-200">
+                            Copia el enlace del ejercicio a tus alumnos. Cada uno lo abre en el editor
+                            3D, gira el sólido y comprueba la solución con los pasos resueltos. Si eres
+                            profesor, puedes crear un código de clase y compartir consultas desde la
+                            sección <a href="/clase" className="underline text-blue-300 hover:text-blue-200">Mi clase</a>.
+                        </p>
+                        <div className="mt-2 flex gap-2">
+                            <a href="/clase" className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500">Crear código de clase</a>
+                            <a href="/academy" className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/10">Ver la teoría</a>
+                            <a href="/para-profesores" className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/10">Guía para profesores</a>
+                        </div>
+                    </div>
 
                     <div className="mt-10 flex items-center justify-between border-t border-white/10 pt-6">
                         <Link to="/ejercicios" className="text-sm text-slate-400 hover:text-white">

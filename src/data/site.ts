@@ -57,6 +57,22 @@ export const PAGE_META: Record<string, PageMeta> = {
         keywords:
             'academia dibujo técnico, teoría sistema diédrico, apuntes, ejercicios guiados, bachillerato',
     },
+    temario: {
+        path: '/temario',
+        title: 'Temario de dibujo técnico: diédrico de Bachillerato',
+        description:
+            'Temario de sistema diédrico para Bachillerato y PAU/EBAU: rectas, intersecciones, distancias, abatimientos, giros y ángulos, con ejercicios resueltos.',
+        keywords:
+            'temario dibujo técnico, temario sistema diédrico, PAU, EBAU, bachillerato, geometría descriptiva, programación didáctica',
+    },
+    profesores: {
+        path: '/para-profesores',
+        title: 'Diédrico Studio para profesores de dibujo técnico',
+        description:
+            'Herramienta gratuita para dar clase de sistema diédrico: ejercicios resueltos, teoría por temas y un editor 3D que se gira mientras explicas.',
+        keywords:
+            'diédrico para profesores, dar clase de dibujo técnico, recursos didácticos, herramienta gratuita, bachillerato',
+    },
     about: {
         path: '/about',
         title: 'Quién está detrás de Diédrico Studio',

@@ -20,7 +20,7 @@
  */
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { EXERCISES } from '../src/data/exercises.ts';
+import { EXERCISES, EXERCISE_TOPICS } from '../src/data/exercises.ts';
 import { CONTACT_EMAIL, PAGE_META, SITE_URL, SITE_NAME, exerciseDescription, exercisePageTitle } from '../src/data/site.ts';
 
 const DIST = path.resolve('dist');
@@ -101,7 +101,7 @@ function homeContent() {
     return `<div id="seo-fallback" class="splash">
 <h1>Diédrico Studio</h1>
 <p>Sistema diédrico interactivo: dibuja en 3D y mira el alzado y la planta al instante.</p>
-<p><a href="/ejercicios">Ejercicios resueltos</a> · <a href="/guia">Guía de la herramienta</a> · <a href="/academy">Academia</a></p>
+<p><a href="/ejercicios">Ejercicios resueltos</a> · <a href="/temario">Temario por bloques</a> · <a href="/guia">Guía de la herramienta</a> · <a href="/academy">Academia</a> · <a href="/para-profesores">Para profesores</a></p>
 </div>`;
 }
 
@@ -118,7 +118,7 @@ ${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Ejercicios resueltos', ro
 <ul>
 ${items}
 </ul>
-<p><a class="cta" href="/">Abrir Diédrico Studio</a><a class="ghost" href="/guia">Ver la guía</a></p>
+<p><a class="cta" href="/">Abrir Diédrico Studio</a><a class="ghost" href="/temario">Ver el temario</a><a class="ghost" href="/guia">Ver la guía</a></p>
 </div>`;
 }
 
@@ -173,6 +173,43 @@ ${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Academia', route: '/acade
 </div>`;
 }
 
+
+function temarioContent() {
+    const topics = EXERCISE_TOPICS.map((topic) => {
+        const list = EXERCISES.filter((e) => e.topic === topic);
+        if (!list.length) return '';
+        return `<h3>${esc(topic)}</h3><ul>${list
+            .map((e) => `<li><a href="/ejercicios/${esc(e.slug)}">${esc(e.title)}</a> (${esc(e.level)})</li>`)
+            .join('')}</ul>`;
+    }).join('\n');
+
+    return `<div id="seo-fallback">
+${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Temario', route: '/temario' }])}
+<h1>Temario de dibujo técnico: sistema diédrico</h1>
+<p>Los bloques de sistema diédrico que entran en Dibujo Técnico de Bachillerato y en la PAU/EBAU, con los ejercicios resueltos de cada uno. Sirve para seguir el curso en orden o para repasar un bloque suelto antes del examen.</p>
+<h2>Temas</h2>
+${topics}
+<p><a class="cta" href="/">Abrir Diédrico Studio</a><a class="ghost" href="/ejercicios">Todos los ejercicios</a></p>
+</div>`;
+}
+
+function profesoresContent() {
+    return `<div id="seo-fallback">
+${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Para profesores', route: '/para-profesores' }])}
+<h1>Diédrico Studio para profesores</h1>
+<p>Herramienta gratuita para dar clase de sistema diédrico: el dibujo se ve en 3D y las proyecciones se actualizan al instante, así que puedes girar la pieza mientras explicas. No hay que instalar nada ni crear cuenta.</p>
+<h2>Qué puedes usar en clase</h2>
+<ul>
+<li>Los 11 ejercicios resueltos, con enunciado, pasos y resultado, para proyectar o mandar como tarea.</li>
+<li>La teoría ordenada por temas de la Academia, para seguir el temario del curso.</li>
+<li>El editor 3D: puntos, rectas, planos, sólidos, secciones, abatimientos, giros y cambios de plano.</li>
+<li>Láminas para imprimir y repartir.</li>
+</ul>
+<h2>Por qué es gratis</h2>
+<p>La herramienta y los ejercicios son gratuitos. Solo el asistente de IA consume consultas, y hay un plan de profesor pensado para grupos.</p>
+<p><a class="cta" href="/temario">Ver el temario</a><a class="ghost" href="/ejercicios">Ejercicios resueltos</a><a class="ghost" href="/">Abrir la aplicación</a></p>
+</div>`;
+}
 
 function aboutContent() {
     return `<div id="seo-fallback">
@@ -296,6 +333,37 @@ const PAGES = [
         content: academyContent,
         chunk: 'AcademyPage',
         extra: '',
+    },
+    {
+        route: '/temario',
+        meta: PAGE_META.temario,
+        content: temarioContent,
+        chunk: 'TemarioPage',
+        extra: jsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: PAGE_META.temario.title,
+            description: PAGE_META.temario.description,
+            url: abs('/temario'),
+            inLanguage: 'es',
+            isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+        }),
+    },
+    {
+        route: '/para-profesores',
+        meta: PAGE_META.profesores,
+        content: profesoresContent,
+        chunk: 'ParaProfesoresPage',
+        extra: jsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: PAGE_META.profesores.title,
+            description: PAGE_META.profesores.description,
+            url: abs('/para-profesores'),
+            inLanguage: 'es',
+            audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
+            isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+        }),
     },
     {
         route: '/about',
@@ -463,6 +531,8 @@ async function main() {
         { route: '/', priority: '1.0', changefreq: 'weekly' },
         { route: '/ejercicios', priority: '0.9', changefreq: 'weekly' },
         { route: '/guia', priority: '0.8', changefreq: 'monthly' },
+        { route: '/temario', priority: '0.8', changefreq: 'monthly' },
+        { route: '/para-profesores', priority: '0.6', changefreq: 'monthly' },
         { route: '/academy', priority: '0.7', changefreq: 'monthly' },
         { route: '/about', priority: '0.5', changefreq: 'yearly' },
         { route: '/contact', priority: '0.4', changefreq: 'yearly' },
