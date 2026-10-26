@@ -355,10 +355,10 @@ export const ACADEMY_THEORY: Record<string, React.ReactNode> = {
                             <DihSvg>
                                 <line x1="70" y1="250" x2="320" y2="120" stroke="#10b981" strokeWidth="2" opacity="0.5" />
                                 <circle cx="232" cy="166" r="3" fill="#f59e0b" />
-                                <circle cx="265" cy="229" r="4" fill="#f59e0b" />
-                                <text x="272" y="240" fill="#f59e0b" fontSize="10" fontWeight="bold">(A)</text>
-                                <line x1="232" y1="166" x2="265" y2="229" stroke="#f59e0b" strokeWidth="2" />
-                                <text x="255" y="205" fill="#f59e0b" fontSize="10">radio real</text>
+                                <circle cx="291" cy="277" r="4" fill="#f59e0b" />
+                                <text x="296" y="272" fill="#f59e0b" fontSize="10" fontWeight="bold">(A)</text>
+                                <line x1="232" y1="166" x2="291" y2="277" stroke="#f59e0b" strokeWidth="2" />
+                                <text x="244" y="238" fill="#f59e0b" fontSize="10">radio real</text>
                                 <circle cx="250" cy="200" r="3" fill="none" stroke="#ef4444" strokeWidth="1.2" opacity="0.6" />
                                 <text x="256" y="212" fill="#ef4444" fontSize="9" opacity="0.7">A′</text>
                             </DihSvg>
@@ -918,7 +918,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             level: 'Fácil',
             statement: 'Sitúa el punto A(4, 3, 5). Después dibuja su simétrico respecto del plano horizontal.',
             setup: [p('A', 4, 3, 5)],
-            solutionHint: 'El simétrico respecto del PH cambia el signo de la cota: A′(4, 3, −5).',
+            solutionHint: 'El simétrico respecto del PH cambia el signo de la cota: A* (4, 3, −5). No lo llames A′, que es la proyección horizontal.',
         },
         {
             id: 'ex-point-quadrants',
@@ -1074,7 +1074,7 @@ export const ACADEMY_EXERCISES: Record<string, AcademyExercise[]> = {
             id: 'ex-flatten-vm',
             title: 'Verdadera magnitud por abatimiento',
             level: 'Difícil',
-            statement: 'Abate el plano que contiene al segmento AB y mide su verdadera magnitud. A(0, 2, 2), B(6, 5, 6).',
+            statement: 'Abate el plano proyectante que contiene al segmento AB y mide su verdadera magnitud. A(0, 2, 2), B(6, 5, 6).',
             setup: [p('A', 0, 2, 2), p('B', 6, 5, 6), { type: 'segment', name: 'AB', p1: { x: 0, y: 2, z: 2 }, p2: { x: 6, y: 5, z: 6 }, color: '#f59e0b' } as Partial<any>],
             solutionHint: 'VM = √(6² + 3² + 4²) = √61 ≈ 7,81. Al abatir, el segmento se ve en su longitud real.',
         },

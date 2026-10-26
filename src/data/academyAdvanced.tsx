@@ -242,7 +242,7 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                 level: 'Difícil',
                 statement: 'Coloca un cubo de arista 4 apoyado en una arista sobre el PH, con la diagonal de la cara vertical.',
                 setup: [solid('Cubo', 'cube', 0, 4, 4, 4), p('A', 0, 4, 0)],
-                solutionHint: 'La altura total es la diagonal de la cara: 4√2 ≈ 5,66. La planta es un cuadrado girado 45°.',
+                solutionHint: 'La altura total es la diagonal de la cara: 4√2 ≈ 5,66. La planta es un rectángulo de 4 × 5,66 (girado si la arista no es paralela a la LT).',
             },
         ],
     },
@@ -256,14 +256,14 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
         theory: 'Cilindros y conos oblicuos.',
         theoryContent: (
             <div className="space-y-10 text-slate-700 dark:text-slate-300">
-                {caja('Qué cambia', 'En un cilindro recto las generatrices son perpendiculares a la base; en uno oblicuo, no. Las bases siguen siendo circunferencias, pero el contorno aparente ya no es un rectángulo.')}
+                {caja('Qué cambia', 'En un cilindro recto las generatrices son perpendiculares a la base; en uno oblicuo, no. Las bases siguen siendo circunferencias, pero el contorno aparente ya no es un rectángulo. Si las bases son perpendiculares al eje, al estar inclinadas se ven como elipses en las dos vistas; si son horizontales, como circunferencias en planta y segmentos en el alzado.')}
 
                 <StepByStepVisualizer
                     title="Cilindro oblicuo"
                     steps={[
                         {
                             title: 'Bases paralelas, generatrices inclinadas',
-                            description: 'Las dos bases son circunferencias en planos horizontales. Las generatrices unen puntos correspondientes y ya no son verticales.',
+                            description: 'Las dos bases son circunferencias perpendiculares al eje; al estar inclinadas respecto a los planos de proyección, se ven como elipses en las dos vistas. Las generatrices unen puntos correspondientes y ya no son verticales.',
                             diagram: (
                                 <DihSvg>
                                     <ellipse cx={CX - 30} cy={LT_Y + 3 * SCALE} rx={2.5 * SCALE} ry={0.7 * SCALE} fill="none" stroke="#3b82f6" strokeWidth="2" />
@@ -287,7 +287,7 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                         },
                     ]}
                 />
-                {tip('El cono oblicuo se resuelve igual: su vértice no cae en el centro de la base, y el contorno se traza tangente a la base desde ese vértice.')}
+                {tip('El cono oblicuo se resuelve igual: su vértice no cae en el centro de la base, y el contorno se traza tangente a la base desde ese vértice. Si el cilindro tiene las bases horizontales (apoyado en una de ellas), el contorno se traza tangente a las dos circunferencias de la planta.')}
             </div>
         ),
         exercises: [
@@ -295,9 +295,9 @@ export const ACADEMY_ADVANCED_TOPICS: AcademyTopic[] = [
                 id: 'ex-oblique-cylinder',
                 title: 'Cilindro oblicuo',
                 level: 'Difícil',
-                statement: 'Dibuja un cilindro oblicuo de radio 3 y altura 8, con las bases horizontales y el eje inclinado.',
+                statement: 'Dibuja un cilindro oblicuo de radio 3 y altura 8, con las bases perpendiculares al eje y el eje inclinado.',
                 setup: [solid('Cilindro', 'cylinder', 0, 4, 3, 8, '#3b82f6', { x: 0.5, y: 0, z: 0 }), p('O', 0, 4, 0)],
-                solutionHint: 'Las bases son elipses en planta; el contorno del alzado son rectas tangentes a ambas, no verticales.',
+                solutionHint: 'Las bases son elipses en las dos vistas; el contorno del alzado son rectas tangentes a ambas, no verticales.',
             },
         ],
     },
