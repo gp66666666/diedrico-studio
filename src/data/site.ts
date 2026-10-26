@@ -30,6 +30,7 @@ export function ogImageForPath(path: string): string {
     if (own) return `${SITE_URL}${own}`;
     const exercise = path.match(/^\/ejercicios\/([^/]+)$/);
     if (exercise) return `${SITE_URL}/og/ejercicios/${exercise[1]}.png`;
+    if (path.startsWith('/temario/')) return `${SITE_URL}/og/temario.png`;
     return OG_IMAGE;
 }
 

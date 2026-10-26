@@ -2,11 +2,13 @@ import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { EXERCISES, EXERCISE_TOPICS } from '../data/exercises';
-import { PAGE_META, pageSeo, SITE_URL } from '../data/site';
+import { PAGE_META, pageSeo } from '../data/site';
+import { TOPIC_PAGES } from '../data/topics';
 
 export default function TemarioPage() {
     const byTopic = EXERCISE_TOPICS.map((t) => ({
         topic: t,
+        page: TOPIC_PAGES.find((p) => p.topic === t),
         exercises: EXERCISES.filter((e) => e.topic === t),
     }));
 
@@ -27,7 +29,7 @@ export default function TemarioPage() {
                 </header>
                 <main className="mx-auto max-w-5xl px-5 py-10">
                     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {byTopic.map(({ topic }) => (
+                        {byTopic.map(({ topic, page }) => (
                             <section key={topic} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
                                 <h2 className="text-lg font-bold text-white">{topic}</h2>
                                 <ul className="mt-4 space-y-2">
@@ -45,6 +47,14 @@ export default function TemarioPage() {
                                         </li>
                                     ))}
                                 </ul>
+                                {page && (
+                                    <Link
+                                        to={`/temario/${page.slug}`}
+                                        className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-300 hover:text-blue-200"
+                                    >
+                                        Ver el bloque completo →
+                                    </Link>
+                                )}
                             </section>
                         ))}
                     </div>

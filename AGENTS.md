@@ -281,6 +281,9 @@ que ven los rastreadores que no ejecutan JavaScript (los de IA, por ejemplo).
   en los dos sitios a la vez (hay tests de longitud y de rutas en `src/data/__tests__/site.test.ts`).
 - Los ejercicios no se listan a mano: salen de `src/data/exercises.ts`. **Añadir un ejercicio =
   añadirlo al array**; el HTML, el sitemap y los enlaces relacionados se generan solos.
+- Cada bloque del temario tiene su página en `/temario/<slug>` (`src/data/topics.ts`). Un test
+  obliga a que haya exactamente una por cada `topic` de los ejercicios: si añades un tema nuevo,
+  añade su página o el test falla.
 - `dist/sitemap.xml` se genera desde la misma lista (ya no hay `public/sitemap.xml`).
 - **Tarjetas Open Graph**: una por ejercicio y por página principal en `public/og/`
   (1200×630 PNG), asignadas en `ogImageForPath()` (`src/data/site.ts`). Se regeneran con

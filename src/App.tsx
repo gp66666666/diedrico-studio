@@ -19,6 +19,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const ClassPage = lazy(() => import('./pages/ClassPage'));
 const TemarioPage = lazy(() => import('./pages/TemarioPage'));
 const ParaProfesoresPage = lazy(() => import('./pages/ParaProfesoresPage'));
+const TopicPage = lazy(() => import('./pages/TopicPage'));
 
 function PageLoader() {
     return (
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/ejercicios" element={<ExercisesPage />} />
                 <Route path="/ejercicios/:slug" element={<ExerciseDetailPage />} />
                 <Route path="/temario" element={<TemarioPage />} />
+                <Route path="/temario/:slug" element={<TopicPage />} />
                 <Route path="/para-profesores" element={<ParaProfesoresPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />

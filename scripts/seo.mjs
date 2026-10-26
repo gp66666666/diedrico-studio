@@ -22,6 +22,7 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { EXERCISES, EXERCISE_TOPICS } from '../src/data/exercises.ts';
 import { CONTACT_EMAIL, PAGE_META, SITE_URL, SITE_NAME, exerciseDescription, exercisePageTitle, ogImageForPath } from '../src/data/site.ts';
+import { TOPIC_PAGES } from '../src/data/topics.ts';
 
 const DIST = path.resolve('dist');
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -178,7 +179,11 @@ function temarioContent() {
     const topics = EXERCISE_TOPICS.map((topic) => {
         const list = EXERCISES.filter((e) => e.topic === topic);
         if (!list.length) return '';
-        return `<h3>${esc(topic)}</h3><ul>${list
+        const page = TOPIC_PAGES.find((t) => t.topic === topic);
+        const heading = page
+            ? `<a href="/temario/${esc(page.slug)}">${esc(topic)}</a>`
+            : esc(topic);
+        return `<h3>${heading}</h3><ul>${list
             .map((e) => `<li><a href="/ejercicios/${esc(e.slug)}">${esc(e.title)}</a> (${esc(e.level)})</li>`)
             .join('')}</ul>`;
     }).join('\n');
@@ -208,6 +213,30 @@ ${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Para profesores', route: 
 <h2>Por qué es gratis</h2>
 <p>La herramienta y los ejercicios son gratuitos. Solo el asistente de IA consume consultas, y hay un plan de profesor pensado para grupos.</p>
 <p><a class="cta" href="/temario">Ver el temario</a><a class="ghost" href="/ejercicios">Ejercicios resueltos</a><a class="ghost" href="/">Abrir la aplicación</a></p>
+</div>`;
+}
+
+function topicContent(topic) {
+    const exercises = EXERCISES.filter((e) => e.topic === topic.topic);
+    return `<div id="seo-fallback">
+${crumbsHtml([
+        { name: 'Inicio', route: '/' },
+        { name: 'Temario', route: '/temario' },
+        { name: topic.topic, route: `/temario/${topic.slug}` },
+    ])}
+<h1>${esc(topic.heading)}</h1>
+<p>${esc(topic.intro)}</p>
+<h2>Qué tienes que saber hacer</h2>
+<ul>${topic.learn.map((item) => `<li>${esc(item)}</li>`).join('')}</ul>
+<h2>Cómo se resuelve</h2>
+<ol>${topic.steps.map((step) => `<li>${esc(step)}</li>`).join('')}</ol>
+<h2>Cómo cae en la PAU/EBAU</h2>
+<p>${esc(topic.exam)}</p>
+<h2>Ejercicios de este bloque</h2>
+<ul>${exercises
+        .map((e) => `<li><a href="/ejercicios/${esc(e.slug)}">${esc(e.title)}</a> (${esc(e.level)})</li>`)
+        .join('')}</ul>
+<p><a class="cta" href="/">Abrir Diédrico Studio</a><a class="ghost" href="/temario">Temario completo</a><a class="ghost" href="/academy">Teoría en la Academia</a></p>
 </div>`;
 }
 
@@ -402,6 +431,35 @@ const PAGES = [
     },
 ];
 
+for (const topic of TOPIC_PAGES) {
+    PAGES.push({
+        route: `/temario/${topic.slug}`,
+        meta: {
+            path: `/temario/${topic.slug}`,
+            title: topic.title,
+            description: topic.description,
+            keywords: `${topic.topic}, sistema diédrico, dibujo técnico, PAU, EBAU, ejercicios resueltos`,
+        },
+        content: () => topicContent(topic),
+        chunk: 'TopicPage',
+        extra:
+            jsonLd({
+                '@context': 'https://schema.org',
+                '@type': 'WebPage',
+                name: topic.title,
+                description: topic.description,
+                url: abs(`/temario/${topic.slug}`),
+                inLanguage: 'es',
+                isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+            }) +
+            crumb([
+                { name: 'Inicio', route: '/' },
+                { name: 'Temario', route: '/temario' },
+                { name: topic.topic, route: `/temario/${topic.slug}` },
+            ]),
+    });
+}
+
 for (const exercise of EXERCISES) {
     PAGES.push({
         route: `/ejercicios/${exercise.slug}`,
@@ -543,6 +601,7 @@ async function main() {
         { route: '/privacy', priority: '0.2', changefreq: 'yearly' },
         { route: '/terms', priority: '0.2', changefreq: 'yearly' },
         ...EXERCISES.map((e) => ({ route: `/ejercicios/${e.slug}`, priority: '0.7', changefreq: 'monthly' })),
+        ...TOPIC_PAGES.map((t) => ({ route: `/temario/${t.slug}`, priority: '0.7', changefreq: 'monthly' })),
     ];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
