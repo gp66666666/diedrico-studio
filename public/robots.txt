@@ -20,4 +20,4 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemap correcto
-Sitemap: https://diedrico-studio.vercel.app/sitemap.xml
+Sitemap: https://diedricostudio.com/sitemap.xml

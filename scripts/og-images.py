@@ -13,7 +13,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "public" / "og"
-SITE = "diedrico-studio.vercel.app"
+SITE = "diedricostudio.com"
 
 CUBE = """
 <svg width="250" height="250" viewBox="0 0 200 200" fill="none" aria-hidden="true">

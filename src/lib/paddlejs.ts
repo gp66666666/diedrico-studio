@@ -1,7 +1,7 @@
 /**
  * Paddle.js: abre el pago encima de la app (overlay).
  *
- * Paddle devuelve una URL del tipo `https://diedrico-studio.vercel.app?_ptxn=txn_...`.
+ * Paddle devuelve una URL del tipo `https://diedricostudio.com?_ptxn=txn_...`.
  * Esa URL sola no cobra nada: quien abre el checkout es Paddle.js, que necesita
  * un **token de cliente** (público, va en el bundle) y el ID de la transacción
  * que ha creado el servidor.

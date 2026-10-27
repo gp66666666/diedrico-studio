@@ -162,7 +162,7 @@ export default function ClassPage() {
                                                     <button
                                                         onClick={() =>
                                                             copy(
-                                                                `Usa mi código de Diédrico Studio: ${c.code} en https://diedrico-studio.vercel.app/clase. Te da ${c.credits_per_student} consultas para el asistente.`,
+                                                                `Usa mi código de Diédrico Studio: ${c.code} en https://diedricostudio.com/clase. Te da ${c.credits_per_student} consultas para el asistente.`,
                                                             )
                                                         }
                                                         className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium hover:bg-white/20"
