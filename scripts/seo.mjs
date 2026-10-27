@@ -623,6 +623,7 @@ ${routes
         .map(
             (r) => `  <url>
     <loc>${abs(r.route)}</loc>
+    <lastmod>${TODAY}</lastmod>
     <changefreq>${r.changefreq}</changefreq>
     <priority>${r.priority}</priority>
   </url>`
