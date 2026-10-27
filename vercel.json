@@ -1,6 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://diedricostudio.com/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/ejercicios",
