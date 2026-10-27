@@ -42,4 +42,6 @@ jobs:
           command: pages deploy dist --project-name=diedrico-studio --branch=main
 
       - name: Avisar a IndexNow
+        # Extra: si Cloudflare bloquea la verificación, no debe tumbar el deploy.
+        continue-on-error: true
         run: node scripts/indexnow.mjs
