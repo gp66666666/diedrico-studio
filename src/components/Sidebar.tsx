@@ -121,7 +121,6 @@ export default function Sidebar() {
     const [showLoadModal, setShowLoadModal] = useState(false);
     const [showViewControls, setShowViewControls] = useState(false);
     const [showCloudOptions, setShowCloudOptions] = useState(false);
-    const [showExportOptions, setShowExportOptions] = useState(false);
 
     const { profile } = useUserStore();
 
@@ -737,7 +736,7 @@ export default function Sidebar() {
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                 >
                     <span className="flex items-center gap-2">
-                        <Settings size={16} /> Controles de Vista
+                        <Settings size={16} /> Ver
                     </span>
                     {showViewControls ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
@@ -765,7 +764,7 @@ export default function Sidebar() {
                                 }`}
                         >
                             <span className="flex items-center gap-2">
-                                <ArrowDownToLine size={16} /> Abatir Plano Horizontal
+                                <ArrowDownToLine size={16} /> Plano horizontal abatido
                             </span>
                             {isFlattened ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
@@ -804,54 +803,42 @@ export default function Sidebar() {
                 )}
             </div>
 
-            {/* Cloud Save/Load - Collapsible */}
+            {/* Archivo: guardar, cargar y exportar en un solo sitio */}
             <div className={`p-2 border-b ${headerBorder}`}>
                 <button
                     onClick={() => setShowCloudOptions(!showCloudOptions)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                 >
                     <span className="flex items-center gap-2">
-                        <Download size={16} /> Proyectos
+                        <Download size={16} /> Archivo
                     </span>
                     {showCloudOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
                 {showCloudOptions && (
-                    <div className="flex gap-2 px-2 mt-2">
+                    <div className="px-2 space-y-2 mt-2">
                         <button
                             onClick={() => setShowSaveModal(true)}
-                            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                         >
-                            <Download size={16} /> Guardar
+                            <span className="flex items-center gap-2">
+                                <Download size={16} /> Guardar
+                            </span>
                         </button>
                         <button
                             onClick={() => setShowLoadModal(true)}
-                            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                         >
-                            <ArrowDownToLine size={16} /> Cargar
+                            <span className="flex items-center gap-2">
+                                <ArrowDownToLine size={16} /> Cargar
+                            </span>
                         </button>
-                    </div>
-                )}
-            </div>
-
-            {/* Export Options - Collapsible */}
-            <div className={`p-2 border-b ${headerBorder}`}>
-                <button
-                    onClick={() => setShowExportOptions(!showExportOptions)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
-                >
-                    <span className="flex items-center gap-2">
-                        <Download size={16} /> Exportar
-                    </span>
-                    {showExportOptions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-                {showExportOptions && (
-                    <div className="px-2 space-y-2 mt-2">
+                        <div className={`my-1 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`} />
                         <button
                             onClick={() => handleExportCurrentView()}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                         >
                             <span className="flex items-center gap-2">
-                                <Download size={16} /> Vista Actual
+                                <Download size={16} /> Exportar vista actual
                             </span>
                         </button>
                         <button
@@ -859,7 +846,7 @@ export default function Sidebar() {
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${buttonClass} ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                         >
                             <span className="flex items-center gap-2">
-                                <Download size={16} /> Todas las Vistas
+                                <Download size={16} /> Exportar todas las vistas
                             </span>
                         </button>
                         <div className={`my-1 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`} />

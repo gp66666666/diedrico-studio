@@ -167,8 +167,8 @@ export default function GuidePage() {
                             <p>La pantalla se divide en cuatro zonas:</p>
                             <ul className="list-inside list-disc space-y-1.5 text-sm">
                                 <li><b className="text-white">Barra superior central</b>: cambia entre <b>Vista 3D</b>, <b>Diédrico (2D)</b>, <b>Boceto</b> y <b>Láminas</b>.</li>
-                                <li><b className="text-white">Columna izquierda</b>: tres pestañas, <b>Añadir</b> (crear elementos), <b>Herramientas</b> (distancias, giros…) y <b>Lista</b> (todo lo que hay en el dibujo).</li>
-                                <li><b className="text-white">Zona central</b>: el lienzo. Arriba a la izquierda están Deshacer/Rehacer y los paneles <b>Controles de Vista</b>, <b>Proyectos</b> y <b>Exportar</b>.</li>
+                                <li><b className="text-white">Columna izquierda</b>: tres pestañas, <b>Añadir</b> (crear elementos), <b>Herramientas</b> (medir, intersecar, construir, transformar y operar con sólidos) y <b>Lista</b> (todo lo que hay en el dibujo).</li>
+                                <li><b className="text-white">Zona central</b>: el lienzo. Arriba a la izquierda están Deshacer/Rehacer y los paneles <b>Ver</b> (colores, relleno, intersecciones) y <b>Archivo</b> (guardar, cargar y exportar).</li>
                                 <li><b className="text-white">Abajo a la izquierda</b>: tu cuenta y tu plan. El botón morado flotante abre el <b>Asistente IA</b>.</li>
                             </ul>
                             <p className="text-sm">
@@ -357,19 +357,19 @@ export default function GuidePage() {
                                     <p>Recta-Recta, Recta-Plano y Plano-Plano. En el grupo avanzado, intersección de 3 planos o combinaciones de 2 planos y 1 recta (3 elementos).</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Verdadera magnitud</p>
+                                    <p className="font-semibold text-white">Medir → longitud y ángulos</p>
                                     <p>Mide un segmento o una recta tal como es en el espacio, no como se ve proyectado.</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Paralelismo / Perpendicularidad</p>
+                                    <p className="font-semibold text-white">Construir → paralelas y perpendiculares</p>
                                     <p>Crea rectas y planos paralelos o perpendiculares a partir de un elemento de referencia y un punto por el que pasar.</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Giros (2 elementos: objeto + eje)</p>
+                                    <p className="font-semibold text-white">Transformar → giros</p>
                                     <p>Girar un punto, o girar recta/plano/segmento/sólido alrededor de una recta-eje. También incluye poner una recta paralela a la LT. El resultado es una copia con subíndice.</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Cambios de plano (2 puntos)</p>
+                                    <p className="font-semibold text-white">Transformar → cambios de plano</p>
                                     <p>Elige dos puntos que definan la nueva línea de tierra y la herramienta añade el sistema auxiliar, con su nueva LT dibujada.</p>
                                 </div>
                                 <div>
@@ -461,8 +461,8 @@ export default function GuidePage() {
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Abatir plano horizontal</p>
-                                    <p>Está en <i>Controles de Vista</i>: selecciona un plano y un punto que pertenezca a él. El punto abatido aparece como <b>(A)</b>.</p>
+                                    <p className="font-semibold text-white">Transformar → abatir</p>
+                                    <p>Está en <i>Herramientas → Transformar → Abatir</i>: selecciona un plano y un punto que pertenezca a él. El punto abatido aparece como <b>(A)</b>.</p>
                                 </div>
                             </div>
                             <Figure

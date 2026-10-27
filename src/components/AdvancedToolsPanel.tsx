@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
     ChevronDown, ChevronRight, Ruler, RotateCw,
-    GitBranch, Box, Maximize2, Layers, Triangle
+    GitBranch, Box, Layers
 } from 'lucide-react';
 import { useGeometryStore } from '../store/geometryStore';
 
@@ -9,603 +9,215 @@ interface AdvancedToolsPanelProps {
     isDark: boolean;
 }
 
+type Tool = { id: string; label: string };
+type Group = { id: string; label?: string; tools: Tool[] };
+type Section = { id: string; label: string; icon: typeof Ruler; groups: Group[] };
+
+/**
+ * Panel de herramientas agrupado por VERBO, no por nombre de concepto:
+ * medir, intersecar, construir, transformar y operar con sólidos.
+ *
+ * Las creaciones (punto, recta, plano, sólido) viven solo en «Añadir»: aquí no
+ * se repiten. Cada herramienta aparece una sola vez.
+ */
+const SECTIONS: Section[] = [
+    {
+        id: 'medir',
+        label: 'Medir',
+        icon: Ruler,
+        groups: [
+            {
+                id: 'distancias',
+                tools: [
+                    { id: 'distance-point-point', label: '📏 Punto - Punto' },
+                    { id: 'distance-point-line', label: '📐 Punto - Recta' },
+                    { id: 'distance-point-plane', label: '📋 Punto - Plano' },
+                    { id: 'distance-line-line', label: '↔️ Recta - Recta' },
+                    { id: 'distance-line-plane', label: '⬌ Recta - Plano' },
+                    { id: 'distance-plane-plane', label: '▭ Plano - Plano' },
+                    { id: 'true-length', label: '📏 Longitud de una recta' },
+                    { id: 'angle-line-line', label: '📐 Ángulo recta - recta' },
+                    { id: 'angle-line-plane', label: '📐 Ángulo recta - plano' },
+                    { id: 'angle-plane-plane', label: '📐 Ángulo plano - plano' },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'intersecar',
+        label: 'Intersecar',
+        icon: GitBranch,
+        groups: [
+            {
+                id: 'basicas',
+                label: 'Básicas',
+                tools: [
+                    { id: 'intersection-line-line', label: '✖️ Recta ∩ Recta' },
+                    { id: 'intersection-line-plane', label: '⊕ Recta ∩ Plano' },
+                    { id: 'intersection-plane-plane', label: '⊞ Plano ∩ Plano' },
+                ],
+            },
+            {
+                id: 'avanzadas',
+                label: 'Más casos',
+                tools: [
+                    { id: 'advanced-intersection-3-planes', label: '⊞ 3 planos' },
+                    { id: 'advanced-intersection-3-lines', label: '✖️ 3 rectas' },
+                    { id: 'advanced-intersection-2planes-1line', label: '2 planos + recta' },
+                    { id: 'advanced-intersection-2lines-1plane', label: '2 rectas + plano' },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'construir',
+        label: 'Construir',
+        icon: Layers,
+        groups: [
+            {
+                id: 'paralelas',
+                label: 'Paralelas',
+                tools: [
+                    { id: 'parallel-line-line', label: '∥ Recta paralela a recta' },
+                    { id: 'plane-parallel-plane', label: '∥ Plano paralelo a plano' },
+                    { id: 'parallel-line-plane', label: '∥ Recta paralela a plano' },
+                    { id: 'plane-parallel-line', label: '∥ Plano paralelo a recta' },
+                    { id: 'line-parallel-2-planes', label: '∥ Recta paralela a 2 planos' },
+                    { id: 'plane-parallel-2-lines', label: '∥ Plano paralelo a 2 rectas' },
+                ],
+            },
+            {
+                id: 'perpendiculares',
+                label: 'Perpendiculares',
+                tools: [
+                    { id: 'perp-line-plane', label: '⊥ Recta perpendicular a plano' },
+                    { id: 'perp-plane-line', label: '⊥ Plano perpendicular a recta' },
+                    { id: 'perp-line-line', label: '⊥ Recta perpendicular a recta' },
+                    { id: 'plane-perp-2-planes', label: '⊥ Plano perpendicular a 2 planos' },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'transformar',
+        label: 'Transformar',
+        icon: RotateCw,
+        groups: [
+            {
+                id: 'giros',
+                label: 'Giros',
+                tools: [
+                    { id: 'rotation-point-axis', label: '🔄 Girar un punto' },
+                    { id: 'rotation-any', label: '🔄 Girar recta, plano o sólido' },
+                    { id: 'rotation-parallel-lt', label: '↔️ Poner una recta paralela a la LT' },
+                ],
+            },
+            {
+                id: 'cambios',
+                label: 'Cambios de plano',
+                tools: [
+                    { id: 'cambio-plano-h', label: '🔼 Cambio de plano horizontal' },
+                    { id: 'cambio-plano-v', label: '🔽 Cambio de plano vertical' },
+                ],
+            },
+            {
+                id: 'abatir',
+                label: 'Abatir',
+                tools: [
+                    { id: 'abatir-ph', label: 'Abatir sobre el PH' },
+                    { id: 'abatir-pv', label: 'Abatir sobre el PV' },
+                    { id: 'abatir-traza', label: 'Abatir sobre una traza' },
+                    { id: 'desabatir', label: 'Desabatir' },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'solidos',
+        label: 'Sólidos',
+        icon: Box,
+        groups: [
+            {
+                id: 'operaciones',
+                label: 'Operaciones',
+                tools: [
+                    { id: 'solid-section', label: '✂️ Sección plana' },
+                    { id: 'solid-intersection', label: '🔗 Intersección de dos sólidos' },
+                    { id: 'line-solid', label: '📍 Recta y sólido (penetración)' },
+                    { id: 'sphere-tangent', label: '⭕ Plano tangente (esfera, cono, cilindro)' },
+                    { id: 'shadows', label: '☀️ Sombras sobre los planos' },
+                    { id: 'cast-shadow', label: '🌗 Sombra arrojada' },
+                    { id: 'solid-development', label: '📄 Desarrollo del sólido' },
+                ],
+            },
+        ],
+    },
+];
+
 export default function AdvancedToolsPanel({ isDark }: AdvancedToolsPanelProps) {
-    const { setActiveTool, activeTool, viewMode, setViewMode } = useGeometryStore();
+    const { setActiveTool, activeTool } = useGeometryStore();
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-        distances: false,
-        abatimientos: false,
-        intersecciones: false,
-        verdaderaMagnitud: false,
-        paralelismo: false,
-        giros: false,
-        cambiosPlano: false,
-        planos: false,
-        solidos: false
-    });
+    const toggle = (id: string) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
-    const toggleSection = (section: string) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [section]: !prev[section]
-        }));
-    };
+    const sectionClass = `w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
+        isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-gray-100 text-gray-800'
+    }`;
 
-    const sectionClass = `w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-gray-100 text-gray-800'
-        }`;
-
-    const contentClass = `ml-4 mt-2 space-y-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`;
-    const getButtonClass = (tool: string) => `w-full text-left px-3 py-2 text-xs rounded-md transition-colors ${activeTool === tool
-        ? 'bg-blue-500/20 text-blue-600 border border-blue-500/50 font-semibold'
-        : isDark ? 'hover:bg-white/5 text-gray-400' : 'hover:bg-gray-50 text-gray-600'
-        }`;
+    const toolClass = (tool: string) => `w-full text-left px-3 py-2 text-xs rounded-md transition-colors ${
+        activeTool === tool
+            ? 'bg-blue-500/20 text-blue-600 border border-blue-500/50 font-semibold'
+            : isDark
+                ? 'hover:bg-white/5 text-gray-400'
+                : 'hover:bg-gray-50 text-gray-600'
+    }`;
 
     return (
-        <div className="space-y-2">
-            {/* DISTANCIAS */}
-            <div>
-                <button
-                    onClick={() => toggleSection('distances')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <Ruler size={16} />
-                        Distancias
-                    </span>
-                    {expandedSections.distances ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
+        <div className="space-y-1">
+            {SECTIONS.map((section) => {
+                const Icon = section.icon;
+                const isOpen = !!expanded[section.id];
+                return (
+                    <div key={section.id}>
+                        <button onClick={() => toggle(section.id)} className={sectionClass}>
+                            <span className="flex items-center gap-2">
+                                <Icon size={16} />
+                                {section.label}
+                            </span>
+                            {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                        </button>
 
-                {expandedSections.distances && (
-                    <div className={contentClass}>
-                        <button
-                            className={getButtonClass('distance-point-point')}
-                            onClick={() => setActiveTool(activeTool === 'distance-point-point' ? 'none' : 'distance-point-point')}
-                        >
-                            📏 Punto - Punto
-                            {activeTool === 'distance-point-point' && (
-                                <span className="ml-2 text-xs opacity-70">(activo)</span>
-                            )}
-                        </button>
-                        <button
-                            className={getButtonClass('distance-point-line')}
-                            onClick={() => setActiveTool(activeTool === 'distance-point-line' ? 'none' : 'distance-point-line')}
-                        >
-                            📐 Punto - Recta
-                        </button>
-                        <button
-                            className={getButtonClass('distance-point-plane')}
-                            onClick={() => setActiveTool(activeTool === 'distance-point-plane' ? 'none' : 'distance-point-plane')}
-                        >
-                            📋 Punto - Plano
-                        </button>
-                        <button
-                            className={getButtonClass('distance-line-line')}
-                            onClick={() => setActiveTool(activeTool === 'distance-line-line' ? 'none' : 'distance-line-line')}
-                        >
-                            ↔️ Recta - Recta
-                        </button>
-                        <button
-                            className={getButtonClass('distance-line-plane')}
-                            onClick={() => setActiveTool(activeTool === 'distance-line-plane' ? 'none' : 'distance-line-plane')}
-                        >
-                            ⬌ Recta - Plano
-                        </button>
-                        <button
-                            className={getButtonClass('distance-plane-plane')}
-                            onClick={() => setActiveTool(activeTool === 'distance-plane-plane' ? 'none' : 'distance-plane-plane')}
-                        >
-                            ▭ Plano - Plano
-                        </button>
+                        {isOpen && (
+                            <div className="ml-4 mt-1 space-y-2">
+                                {section.groups.map((group) => (
+                                    <div key={group.id}>
+                                        {group.label && (
+                                            <p className={`px-3 pt-1 text-[10px] font-bold uppercase tracking-wider ${
+                                                isDark ? 'text-gray-500' : 'text-gray-500'
+                                            }`}>
+                                                {group.label}
+                                            </p>
+                                        )}
+                                        <div className="space-y-1">
+                                            {group.tools.map((tool) => (
+                                                <button
+                                                    key={tool.id}
+                                                    className={toolClass(tool.id)}
+                                                    onClick={() =>
+                                                        setActiveTool(activeTool === tool.id ? 'none' : (tool.id as never))
+                                                    }
+                                                >
+                                                    {tool.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
-
-            {/* ABATIMIENTOS (DISABLED)
-             <div>
-                 <button
-@@ -136,5 +136,5 @@
- 
-                     </div>
-                 )}
--            </div>
-+            </div> */}
-
-            {/* INTERSECCIONES */}
-            <div>
-                <button
-                    onClick={() => toggleSection('intersecciones')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <GitBranch size={16} className="rotate-0" />
-                        Intersecciones
-                    </span>
-                    {expandedSections.intersecciones ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.intersecciones && (
-                    <div className={contentClass}>
-                        <div className="mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Básicos (2 Elementos)</div>
-                        <button
-                            className={getButtonClass('intersection-line-line')}
-                            onClick={() => setActiveTool(activeTool === 'intersection-line-line' ? 'none' : 'intersection-line-line')}
-                        >
-                            ✖️ Recta ∩ Recta
-                        </button>
-                        <button
-                            className={getButtonClass('intersection-line-plane')}
-                            onClick={() => setActiveTool(activeTool === 'intersection-line-plane' ? 'none' : 'intersection-line-plane')}
-                        >
-                            ⊕ Recta ∩ Plano
-                        </button>
-                        <button
-                            className={getButtonClass('intersection-plane-plane')}
-                            onClick={() => setActiveTool(activeTool === 'intersection-plane-plane' ? 'none' : 'intersection-plane-plane')}
-                        >
-                            ⊞ Plano ∩ Plano
-                        </button>
-
-
-                        <div className="mt-3 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Avanzados (3 Elementos)</div>
-                        <button
-                            className={getButtonClass('advanced-intersection-3-planes')}
-                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-3-planes' ? 'none' : 'advanced-intersection-3-planes')}
-                        >
-                            3 Planos ∩
-                        </button>
-                        <button
-                            className={getButtonClass('advanced-intersection-3-lines')}
-                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-3-lines' ? 'none' : 'advanced-intersection-3-lines')}
-                        >
-                            3 Rectas ∩
-                        </button>
-                        <button
-                            className={getButtonClass('advanced-intersection-2planes-1line')}
-                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-2planes-1line' ? 'none' : 'advanced-intersection-2planes-1line')}
-                        >
-                            2 Planos + Recta ∩
-                        </button>
-                        <button
-                            className={getButtonClass('advanced-intersection-2lines-1plane')}
-                            onClick={() => setActiveTool(activeTool === 'advanced-intersection-2lines-1plane' ? 'none' : 'advanced-intersection-2lines-1plane')}
-                        >
-                            2 Rectas + Plano ∩
-                        </button>
-
-                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Selecciona los elementos en la Lista
-                        </div>
-                    </div>
-                )}
-            </div>
-
-
-
-
-            {/* VERDADERA MAGNITUD */}
-            <div>
-                <button
-                    onClick={() => toggleSection('verdaderaMagnitud')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <Ruler size={16} />
-                        Verdadera Magnitud
-                    </span>
-                    {expandedSections.verdaderaMagnitud ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.verdaderaMagnitud && (
-                    <div className={contentClass}>
-                        <button
-                            className={getButtonClass('true-length')}
-                            onClick={() => setActiveTool(activeTool === 'true-length' ? 'none' : 'true-length')}
-                        >
-                            📏 Longitud de Recta
-                        </button>
-                        <button
-                            className={getButtonClass('angle-line-line')}
-                            onClick={() => setActiveTool(activeTool === 'angle-line-line' ? 'none' : 'angle-line-line')}
-                        >
-                            📐 Ángulo Recta-Recta
-                        </button>
-                        <button
-                            className={getButtonClass('angle-line-plane')}
-                            onClick={() => setActiveTool(activeTool === 'angle-line-plane' ? 'none' : 'angle-line-plane')}
-                        >
-                            📐 Ángulo Recta-Plano
-                        </button>
-                        <button
-                            className={getButtonClass('angle-plane-plane')}
-                            onClick={() => setActiveTool(activeTool === 'angle-plane-plane' ? 'none' : 'angle-plane-plane')}
-                        >
-                            📐 Ángulo Plano-Plano
-                        </button>
-                        <div className={`px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Calcula dimensiones reales
-                        </div>
-                        <div className="mt-4 pt-4 border-t border-white/5">
-                            <button
-                                onClick={() => setActiveTool(activeTool === 'reconstruct-vm' ? 'none' : 'reconstruct-vm')}
-                                className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all ${activeTool === 'reconstruct-vm'
-                                    ? 'bg-purple-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.4)]'
-                                    : 'bg-purple-600/10 text-purple-400 border border-purple-500/30 hover:bg-purple-600/20'
-                                    }`}
-                            >
-                                <Maximize2 size={16} /> RECONSTRUIR EN VM
-                            </button>
-                            <p className="text-[10px] text-gray-500 mt-2 text-center">
-                                Selecciona elementos y un plano para ver su VM
-                            </p>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* PARALELISMO Y PERPENDICULARIDAD */}
-            <div>
-                <button
-                    onClick={() => toggleSection('paralelismo')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M3 6h18M3 12h18M3 18h18" />
-                        </svg>
-                        Paralelismo / Perpendicularidad
-                    </span>
-                    {expandedSections.paralelismo ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.paralelismo && (
-                    <div className={contentClass}>
-                        <div className="mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Básicos (1 Referencia)</div>
-                        <button
-                            className={getButtonClass('parallel-line-line')}
-                            onClick={() => setActiveTool(activeTool === 'parallel-line-line' ? 'none' : 'parallel-line-line')}
-                        >
-                            ∥ Recta Paralela a Recta
-                        </button>
-                        <button
-                            className={getButtonClass('plane-parallel-plane')}
-                            onClick={() => setActiveTool(activeTool === 'plane-parallel-plane' ? 'none' : 'plane-parallel-plane')}
-                        >
-                            ∥ Plano Paralelo a Plano
-                        </button>
-                        <button
-                            className={getButtonClass('parallel-line-plane')}
-                            onClick={() => setActiveTool(activeTool === 'parallel-line-plane' ? 'none' : 'parallel-line-plane')}
-                        >
-                            ∥ Recta Paralela a Plano
-                        </button>
-                        <button
-                            className={getButtonClass('plane-parallel-line')}
-                            onClick={() => setActiveTool(activeTool === 'plane-parallel-line' ? 'none' : 'plane-parallel-line')}
-                        >
-                            ∥ Plano Paralelo a Recta
-                        </button>
-                        <button
-                            className={getButtonClass('perp-line-plane')}
-                            onClick={() => setActiveTool(activeTool === 'perp-line-plane' ? 'none' : 'perp-line-plane')}
-                        >
-                            ⊥ Recta Perpendicular a Plano
-                        </button>
-                        <button
-                            className={getButtonClass('perp-plane-line')}
-                            onClick={() => setActiveTool(activeTool === 'perp-plane-line' ? 'none' : 'perp-plane-line')}
-                        >
-                            ⊥ Plano Perpendicular a Recta
-                        </button>
-                        <button
-                            className={getButtonClass('perp-line-line')}
-                            onClick={() => setActiveTool(activeTool === 'perp-line-line' ? 'none' : 'perp-line-line')}
-                        >
-                            ⊥ Recta Perpendicular a Recta
-                        </button>
-
-                        <div className="mt-3 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Avanzados (2 Referencias)</div>
-                        <button
-                            className={getButtonClass('plane-perp-2-planes')}
-                            onClick={() => setActiveTool(activeTool === 'plane-perp-2-planes' ? 'none' : 'plane-perp-2-planes')}
-                        >
-                            ⊥ Plano Perpendicular a 2 Planos
-                        </button>
-                        <button
-                            className={getButtonClass('line-parallel-2-planes')}
-                            onClick={() => setActiveTool(activeTool === 'line-parallel-2-planes' ? 'none' : 'line-parallel-2-planes')}
-                        >
-                            ∥ Recta Paralela a 2 Planos
-                        </button>
-                        <button
-                            className={getButtonClass('plane-parallel-2-lines')}
-                            onClick={() => setActiveTool(activeTool === 'plane-parallel-2-lines' ? 'none' : 'plane-parallel-2-lines')}
-                        >
-                            ∥ Plano Paralelo a 2 Rectas
-                        </button>
-
-                        <div className={`mt-2 px-3 py-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Selecciona Punto + Referencias
-                        </div>
-                    </div>
-                )}
-            </div>
-
-
-            {/* GIROS */}
-            <div>
-                <button onClick={() => toggleSection('giros')} className={sectionClass}>
-                    <span className="flex items-center gap-2">
-                        <RotateCw size={16} />
-                        Giros
-                    </span>
-                    {expandedSections.giros ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.giros && (
-                    <div className={contentClass}>
-                        <p className={`px-3 text-[10px] leading-tight ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                            Selecciona el objeto y después la recta que hace de eje. Se crea una copia girada.
-                        </p>
-                        <button
-                            className={getButtonClass('rotation-point-axis')}
-                            onClick={() => setActiveTool(activeTool === 'rotation-point-axis' ? 'none' : 'rotation-point-axis')}
-                        >
-                            🔄 Girar un punto
-                        </button>
-                        <button
-                            className={getButtonClass('rotation-any')}
-                            onClick={() => setActiveTool(activeTool === 'rotation-any' ? 'none' : 'rotation-any')}
-                        >
-                            🔄 Girar recta, plano, segmento o sólido
-                        </button>
-                        <button
-                            className={getButtonClass('rotation-parallel-lt')}
-                            onClick={() => setActiveTool(activeTool === 'rotation-parallel-lt' ? 'none' : 'rotation-parallel-lt')}
-                        >
-                            ↔️ Poner una recta paralela a la LT
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            {/* CAMBIOS DE PLANO */}
-            <div>
-                <button onClick={() => toggleSection('cambiosPlano')} className={sectionClass}>
-                    <span className="flex items-center gap-2">
-                        <Maximize2 size={16} />
-                        Cambios de plano
-                    </span>
-                    {expandedSections.cambiosPlano ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.cambiosPlano && (
-                    <div className={contentClass}>
-                        <p className={`px-3 text-[10px] leading-tight ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                            Elige dos puntos: definen la nueva línea de tierra.
-                        </p>
-                        <button
-                            className={getButtonClass('cambio-plano-h')}
-                            onClick={() => setActiveTool(activeTool === 'cambio-plano-h' ? 'none' : 'cambio-plano-h')}
-                        >
-                            🔼 Cambio de plano horizontal
-                        </button>
-                        <button
-                            className={getButtonClass('cambio-plano-v')}
-                            onClick={() => setActiveTool(activeTool === 'cambio-plano-v' ? 'none' : 'cambio-plano-v')}
-                        >
-                            🔽 Cambio de plano vertical
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            {/* PLANOS */}
-            <div>
-                <button onClick={() => toggleSection('planos')} className={sectionClass}>
-                    <span className="flex items-center gap-2">
-                        <Layers size={16} />
-                        Planos
-                    </span>
-                    {expandedSections.planos ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.planos && (
-                    <div className={contentClass}>
-                        <button
-                            className={getButtonClass('plane-click')}
-                            onClick={() => {
-                                const next = activeTool === 'plane-click' ? 'none' : 'plane-click';
-                                setActiveTool(next);
-                                // El plano se dibuja sobre el papel: hay que estar en diédrico
-                                if (next === 'plane-click' && viewMode !== '2d') setViewMode('2d');
-                            }}
-                        >
-                            <span className="inline-flex items-center gap-2"><Triangle size={12} /> Dibujar plano con 3 clics</span>
-                        </button>
-                        <button
-                            className={getButtonClass('plane-3-points')}
-                            onClick={() => setActiveTool(activeTool === 'plane-3-points' ? 'none' : 'plane-3-points')}
-                        >
-                            <span className="inline-flex items-center gap-2"><Triangle size={12} /> Plano por 3 puntos existentes</span>
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            {/* SÓLIDOS */}
-            <div>
-                <button
-                    onClick={() => toggleSection('solidos')}
-                    className={sectionClass}
-                >
-                    <span className="flex items-center gap-2">
-                        <Box size={16} />
-                        Sólidos
-                    </span>
-                    {expandedSections.solidos ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-
-                {expandedSections.solidos && (
-                    <div className={contentClass}>
-
-                        {/* Poliedros */}
-                        <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase`}>
-                            Poliedros
-                        </div>
-                        <button
-                            className={getButtonClass('poliedro-tetraedro')}
-                            onClick={() => setActiveTool(activeTool === 'poliedro-tetraedro' ? 'none' : 'poliedro-tetraedro')}
-                        >
-                            🔺 Tetraedro
-                        </button>
-                        <button
-                            className={getButtonClass('poliedro-cubo')}
-                            onClick={() => setActiveTool(activeTool === 'poliedro-cubo' ? 'none' : 'poliedro-cubo')}
-                        >
-                            🟦 Cubo/Hexaedro
-                        </button>
-                        <button
-                            className={getButtonClass('poliedro-octaedro')}
-                            onClick={() => setActiveTool(activeTool === 'poliedro-octaedro' ? 'none' : 'poliedro-octaedro')}
-                        >
-                            🔶 Octaedro
-                        </button>
-                        <button
-                            className={getButtonClass('poliedro-dodecaedro')}
-                            onClick={() => setActiveTool(activeTool === 'poliedro-dodecaedro' ? 'none' : 'poliedro-dodecaedro')}
-                        >
-                            ⬟ Dodecaedro
-                        </button>
-                        <button
-                            className={getButtonClass('poliedro-icosaedro')}
-                            onClick={() => setActiveTool(activeTool === 'poliedro-icosaedro' ? 'none' : 'poliedro-icosaedro')}
-                        >
-                            🔷 Icosaedro
-                        </button>
-                        <button
-                            className={getButtonClass('poliedro-libre')}
-                            onClick={() => setActiveTool(activeTool === 'poliedro-libre' ? 'none' : 'poliedro-libre')}
-                            title="Tetraedro irregular, prisma oblicuo, tronco… escribes sus vértices y se calculan las caras"
-                        >
-                            🧩 Poliedro libre (vértices)
-                        </button>
-
-                        {/* Prismáticos */}
-                        <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>
-                            Prismáticos
-                        </div>
-                        <button
-                            className={getButtonClass('solid-prisma')}
-                            onClick={() => setActiveTool(activeTool === 'solid-prisma' ? 'none' : 'solid-prisma')}
-                        >
-                            ▭ Prisma
-                        </button>
-                        <button
-                            className={getButtonClass('solid-piramide')}
-                            onClick={() => setActiveTool(activeTool === 'solid-piramide' ? 'none' : 'solid-piramide')}
-                        >
-                            🔺 Pirámide
-                        </button>
-
-                        {/* Revolución */}
-                        <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>
-                            Revolución
-                        </div>
-                        <button
-                            className={getButtonClass('revolucion-cilindro')}
-                            onClick={() => setActiveTool(activeTool === 'revolucion-cilindro' ? 'none' : 'revolucion-cilindro')}
-                        >
-                            🥫 Cilindro
-                        </button>
-                        <button
-                            className={getButtonClass('revolucion-cono')}
-                            onClick={() => setActiveTool(activeTool === 'revolucion-cono' ? 'none' : 'revolucion-cono')}
-                        >
-                            🍦 Cono
-                        </button>
-                        <button
-                            className={getButtonClass('revolucion-esfera')}
-                            onClick={() => setActiveTool(activeTool === 'revolucion-esfera' ? 'none' : 'revolucion-esfera')}
-                        >
-                            ⚫ Esfera
-                        </button>
-
-                        {/* Operaciones */}
-                        <div className={`px-3 py-1 text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'} uppercase mt-2`}>
-                            Operaciones
-                        </div>
-                        <button
-                            className={getButtonClass('solid-section')}
-                            onClick={() => {
-                                const next = activeTool === 'solid-section' ? 'none' : 'solid-section';
-                                setActiveTool(next);
-                                if (next === 'solid-section' && viewMode !== '2d') setViewMode('3d');
-                            }}
-                        >
-                            ✂️ Sección plana (sólido + plano)
-                        </button>
-                        <button
-                            className={getButtonClass('solid-intersection')}
-                            onClick={() => {
-                                const next = activeTool === 'solid-intersection' ? 'none' : 'solid-intersection';
-                                setActiveTool(next);
-                                if (next === 'solid-intersection' && viewMode !== '3d') setViewMode('3d');
-                            }}
-                        >
-                            🔗 Intersección de dos sólidos
-                        </button>
-                        <button
-                            className={getButtonClass('line-solid')}
-                            onClick={() => {
-                                const next = activeTool === 'line-solid' ? 'none' : 'line-solid';
-                                setActiveTool(next);
-                                if (next === 'line-solid' && viewMode !== '3d') setViewMode('3d');
-                            }}
-                        >
-                            📍 Recta y sólido (penetración)
-                        </button>
-                        <button
-                            className={getButtonClass('sphere-tangent')}
-                            onClick={() => {
-                                const next = activeTool === 'sphere-tangent' ? 'none' : 'sphere-tangent';
-                                setActiveTool(next);
-                                if (next === 'sphere-tangent' && viewMode !== '3d') setViewMode('3d');
-                            }}
-                        >
-                            ⭕ Plano tangente (esfera, cono, cilindro)
-                        </button>
-                        <button
-                            className={getButtonClass('shadows')}
-                            onClick={() => {
-                                const next = activeTool === 'shadows' ? 'none' : 'shadows';
-                                setActiveTool(next);
-                                if (next === 'shadows' && viewMode !== '3d') setViewMode('3d');
-                            }}
-                        >
-                            ☀️ Sombras sobre los planos
-                        </button>
-                        <button
-                            className={getButtonClass('cast-shadow')}
-                            onClick={() => {
-                                const next = activeTool === 'cast-shadow' ? 'none' : 'cast-shadow';
-                                setActiveTool(next);
-                                if (next === 'cast-shadow' && viewMode !== '3d') setViewMode('3d');
-                            }}
-                        >
-                            🌗 Sombra arrojada (plano o cuerpo)
-                        </button>
-                        <button
-                            className={getButtonClass('solid-development')}
-                            onClick={() => setActiveTool(activeTool === 'solid-development' ? 'none' : 'solid-development')}
-                        >
-                            📄 Desarrollo del sólido
-                        </button>
-
-                    </div>
-                )}
-            </div>
-
-
-        </div >
+                );
+            })}
+        </div>
     );
 }
