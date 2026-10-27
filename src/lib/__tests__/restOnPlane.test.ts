@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { restSolidOnPlane } from '../solidPlacement';
+import { restSolidOnPlane, restSolidOnLine } from '../solidPlacement';
 import { buildSolidMesh, rotateStorePoint } from '../solidGeometry';
 import type { PlaneElement, SolidElement } from '../../types';
 
@@ -112,5 +112,41 @@ describe('apoyo general: cualquier sólido, cualquier plano', () => {
         const res = restSolidOnPlane(s, p, 'face')!;
         const d = enPlano(s, res, p);
         expect(d.filter((x) => Math.abs(x) < 1e-6)).toHaveLength(4);
+    });
+});
+
+describe('apoyar una arista en una recta', () => {
+    it('recta horizontal: la cara queda horizontal y dos vértices en la recta', () => {
+        const s = cube();
+        const line = { point: { x: 0, y: 0, z: 4 }, direction: { x: 1, y: 0, z: 0 } };
+        const res = restSolidOnLine(s, line)!;
+        expect(res).not.toBeNull();
+        const pts = mundo(s, res);
+        // Dos vértices sobre la recta (y = 0, z = 4).
+        const enRecta = pts.filter((q) => Math.abs(q.y) < 1e-6 && Math.abs(q.z - 4) < 1e-6);
+        expect(enRecta).toHaveLength(2);
+        // La cara inferior es horizontal: cuatro vértices a cota 4.
+        expect(pts.filter((q) => Math.abs(q.z - 4) < 1e-6)).toHaveLength(4);
+    });
+
+    it('recta oblicua: dos vértices sobre ella', () => {
+        const s = cube();
+        const line = { point: { x: 0, y: 0, z: 3 }, direction: { x: 1, y: 1, z: 0 } };
+        const res = restSolidOnLine(s, line)!;
+        const d = { x: 1 / Math.SQRT2, y: 1 / Math.SQRT2, z: 0 };
+        const p0 = { x: 0, y: 0, z: 3 };
+        const distToLine = (q: { x: number; y: number; z: number }) => {
+            const v = { x: q.x - p0.x, y: q.y - p0.y, z: q.z - p0.z };
+            const t = v.x * d.x + v.y * d.y + v.z * d.z;
+            const proj = { x: p0.x + t * d.x, y: p0.y + t * d.y, z: p0.z + t * d.z };
+            return Math.hypot(q.x - proj.x, q.y - proj.y, q.z - proj.z);
+        };
+        const pts = mundo(s, res);
+        expect(pts.filter((q) => distToLine(q) < 1e-6)).toHaveLength(2);
+    });
+
+    it('rechaza rectas verticales', () => {
+        const s = cube();
+        expect(restSolidOnLine(s, { point: { x: 1, y: 1, z: 0 }, direction: { x: 0, y: 0, z: 1 } })).toBeNull();
     });
 });

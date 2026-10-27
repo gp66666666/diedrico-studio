@@ -276,6 +276,13 @@ export default function GuidePage() {
                                 horizontal y pides arista, te avisa de que no tiene α₁.
                             </p>
 
+                            <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
+                                <b className="text-emerald-300">Apoyar una arista en una recta</b>: elige la recta y pulsa el botón.
+                                Una arista del sólido queda sobre la recta y la cara se coloca en el plano que contiene a la recta y es
+                                lo más horizontal posible. Si la recta es horizontal, el sólido descansa con la base horizontal a la
+                                cota de la recta. Una recta vertical no determina el apoyo y la app te avisa.
+                            </p>
+
                             <div className="my-6 grid gap-4 sm:grid-cols-2">
                                 <figure>
                                     <img src={IMG('13-solidos-2d.jpg')} alt="Proyecciones diédricas de los sólidos sin girar" loading="lazy"

@@ -332,3 +332,88 @@ export function restSolidOnPlane(
         rotation: rotationFromMatrix(R),
     };
 }
+
+
+/**
+ * Apoya una arista del sólido sobre una recta.
+ *
+ * El plano de apoyo es el que contiene a la recta y es lo más horizontal
+ * posible: si la recta es horizontal, la cara inferior queda horizontal (el
+ * sólido «descansa» sobre la recta); si es oblicua, la cara queda en el plano
+ * más próximo al horizontal que contiene a la recta.
+ *
+ * Devuelve null si la recta es vertical (cualquier plano vertical la contiene y
+ * el apoyo no estaría determinado).
+ */
+export function restSolidOnLine(
+    solid: SolidElement,
+    line: { point: Vec3; direction: Vec3 }
+): RestResult | null {
+    const dir = vunit(line.direction);
+    if (vnorm(dir) < 1e-9) return null;
+
+    const zAxis: Vec3 = { x: 0, y: 0, z: 1 };
+    const nRaw = vsub(zAxis, vmul(dir, vdot(zAxis, dir)));
+    if (vnorm(nRaw) < 1e-6) return null; // recta vertical
+    const n = vunit(nRaw);
+
+    const mesh = buildSolidMesh(solid.subtype, solid.size, solid.custom);
+    if (!mesh.vertices.length) return null;
+
+    const R0 = matrixOf(solid.rotation);
+    const basePosition = solid.position;
+    const worldOf = (m: Mat3) => mesh.vertices.map((v) => vadd(basePosition, matVec(m, v)));
+
+    const faces = orientedFaces(mesh);
+    if (!faces.length) return null;
+
+    let support = faces[0];
+    let best = -Infinity;
+    for (const face of faces) {
+        const score = -vdot(matVec(R0, face.normal), n);
+        if (score > best) {
+            best = score;
+            support = face;
+        }
+    }
+
+    // 1) Cara paralela al plano de apoyo.
+    let R = matMul(rotationBetween(matVec(R0, support.normal), vmul(n, -1)), R0);
+
+    // 2) Giro alrededor de n para que una arista quede paralela a la recta.
+    const verts0 = worldOf(R);
+    const [ia0, ib0] = [support.indices[0], support.indices[1]];
+    const e0 = vunit(vsub(verts0[ib0], verts0[ia0]));
+    const angle = Math.atan2(vdot(vcross(e0, dir), n), vdot(e0, dir));
+    R = matMul(rotationAxis(n, angle), R);
+
+    // 3) De las aristas ya paralelas, la más cercana a la recta.
+    const verts = worldOf(R);
+    let bestEdge: [number, number] | null = null;
+    let bestDist = Infinity;
+    for (let i = 0; i < support.indices.length; i++) {
+        const a = support.indices[i];
+        const b = support.indices[(i + 1) % support.indices.length];
+        if (Math.abs(vdot(vunit(vsub(verts[b], verts[a])), dir)) < 0.999) continue;
+        const mid = vmul(vadd(verts[a], verts[b]), 0.5);
+        const t = vdot(vsub(mid, line.point), dir);
+        const q = vadd(line.point, vmul(dir, t));
+        const dist = vnorm(vsub(mid, q));
+        if (dist < bestDist) {
+            bestDist = dist;
+            bestEdge = [a, b];
+        }
+    }
+    if (!bestEdge) return null;
+
+    // 4) Trasladar para que el punto medio de la arista caiga en la recta.
+    const [ia, ib] = bestEdge;
+    const mid = vmul(vadd(verts[ia], verts[ib]), 0.5);
+    const t = vdot(vsub(mid, line.point), dir);
+    const target = vadd(line.point, vmul(dir, t));
+
+    return {
+        position: vadd(basePosition, vsub(target, mid)),
+        rotation: rotationFromMatrix(R),
+    };
+}

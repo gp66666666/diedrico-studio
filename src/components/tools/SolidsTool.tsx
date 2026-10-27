@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
 import { Box, Maximize2, X, ArrowDownToLine, ArrowLeftToLine, Move3d, Hand, ChevronDown, ChevronUp, Crosshair, Ruler, Shapes } from 'lucide-react';
-import type { SolidElement, PointElement, PlaneElement } from '../../types';
+import type { SolidElement, PointElement, PlaneElement, LineElement } from '../../types';
 import { makeSolid, isSolidCreationTool, makePolyhedron } from '../../lib/solidFactory';
 import { parseVertexInput } from '../../lib/parseVertices';
 import { countEdges, polyhedronFromPoints } from '../../lib/freePolyhedron';
 import { meshVolume, solidMesh } from '../../lib/solidGeometry';
 import { solidFromEdge } from '../../lib/solidFromEdge';
 import { toast } from '../../lib/toast';
-import { lowestLocalZ, lowestLocalY, restOnHorizontalPlane, restOnVerticalPlane, restSolidOnPlane, type RestMode } from '../../lib/solidPlacement';
+import { lowestLocalZ, lowestLocalY, restOnHorizontalPlane, restOnVerticalPlane, restSolidOnPlane, restSolidOnLine, type RestMode } from '../../lib/solidPlacement';
 
 type Pane = {
     px: string; py: string; pz: string;
@@ -213,6 +213,7 @@ export default function SolidsTool() {
     const [pane, setPane] = useState<Pane | null>(null);
     const [restPlaneId, setRestPlaneId] = useState('');
     const [restMode, setRestMode] = useState<RestMode>('face');
+    const [restLineId, setRestLineId] = useState('');
 
     /**
      * Cómo se coloca el sólido al crearlo:
@@ -669,6 +670,46 @@ export default function SolidsTool() {
                                     className="w-full rounded-lg bg-emerald-500/90 px-2 py-1.5 text-xs font-semibold hover:bg-emerald-400"
                                 >
                                     Apoyar
+                                </button>
+                            </div>
+
+                            <div className="space-y-2 rounded-xl bg-white/5 p-2">
+                                <span className="label-text block">Apoyar una arista en una recta</span>
+                                <select
+                                    value={restLineId}
+                                    onChange={(e) => setRestLineId(e.target.value)}
+                                    className="w-full rounded-lg border border-white/15 bg-white/5 px-2 py-1.5 text-xs"
+                                    title="Recta sobre la que se apoya una arista del sólido"
+                                >
+                                    <option value="">Elegir recta…</option>
+                                    {elements
+                                        .filter((el): el is LineElement => el.type === 'line')
+                                        .map((ln) => (
+                                            <option key={ln.id} value={ln.id}>{ln.name}</option>
+                                        ))}
+                                </select>
+                                <button
+                                    onClick={() => {
+                                        if (!solid) return;
+                                        const line = elements.find(
+                                            (el): el is LineElement => el.type === 'line' && el.id === restLineId
+                                        );
+                                        if (!line) {
+                                            toast('Elige una recta de la lista.');
+                                            return;
+                                        }
+                                        const res = restSolidOnLine(solid, { point: line.point, direction: line.direction });
+                                        if (!res) {
+                                            toast('No se ha podido apoyar: una recta vertical no determina el plano de apoyo.');
+                                            return;
+                                        }
+                                        updateElement(solid.id, { position: res.position, rotation: res.rotation });
+                                        setPane(toPane({ ...solid, position: res.position, rotation: res.rotation }));
+                                        toast('Arista apoyada sobre la recta.');
+                                    }}
+                                    className="w-full rounded-lg bg-emerald-500/90 px-2 py-1.5 text-xs font-semibold hover:bg-emerald-400"
+                                >
+                                    Apoyar en la recta
                                 </button>
                             </div>
                         </section>
