@@ -3,6 +3,11 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/",
+      "destination": "https://diedricostudio.com/",
+      "statusCode": 301
+    },
+    {
       "source": "/:path*",
       "destination": "https://diedricostudio.com/:path*",
       "statusCode": 301
