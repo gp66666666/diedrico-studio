@@ -7,7 +7,7 @@
  * `src/data/exercises.ts`.
  */
 
-export const SITE_URL = 'https://diedrico-studio.vercel.app';
+export const SITE_URL = 'https://diedrico-studio.pages.dev';
 export const SITE_NAME = 'Diédrico Studio';
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 export const CONTACT_EMAIL = 'diedrico.studio25@gmail.com';

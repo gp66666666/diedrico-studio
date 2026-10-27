@@ -562,6 +562,11 @@ async function main() {
         const dir = path.join(DIST, page.route.slice(1));
         await mkdir(dir, { recursive: true });
         await writeFile(path.join(dir, 'index.html'), html, 'utf8');
+
+        // Cloudflare Pages normaliza /ruta a /ruta/ si solo existe la carpeta y
+        // responde 308. Se escribe también /ruta.html para que la URL sin barra
+        // (la del sitemap y los canonicals) responda 200 directamente.
+        await writeFile(path.join(DIST, `${page.route.slice(1)}.html`), html, 'utf8');
     }
     await writeFile(path.join(DIST, 'index.html'), home, 'utf8');
 
