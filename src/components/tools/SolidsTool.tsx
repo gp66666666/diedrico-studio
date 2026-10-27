@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useGeometryStore } from '../../store/geometryStore';
 import { Box, Maximize2, X, ArrowDownToLine, ArrowLeftToLine, Move3d, Hand, ChevronDown, ChevronUp, Crosshair, Ruler, Shapes } from 'lucide-react';
-import type { SolidElement, PointElement } from '../../types';
+import type { SolidElement, PointElement, PlaneElement } from '../../types';
 import { makeSolid, isSolidCreationTool, makePolyhedron } from '../../lib/solidFactory';
 import { parseVertexInput } from '../../lib/parseVertices';
 import { countEdges, polyhedronFromPoints } from '../../lib/freePolyhedron';
 import { meshVolume, solidMesh } from '../../lib/solidGeometry';
 import { solidFromEdge } from '../../lib/solidFromEdge';
 import { toast } from '../../lib/toast';
-import { lowestLocalZ, lowestLocalY, restOnHorizontalPlane, restOnVerticalPlane } from '../../lib/solidPlacement';
+import { lowestLocalZ, lowestLocalY, restOnHorizontalPlane, restOnVerticalPlane, restSolidOnPlane, type RestMode } from '../../lib/solidPlacement';
 
 type Pane = {
     px: string; py: string; pz: string;
@@ -211,6 +211,8 @@ export default function SolidsTool() {
     // Valores del formulario como texto: así se puede escribir «1,5» sin que el
     // campo se coma el decimal a medio escribir.
     const [pane, setPane] = useState<Pane | null>(null);
+    const [restPlaneId, setRestPlaneId] = useState('');
+    const [restMode, setRestMode] = useState<RestMode>('face');
 
     /**
      * Cómo se coloca el sólido al crearlo:
@@ -609,6 +611,64 @@ export default function SolidsTool() {
                                 >
                                     <Move3d size={14} />
                                     {activeTool === 'solid-move' ? 'Haz clic…' : 'Mover con el ratón'}
+                                </button>
+                            </div>
+
+                            <div className="space-y-2 rounded-xl bg-white/5 p-2">
+                                <span className="label-text block">Apoyar en un plano</span>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <select
+                                        value={restPlaneId}
+                                        onChange={(e) => setRestPlaneId(e.target.value)}
+                                        className="w-full rounded-lg border border-white/15 bg-white/5 px-2 py-1.5 text-xs"
+                                        title="Plano sobre el que se apoya el sólido"
+                                    >
+                                        <option value="">Elegir plano…</option>
+                                        {elements
+                                            .filter((el): el is PlaneElement => el.type === 'plane')
+                                            .map((pl) => (
+                                                <option key={pl.id} value={pl.id}>{pl.name}</option>
+                                            ))}
+                                    </select>
+                                    <select
+                                        value={restMode}
+                                        onChange={(e) => setRestMode(e.target.value as RestMode)}
+                                        className="w-full rounded-lg border border-white/15 bg-white/5 px-2 py-1.5 text-xs"
+                                        title="Cara: la cara mira al plano. Arista: además, una arista se apoya en la traza α₁. Vértice: solo toca el plano."
+                                    >
+                                        <option value="face">Por cara</option>
+                                        <option value="edge">Por arista (en α₁)</option>
+                                        <option value="vertex">Por vértice</option>
+                                    </select>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        if (!solid) return;
+                                        const plane = elements.find(
+                                            (el): el is PlaneElement => el.type === 'plane' && el.id === restPlaneId
+                                        );
+                                        if (!plane) {
+                                            toast('Elige un plano de la lista.');
+                                            return;
+                                        }
+                                        const res = restSolidOnPlane(solid, plane, restMode);
+                                        if (!res) {
+                                            toast(restMode === 'edge'
+                                                ? 'Ese plano es horizontal: no tiene traza α₁. Prueba «Por cara» o «Por vértice».'
+                                                : 'No se ha podido apoyar el sólido en ese plano.');
+                                            return;
+                                        }
+                                        updateElement(solid.id, { position: res.position, rotation: res.rotation });
+                                        setPane(toPane({ ...solid, position: res.position, rotation: res.rotation }));
+                                        toast(restMode === 'edge'
+                                            ? 'Apoyado: la cara en el plano y una arista sobre α₁.'
+                                            : restMode === 'face'
+                                                ? 'Apoyado por la cara en el plano.'
+                                                : 'Apoyado por el vértice en el plano.');
+                                    }}
+                                    className="w-full rounded-lg bg-emerald-500/90 px-2 py-1.5 text-xs font-semibold hover:bg-emerald-400"
+                                >
+                                    Apoyar
                                 </button>
                             </div>
                         </section>

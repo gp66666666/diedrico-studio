@@ -266,6 +266,16 @@ export default function GuidePage() {
                                 detrás del plano). Al girar un sólido inclinado, vuelve a pulsarlo: ahora apoya en otra cara o arista.
                             </p>
 
+                            <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">
+                                <b className="text-emerald-300">Apoyar en un plano</b>: elige el plano en la lista y el modo.
+                                <b className="text-white"> Por cara</b> deja contenida en el plano la cara que mira hacia abajo.
+                                <b className="text-white"> Por arista (en α₁)</b> hace lo mismo y además coloca una arista de esa cara sobre
+                                la traza horizontal: es el caso del cubo apoyado en un plano oblicuo con dos vértices en el papel.
+                                <b className="text-white"> Por vértice</b> solo baja el sólido hasta que el vértice más bajo toque el plano,
+                                sin girarlo. Vale para cualquier sólido y para planos horizontales, verticales u oblicuos; si el plano es
+                                horizontal y pides arista, te avisa de que no tiene α₁.
+                            </p>
+
                             <div className="my-6 grid gap-4 sm:grid-cols-2">
                                 <figure>
                                     <img src={IMG('13-solidos-2d.jpg')} alt="Proyecciones diédricas de los sólidos sin girar" loading="lazy"
