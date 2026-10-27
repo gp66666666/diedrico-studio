@@ -290,6 +290,13 @@ que ven los rastreadores que no ejecutan JavaScript (los de IA, por ejemplo).
   obliga a que haya exactamente una por cada `topic` de los ejercicios: si añades un tema nuevo,
   añade su página o el test falla.
 - `dist/sitemap.xml` se genera desde la misma lista (ya no hay `public/sitemap.xml`).
+- **La Academia tiene una URL por tema** (`/academia/<slug>`, 20 páginas). El HTML estático
+  sale de `src/data/academyPages.json`, que se regenera con
+  `python3 scripts/academy-pages.py` (con `dist` servido en `localhost:4190`) cuando cambie
+  la teoría. El mapa id→slug vive en `src/data/academySlugs.ts` y no se toca a la ligera:
+  cambiar un slug rompe enlaces ya indexados.
+- `scripts/indexnow.mjs` avisa a Bing (IndexNow) de las 50 URLs después de cada despliegue;
+  el workflow lo ejecuta. La clave está en `public/<clave>.txt`.
 - **Tarjetas Open Graph**: una por ejercicio y por página principal en `public/og/`
   (1200×630 PNG), asignadas en `ogImageForPath()` (`src/data/site.ts`). Se regeneran con
   `python3 scripts/og-images.py` (Playwright) cuando cambie un título; los PNG se commitean y
@@ -308,7 +315,7 @@ que ven los rastreadores que no ejecutan JavaScript (los de IA, por ejemplo).
 Comprobar tras desplegar:
 
 ```bash
-curl -s https://diedricostudio.com/ejercicios/trazas-de-una-recta | grep '<title>'
+curl -s https://diedricostudio.com/academia/abatimientos | grep '<title>'
 curl -s -o /dev/null -w '%{http_code}\n' https://diedricostudio.com/ejercicios/no-existe   # 404
 ```
 
