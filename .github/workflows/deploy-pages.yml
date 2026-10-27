@@ -23,6 +23,11 @@ jobs:
       - name: Instalar
         run: npm ci
 
+      - name: Variables de entorno
+        run: printf '%s\n' "$ENV_FILE" > .env
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+
       - name: Tests
         run: npm test
 
