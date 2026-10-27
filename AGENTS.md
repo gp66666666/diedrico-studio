@@ -7,7 +7,8 @@ están en `.env` y en `~/.config/opencode/env`; ver `ACCESOS_Y_DEPLOY.md`, que n
 
 App web educativa de geometría 3D y sistema diédrico: visor 3D (Three.js / react-three-fiber),
 vista 2D diédrica, herramientas de medida/exportación (jsPDF, JSZip), asistente IA (DeepSeek),
-auth y guardado en la nube (Supabase). Producción: https://diedrico-studio.vercel.app
+auth y guardado en la nube (Supabase). Producción: **https://diedricostudio.com** (Cloudflare Pages).
+El antiguo `diedrico-studio.vercel.app` redirige con 301 al dominio nuevo.
 
 ## Stack y comandos
 
@@ -20,8 +21,12 @@ npm test         # vitest: geometría de sólidos, rotaciones y selección por h
 ```
 
 - Vite 5 · React 18 · TypeScript 5.5 · Tailwind 3 · Zustand · three 0.163
-- Deploy: **push a `main` → Vercel automático** (proyecto `diedrico-studio`).
-- Node 24.x en Vercel.
+- Deploy: **Cloudflare Pages**, proyecto `diedrico-studio` (rama `main`).
+  - MCP de OpenCode: `cloudflare-pages` (herramientas `cf_deploy`, `cf_add_domain`...).
+    Credenciales en `~/.config/opencode/mcp/cloudflare-pages/credentials.env` (600).
+  - También se puede desplegar con `npx wrangler pages deploy dist --project-name diedrico-studio`.
+  - Vercel sigue vivo solo para el **301** al dominio nuevo (`vercel.json`).
+- Node 20+ en Pages.
 
 ## Variables de entorno (solo nombres)
 
@@ -152,8 +157,8 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   falsa y variante desconocida).
 - Decisión tomada por el dueño: no darse de alta como autónomo por un proyecto que aún
   no factura; cuando haya tracción se retomará el pago (mejor Lemon Squeezy/Paddle,
-  que actúan como vendedor y se encargan del IVA) y, si el volumen lo exige, Vercel Pro
-  (el plan Hobby no permite uso comercial).
+  que actúan como vendedor y se encargan del IVA). El hosting ya no es un problema: Cloudflare
+  Pages permite uso comercial en el plan gratuito.
 
 ## Crear sólidos (2026)
 
@@ -291,6 +296,11 @@ que ven los rastreadores que no ejecutan JavaScript (los de IA, por ejemplo).
   el build no los toca. Un test comprueba que no falte ninguna.
 - `vercel.json` usa `rewrites` explícitos: cada ruta conocida sirve su HTML y lo desconocido da
   **404 de verdad** (`dist/404.html`, con `noindex`), no un 200 con la app dentro.
+- **Cloudflare Pages**: si solo existe `<ruta>/index.html`, Pages redirige `/ruta` a `/ruta/` con
+  un 308. Para conservar las URLs sin barra del sitemap, `scripts/seo.mjs` escribe además
+  `<ruta>.html`. No quitar esa línea.
+- El dominio (`diedricostudio.com`) está en Cloudflare; el apex y `www` son CNAME al proyecto
+  Pages. El canonical siempre es el apex.
 - `/clase` y el 404 llevan `noindex`. El resto, `index, follow`.
 - El service worker no precachea los HTML por ruta (`globIgnores` en `vite.config.ts`): son para
   los rastreadores y para la primera visita; el usuario que vuelve navega con el shell cacheado.
@@ -298,8 +308,8 @@ que ven los rastreadores que no ejecutan JavaScript (los de IA, por ejemplo).
 Comprobar tras desplegar:
 
 ```bash
-curl -s https://diedrico-studio.vercel.app/ejercicios/trazas-de-una-recta | grep '<title>'
-curl -s -o /dev/null -w '%{http_code}\n' https://diedrico-studio.vercel.app/ejercicios/no-existe   # 404
+curl -s https://diedricostudio.com/ejercicios/trazas-de-una-recta | grep '<title>'
+curl -s -o /dev/null -w '%{http_code}\n' https://diedricostudio.com/ejercicios/no-existe   # 404
 ```
 
 ## Hechos conocidos
