@@ -15,7 +15,7 @@
 import { apiBase, cors, json, readCatalog } from '../_shared/paddle.ts';
 
 /** Origen al que vuelve el alumno después de pagar (y al cancelar). */
-const APP_URL = Deno.env.get('APP_URL') ?? 'https://diedrico-studio.vercel.app';
+const APP_URL = Deno.env.get('APP_URL') ?? 'https://diedricostudio.com';
 
 Deno.serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
