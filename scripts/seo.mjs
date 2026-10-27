@@ -570,6 +570,14 @@ async function main() {
     }
     await writeFile(path.join(DIST, 'index.html'), home, 'utf8');
 
+    // Cloudflare Pages sirve /ruta/ y /ruta con el mismo HTML. Se deja una sola
+    // URL canónica (sin barra) y se redirige la otra con 301.
+    const redirects = PAGES
+        .filter((p) => p.route !== '/' && p.route !== '/404')
+        .map((p) => `${p.route}/ ${p.route} 301`)
+        .join('\n');
+    await writeFile(path.join(DIST, '_redirects'), redirects + '\n', 'utf8');
+
     // 404 propio: Vercel lo sirve con estado 404 (no un 200 con la app dentro).
     const notFound = await renderPage(
         template,

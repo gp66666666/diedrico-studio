@@ -105,7 +105,7 @@ export const PAGE_META: Record<string, PageMeta> = {
     },
     contact: {
         path: '/contact',
-        title: 'Contacto · Diédrico Studio',
+        title: 'Contacto y soporte técnico · Diédrico Studio',
         description:
             'Escríbenos para dudas, sugerencias o problemas con la herramienta. Respondemos al correo que dejes en el formulario de contacto.',
         keywords: 'contacto Diédrico Studio, soporte, sugerencias, dudas dibujo técnico',
@@ -161,7 +161,13 @@ export function exercisePageTitle(title: string): string {
 /** Descripción de un ejercicio, recortada por palabras para no cortar a mitad. */
 export function exerciseDescription(statement: string, max = 155): string {
     const clean = statement.replace(/\s+/g, ' ').trim();
-    if (clean.length <= max) return clean;
+    if (clean.length <= max) {
+        // Un enunciado muy corto deja una description pobre: se completa con
+        // el contexto del ejercicio, sin pasar del límite.
+        if (clean.length >= 90) return clean;
+        const suffix = ' Ejercicio resuelto paso a paso de sistema diédrico para PAU y EBAU.';
+        return `${clean}${suffix}`.slice(0, max).replace(/[.,;:]?\s*$/, '');
+    }
     const cut = clean.slice(0, max);
     const lastSpace = cut.lastIndexOf(' ');
     return `${cut.slice(0, lastSpace > 90 ? lastSpace : max).replace(/[.,;:]$/, '')}…`;
