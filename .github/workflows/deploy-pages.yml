@@ -40,3 +40,6 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=diedrico-studio --branch=main
+
+      - name: Avisar a IndexNow
+        run: node scripts/indexnow.mjs

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ACADEMY_CONTENT } from '../academyContent';
+import { ACADEMY_SLUGS } from '../academySlugs';
+import academyPages from '../academyPages.json';
 
 /**
  * La Academia es material didáctico: ningún tema puede quedarse sin teoría ni
@@ -52,5 +54,24 @@ describe('academia', () => {
         const topic = ACADEMY_CONTENT.find((t) => t.id === 'theory-20-map')!;
         const txt = texto(topic);
         expect(txt).not.toContain('El bloque de diédrico está completo');
+    });
+});
+
+describe('academia · una URL por tema', () => {
+    it('cada tema tiene slug y no se repite', () => {
+        expect(Object.keys(ACADEMY_SLUGS)).toHaveLength(ACADEMY_CONTENT.length);
+        for (const topic of ACADEMY_CONTENT) {
+            expect(ACADEMY_SLUGS[topic.id], `sin slug: ${topic.id}`).toBeTruthy();
+        }
+        const slugs = Object.values(ACADEMY_SLUGS);
+        expect(new Set(slugs).size).toBe(slugs.length);
+    });
+
+    it('el HTML estático de cada tema no está vacío', () => {
+        expect(academyPages).toHaveLength(20);
+        for (const page of academyPages) {
+            expect(page.html.length, `vacío: ${page.slug}`).toBeGreaterThan(1000);
+            expect(page.title.length).toBeGreaterThan(3);
+        }
     });
 });

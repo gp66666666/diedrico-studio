@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { useGeometryStore } from '../store/geometryStore';
 import { ACADEMY_CONTENT } from '../data/academyContent';
+import { slugForTopic, topicForSlug } from '../data/academySlugs';
 import type { AcademyTopic, AcademyExercise } from '../types';
 import SEO from '../components/SEO';
 import { PAGE_META, pageSeo } from '../data/site';
@@ -17,8 +18,13 @@ export default function AcademyPage() {
 
     const { isPremium, markTopicComplete, profile } = user;
 
+    const { slug } = useParams<{ slug: string }>();
+    const initialTopic = slug
+        ? ACADEMY_CONTENT.find((t) => t.id === topicForSlug(slug))
+        : undefined;
+
     const [lightboxContent, setLightboxContent] = useState<string | null>(null);
-    const [selectedTopic, setSelectedTopic] = useState<AcademyTopic | null>(ACADEMY_CONTENT[0]);
+    const [selectedTopic, setSelectedTopic] = useState<AcademyTopic | null>(initialTopic ?? ACADEMY_CONTENT[0]);
     const [showScrollToTop, setShowScrollToTop] = useState(false);
 
     const contentRef = useRef<HTMLDivElement>(null);
@@ -73,6 +79,8 @@ export default function AcademyPage() {
 
     const handleTopicClick = (topic: AcademyTopic) => {
         setSelectedTopic(topic);
+        const nextSlug = slugForTopic(topic.id);
+        if (nextSlug) nav(`/academia/${nextSlug}`, { replace: true });
         setTimeout(() => {
             if (window.innerWidth < 768) {
                 contentRef.current?.scrollIntoView({

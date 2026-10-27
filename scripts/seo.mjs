@@ -19,12 +19,14 @@
  * Uso: node scripts/seo.mjs   (lo llama `npm run build`)
  */
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { EXERCISES, EXERCISE_TOPICS } from '../src/data/exercises.ts';
 import { CONTACT_EMAIL, PAGE_META, SITE_URL, SITE_NAME, exerciseDescription, exercisePageTitle, ogImageForPath } from '../src/data/site.ts';
 import { TOPIC_PAGES } from '../src/data/topics.ts';
 
 const DIST = path.resolve('dist');
+const ACADEMY_PAGES = JSON.parse(readFileSync(path.resolve('src/data/academyPages.json'), 'utf8'));
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const esc = (value) =>
@@ -171,6 +173,8 @@ ${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Academia', route: '/acade
 <h1>Academia de dibujo técnico</h1>
 <p>Teoría de sistema diédrico ordenada por temas, con ejercicios guiados paso a paso. Puedes leerla entera y, cuando quieras, abrir el ejercicio en el editor 3D para girarlo y comprobar la solución.</p>
 <p><a class="cta" href="/">Abrir Diédrico Studio</a><a class="ghost" href="/ejercicios">Ejercicios resueltos</a></p>
+<h2>Temas de la Academia</h2>
+<ul>${ACADEMY_PAGES.map((t) => `<li><a href="/academia/${t.slug}">${esc(t.title)}</a></li>`).join('')}</ul>
 </div>`;
 }
 
@@ -363,6 +367,26 @@ const PAGES = [
         chunk: 'AcademyPage',
         extra: '',
     },
+    ...ACADEMY_PAGES.map((t) => ({
+        route: `/academia/${t.slug}`,
+        meta: {
+            path: `/academia/${t.slug}`,
+            title: `${t.title} · Academia · Diédrico Studio`,
+            description: (() => {
+                const d = `${t.title}: ${t.description || 'teoría de sistema diédrico paso a paso'}`.replace(/\s+/g, ' ').trim();
+                return d.length <= 155 ? d : `${d.slice(0, 152).replace(/\s+\S*$/, '')}…`;
+            })(),
+            keywords: `${t.title}, academia, sistema diédrico, dibujo técnico, PAU, EBAU`,
+        },
+        content: () => `<div id="seo-fallback">
+${crumbsHtml([{ name: 'Inicio', route: '/' }, { name: 'Academia', route: '/academy' }, { name: t.title, route: `/academia/${t.slug}` }])}
+<h1>${esc(t.title)}</h1>
+${t.html}
+<p><a class="cta" href="/academy">Ver toda la Academia</a><a class="ghost" href="/ejercicios">Ejercicios resueltos</a></p>
+</div>`,
+        chunk: 'AcademyPage',
+        type: 'article',
+    })),
     {
         route: '/temario',
         meta: PAGE_META.temario,
@@ -615,6 +639,7 @@ async function main() {
         { route: '/terms', priority: '0.2', changefreq: 'yearly' },
         ...EXERCISES.map((e) => ({ route: `/ejercicios/${e.slug}`, priority: '0.7', changefreq: 'monthly' })),
         ...TOPIC_PAGES.map((t) => ({ route: `/temario/${t.slug}`, priority: '0.7', changefreq: 'monthly' })),
+        ...ACADEMY_PAGES.map((t) => ({ route: `/academia/${t.slug}`, priority: '0.6', changefreq: 'monthly' })),
     ];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
