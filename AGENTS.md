@@ -175,6 +175,20 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - Los **colores por proyección** (planta amarilla, alzado cian, solape verde) se encienden en
   *Controles de Vista* de la barra lateral; ya no hay botón flotante en la vista 2D.
 
+## PWA y versiones (2026-10-29)
+
+- El service worker real está en **`/sw2.js`** (`filename` en `vite.config.ts`) y se
+  registra desde `src/components/PwaUpdatePrompt.tsx`, que además avisa de versión
+  nueva. Las navegaciones van **NetworkFirst**: un despliegue se ve al recargar.
+- **`/sw.js` es un service worker "suicida"** (`public/sw.js`), solo migración: las
+  versiones antiguas precacheaban el index y dejaban a los usuarios atrapadas en el
+  build viejo, sin posibilidad de avisarles (el aviso no existía en su versión).
+  Al visitar, el navegador actualiza `/sw.js`, este borra cachés, se desregistra y
+  recarga las pestañas (una sola vez; marca en IndexedDB para no hacer bucle).
+  No borrar `public/sw.js`: sigue rescatando a quien tenga la versión antigua.
+- El pie de la app muestra `v<AAAA-MM-DD-HHMM>` (`__BUILD_ID__`): sirve para saber
+  si alguien está viendo una versión cacheada.
+
 ## Planos con clics y secciones (2026)
 - **Crear punto y recta con el ratón** (misma convención que el plano):
   - `point-click`: cada clic del papel crea un punto. Debajo de la LT → horizontal
