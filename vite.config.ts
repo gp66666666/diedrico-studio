@@ -3,6 +3,13 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  // Versión del build, visible en el pie de la app: sirve para comprobar de un
+  // vistazo si el navegador está sirviendo una versión cacheada.
+  define: {
+    __BUILD_ID__: JSON.stringify(
+      new Date().toISOString().slice(0, 16).replace('T', '-').replace(':', '')
+    ),
+  },
   plugins: [
     react(),
     // PWA: instalable y con el núcleo cacheado para clase (wifi malo).

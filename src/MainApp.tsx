@@ -458,7 +458,10 @@ export default function MainApp() {
 
                     {/* Watermark */}
                     <div className={`absolute bottom-2 right-4 text-[10px] md:text-xs font-medium pointer-events-none z-50 ${isDark ? 'text-white/60' : 'text-gray-700'}`}>
-                        Hecho por Eloi García
+                        Hecho por Eloi García{' '}
+                        <span className="opacity-70" title="Versión cargada en tu navegador">
+                            · v{__BUILD_ID__}
+                        </span>
                     </div>
                 </div>
 
