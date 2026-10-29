@@ -142,7 +142,7 @@ export default function Sidebar() {
     // Plane state
     const [planeName, setPlaneName] = useState('');
     const [planeType, setPlaneType] = useState<'generic' | 'horizontal' | 'frontal' | 'parallel_lt' | 'vertical' | 'canto' | 'through_lt' | 'profile'>('generic');
-    const [planeMode, setPlaneMode] = useState<'simple' | '3points' | 'normal' | 'equation' | 'intercepts' | '2lines'>('intercepts');
+    const [planeMode, setPlaneMode] = useState<'simple' | '3points' | 'clicks' | 'normal' | 'equation' | 'intercepts' | '2lines'>('intercepts');
 
     // String states for Plane inputs
     const [planeP1Str, setPlaneP1Str] = useState({ x: '0', y: '0', z: '0' });
@@ -282,7 +282,18 @@ export default function Sidebar() {
                     y: v1.z * v2.x - v1.x * v2.z,
                     z: v1.x * v2.y - v1.y * v2.x
                 };
+
+                if (Math.hypot(normal.x, normal.y, normal.z) < 1e-6) {
+                    toast('Los tres puntos están alineados: no definen un plano.');
+                    return;
+                }
+
                 constant = -(normal.x * p1.x + normal.y * p1.y + normal.z * p1.z);
+            } else if (planeMode === 'clicks') {
+                // Este modo no crea nada desde el formulario: se dibuja sobre el lienzo.
+                setActiveTool('plane-click');
+                toast('Dibuja el plano en el lienzo: 2 clics debajo de la LT y 1 encima.');
+                return;
             } else if (planeMode === 'normal') {
                 const p1 = parseCoords(planeP1Str);
                 normal = parseCoords(planeNormalStr);
@@ -1140,6 +1151,9 @@ export default function Sidebar() {
                                             <button onClick={() => setPlaneMode('intercepts')} className={`py-1.5 text-xs rounded border ${planeMode === 'intercepts' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Trazas</button>
                                             <button onClick={() => setPlaneMode('2lines')} className={`py-1.5 text-xs rounded border ${planeMode === '2lines' ? (isDark ? 'bg-blue-600 border-blue-500 text-white' : 'bg-blue-50 border-blue-300 text-blue-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>2 Rectas</button>
                                         </div>
+                                        <div className="grid grid-cols-3 gap-2 mt-2">
+                                            <button onClick={() => setPlaneMode('clicks')} className={`col-span-3 py-1.5 text-xs rounded border ${planeMode === 'clicks' ? (isDark ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-emerald-50 border-emerald-300 text-emerald-700') : `${isDark ? 'border-white/20 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}`}>Dibujar en el lienzo (3 clics)</button>
+                                        </div>
 
                                         <div className="mt-3">
                                             {planeMode === 'simple' && (
@@ -1149,32 +1163,93 @@ export default function Sidebar() {
                                                 </div>
                                             )}
 
-                                            {planeMode === '3points' && (
+                                            {planeMode === '3points' && (() => {
+                                                const scenePoints = elements.filter((el) => el.type === 'point') as PointElement[];
+                                                const setRows = [
+                                                    { key: 'p1', label: 'Punto 1', value: planeP1Str, set: setPlaneP1Str },
+                                                    { key: 'p2', label: 'Punto 2', value: planeP2Str, set: setPlaneP2Str },
+                                                    { key: 'p3', label: 'Punto 3', value: planeP3Str, set: setPlaneP3Str },
+                                                ] as const;
+                                                return (
+                                                    <div className="space-y-3">
+                                                        <p className={`text-[11px] leading-snug ${isDark ? 'text-slate-400' : 'text-gray-600'}`}>
+                                                            Escribe las coordenadas de los 3 puntos o elige puntos que ya estén en el dibujo.
+                                                            También puedes hacer clic en 3 puntos del lienzo y el plano se crea solo.
+                                                        </p>
+                                                        {setRows.map((row) => (
+                                                            <div key={row.key}>
+                                                                <div className="mb-1 flex items-center justify-between gap-2">
+                                                                    <label className={`block text-xs font-medium ${labelClass}`}>{row.label}</label>
+                                                                    <select
+                                                                        value=""
+                                                                        onChange={(e) => {
+                                                                            const pt = scenePoints.find((p) => p.id === e.target.value);
+                                                                            if (pt) {
+                                                                                row.set({
+                                                                                    x: String(pt.coords.x),
+                                                                                    y: String(pt.coords.y),
+                                                                                    z: String(pt.coords.z),
+                                                                                });
+                                                                            }
+                                                                        }}
+                                                                        className={`max-w-[60%] rounded border px-1 py-0.5 text-[10px] ${inputClass}`}
+                                                                        title="Copia las coordenadas de un punto que ya está en el dibujo"
+                                                                    >
+                                                                        <option value="">Usar punto del dibujo…</option>
+                                                                        {scenePoints.map((p) => (
+                                                                            <option key={p.id} value={p.id}>
+                                                                                {p.name} ({p.coords.x}, {p.coords.y}, {p.coords.z})
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+                                                                <div className="grid grid-cols-3 gap-2">
+                                                                    <input type="number" placeholder="X" value={row.value.x} onChange={(e) => row.set({ ...row.value, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                                    <input type="number" placeholder="Y" value={row.value.y} onChange={(e) => row.set({ ...row.value, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                                    <input type="number" placeholder="Z" value={row.value.z} onChange={(e) => row.set({ ...row.value, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setActiveTool('plane-3-points');
+                                                                toast('Haz clic en 3 puntos del dibujo: el plano se crea solo.');
+                                                            }}
+                                                            disabled={scenePoints.length < 3}
+                                                            title={scenePoints.length < 3 ? 'Necesitas al menos 3 puntos en el dibujo' : 'Selecciona 3 puntos existentes en el lienzo'}
+                                                            className={`w-full rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${scenePoints.length < 3
+                                                                ? `${isDark ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-400'} cursor-not-allowed`
+                                                                : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'}`}
+                                                        >
+                                                            Haz clic en 3 puntos del dibujo →
+                                                        </button>
+                                                        {scenePoints.length < 3 && (
+                                                            <p className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-gray-500'}`}>
+                                                                Hay {scenePoints.length} punto(s) en el dibujo. Crea al menos 3 o escribe sus coordenadas arriba.
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            {planeMode === 'clicks' && (
                                                 <div className="space-y-3">
-                                                    <div>
-                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 1</label>
-                                                        <div className="grid grid-cols-3 gap-2">
-                                                            <input type="number" placeholder="X" value={planeP1Str.x} onChange={(e) => setPlaneP1Str({ ...planeP1Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                            <input type="number" placeholder="Y" value={planeP1Str.y} onChange={(e) => setPlaneP1Str({ ...planeP1Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                            <input type="number" placeholder="Z" value={planeP1Str.z} onChange={(e) => setPlaneP1Str({ ...planeP1Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 2</label>
-                                                        <div className="grid grid-cols-3 gap-2">
-                                                            <input type="number" placeholder="X" value={planeP2Str.x} onChange={(e) => setPlaneP2Str({ ...planeP2Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                            <input type="number" placeholder="Y" value={planeP2Str.y} onChange={(e) => setPlaneP2Str({ ...planeP2Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                            <input type="number" placeholder="Z" value={planeP2Str.z} onChange={(e) => setPlaneP2Str({ ...planeP2Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className={`block text-xs font-medium mb-1 ${labelClass}`}>Punto 3</label>
-                                                        <div className="grid grid-cols-3 gap-2">
-                                                            <input type="number" placeholder="X" value={planeP3Str.x} onChange={(e) => setPlaneP3Str({ ...planeP3Str, x: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                            <input type="number" placeholder="Y" value={planeP3Str.y} onChange={(e) => setPlaneP3Str({ ...planeP3Str, y: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                            <input type="number" placeholder="Z" value={planeP3Str.z} onChange={(e) => setPlaneP3Str({ ...planeP3Str, z: e.target.value })} className={`px-2 py-2 border rounded text-sm ${inputClass}`} />
-                                                        </div>
-                                                    </div>
+                                                    <p className={`text-[11px] leading-snug ${isDark ? 'text-slate-400' : 'text-gray-600'}`}>
+                                                        Dibuja el plano directamente sobre el papel, sin escribir coordenadas:
+                                                        <b> dos clics debajo de la línea de tierra</b> marcan la traza horizontal α₁ y
+                                                        <b> un clic encima</b> fija la traza vertical α₂.
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setActiveTool('plane-click');
+                                                            toast('Haz 2 clics debajo de la LT y 1 encima: el plano se crea solo.');
+                                                        }}
+                                                        className="w-full rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20"
+                                                    >
+                                                        Empezar a dibujar en el lienzo →
+                                                    </button>
                                                 </div>
                                             )}
 

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainApp from './MainApp';
 import ToastHost from './components/ToastHost';
+import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import { useThemeInitializer } from './hooks/useThemeSync';
 
 // Las páginas secundarias se cargan solo al entrar: la app (3D) pesa lo suyo
@@ -54,6 +55,7 @@ function App() {
             </Routes>
             </Suspense>
             <ToastHost />
+            <PwaUpdatePrompt />
         </BrowserRouter>
     );
 }

@@ -8,6 +8,9 @@ export default defineConfig({
     // PWA: instalable y con el núcleo cacheado para clase (wifi malo).
     VitePWA({
       registerType: 'autoUpdate',
+      // La registración la hace <PwaUpdatePrompt /> (virtual:pwa-register/react)
+      // para poder avisar de la versión nueva en vez de dejar el shell viejo.
+      injectRegister: null,
       includeAssets: ['logo-128.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Diédrico Studio',
@@ -44,10 +47,23 @@ export default defineConfig({
         skipWaiting: true,
         runtimeCaching: [
           {
-            // Láminas: se usan sin conexión una vez abiertas
+            // Láminas: se usan sin conexión una vez abiertas (va antes que la
+            // regla de navegaciones, que si no la capturaría).
             urlPattern: /\/Laminas_automaticas\.html$/,
             handler: 'StaleWhileRevalidate',
             options: { cacheName: 'laminas' },
+          },
+          {
+            // Navegaciones: primero la red y, si falla o tarda, lo cacheado.
+            // Así un despliegue nuevo se ve al recargar sin esperar a que el
+            // service worker viejo se jubile (era el "no me salen los cambios").
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
           },
         ],
       },

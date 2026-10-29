@@ -191,7 +191,7 @@ export default function GuidePage() {
                                 <li><b className="text-white">Punto</b>: introduces la <b>coordenada X</b> (lateralidad: a lo largo de la línea de tierra), la <b>Y</b> (alejamiento) y la <b>Z</b> (cota). El nombre es opcional; si lo dejas vacío se numera solo.</li>
                                 <li><b className="text-white">Recta</b>: por <b>2 puntos</b> o por <b>punto + dirección</b>. Si dejas un punto vacío, la recta es infinita.</li>
                                 <li><b className="text-white">Segmento</b>: elige dos puntos ya existentes en el lienzo.</li>
-                                <li><b className="text-white">Plano</b>: por <b>trazas</b> o por <b>punto y normal</b>. También puedes construirlo con 3 puntos, o <b>dibujarlo con el ratón</b> desde <i>Herramientas → Planos → Dibujar plano con 3 clics</i>.</li>
+                                <li><b className="text-white">Plano</b>: por <b>trazas</b>, <b>punto y normal</b>, <b>3 puntos</b> o <b>dibujándolo con 3 clics</b>. En <i>Añadir → Plano</i> tienes todos los modos; en «3 Puntos» puedes escribir las coordenadas, elegir puntos que ya estén en el dibujo o pulsar «Haz clic en 3 puntos del dibujo» y marcarlos en el lienzo.</li>
                                 <li><b className="text-white">Sólido</b>: a mano (en el origen), con un punto como centro, con dos puntos como arista, por sus vértices (poliedro libre) o con un clic en el suelo de la vista 3D (ver el apartado siguiente).</li>
                             </ul>
                             <p className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3 text-sm">
@@ -373,17 +373,23 @@ export default function GuidePage() {
                                     <p>Elige dos puntos que definan la nueva línea de tierra y la herramienta añade el sistema auxiliar, con su nueva LT dibujada.</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Planos → Dibujar plano con 3 clics</p>
+                                    <p className="font-semibold text-white">Planos → Dibujar en el lienzo (3 clics)</p>
                                     <p>
-                                        Sin escribir coordenadas: <b className="text-white">dos clics debajo de la línea de tierra</b> marcan
+                                        Sin escribir coordenadas: elige <b className="text-white">Añadir → Plano → Dibujar en el lienzo (3 clics)</b>.
+                                        <b className="text-white"> Dos clics debajo de la línea de tierra</b> marcan
                                         la traza horizontal α₁ y <b className="text-white">un tercer clic encima</b> fija la traza vertical α₂,
                                         que pasa por el vértice. Mientras dibujas ves la traza y el vértice en verde; al tercer clic el plano
                                         queda creado con sus dos trazas.
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-white">Planos → Plano por 3 puntos existentes (3 puntos)</p>
-                                    <p>Construye el plano que contiene a tres puntos que ya tengas en el dibujo.</p>
+                                    <p className="font-semibold text-white">Planos → 3 Puntos</p>
+                                    <p>
+                                        Construye el plano que contiene a tres puntos. Puedes <b className="text-white">escribir sus coordenadas</b>,
+                                        <b className="text-white"> elegirlos de los que ya están dibujados</b> en cada campo, o pulsar
+                                        <b className="text-white"> «Haz clic en 3 puntos del dibujo»</b> y marcarlos directamente en el lienzo:
+                                        al tercero, el plano se crea solo.
+                                    </p>
                                 </div>
                                 <div>
                                     <p className="font-semibold text-white">Sólidos → Sección plana (1 sólido + 1 plano)</p>

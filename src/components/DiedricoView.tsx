@@ -1219,6 +1219,26 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                 </div>
             )}
 
+            {/* Aviso de la herramienta "plano por 3 puntos del dibujo" */}
+            {activeDistanceTool === 'plane-3-points' && (
+                <div className="absolute left-1/2 top-3 z-30 flex max-w-[92%] -translate-x-1/2 items-center gap-3 rounded-full border border-emerald-500/40 bg-slate-900/90 px-4 py-2 text-xs text-white shadow-xl">
+                    <span>
+                        {selectedForDistance.length === 0 && '1/3 · Haz clic en el primer punto del dibujo'}
+                        {selectedForDistance.length === 1 && '2/3 · Ahora el segundo punto'}
+                        {selectedForDistance.length === 2 && '3/3 · Y el tercero: el plano se crea solo'}
+                    </span>
+                    <button
+                        onClick={() => {
+                            setGeometryTool('none');
+                            clearDistanceTool();
+                        }}
+                        className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] hover:bg-white/20"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            )}
+
             {/* Grid */}
             <div className="absolute inset-0 opacity-10 pointer-events-none"
                 style={{ backgroundImage: `linear-gradient(${gridColor} 1px, transparent 1px), linear-gradient(90deg, ${gridColor} 1px, transparent 1px)`, backgroundSize: '20px 20px' }}

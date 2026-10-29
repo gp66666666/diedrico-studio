@@ -176,7 +176,18 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   *Controles de Vista* de la barra lateral; ya no hay botón flotante en la vista 2D.
 
 ## Planos con clics y secciones (2026)
-- `plane-click`: el plano se dibuja sobre el papel. Dos clics **debajo** de la LT definen la traza horizontal α₁; uno **encima** fija α₂ (pasa por el vértice). Lógica en `src/lib/planeFromClicks.ts` (con tests).
+- **Dos entradas, visibles en `Añadir → Plano`**:
+  - **«3 Puntos»**: coordenadas escritas, puntos elegidos del dibujo en cada campo o
+    botón **«Haz clic en 3 puntos del dibujo»** (herramienta `plane-3-points`, pide 3
+    selecciones y crea el plano al tercero). Al tercer clic el plano se crea solo.
+  - **«Dibujar en el lienzo (3 clics)»**: `plane-click`. Dos clics **debajo** de la LT
+    definen la traza horizontal α₁; uno **encima** fija α₂ (pasa por el vértice). Lógica
+    en `src/lib/planeFromClicks.ts` (con tests).
+- ⚠️ `ParallelismTool` filtraba por prefijos `plane-`/`line-`; eso capturaba
+  `plane-3-points` y `line-solid` y **reseteaba la herramienta al segundo clic** (el plano
+  por 3 puntos nunca se creaba). Ahora la lista vive en `src/lib/parallelismTools.ts`
+  (`isParallelismTool`) con test de regresión: si añades una herramienta nueva, **no**
+  la metas por prefijo.
 - `solid-section`: sólido + plano → polígono `polygon` en el dibujo y panel con la VM (abatimiento), área y perímetro. La sección es válida para **todos** los sólidos (son convexos): `src/lib/section.ts`, tests en `__tests__/section.test.ts` (los 10 subtipos + esfera + cono).
 - `solid-development`: desarrollo (red) del sólido completo: cubo, prisma hexagonal, pirámide, tetraedro, cilindro, cono, y octaedro/dodecaedro/icosaedro. Los tres regulares se despliegan abatiendo la malla cara a cara en `src/lib/unfold.ts` (BFS desde una cara, cada vecina se abate al otro lado de la arista; se prueba cada cara como raíz hasta dar con una red sin solapes, comprobado con SAT). `src/lib/development.ts` + `components/tools/DevelopmentTool.tsx`. La esfera no es desarrollable (se avisa en el panel).
 - `line-solid`: puntos de entrada/salida de una recta o segmento en un sólido convexo. `src/lib/lineSolid.ts` recorta el intervalo de parámetro con los semiplanos de las caras; si el extremo cae en el borde del segmento no cuenta como penetración (un segmento que acaba dentro solo tiene entrada). Tests: cubo ±1.5, tangente por vértice (1 punto), recta contenida en una arista, esfera 2r, cilindro.

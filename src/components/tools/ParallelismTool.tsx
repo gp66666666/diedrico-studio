@@ -3,13 +3,14 @@ import { useGeometryStore } from '../../store/geometryStore';
 import { LineElement, PlaneElement, PointElement } from '../../types';
 import { getNextName } from '../../utils/namingUtils';
 import { toast } from '../../lib/toast';
+import { isParallelismTool } from '../../lib/parallelismTools';
 
 export default function ParallelismTool() {
     const { activeTool, elements, addElement, setActiveTool, selectForDistance, selectedForDistance } = useGeometryStore();
 
     useEffect(() => {
         // Handle element selection via selectedForDistance
-        if (!activeTool || (!activeTool.startsWith('parallel-') && !activeTool.startsWith('perp-') && !activeTool.startsWith('plane-') && !activeTool.startsWith('line-'))) return;
+        if (!isParallelismTool(activeTool)) return;
 
         // Determine required count based on tool
         let requiredCount = 2;
