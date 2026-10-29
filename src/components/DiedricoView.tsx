@@ -27,9 +27,13 @@ import HelpGuide from './HelpGuide';
 import SketchToolbar from './SketchToolbar';
 import { toast } from '../lib/toast';
 import { projectionPalette } from '../lib/projectionColors';
-import { paperToPoint, planeFromThreeClicks } from '../lib/planeFromClicks';
+import { paperToPoint, planeFromThreeClicks, lineFromTwoClicks } from '../lib/planeFromClicks';
+import { getNextName } from '../utils/namingUtils';
 
 const SCALE = 40; // 40 pixels per unit
+
+/** Número corto para los avisos de "punto creado en (x, y, z)". */
+const fmtNum = (v: number) => String(Math.round(v * 100) / 100);
 
 // --- Types for Sketch Mode ---
 
@@ -610,6 +614,90 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
     // debajo de la LT, punto del horizontal (alejamiento); encima, del vertical (cota).
     const clickToPoint = (p: { x: number, y: number }): Vector3 => paperToPoint(p, SCALE);
 
+    // --- Punto y recta por clic ---
+    // Misma convención que el plano: el papel es la planta (debajo de la LT) o
+    // el alzado (encima). Así se puede construir sin escribir coordenadas.
+    const [lineClicks, setLineClicks] = useState<{ x: number, y: number }[]>([]);
+
+    useEffect(() => {
+        if (activeDistanceTool !== 'line-click') setLineClicks([]);
+    }, [activeDistanceTool]);
+
+    /** Busca un punto ya existente en esas coordenadas (evita duplicados). */
+    const findPointAt = (coords: Vector3): PointElement | null => {
+        const el = useGeometryStore.getState().elements.find(
+            (x): x is PointElement =>
+                x.type === 'point' &&
+                Math.hypot(x.coords.x - coords.x, x.coords.y - coords.y, x.coords.z - coords.z) < 1e-6
+        );
+        return el ?? null;
+    };
+
+    /** Crea un punto (o devuelve el que ya está en ese sitio). */
+    const createPointAt = (coords: Vector3): PointElement => {
+        const existing = findPointAt(coords);
+        if (existing) return existing;
+
+        const st = useGeometryStore.getState();
+        const name = getNextName(st.elements, 'Punto');
+        st.addElement({
+            type: 'point',
+            name,
+            coords,
+            color: '#ef4444',
+            visible: true,
+        } as PointElement);
+
+        const created = useGeometryStore.getState().elements.find((el) => el.name === name);
+        return created as PointElement;
+    };
+
+    const handlePointClick = (paper: { x: number, y: number }) => {
+        const coords = clickToPoint(paper);
+        const existing = findPointAt(coords);
+
+        if (existing) {
+            toast(`Ya hay un punto ${existing.name} en (${coords.x}, ${coords.y}, ${coords.z}).`);
+            return;
+        }
+
+        const point = createPointAt(coords);
+        toast(`${point.name} en (${fmtNum(coords.x)}, ${fmtNum(coords.y)}, ${fmtNum(coords.z)}).`);
+    };
+
+    const handleLineClick = (paper: { x: number, y: number }) => {
+        const next = [...lineClicks, paper];
+        setLineClicks(next);
+
+        if (next.length < 2) return;
+
+        const result = lineFromTwoClicks(next, SCALE);
+
+        if (!result) {
+            toast('Los dos clics están en el mismo sitio: no definen una recta.');
+            setLineClicks([]);
+            return;
+        }
+
+        const p1 = createPointAt(result.point);
+        const p2 = createPointAt(result.point2);
+
+        const st = useGeometryStore.getState();
+        const name = getNextName(st.elements, 'Recta');
+        st.addElement({
+            type: 'line',
+            name,
+            point: result.point,
+            p2: result.point2,
+            direction: result.direction,
+            color: '#3b82f6',
+            visible: true,
+        } as LineElement);
+
+        setLineClicks([]);
+        toast(`${name} por ${p1.name} y ${p2.name}.`);
+    };
+
     const handlePlaneClick = (paper: { x: number, y: number }) => {
         const step = planeClicks.length;
 
@@ -657,6 +745,16 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
 
         if (activeDistanceTool === 'plane-click') {
             handlePlaneClick(getSnapPoint(e.clientX, e.clientY));
+            return;
+        }
+
+        if (activeDistanceTool === 'point-click') {
+            handlePointClick(getSnapPoint(e.clientX, e.clientY));
+            return;
+        }
+
+        if (activeDistanceTool === 'line-click') {
+            handleLineClick(getSnapPoint(e.clientX, e.clientY));
             return;
         }
         const snapPos = getSnapPoint(e.clientX, e.clientY, p1 || undefined);
@@ -1199,6 +1297,41 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                 handleMouseUp();
             }}
         >
+            {/* Aviso de la herramienta "punto por clic" */}
+            {activeDistanceTool === 'point-click' && (
+                <div className="absolute left-1/2 top-3 z-30 flex max-w-[92%] -translate-x-1/2 items-center gap-3 rounded-full border border-emerald-500/40 bg-slate-900/90 px-4 py-2 text-xs text-white shadow-xl">
+                    <span>
+                        Haz clic en el papel para poner un punto · <b>debajo de la LT</b> = planta (alejamiento),
+                        <b> encima</b> = alzado (cota)
+                    </span>
+                    <button
+                        onClick={() => setGeometryTool('none')}
+                        className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] hover:bg-white/20"
+                    >
+                        Terminar
+                    </button>
+                </div>
+            )}
+
+            {/* Aviso de la herramienta "recta por 2 clics" */}
+            {activeDistanceTool === 'line-click' && (
+                <div className="absolute left-1/2 top-3 z-30 flex max-w-[92%] -translate-x-1/2 items-center gap-3 rounded-full border border-emerald-500/40 bg-slate-900/90 px-4 py-2 text-xs text-white shadow-xl">
+                    <span>
+                        {lineClicks.length === 0 && '1/2 · Primer punto de la recta (clic en el papel)'}
+                        {lineClicks.length === 1 && '2/2 · Segundo punto: la recta se crea sola'}
+                    </span>
+                    <button
+                        onClick={() => {
+                            setLineClicks([]);
+                            setGeometryTool('none');
+                        }}
+                        className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] hover:bg-white/20"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            )}
+
             {/* Aviso de la herramienta "plano con 3 clics" */}
             {activeDistanceTool === 'plane-click' && (
                 <div className="absolute left-1/2 top-3 z-30 flex max-w-[92%] -translate-x-1/2 items-center gap-3 rounded-full border border-emerald-500/40 bg-slate-900/90 px-4 py-2 text-xs text-white shadow-xl">
@@ -1449,6 +1582,22 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                         <PlaneClickPreview clicks={planeClicks} mouse={currentMousePos} />
                     )}
 
+                    {/* Vista previa de la recta que se está dibujando */}
+                    {activeDistanceTool === 'line-click' && lineClicks.length === 1 && currentMousePos && (
+                        <g>
+                            <circle cx={lineClicks[0].x} cy={lineClicks[0].y} r="4" fill="#22c55e" />
+                            <line
+                                x1={lineClicks[0].x}
+                                y1={lineClicks[0].y}
+                                x2={currentMousePos.x}
+                                y2={currentMousePos.y}
+                                stroke="#22c55e"
+                                strokeWidth="1.5"
+                                strokeDasharray="6 4"
+                            />
+                        </g>
+                    )}
+
                     {/* 3D Elements Projections (Always Visible) */}
                     {/* Con el modo de colores se aísla el grupo: así el alzado (cian)
                         solo se mezcla con la planta (amarillo) y el cruce sale
@@ -1465,6 +1614,13 @@ export default function DiedricoView({ mode = '2d', isSidebarOpen = false }: Die
                             }
 
                             if (activeDistanceTool === 'plane-click') return;
+                            if (activeDistanceTool === 'point-click' || activeDistanceTool === 'line-click') return;
+
+                            // El plano por 3 puntos solo entiende de puntos.
+                            if (activeDistanceTool === 'plane-3-points' && el.type !== 'point') {
+                                toast('Esta herramienta usa puntos: haz clic sobre los puntos del dibujo.');
+                                return;
+                            }
 
                             if (activeDistanceTool && activeDistanceTool !== 'none') {
                                 selectForDistance(el.id);

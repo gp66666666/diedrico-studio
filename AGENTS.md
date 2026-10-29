@@ -176,7 +176,16 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   *Controles de Vista* de la barra lateral; ya no hay botón flotante en la vista 2D.
 
 ## Planos con clics y secciones (2026)
-- **Dos entradas, visibles en `Añadir → Plano`**:
+- **Crear punto y recta con el ratón** (misma convención que el plano):
+  - `point-click`: cada clic del papel crea un punto. Debajo de la LT → horizontal
+    (alejamiento); encima → vertical (cota). Se reutiliza un punto si ya existe en
+    esas coordenadas. Entrada: `Añadir → Punto → «O poner puntos en el lienzo»`.
+  - `line-click`: dos clics definen la recta (`lineFromTwoClicks`, con tests: dos
+    clics en planta dan dirección z = 0, uno en cada plano da recta oblicua). Crea
+    los dos puntos extremos y reutiliza los que ya existan.
+    Entrada: `Añadir → Recta → «O dibujar la recta con 2 clics»`.
+  - Los tres modos cambian solos a la vista 2D si estabas en 3D.
+- **Dos entradas para el plano, visibles en `Añadir → Plano`**:
   - **«3 Puntos»**: coordenadas escritas, puntos elegidos del dibujo en cada campo o
     botón **«Haz clic en 3 puntos del dibujo»** (herramienta `plane-3-points`, pide 3
     selecciones y crea el plano al tercero). Al tercer clic el plano se crea solo.

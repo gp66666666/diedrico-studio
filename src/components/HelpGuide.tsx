@@ -38,6 +38,8 @@ export default function HelpGuide({ isOpen, onClose, isDark }: HelpGuideProps) {
             items: [
                 { name: "Punto 3D", desc: "Introduce coordenadas X, Y, Z para situar puntos en el espacio." },
                 { name: "Recta / Plano", desc: "Define elementos mediante puntos o ecuaciones." },
+                { name: "Punto por clic", desc: "En Añadir → Punto → «O poner puntos en el lienzo»: cada clic crea un punto. Debajo de la LT, en el horizontal (alejamiento); encima, en el vertical (cota)." },
+                { name: "Recta por 2 clics", desc: "En Añadir → Recta → «O dibujar la recta con 2 clics»: dos clics en el papel definen la recta y se crean sus dos puntos (reutiliza uno si ya existe ahí)." },
                 { name: "Plano con 3 puntos", desc: "En Añadir → Plano → 3 Puntos: escribe las coordenadas, elige puntos ya dibujados o pulsa «Haz clic en 3 puntos del dibujo» y márcalos en el lienzo. El plano se crea solo al tercero." },
                 { name: "Plano dibujado con 3 clics", desc: "En Añadir → Plano → Dibujar en el lienzo: dos clics debajo de la LT (traza horizontal α₁) y uno encima (traza vertical α₂)." },
                 { name: "Poliedro libre (vértices)", desc: "Para cuerpos no regulares: escribes solo sus vértices (o haces clic en los puntos del dibujo) y el programa calcula caras y aristas. Antes de crear verás cuántos vértices, aristas, caras y volumen sale." },

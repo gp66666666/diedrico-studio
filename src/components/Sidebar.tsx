@@ -8,6 +8,7 @@ import '../sidebar-theme-protection.css';
 import { useGeometryStore } from '../store/geometryStore';
 import { useThemeSync } from '../hooks/useThemeSync';
 import type { GeometryElement, PointElement, LineElement, PlaneElement } from '../types';
+import { planeFromThreePoints } from '../lib/planeMath';
 import AdvancedToolsPanel from './AdvancedToolsPanel';
 import { calculatePlaneFromTwoLines } from '../utils/mathUtils';
 import UserMenu from './Auth/UserMenu';
@@ -274,21 +275,15 @@ export default function Sidebar() {
                 const p2 = parseCoords(planeP2Str);
                 const p3 = parseCoords(planeP3Str);
 
-                const v1 = { x: p2.x - p1.x, y: p2.y - p1.y, z: p2.z - p1.z };
-                const v2 = { x: p3.x - p1.x, y: p3.y - p1.y, z: p3.z - p1.z };
+                const equation = planeFromThreePoints(p1, p2, p3);
 
-                normal = {
-                    x: v1.y * v2.z - v1.z * v2.y,
-                    y: v1.z * v2.x - v1.x * v2.z,
-                    z: v1.x * v2.y - v1.y * v2.x
-                };
-
-                if (Math.hypot(normal.x, normal.y, normal.z) < 1e-6) {
+                if (!equation) {
                     toast('Los tres puntos están alineados: no definen un plano.');
                     return;
                 }
 
-                constant = -(normal.x * p1.x + normal.y * p1.y + normal.z * p1.z);
+                normal = equation.normal;
+                constant = equation.constant;
             } else if (planeMode === 'clicks') {
                 // Este modo no crea nada desde el formulario: se dibuja sobre el lienzo.
                 setActiveTool('plane-click');
@@ -991,6 +986,19 @@ export default function Sidebar() {
                                 <button onClick={handleAddPoint} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
                                     {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Punto' : 'Añadir Punto'}
                                 </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { const next = activeTool === 'point-click' ? 'none' : 'point-click'; if (next === 'point-click' && viewMode !== '2d') setViewMode('2d'); setActiveTool(next); }}
+                                    className={`w-full rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${activeTool === 'point-click'
+                                        ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300'
+                                        : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'}`}
+                                >
+                                    {activeTool === 'point-click' ? 'Colocando puntos… (clic para parar)' : 'O poner puntos en el lienzo →'}
+                                </button>
+                                <p className={`text-[10px] leading-snug ${isDark ? 'text-slate-500' : 'text-gray-500'}`}>
+                                    Cada clic pone un punto: <b>debajo de la LT</b> en el plano horizontal (alejamiento) y
+                                    <b> encima</b> en el vertical (cota).
+                                </p>
                             </div>
                         )}
 
@@ -1090,6 +1098,19 @@ export default function Sidebar() {
                                 <button onClick={handleAddLine} className={`w-full py-2.5 ${editingElementId ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}>
                                     {editingElementId ? <Settings size={18} /> : <Plus size={18} />} {editingElementId ? 'Actualizar Recta' : 'Añadir Recta'}
                                 </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { const next = activeTool === 'line-click' ? 'none' : 'line-click'; if (next === 'line-click' && viewMode !== '2d') setViewMode('2d'); setActiveTool(next); }}
+                                    className={`w-full rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${activeTool === 'line-click'
+                                        ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300'
+                                        : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'}`}
+                                >
+                                    {activeTool === 'line-click' ? 'Dibujando recta… (clic para parar)' : 'O dibujar la recta con 2 clics →'}
+                                </button>
+                                <p className={`text-[10px] leading-snug ${isDark ? 'text-slate-500' : 'text-gray-500'}`}>
+                                    Dos clics en el lienzo definen la recta. Se crean también los dos puntos extremos
+                                    (si ya existe un punto en ese sitio, se reutiliza).
+                                </p>
 
                                 {/* Alternativa: Crear recta desde puntos existentes */}
                                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -1213,6 +1234,7 @@ export default function Sidebar() {
                                                         <button
                                                             type="button"
                                                             onClick={() => {
+                                                                if (viewMode !== '2d') setViewMode('2d');
                                                                 setActiveTool('plane-3-points');
                                                                 toast('Haz clic en 3 puntos del dibujo: el plano se crea solo.');
                                                             }}
@@ -1243,6 +1265,7 @@ export default function Sidebar() {
                                                     <button
                                                         type="button"
                                                         onClick={() => {
+                                                            if (viewMode !== '2d') setViewMode('2d');
                                                             setActiveTool('plane-click');
                                                             toast('Haz 2 clics debajo de la LT y 1 encima: el plano se crea solo.');
                                                         }}

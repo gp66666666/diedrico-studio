@@ -8,16 +8,14 @@
  */
 
 import type { Vector3 } from '../types';
+import { planeFromThreePoints, type PlaneEquation } from './planeMath';
 
 export interface PaperPoint {
     x: number;
     y: number;
 }
 
-export interface PlaneEquation {
-    normal: Vector3;
-    constant: number;
-}
+export type { PlaneEquation };
 
 /** Punto del papel (px, LT en y = 0) → punto del espacio. */
 export function paperToPoint(p: PaperPoint, scale: number): Vector3 {
@@ -28,25 +26,39 @@ export function paperToPoint(p: PaperPoint, scale: number): Vector3 {
 
 /**
  * Plano que pasa por tres clics. Devuelve `null` si están alineados.
+ *
+ * Los dos primeros clics (bajo la LT) son puntos de z = 0, o sea de la traza
+ * horizontal α₁; el tercero (sobre la LT) tiene y = 0 y pertenece a α₂.
  */
 export function planeFromThreeClicks(clicks: PaperPoint[], scale: number): PlaneEquation | null {
     if (clicks.length !== 3) return null;
 
     const [a, b, c] = clicks.map((p) => paperToPoint(p, scale));
+    return planeFromThreePoints(a, b, c);
+}
 
-    const u = { x: b.x - a.x, y: b.y - a.y, z: b.z - a.z };
-    const v = { x: c.x - a.x, y: c.y - a.y, z: c.z - a.z };
+/**
+ * Recta a partir de dos clics en el papel.
+ *
+ * Devuelve los dos puntos en el espacio y la dirección (sin normalizar, como el
+ * resto de rectas del store: `direction = B − A`). `null` si los clics coinciden.
+ */
+export function lineFromTwoClicks(
+    clicks: PaperPoint[],
+    scale: number
+): { point: Vector3; point2: Vector3; direction: Vector3 } | null {
+    if (clicks.length !== 2) return null;
 
-    const normal = {
-        x: u.y * v.z - u.z * v.y,
-        y: u.z * v.x - u.x * v.z,
-        z: u.x * v.y - u.y * v.x,
+    const point = paperToPoint(clicks[0], scale);
+    const point2 = paperToPoint(clicks[1], scale);
+
+    const direction = {
+        x: point2.x - point.x,
+        y: point2.y - point.y,
+        z: point2.z - point.z,
     };
 
-    if (Math.hypot(normal.x, normal.y, normal.z) < 1e-6) return null;
+    if (Math.hypot(direction.x, direction.y, direction.z) < 1e-9) return null;
 
-    return {
-        normal,
-        constant: -(normal.x * a.x + normal.y * a.y + normal.z * a.z),
-    };
+    return { point, point2, direction };
 }
