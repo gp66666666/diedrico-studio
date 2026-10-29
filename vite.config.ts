@@ -18,6 +18,9 @@ export default defineConfig({
       // La registración la hace <PwaUpdatePrompt /> (virtual:pwa-register/react)
       // para poder avisar de la versión nueva en vez de dejar el shell viejo.
       injectRegister: null,
+      // El service worker real vive en /sw2.js: /sw.js queda reservado para el
+      // "suicida" que limpia la caché vieja de los clientes (public/sw.js).
+      filename: 'sw2.js',
       includeAssets: ['logo-128.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Diédrico Studio',
@@ -43,7 +46,7 @@ export default defineConfig({
         // El HTML por ruta que genera scripts/seo.mjs NO se precachea: se sirve
         // desde la red y, sin conexión, el service worker ya responde con el
         // index de la app (la ruta la resuelve React).
-        globIgnores: ['guia/**', 'og-image.jpg', 'Laminas_automaticas.html', '*/index.html', 'ejercicios/**'],
+        globIgnores: ['guia/**', 'og-image.jpg', 'Laminas_automaticas.html', '*/index.html', 'ejercicios/**', 'sw.js'],
         navigateFallback: '/index.html',
         // OJO: sin esta lista, el service worker responde CUALQUIER navegación
         // (incluido el iframe de las láminas) con el index de la app, y la
