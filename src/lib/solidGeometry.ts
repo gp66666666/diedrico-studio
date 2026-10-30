@@ -447,8 +447,15 @@ export function getProjectedEdges(mesh: SolidMesh, rotation?: Vec3): ProjectedEd
     const result: ProjectedEdge[] = [];
 
     edges.forEach((edge) => {
+        // El observador de la planta está arriba (mira en −z) y el del alzado
+        // está delante (mira en −y): en los dos casos ve las caras cuya normal
+        // apunta HACIA él, es decir, con componente positiva (+z y +y).
+        // OJO: en el alzado estaba con el signo cambiado y se dibujaban ocultas
+        // las aristas del vértice más cercano (el de mayor alejamiento) y
+        // visibles las del más lejano. Solo se notaba en sólidos girados: en un
+        // cubo recto las caras de delante y de atrás se superponen.
         const visibleH = edge.faces.map((fi) => faces[fi].normal.z > 1e-6);
-        const visibleV = edge.faces.map((fi) => faces[fi].normal.y < -1e-6);
+        const visibleV = edge.faces.map((fi) => faces[fi].normal.y > 1e-6);
 
         let isFeature = edge.faces.length === 1; // borde libre
         if (!isFeature && edge.faces.length === 2) {

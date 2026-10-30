@@ -256,6 +256,15 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
 - Si un paso de la IA crea un punto con un nombre que ya existe y otras coordenadas, el executor
   lo renombra (A2) y traduce los pasos siguientes (`resetNameAliases`). Sin eso, una recta nueva
   se enganchaba a un punto antiguo del mismo nombre.
+- **Visibilidad de aristas (2026-10-30)**: en `getProjectedEdges`, el observador de la planta está
+  arriba (mira en −z) y el del alzado delante (mira en −y). Una cara se ve si su normal apunta
+  hacia él: `normal.z > 0` (planta) y `normal.y > 0` (alzado). El alzado tenía el signo cambiado y
+  dibujaba ocultas las aristas del vértice más cercano (el de mayor alejamiento). En un cubo recto
+  no se notaba porque las caras de delante y de atrás se superponen; en uno girado (apoyado en un
+  plano oblicuo) el diédrico salía al revés. Lo vigila `src/lib/__tests__/solidVisibility.test.ts`,
+  que comprueba la visibilidad por dentro/fuera del sólido, no repitiendo la misma fórmula.
+- En el panel de sólidos, el campo del cubo es la ARISTA (`src/lib/solidSizes.ts`): `size.x` es
+  1,5 veces la arista por compatibilidad, pero el alumno escribe y lee la arista de verdad.
 - Cada herramienta declara cuántos elementos consume en `selectionCountForTool` (geometryStore).
   Si añades una herramienta nueva, añádela ahí o se quedará esperando selección para siempre.
 

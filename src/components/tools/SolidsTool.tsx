@@ -4,6 +4,7 @@ import { useGeometryStore } from '../../store/geometryStore';
 import { Box, Maximize2, X, ArrowDownToLine, ArrowLeftToLine, Move3d, Hand, ChevronDown, ChevronUp, Crosshair, Ruler, Shapes } from 'lucide-react';
 import type { SolidElement, PointElement, PlaneElement, LineElement } from '../../types';
 import { makeSolid, isSolidCreationTool, makePolyhedron } from '../../lib/solidFactory';
+import { displaySizeX, sizeXFromDisplay } from '../../lib/solidSizes';
 import { parseVertexInput } from '../../lib/parseVertices';
 import { countEdges, polyhedronFromPoints } from '../../lib/freePolyhedron';
 import { meshVolume, solidMesh } from '../../lib/solidGeometry';
@@ -79,7 +80,7 @@ const toPane = (solid: SolidElement): Pane => ({
     px: fmt(solid.position.x),
     py: fmt(solid.position.y),
     pz: fmt(solid.position.z),
-    sx: fmt(solid.size.x),
+    sx: fmt(displaySizeX(solid.subtype, solid.size.x)),
     sy: fmt(solid.size.y),
     rx: fmt(toDeg(solid.rotation?.x ?? 0)),
     ry: fmt(toDeg(solid.rotation?.y ?? 0)),
@@ -395,7 +396,7 @@ export default function SolidsTool() {
             px: keep(prev.px, s.position.x),
             py: keep(prev.py, s.position.y),
             pz: keep(prev.pz, s.position.z),
-            sx: keep(prev.sx, s.size.x),
+            sx: keep(prev.sx, displaySizeX(s.subtype, s.size.x)),
             sy: keep(prev.sy, s.size.y),
             rx: keep(prev.rx, toDeg(rot.x)),
             ry: keep(prev.ry, toDeg(rot.y)),
@@ -421,7 +422,7 @@ export default function SolidsTool() {
             case 'px': updateElement(solid.id, { position: { ...solid.position, x: value } }); break;
             case 'py': updateElement(solid.id, { position: { ...solid.position, y: value } }); break;
             case 'pz': updateElement(solid.id, { position: { ...solid.position, z: value } }); break;
-            case 'sx': updateElement(solid.id, { size: { ...solid.size, x: value } }); break;
+            case 'sx': updateElement(solid.id, { size: { ...solid.size, x: sizeXFromDisplay(solid.subtype, value) } }); break;
             case 'sy': updateElement(solid.id, { size: { ...solid.size, y: value } }); break;
             case 'rx': updateElement(solid.id, { rotation: { ...rotation, x: toRad(value) } }); break;
             case 'ry': updateElement(solid.id, { rotation: { ...rotation, y: toRad(value) } }); break;
@@ -738,17 +739,13 @@ export default function SolidsTool() {
                                 <label className="block">
                                     <span className="label-text mb-1 block">
                                         {solid.subtype === 'cube'
-                                            ? 'Tamaño'
+                                            ? 'Arista'
                                             : ['prism', 'cylinder', 'cone', 'pyramid', 'tetrahedron'].includes(solid.subtype)
                                                 ? 'Radio de la base'
                                                 : 'Radio'}
                                     </span>
                                     <input type="number" min="0.1" step="0.1" inputMode="decimal" value={pane?.sx ?? ''} onChange={(e) => setField('sx', e.target.value)} className="w-full rounded-lg px-2 py-1.5 text-sm" />
-                                    {solid.subtype === 'cube' && (
-                                        <span className="mt-1 block text-[10px] text-white/50">
-                                            Arista: {(solid.size.x * 1.5).toFixed(2)} u
-                                        </span>
-                                    )}
+
                                 </label>
                                 {HAS_HEIGHT.includes(solid.subtype) && (
                                     <label className="block">
