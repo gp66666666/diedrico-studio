@@ -263,6 +263,21 @@ Proyecto `zrfmltqfunizhudkekdc` (`eu-west-1`, Postgres 17). Tablas en `public`:
   no se notaba porque las caras de delante y de atrás se superponen; en uno girado (apoyado en un
   plano oblicuo) el diédrico salía al revés. Lo vigila `src/lib/__tests__/solidVisibility.test.ts`,
   que comprueba la visibilidad por dentro/fuera del sólido, no repitiendo la misma fórmula.
+- **Volumen de la malla (2026-10-30)**: `hullFaces` ordenaba las caras de cada poliedro con un
+  sentido arbitrario. `meshVolume` suma tetraedros con signo, así que las caras se cancelaban:
+  el cubo daba un tercio de su volumen, el octaedro y el icosaedro daban 0. Ahora `hullFaces`
+  deja todas las caras hacia fuera y `meshVolume` orienta cada cara respecto al centro del cuerpo,
+  así que también acierta con mallas antiguas o escritas a mano.
+- **Apoyar por arista en α₁ (2026-10-30)**: solo probaba una arista de la cara que más miraba
+  abajo. En caras triangulares o pentagonales no hay otra paralela que elegir y, en cuerpos más
+  anchos que una cara (icosaedro, esfera), parte del sólido quedaba por debajo del PH. Ahora
+  prueba todas las caras, sus aristas y los dos sentidos de giro, y devuelve `null` si ninguna
+  colocación deja todo el cuerpo por encima del papel: mejor avisar que dibujarlo atravesando el
+  suelo. Lo vigila `src/lib/__tests__/generationAudit.test.ts`.
+- `src/lib/__tests__/generationAudit.test.ts` es la auditoría de generación: mallas cerradas y
+  planas, volúmenes, proyección contra oclusión por rayos, apoyos, secciones, intersecciones,
+  recta-sólido y desarrollos, con miles de casos aleatorios de semilla fija. Si tocas geometría,
+  pásala antes de dar nada por bueno.
 - En el panel de sólidos, el campo del cubo es la ARISTA (`src/lib/solidSizes.ts`): `size.x` es
   1,5 veces la arista por compatibilidad, pero el alumno escribe y lee la arista de verdad.
 - Cada herramienta declara cuántos elementos consume en `selectionCountForTool` (geometryStore).

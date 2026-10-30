@@ -656,7 +656,7 @@ export default function SolidsTool() {
                                         const res = restSolidOnPlane(solid, plane, restMode);
                                         if (!res) {
                                             toast(restMode === 'edge'
-                                                ? 'Ese plano es horizontal: no tiene traza α₁. Prueba «Por cara» o «Por vértice».'
+                                                ? 'No se puede apoyar por arista: o el plano es horizontal (no tiene traza α₁) o el sólido quedaría por debajo del PH. Prueba «Por cara» o «Por vértice».'
                                                 : 'No se ha podido apoyar el sólido en ese plano.');
                                             return;
                                         }

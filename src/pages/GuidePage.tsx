@@ -273,7 +273,9 @@ export default function GuidePage() {
                                 la traza horizontal: es el caso del cubo apoyado en un plano oblicuo con dos vértices en el papel.
                                 <b className="text-white"> Por vértice</b> solo baja el sólido hasta que el vértice más bajo toque el plano,
                                 sin girarlo. Vale para cualquier sólido y para planos horizontales, verticales u oblicuos; si el plano es
-                                horizontal y pides arista, te avisa de que no tiene α₁.
+                                horizontal y pides arista, te avisa de que no tiene α₁. Si con esa cara el sólido quedaría por debajo del
+                                papel (cuerpos muy redondos en planos muy inclinados), tampoco lo coloca: prefiere avisar a dibujarlo
+                                atravesando el PH. Prueba entonces «Por cara» o gira el sólido antes de apoyarlo.
                             </p>
 
                             <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm">

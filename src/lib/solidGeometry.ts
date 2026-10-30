@@ -109,6 +109,12 @@ function hullFaces(vertices: Vec3[]): number[][] {
                     return Math.atan2(dot(pv, w), dot(pv, u)) - Math.atan2(dot(qv, w), dot(qv, u));
                 });
 
+                // Sentido consistente hacia fuera: el resto de vértices queda
+                // por encima del plano, así que la normal hacia fuera es -normal.
+                // Sin esto, `meshVolume` (suma de tetraedros con signo) cancelaba
+                // caras y daba 0 en el octaedro o un tercio en el cubo.
+                if (above > 0) ordered.reverse();
+
                 faces.push(ordered);
             }
         }
@@ -370,20 +376,63 @@ export interface SolidFaceInfo {
  * ha escrito bien los vértices, el número cuadra con lo que ve dibujado.
  */
 export function meshVolume(mesh: SolidMesh): number {
+    if (!mesh.faces.length) return 0;
+
+    // Centro del cuerpo: sirve para saber hacia dónde mira cada cara aunque la
+    // malla venga con las caras en sentidos mezclados (poliedros libres,
+    // caras heredadas de proyectos antiguos…).
+    const used = new Set<number>();
+    mesh.faces.forEach((face) => face.forEach((i) => used.add(i)));
+    if (!used.size) return 0;
+    let cx = 0;
+    let cy = 0;
+    let cz = 0;
+    used.forEach((i) => {
+        const v = mesh.vertices[i];
+        cx += v.x;
+        cy += v.y;
+        cz += v.z;
+    });
+    const center = { x: cx / used.size, y: cy / used.size, z: cz / used.size };
+
     let total = 0;
     for (const face of mesh.faces) {
+        if (face.length < 3) continue;
         const a = mesh.vertices[face[0]];
         if (!a) continue;
+
+        // Newell para el sentido de la cara y centro de la cara.
+        let nx = 0;
+        let ny = 0;
+        let nz = 0;
+        let fx = 0;
+        let fy = 0;
+        let fz = 0;
+        for (let i = 0; i < face.length; i++) {
+            const p = mesh.vertices[face[i]];
+            const q = mesh.vertices[face[(i + 1) % face.length]];
+            nx += (p.y - q.y) * (p.z + q.z);
+            ny += (p.z - q.z) * (p.x + q.x);
+            nz += (p.x - q.x) * (p.y + q.y);
+            fx += p.x;
+            fy += p.y;
+            fz += p.z;
+        }
+        const fc = { x: fx / face.length, y: fy / face.length, z: fz / face.length };
+        const outward = dot({ x: nx, y: ny, z: nz }, sub(fc, center)) >= 0 ? 1 : -1;
+
+        let signed = 0;
         for (let i = 1; i < face.length - 1; i++) {
             const b = mesh.vertices[face[i]];
             const c = mesh.vertices[face[i + 1]];
             if (!b || !c) continue;
-            total +=
+            signed +=
                 (a.x * (b.y * c.z - b.z * c.y) -
                     a.y * (b.x * c.z - b.z * c.x) +
                     a.z * (b.x * c.y - b.y * c.x)) /
                 6;
         }
+        total += outward * signed;
     }
     return Math.abs(total);
 }

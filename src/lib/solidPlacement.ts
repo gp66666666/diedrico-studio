@@ -283,45 +283,71 @@ export function restSolidOnPlane(
         const d0 = vcross(n, vertical);
         if (vnorm(d0) < 1e-6) return null; // plano horizontal: no hay α₁
         const d = vunit(d0);
-
-        // 1) Girar alrededor de n hasta que una arista de la cara sea paralela
-        //    a α₁ (se toma la primera; luego se elige la más baja de las dos).
-        const [ia0, ib0] = [support.indices[0], support.indices[1]];
-        const verts0 = worldOf(R);
-        const edgeDir0 = vunit(vsub(verts0[ib0], verts0[ia0]));
-        const angle = Math.atan2(vdot(vcross(edgeDir0, d), n), vdot(edgeDir0, d));
-        R = matMul(rotationAxis(n, angle), R);
-
-        // 2) De las aristas ya paralelas a α₁, la de menor cota: al llevarla a
-        //    la traza, el resto del sólido queda por encima del PH.
-        const verts2 = worldOf(R);
-        let bestEdge: [number, number] | null = null;
-        let lowest = Infinity;
-        for (let i = 0; i < support.indices.length; i++) {
-            const a = support.indices[i];
-            const b = support.indices[(i + 1) % support.indices.length];
-            const dir = vunit(vsub(verts2[b], verts2[a]));
-            if (Math.abs(vdot(dir, d)) < 0.999) continue;
-            const mid = vmul(vadd(verts2[a], verts2[b]), 0.5);
-            if (mid.z < lowest) {
-                lowest = mid.z;
-                bestEdge = [a, b];
-            }
-        }
-        if (!bestEdge) return null;
-
-        // 3) Trasladar para que esa arista caiga en α₁ (z = 0 y en el plano).
-        const [ia, ib] = bestEdge;
-        const mid = vmul(vadd(verts2[ia], verts2[ib]), 0.5);
-        const onPlane = vadd(mid, vmul(n, -(vdot(n, mid) + c)));
         let u = vunit(vcross(n, d));
         if (u.z < 0) u = vmul(u, -1);
-        const drop = Math.abs(u.z) > 1e-9 ? onPlane.z / u.z : 0;
-        const target = vadd(onPlane, vmul(u, -drop));
-        return {
-            position: vadd(basePosition, vsub(target, mid)),
-            rotation: rotationFromMatrix(R),
+
+        // z del vértice más bajo para un giro dado (fila z de la matriz).
+        const minZOf = (m: Mat3) => {
+            let min = Infinity;
+            for (const v of mesh.vertices) {
+                const z = m[6] * v.x + m[7] * v.y + m[8] * v.z;
+                if (z < min) min = z;
+            }
+            return min;
         };
+
+        // No siempre vale la cara que más mira hacia abajo: en cuerpos
+        // «redondos» (icosaedro, esfera) esa cara deja el resto del cuerpo por
+        // debajo del PH. Se prueban todas las caras, sus aristas y los dos
+        // sentidos de giro, y se prefiere la colocación que deja TODO el
+        // sólido por encima del papel. Si no existe ninguna, no se apoya: es
+        // preferible avisar a dibujar un cuerpo atravesando el suelo.
+        const order = faces
+            .map((face) => ({ face, score: -vdot(matVec(R0, face.normal), n) }))
+            .filter((f) => f.score > 0) // las que miran hacia arriba no apoyan
+            .sort((a, b) => b.score - a.score);
+
+        for (const { face } of order) {
+            const align = rotationBetween(matVec(R0, face.normal), vmul(n, -1));
+            const Ra = matMul(align, R0);
+
+            let localBest: { position: Vec3; rotation: Vec3; cost: number } | null = null;
+
+            for (let e = 0; e < face.indices.length; e++) {
+                const ia = face.indices[e];
+                const ib = face.indices[(e + 1) % face.indices.length];
+                const pa = matVec(Ra, mesh.vertices[ia]);
+                const pb = matVec(Ra, mesh.vertices[ib]);
+                const dir0 = vunit(vsub(pb, pa));
+                const angle = Math.atan2(vdot(vcross(dir0, d), n), vdot(dir0, d));
+
+                for (const turn of [angle, angle + Math.PI]) {
+                    const R2 = matMul(rotationAxis(n, turn), Ra);
+                    const qa = matVec(R2, mesh.vertices[ia]);
+                    const qb = matVec(R2, mesh.vertices[ib]);
+                    const mid = vadd(basePosition, vmul(vadd(qa, qb), 0.5));
+
+                    // Trasladar para que esa arista caiga en α₁ (z = 0 y en el plano).
+                    const onPlane = vadd(mid, vmul(n, -(vdot(n, mid) + c)));
+                    const drop = Math.abs(u.z) > 1e-9 ? onPlane.z / u.z : 0;
+                    const shift = vsub(vadd(onPlane, vmul(u, -drop)), mid);
+
+                    const minZ = minZOf(R2) + basePosition.z + shift.z;
+                    if (minZ < -1e-6) continue; // se hundiría en el PH
+
+                    const cost = Math.abs(Math.atan2(Math.sin(turn), Math.cos(turn)));
+                    if (!localBest || cost < localBest.cost) {
+                        localBest = { position: vadd(basePosition, shift), rotation: rotationFromMatrix(R2), cost };
+                    }
+                }
+            }
+
+            // Primera cara (la que más mira abajo) que admite una colocación
+            // válida: no hace falta seguir probando caras peores.
+            if (localBest) return { position: localBest.position, rotation: localBest.rotation };
+        }
+
+        return null;
     }
 
     // --- cara: trasladar para que el punto más bajo toque el plano ---
